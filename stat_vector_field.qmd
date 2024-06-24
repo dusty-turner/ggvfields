@@ -1,0 +1,102 @@
+---
+title: "stat_vector_field"
+author: "Dusty Turner"
+format: html
+editor: visual
+warning: false
+message: false
+self-contained: true
+---
+
+## References
+
+1) https://github.com/jamesotto852/ggdensity
+2) https://ggplot2-book.org/extensions
+3) James's video / talk
+
+## Import Dependencies
+
+```{r}
+## want to make this not rely on all of tidyverse at some point soon
+library(tidyverse)
+```
+
+
+## Define a new ggproto object
+
+```{r}
+StatVectorField <- 
+  ggproto("StatVectorField", Stat,
+          required_aes = c("x", "y"),
+                           
+          compute_group = function(data, scales, fun = NULL, scaling_factor = 1,...) {
+            if (is.null(fun)) {
+              stop("A transformation function must be provided")
+            }
+            
+            transformed <- fun(data$x, data$y)
+            
+            data <-
+              data.frame(x = data$x,
+                         y = data$y,
+                         u = transformed[[1]],
+                         v = transformed[[2]]
+                         ) |> 
+              mutate(magnitude = sqrt(u^2 + v^2)) |>
+              mutate(u_norm = u / magnitude, v_norm = v / magnitude) |>
+              mutate(xend = x + u_norm * scaling_factor, yend = y + v_norm * scaling_factor)
+            
+            return(data)
+          }
+)
+```
+
+## Create a new function for StatVectorField ggproto object
+
+```{r}
+stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment", 
+                              position = "identity", ..., fun = NULL, 
+                              scaling_factor = 1, na.rm = FALSE, show.legend = NA, 
+                              inherit.aes = TRUE) {
+  layer(
+    stat = StatVectorField, 
+    mapping = mapping, 
+    data = data, 
+    geom = geom, 
+    position = position, 
+    show.legend = show.legend, 
+    inherit.aes = inherit.aes, 
+    params = list(na.rm = na.rm, fun = fun, scaling_factor = scaling_factor, ...)
+  )
+}
+```
+
+## Execute
+
+```{r}
+points_to_be_evaluated <- 
+  expand.grid(x = seq(-5, 5, by = 1), y = seq(-5, 5, by = 1)) |> 
+  mutate(id = c(rep(c("a","b"), 60),"a"))
+
+my_vector_transform <- function(x, y) {
+  # list(x^2, y^2)
+  list(y, -x)
+}
+
+ggplot(data = points_to_be_evaluated, aes(x = x, y = y, color = id)) +
+  stat_vector_field(fun = my_vector_transform, scaling_factor = .5, arrow = arrow(length = unit(1, "mm"))) +
+  labs(title = "Vector field for f(x,y) = <y, -x>") 
+```
+
+## Thoughts / Questions
+
+1) Usage of `geom_*` vs `stat_*`
+2) Is using `geom_segment()` the right way to go about this
+
+It may seem surprising, but creating new stats is one of the most useful ways to extend the capabilities of ggplot2. When users add new layers to a plot they most often use a geom function, and *so it is tempting as a developer to think that your ggplot2 extension should be encapsulated as a new geom*. To an extent this is true, as your users will likely want to use a geom function, but in truth the variety among different geoms is mostly due to the variety in different stats. One of the benefits of working with stats is that they are purely about data transformations. Most R users and developers are very comfortable with data transformation, which makes the task of defining a new stat easier. *As long as the desired behaviour can be encapsulated in a stat, there is no need to fiddle with any calls to grid*.
+
+---
+
+When creating new stats it is usually a good idea to provide an accompanying `geom_*()` constructor as well as the `stat_*()` constructor, because most users are accustomed to adding plot layers with geoms rather than stats. We’ll show what a geom_chull() function might look like in Section 20.3.
+
+Note that it is not always possible to define `geom_*()` constructor in a sensible way. This can happen when there is no obvious default geom for the new stat, or if the stat is intended to offer a slight modification to an existing geom/stat pair. In such cases it may be wise to provide only a `stat_*()` function.
