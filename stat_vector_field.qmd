@@ -74,16 +74,19 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
 
 ```{r}
 points_to_be_evaluated <- 
-  expand.grid(x = seq(-5, 5, by = 1), y = seq(-5, 5, by = 1)) |> 
-  mutate(id = c(rep(c("a","b"), 60),"a"))
+  expand.grid(x = seq(-50, 50, by = 10), y = seq(-50, 50, by = 10)) 
+  # mutate(id = c(rep(c("a","b"), 60),"a"))
 
-my_vector_transform <- function(x, y) {
+f <- function(x, y) {
   # list(x^2, y^2)
   list(y, -x)
 }
 
-ggplot(data = points_to_be_evaluated, aes(x = x, y = y, color = id)) +
-  stat_vector_field(fun = my_vector_transform, scaling_factor = .5, arrow = arrow(length = unit(1, "mm"))) +
+f(x = points_to_be_evaluated$x, y = points_to_be_evaluated$y)
+
+# ggplot(data = points_to_be_evaluated, aes(x = x, y = y, color = id)) +
+  ggplot(data = points_to_be_evaluated, aes(x = x, y = y)) +
+  stat_vector_field(fun = f, scaling_factor = 5, arrow = arrow(length = unit(1, "mm"))) +
   labs(title = "Vector field for f(x,y) = <y, -x>") 
 ```
 
