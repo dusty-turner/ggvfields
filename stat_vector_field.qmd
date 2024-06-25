@@ -10,9 +10,9 @@ self-contained: true
 
 ## References
 
-1) https://github.com/jamesotto852/ggdensity
-2) https://ggplot2-book.org/extensions
-3) James's video / talk
+1)  https://github.com/jamesotto852/ggdensity
+2)  https://ggplot2-book.org/extensions
+3)  James's video / talk
 
 ## Import Dependencies
 
@@ -20,7 +20,6 @@ self-contained: true
 ## want to make this not rely on all of tidyverse at some point soon
 library(tidyverse)
 ```
-
 
 ## Define a new ggproto object
 
@@ -90,13 +89,13 @@ ggplot(data = points_to_be_evaluated, aes(x = x, y = y, color = id)) +
 
 ## Thoughts / Questions
 
-1) Usage of `geom_*` vs `stat_*`
-2) Is using `geom_segment()` the right way to go about this
+1)  Usage of `geom_*` vs `stat_*`
+2)  Is using `geom_segment()` the right way to go about this
 
 It may seem surprising, but creating new stats is one of the most useful ways to extend the capabilities of ggplot2. When users add new layers to a plot they most often use a geom function, and *so it is tempting as a developer to think that your ggplot2 extension should be encapsulated as a new geom*. To an extent this is true, as your users will likely want to use a geom function, but in truth the variety among different geoms is mostly due to the variety in different stats. One of the benefits of working with stats is that they are purely about data transformations. Most R users and developers are very comfortable with data transformation, which makes the task of defining a new stat easier. *As long as the desired behaviour can be encapsulated in a stat, there is no need to fiddle with any calls to grid*.
 
----
+------------------------------------------------------------------------
 
-When creating new stats it is usually a good idea to provide an accompanying `geom_*()` constructor as well as the `stat_*()` constructor, because most users are accustomed to adding plot layers with geoms rather than stats. We’ll show what a geom_chull() function might look like in Section 20.3.
+When creating new stats it is usually a good idea to provide an accompanying `geom_*()` constructor as well as the `stat_*()` constructor, because most users are accustomed to adding plot layers with geoms rather than stats. We'll show what a geom_chull() function might look like in Section 20.3.
 
 Note that it is not always possible to define `geom_*()` constructor in a sensible way. This can happen when there is no obvious default geom for the new stat, or if the stat is intended to offer a slight modification to an existing geom/stat pair. In such cases it may be wise to provide only a `stat_*()` function.
