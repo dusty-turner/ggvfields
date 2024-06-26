@@ -26,12 +26,14 @@ library(tidyverse)
 ```{r}
 StatVectorField <- 
   ggproto("StatVectorField", Stat,
-          required_aes = c("x", "y"),
+          # required_aes = c("x", "y"),
                            
           compute_group = function(data, scales, fun = NULL, scaling_factor = 1,...) {
             if (is.null(fun)) {
               stop("A transformation function must be provided")
             }
+            
+            print("test")
             
             transformed <- fun(data$x, data$y)
             
@@ -86,8 +88,9 @@ f(x = points_to_be_evaluated$x, y = points_to_be_evaluated$y)
 
 # ggplot(data = points_to_be_evaluated, aes(x = x, y = y, color = id)) +
   ggplot(data = points_to_be_evaluated, aes(x = x, y = y)) +
-  stat_vector_field(fun = f, scaling_factor = 5, arrow = arrow(length = unit(1, "mm"))) +
-  labs(title = "Vector field for f(x,y) = <y, -x>") 
+  stat_vector_field(fun = f, scaling_factor = 5, arrow = arrow(length = unit(1, "mm"))) 
+    # gginnards::geom_debug() +
+  # labs(title = "Vector field for f(x,y) = <y, -x>")  
 ```
 
 ## Thoughts / Questions
