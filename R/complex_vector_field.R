@@ -2,6 +2,8 @@
 #'
 #' `stat_complex_vector_field` generates a vector field plot layer using a user-defined function to compute the vector components. This is particularly useful for visualizing vector fields in a two-dimensional space.
 #'
+#' @inheritParams ggplot2::geom_raster
+#' @inheritParams ggplot2::stat_identity
 #' @param fun A user-defined function that takes a complex number as input and returns a complex number.
 #' @param relim A numeric vector of length 2 giving the real-axis limits.
 #' @param imlim A numeric vector of length 2 giving the imaginary-axis limits.
@@ -10,6 +12,7 @@
 #' @return A ggplot2 layer that can be added to a ggplot object to produce a vector field plot.
 #' @export
 #' @import ggplot2
+#' @importFrom farver encode_colour
 #'
 #' @examples
 #' library(ggplot2)
@@ -20,6 +23,32 @@
 #' ggplot() +
 #'   geom_complex_vector_field(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100)
 #'
+
+stat_complex_vector_field <- function(mapping = NULL, data = NULL, geom = "raster",
+                                      position = "identity", na.rm = FALSE,
+                                      show.legend = NA, inherit.aes = TRUE,
+                                      fun, relim, imlim, n = 10, ...) {
+
+  if (is.null(data)) data <- ensure_nonempty_data
+
+  layer(
+    stat = StatComplexVectorField,
+    data = data,
+    mapping = mapping,
+    geom = "raster",
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      fun = fun,
+      relim = relim,
+      imlim = imlim,
+      n = n,
+      na.rm = na.rm,
+      ...
+    )
+  )
+}
 
 StatComplexVectorField <- ggproto("StatComplexVectorField", Stat,
 

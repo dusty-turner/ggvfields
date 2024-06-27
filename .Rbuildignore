@@ -1,3 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 dusty_files*
+^README\.Rmd$
+^README_cache$
+^docs$

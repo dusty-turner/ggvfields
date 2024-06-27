@@ -2,7 +2,8 @@
 #'
 #' `stat_vector_field` generates a vector field plot layer using a user-defined function to compute the vector components. This is particularly useful for visualizing vector fields in a two-dimensional space.
 #'
-#' @inheritParams ggplot2::geom_segment
+#' @inheritParams ggplot2::geom_raster
+#' @inheritParams ggplot2::stat_identity
 #' @param fun A user-defined function that takes two arguments (x and y coordinates) and returns a list of two components: the x and y components of the vector field.
 #' @param xlim A numeric vector of length 2 giving the x-axis limits.
 #' @param ylim A numeric vector of length 2 giving the y-axis limits.

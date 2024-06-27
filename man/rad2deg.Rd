@@ -17,8 +17,4 @@ The angle in degrees.
 \description{
 This function converts an angle from radians to degrees.
 }
-\examples{
-rad2deg(pi) # Returns 180
-rad2deg(pi / 2) # Returns 90
-
-}
+\keyword{internal}

@@ -23,12 +23,9 @@ ensure_nonempty_data <- function(data) {
 #' @param x, y Numeric values to be multiplied.
 #'
 #' @return The product of x and y.
-#'
 #' @keywords internal
 #'
 times <- `*`
-
-rad2deg <- function(rad, rotate = 0) ((rad + rotate) * 360/(2*pi)) %% 360
 
 #' Radians to Degrees Conversion
 #'
@@ -38,13 +35,7 @@ rad2deg <- function(rad, rotate = 0) ((rad + rotate) * 360/(2*pi)) %% 360
 #' @param rotate A numeric value to rotate the angle. Default is 0.
 #'
 #' @return The angle in degrees.
+#' @keywords internal
 #'
-#' @examples
-#' rad2deg(pi) # Returns 180
-#' rad2deg(pi / 2) # Returns 90
-#'
-#' @export
-#'
-rad2deg <- function(rad, rotate = 0) {
-  ((rad + rotate) * 360 / (2 * pi)) %% 360
-}
+
+rad2deg <- function(rad, rotate = 0) ((rad + rotate) * 360/(2*pi)) %% 360
