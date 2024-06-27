@@ -34,4 +34,4 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-Date: "27 June 2024"
+Date: 2024-06-27

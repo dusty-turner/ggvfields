@@ -20,7 +20,8 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-ggvfields provides tools for visualizing vector fields, complex numbers, dual numbers, and more. The package is designed to be user-friendly and extendable, making it easy to create detailed and informative plots for a variety of mathematical constructs.
+ggvfields provides tools for visualizing vector fields, complex numbers, and soon dual numbers and more. 
+
 
 ## Installation
 
