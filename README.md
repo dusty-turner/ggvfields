@@ -46,7 +46,8 @@ f <- function(x, y) {
 
 # Create a ggplot with the vector field layer
 ggplot() +
-  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20)
+  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20) +
+  coord_fixed()
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
@@ -68,7 +69,8 @@ f <- function(z) (z^2 + 1) / (z^2 - 1)
 # Create a ggplot with the complex vector field layer
 ggplot() +
   geom_complex_vector_field(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) +
-  labs(x = "Real", y = "Imaginary")
+  labs(x = "Real", y = "Imaginary") +
+  coord_fixed()
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
