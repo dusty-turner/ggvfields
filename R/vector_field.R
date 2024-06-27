@@ -93,7 +93,33 @@ StatVectorField <- ggproto("StatVectorField", Stat,
 
 )
 
-
+#' Create a Vector Field Geom Layer
+#'
+#' `geom_vector_field` generates a vector field plot layer using a user-defined function to compute the vector components. This is particularly useful for visualizing vector fields in a two-dimensional space.
+#'
+#' @inheritParams ggplot2::geom_segment
+#' @param fun A user-defined function that takes two arguments (x and y coordinates) and returns a list of two components: the x and y components of the vector field.
+#' @param xlim A numeric vector of length 2 giving the x-axis limits.
+#' @param ylim A numeric vector of length 2 giving the y-axis limits.
+#' @param n An integer specifying the number of grid points along each axis.
+#'
+#' @return A ggplot2 layer that can be added to a ggplot object to produce a vector field plot.
+#' @export
+#' @import ggplot2
+#'
+#' @examples
+#' library(ggplot2)
+#' # Example user-defined function
+#' f <- function(x, y) {
+#'   u <- -y
+#'   v <- x
+#'   list(u, v)
+#' }
+#'
+#' # Create a ggplot with the vector field layer
+#' ggplot() +
+#'   geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20)
+#'
 geom_vector_field <- function(mapping = NULL, data = NULL,
                               stat = "vectorfield",
                               position = "identity", na.rm = FALSE,
