@@ -22,10 +22,13 @@ devtools::install_github("dusty-turner/ggvfields")
 
 ### `geom_vector_field`
 
-The `geom_vector_field` function also generates a vector field plot
-layer using a user-defined function to compute the vector components.
-This function can be used similarly to `stat_vector_field` but provides
-more flexibility in terms of ggplot2 layering and customization.
+The `geom_vector_field` function generates a vector field plot layer
+using a user-defined function to compute the vector components. This
+function abstracts away the mathematical computations required to
+generate the vector field, so the user does not need to manually
+calculate and input the vector components into `geom_segment`. It
+simplifies the process, making it easier to create vector field
+visualizations without dealing with the underlying math.
 
 ``` r
 # Create a ggplot with the vector field layer
