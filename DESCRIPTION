@@ -1,14 +1,33 @@
 Package: ggvfields
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Vector Field Visualizations with ggplot2
 Version: 0.1.0
-Author: Dusty Turner, David Kahle, Rodney Sturdivant
-Maintainer: <dusty.s.turner@gmail.com>
-Description: More to follow
-License: What license is it under?
+Authors@R: 
+    c(person(given = "Dusty",
+           family = "Turner",
+           role = c("aut", "cre"),
+           email = "dusty.s.turner@gmail.com"),
+      person(given = "David",
+           family = "Kahle",
+           role = c("aut"),
+           email = "david_kahle@baylor.edu"),
+      person(given = "Rodney",
+           family = "Sturdivant",
+           role = c("aut"),
+           email = "rodney_sturdivant@baylor.edu"))
+Maintainer: Dusty Turner <dusty.s.turner@gmail.com>
+Description: A ggplot2 extension for visualizing vector fields in a two-dimensional space. 
+             Provides functions to create vector field layers using user-defined vector field functions.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Imports:
-    ggplot2 (>= 3.3.0),
-    dplyr (>= 1.0.0)
+    ggplot2 (>= 3.3.0)
+URL: https://github.com/dusty-turner/ggvfields
+BugReports: https://github.com/dusty-turner/ggvfields/issues
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

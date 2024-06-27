@@ -2,24 +2,93 @@
 % Please edit documentation in R/stat_vector_field.R
 \name{stat_vector_field}
 \alias{stat_vector_field}
-\title{stat_vector_field}
+\title{Create a Vector Field Plot Layer}
 \usage{
 stat_vector_field(
   mapping = NULL,
   data = NULL,
   geom = "segment",
   position = "identity",
-  ...,
-  fun = NULL,
-  scaling_factor = 1,
   na.rm = FALSE,
   show.legend = NA,
-  inherit.aes = TRUE
+  inherit.aes = TRUE,
+  fun,
+  xlim,
+  ylim,
+  n = 10,
+  ...
 )
 }
 \arguments{
-\item{inherit.aes}{}
+\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and
+\code{inherit.aes = TRUE} (the default), it is combined with the default mapping
+at the top level of the plot. You must supply \code{mapping} if there is no plot
+mapping.}
+
+\item{data}{The data to be displayed in this layer. There are three
+options:
+
+If \code{NULL}, the default, the data is inherited from the plot
+data as specified in the call to \code{\link[ggplot2:ggplot]{ggplot()}}.
+
+A \code{data.frame}, or other object, will override the plot
+data. All objects will be fortified to produce a data frame. See
+\code{\link[ggplot2:fortify]{fortify()}} for which variables will be created.
+
+A \code{function} will be called with a single argument,
+the plot data. The return value must be a \code{data.frame}, and
+will be used as the layer data. A \code{function} can be created
+from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
+
+\item{position}{Position adjustment, either as a string naming the adjustment
+(e.g. \code{"jitter"} to use \code{position_jitter}), or the result of a call to a
+position adjustment function. Use the latter if you need to change the
+settings of the adjustment.}
+
+\item{na.rm}{If \code{FALSE}, the default, missing values are removed with
+a warning. If \code{TRUE}, missing values are silently removed.}
+
+\item{show.legend}{logical. Should this layer be included in the legends?
+\code{NA}, the default, includes if any aesthetics are mapped.
+\code{FALSE} never includes, and \code{TRUE} always includes.
+It can also be a named logical vector to finely select the aesthetics to
+display.}
+
+\item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
+rather than combining with them. This is most useful for helper functions
+that define both data and aesthetics and shouldn't inherit behaviour from
+the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
+
+\item{fun}{A user-defined function that takes two arguments (x and y coordinates) and returns a list of two components: the x and y components of the vector field.}
+
+\item{xlim}{A numeric vector of length 2 giving the x-axis limits.}
+
+\item{ylim}{A numeric vector of length 2 giving the y-axis limits.}
+
+\item{n}{An integer specifying the number of grid points along each axis.}
+
+\item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}. These are
+often aesthetics, used to set an aesthetic to a fixed value, like
+\code{colour = "red"} or \code{size = 3}. They may also be parameters
+to the paired geom/stat.}
+}
+\value{
+A ggplot2 layer that can be added to a ggplot object to produce a vector field plot.
 }
 \description{
-stat_vector_field
+\code{stat_vector_field} generates a vector field plot layer using a user-defined function to compute the vector components. This is particularly useful for visualizing vector fields in a two-dimensional space.
+}
+\examples{
+library(ggplot2)
+# Example user-defined function
+f <- function(x, y) {
+  u <- -y
+  v <- x
+  list(u, v)
+}
+
+# Create a ggplot with the vector field layer
+ggplot() +
+  stat_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20)
+
 }
