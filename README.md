@@ -35,16 +35,7 @@ simplifies the process, making it easier to create vector field
 visualizations without dealing with the underlying math.
 
 ``` r
-library(tidyverse)
-#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-#> ✔ dplyr     1.1.2     ✔ readr     2.1.4
-#> ✔ forcats   1.0.0     ✔ stringr   1.5.0
-#> ✔ lubridate 1.9.2     ✔ tibble    3.2.1
-#> ✔ purrr     1.0.1     ✔ tidyr     1.3.0
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ dplyr::filter() masks stats::filter()
-#> ✖ dplyr::lag()    masks stats::lag()
-#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+library(ggplot2)
 
 # custom function
 f <- function(x, y) {
@@ -74,7 +65,6 @@ with the underlying math.
 # custom function
 f <- function(z) (z^2 + 1) / (z^2 - 1)
 
-library(tidyverse)
 # Create a ggplot with the complex vector field layer
 ggplot() +
   geom_complex_vector_field(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) +
