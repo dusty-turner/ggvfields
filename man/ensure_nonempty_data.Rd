@@ -13,6 +13,6 @@ ensure_nonempty_data(data)
 A data frame. If the input data is empty, returns a default data frame with a single row.
 }
 \description{
-This function ensures that the data is non-empty. If the input data is empty, it returns a default data frame.  ggplot2 layers require a data argument but this allows layers to operate without data.
+This function ensures that the data is non-empty. If the input data is empty, it returns a default data frame. This is useful because ggplot2 layers require a data argument, and this function allows layers to operate without explicit data.
 }
 \keyword{internal}
