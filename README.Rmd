@@ -42,13 +42,13 @@ f <- function(x, y) {
 
 # create a ggplot with the vector field layer
 ggplot() +
-  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20) +
+  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20, center = TRUE) +
   coord_fixed()
 ```
 
-### `geom_complex_vector_field()`{.R}
+### `geom_complex_function()`{.R}
 
-The `geom_vector_field()`{.R} function generates a vector field plot layer using a user-defined function to compute the vector components. This function abstracts away the mathematical computations required to generate the vector field, so the user does not need to manually calculate and input the vector components into `geom_segment()`{.R}. It simplifies the process, making it easier to create vector field visualizations without dealing with the underlying math.
+The `geom_complex_function()`{.R} function generates a vector field plot layer using a user-defined function to compute the vector components. This function abstracts away the mathematical computations required to generate the vector field, so the user does not need to manually calculate and input the vector components into `geom_segment()`{.R}. It simplifies the process, making it easier to create vector field visualizations without dealing with the underlying math.
 
 ```{r}
 # custom function
@@ -56,7 +56,7 @@ f <- function(z) (z^2 + 1) / (z^2 - 1)
 
 # create a ggplot with the complex vector field layer
 ggplot() +
-  geom_complex_vector_field(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) +
+  geom_complex_function(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) +
   coord_fixed()
 ```
 

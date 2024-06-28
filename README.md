@@ -35,17 +35,17 @@ f <- function(x, y) {
 
 # create a ggplot with the vector field layer
 ggplot() +
-  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20) +
+  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20, center = TRUE) +
   coord_fixed()
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
-### `geom_complex_vector_field()`
+### `geom_complex_function()`
 
-The `geom_vector_field()` function generates a vector field plot layer
-using a user-defined function to compute the vector components. This
-function abstracts away the mathematical computations required to
+The `geom_complex_function()` function generates a vector field plot
+layer using a user-defined function to compute the vector components.
+This function abstracts away the mathematical computations required to
 generate the vector field, so the user does not need to manually
 calculate and input the vector components into `geom_segment()`. It
 simplifies the process, making it easier to create vector field
@@ -57,7 +57,7 @@ f <- function(z) (z^2 + 1) / (z^2 - 1)
 
 # create a ggplot with the complex vector field layer
 ggplot() +
-  geom_complex_vector_field(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) +
+  geom_complex_function(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) +
   coord_fixed()
 ```
 
