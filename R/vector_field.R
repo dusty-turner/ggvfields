@@ -1,21 +1,20 @@
 #' Create a Vector Field Plot Layer
 #'
-#' `stat_vector_field` generates a vector field plot layer using a user-defined function to compute the vector components. This is particularly useful for visualizing vector fields in a two-dimensional space.
-#'
+#' [stat_vector_field()] generates a vector field plot layer using a
+#' user-defined function to compute the vector components. This is particularly
+#' useful for visualizing vector fields in a two-dimensional space.
 #' @inheritParams ggplot2::geom_raster
 #' @inheritParams ggplot2::stat_identity
-#' @param fun A user-defined function that takes two arguments (x and y coordinates) and returns a list of two components: the x and y components of the vector field.
-#' @param xlim A numeric vector of length 2 giving the x-axis limits.
-#' @param ylim A numeric vector of length 2 giving the y-axis limits.
+#' @param fun A user-defined function that takes two arguments (x and y
+#'   coordinates) and returns a list of two components: the x and y components
+#'   of the vector field.
+#' @param xlim,ylim A numeric vector of length 2 giving the x-axis limits.
 #' @param n An integer specifying the number of grid points along each axis.
-#'
-#' @return A ggplot2 layer that can be added to a ggplot object to produce a vector field plot.
-#' @export
-#' @import ggplot2
-#'
+#' @return A ggplot2 layer that can be added to a ggplot object to produce a
+#'   vector field plot.
 #' @examples
-#' library(ggplot2)
-#' # Example user-defined function
+#'
+#' # example user-defined function
 #' f <- function(x, y) {
 #'   u <- -y
 #'   v <- x
@@ -27,6 +26,10 @@
 #'   stat_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20)
 #'
 
+
+
+
+#' @export
 stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
                               position = "identity", na.rm = FALSE,
                               show.legend = NA, inherit.aes = TRUE,
@@ -57,54 +60,64 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
 
 StatVectorField <- ggproto("StatVectorField", Stat,
 
-                           # setup_data = cpt_data,
+  # setup_data = cpt_data,
 
-                           # required_aes = c("x","y"),
+  # required_aes = c("x","y"),
 
-                           compute_group = function(data, scales, fun, xlim, ylim, n = n) {
-                             # Create a sequence of x and y values within the limits
-                             x_seq <- seq(xlim[1], xlim[2], length.out = n)
-                             y_seq <- seq(ylim[1], ylim[2], length.out = n)
-                             grid <- expand.grid(x = x_seq, y = y_seq)
+  compute_group = function(data, scales, fun, xlim, ylim, n = n) {
+    # Create a sequence of x and y values within the limits
+    x_seq <- seq(xlim[1], xlim[2], length.out = n)
+    y_seq <- seq(ylim[1], ylim[2], length.out = n)
+    grid <- expand.grid(x = x_seq, y = y_seq)
 
-                             # Evaluate the function to get vector components
-                             vectors <- fun(grid$x, grid$y)
+    # Evaluate the function to get vector components
+    vectors <- fun(grid$x, grid$y)
 
-                             # Create a data frame for geom_segment
-                             data <- data.frame(
-                               x = grid$x,
-                               y = grid$y,
-                               u = vectors[[1]],
-                               v = vectors[[2]]
-                             )
+    # Create a data frame for geom_segment
+    data <- data.frame(
+      x = grid$x,
+      y = grid$y,
+      u = vectors[[1]],
+      v = vectors[[2]]
+    )
 
-                             # Calculate magnitude
-                             magnitude <- sqrt(data$u^2 + data$v^2)
+    # Calculate magnitude
+    magnitude <- sqrt(data$u^2 + data$v^2)
 
-                             # Normalize the vectors
-                             data$u_norm <- data$u / magnitude
-                             data$v_norm <- data$v / magnitude
+    # Normalize the vectors
+    data$u_norm <- data$u / magnitude
+    data$v_norm <- data$v / magnitude
 
-                             # Calculate the end points of the vectors
-                             data$xend <- data$x + data$u_norm
-                             data$yend <- data$y + data$v_norm
+    # Calculate the end points of the vectors
+    data$xend <- data$x + data$u_norm
+    data$yend <- data$y + data$v_norm
 
-                             data
-                           }
+    data
+  }
 
 )
 
+
+
+
+
+
 #' Create a Vector Field Geom Layer
 #'
-#' `geom_vector_field` generates a vector field plot layer using a user-defined function to compute the vector components. This is particularly useful for visualizing vector fields in a two-dimensional space.
+#' `geom_vector_field` generates a vector field plot layer using a user-defined
+#' function to compute the vector components. This is particularly useful for
+#' visualizing vector fields in a two-dimensional space.
 #'
 #' @inheritParams ggplot2::geom_segment
-#' @param fun A user-defined function that takes two arguments (x and y coordinates) and returns a list of two components: the x and y components of the vector field.
+#' @param fun A user-defined function that takes two arguments (x and y
+#'   coordinates) and returns a list of two components: the x and y components
+#'   of the vector field.
 #' @param xlim A numeric vector of length 2 giving the x-axis limits.
 #' @param ylim A numeric vector of length 2 giving the y-axis limits.
 #' @param n An integer specifying the number of grid points along each axis.
 #'
-#' @return A ggplot2 layer that can be added to a ggplot object to produce a vector field plot.
+#' @return A ggplot2 layer that can be added to a ggplot object to produce a
+#'   vector field plot.
 #' @export
 #' @import ggplot2
 #'
