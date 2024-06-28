@@ -38,7 +38,7 @@ NULL
 geom_complex_function <- function(mapping = NULL, data = NULL,
   stat = "complex_function",
   position = "identity", na.rm = FALSE,
-  show.legend = NA, inherit.aes = TRUE,
+  show.legend = TRUE, inherit.aes = TRUE,
   fun, relim, imlim, n = 10, ...) {
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
@@ -74,7 +74,7 @@ GeomComplexFunction <- ggproto("GeomComplexFunction", GeomRaster)
 
 stat_complex_function <- function(mapping = NULL, data = NULL, geom = "raster",
                                   position = "identity", na.rm = FALSE,
-                                  show.legend = NA, inherit.aes = TRUE,
+                                  show.legend = TRUE, inherit.aes = TRUE,
                                   fun, relim, imlim, n = 10, ...) {
 
   if (is.null(data)) data <- ensure_nonempty_data

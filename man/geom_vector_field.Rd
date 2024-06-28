@@ -20,6 +20,7 @@ geom_vector_field(
   xlim,
   ylim,
   n = 10,
+  center = TRUE,
   ...
 )
 
@@ -35,6 +36,7 @@ stat_vector_field(
   xlim,
   ylim,
   n = 10,
+  center = TRUE,
   ...
 )
 }
@@ -91,6 +93,8 @@ of the vector field.}
 
 \item{n}{An integer specifying the number of grid points along each axis.}
 
+\item{center}{TRUE / FALSE}
+
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}. These are
 often aesthetics, used to set an aesthetic to a fixed value, like
 \code{colour = "red"} or \code{size = 3}. They may also be parameters
@@ -120,7 +124,10 @@ f <- function(x, y) {
 
 # Create a ggplot with the vector field layer
 ggplot() +
-  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20, arrow = arrow(length = unit(1, "mm")))
+  geom_vector_field(
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20, center = TRUE,
+    arrow = arrow(length = unit(1, "mm"))
+  )
 
 }
 \keyword{datasets}
