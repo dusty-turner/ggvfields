@@ -126,4 +126,8 @@ geom_complex_function <- function(mapping = NULL, data = NULL,
   )
 }
 
+#' @rdname geom_complex_function
+#' @format NULL
+#' @usage NULL
+#' @export
 GeomComplexFunction <- ggproto("GeomComplexFunction", GeomRaster)
