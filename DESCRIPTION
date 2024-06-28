@@ -27,7 +27,8 @@ Depends:
     R (>= 3.5.0),
     ggplot2 (>= 3.3.0)
 Imports:
-    farver
+    farver,
+    tibble
 URL: https://github.com/dusty-turner/ggvfields
 BugReports: https://github.com/dusty-turner/ggvfields/issues
 Suggests: 

@@ -1,6 +1,6 @@
 #' Create a Vector Field Plot Layer
 #'
-#' [stat_vector_field()] generates a vector field plot layer using a
+#' [geom_vector_field()] generates a vector field plot layer using a
 #' user-defined function to compute the vector components. This is particularly
 #' useful for visualizing vector fields in a two-dimensional space.
 #' @inheritParams ggplot2::geom_raster
@@ -12,6 +12,8 @@
 #' @param n An integer specifying the number of grid points along each axis.
 #' @return A ggplot2 layer that can be added to a ggplot object to produce a
 #'   vector field plot.
+#' @name geom_vector_field
+#' @rdname geom_vector_field
 #' @examples
 #'
 #' # example user-defined function
@@ -23,12 +25,48 @@
 #'
 #' # Create a ggplot with the vector field layer
 #' ggplot() +
-#'   stat_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20)
+#'   geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20, arrow = arrow(length = unit(1, "mm")))
 #'
+NULL
 
 
+#' @rdname geom_vector_field
+#' @export
+geom_vector_field <- function(mapping = NULL, data = NULL,
+                              stat = "vectorfield",
+                              position = "identity", na.rm = FALSE,
+                              show.legend = NA, inherit.aes = TRUE,
+                              fun, xlim, ylim, n = 10, ...) {
+
+  if (is.null(data)) data <- ensure_nonempty_data(data)
+
+  layer(
+    stat = StatVectorField,
+    data = data,
+    mapping = mapping,
+    geom = GeomVectorField,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      fun = fun,
+      xlim = xlim,
+      ylim = ylim,
+      n = n,
+      na.rm = na.rm,
+      ...
+    )
+  )
+}
 
 
+#' @rdname geom_vector_field
+#' @format NULL
+#' @usage NULL
+#' @export
+GeomVectorField <- ggproto("GeomVectorField", GeomSegment)
+
+#' @rdname geom_vector_field
 #' @export
 stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
                               position = "identity", na.rm = FALSE,
@@ -57,7 +95,10 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
 }
 
 
-
+#' @rdname geom_vector_field
+#' @format NULL
+#' @usage NULL
+#' @export
 StatVectorField <- ggproto("StatVectorField", Stat,
 
   # setup_data = cpt_data,
@@ -98,70 +139,4 @@ StatVectorField <- ggproto("StatVectorField", Stat,
 )
 
 
-
-
-
-
-#' Create a Vector Field Geom Layer
-#'
-#' `geom_vector_field` generates a vector field plot layer using a user-defined
-#' function to compute the vector components. This is particularly useful for
-#' visualizing vector fields in a two-dimensional space.
-#'
-#' @inheritParams ggplot2::geom_segment
-#' @param fun A user-defined function that takes two arguments (x and y
-#'   coordinates) and returns a list of two components: the x and y components
-#'   of the vector field.
-#' @param xlim A numeric vector of length 2 giving the x-axis limits.
-#' @param ylim A numeric vector of length 2 giving the y-axis limits.
-#' @param n An integer specifying the number of grid points along each axis.
-#'
-#' @return A ggplot2 layer that can be added to a ggplot object to produce a
-#'   vector field plot.
-#' @export
-#' @import ggplot2
-#'
-#' @examples
-#' library(ggplot2)
-#' # Example user-defined function
-#' f <- function(x, y) {
-#'   u <- -y
-#'   v <- x
-#'   list(u, v)
-#' }
-#'
-#' # Create a ggplot with the vector field layer
-#' ggplot() +
-#'   geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20)
-#'
-geom_vector_field <- function(mapping = NULL, data = NULL,
-                              stat = "vectorfield",
-                              position = "identity", na.rm = FALSE,
-                              show.legend = NA, inherit.aes = TRUE,
-                              fun, xlim, ylim, n = 10, ...) {
-
-  if (is.null(data)) data <- ensure_nonempty_data(data)
-
-  layer(
-    stat = StatVectorField,
-    data = data,
-    mapping = mapping,
-    geom = GeomVectorField,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      fun = fun,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      na.rm = na.rm,
-      ...
-    )
-  )
-}
-
-
-
-GeomVectorField <- ggproto("GeomVectorField", GeomSegment)
 
