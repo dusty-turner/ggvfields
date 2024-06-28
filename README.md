@@ -26,8 +26,6 @@ simplifies the process, making it easier to create vector field
 visualizations without dealing with the underlying math.
 
 ``` r
-library("ggplot2")
-
 # custom function
 f <- function(x, y) {
   u <- -y
@@ -60,7 +58,6 @@ f <- function(z) (z^2 + 1) / (z^2 - 1)
 # create a ggplot with the complex vector field layer
 ggplot() +
   geom_complex_vector_field(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) +
-  # labs(x = "Real", y = "Imaginary") +
   coord_fixed()
 ```
 

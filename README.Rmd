@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   out.width = "100%",
   dev = "png", dpi = 300,
   fig.height = 3.5, 
-  cache = TRUE
+  cache = FALSE
 )
 ```
 
@@ -57,7 +57,6 @@ f <- function(z) (z^2 + 1) / (z^2 - 1)
 # create a ggplot with the complex vector field layer
 ggplot() +
   geom_complex_vector_field(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) +
-  # labs(x = "Real", y = "Imaginary") +
   coord_fixed()
 ```
 
