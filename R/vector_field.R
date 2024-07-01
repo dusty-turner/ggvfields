@@ -10,7 +10,10 @@
 #'   of the vector field.
 #' @param xlim,ylim A numeric vector of length 2 giving the x-axis limits.
 #' @param n An integer specifying the number of grid points along each axis.
-#' @param center TRUE / FALSE
+#' @param center Logical; if TRUE, centers the vector on the evaluated x/y
+#'   location. If FALSE, the vector origin is on the evaluated x/y location.
+#' @param normalize Logical; if TRUE, normalizes the vector to a length of unit
+#'   1.
 #' @return A ggplot2 layer that can be added to a ggplot object to produce a
 #'   vector field plot.
 #' @name geom_vector_field
@@ -40,7 +43,8 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
                               stat = "vectorfield",
                               position = "identity", na.rm = FALSE,
                               show.legend = NA, inherit.aes = TRUE,
-                              fun, xlim, ylim, n = 10, center = TRUE, ...) {
+                              fun, xlim, ylim, n = 10, center = TRUE,
+                              normalize = TRUE, ...) {
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
 
@@ -58,6 +62,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
       ylim = ylim,
       n = n,
       center = center,
+      normalize = normalize,
       na.rm = na.rm,
       ...
     )
@@ -76,7 +81,8 @@ GeomVectorField <- ggproto("GeomVectorField", GeomSegment)
 stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
                               position = "identity", na.rm = FALSE,
                               show.legend = NA, inherit.aes = TRUE,
-                              fun, xlim, ylim, n = 10, center = TRUE, ...) {
+                              fun, xlim, ylim, n = 10, center = TRUE,
+                              normalize = TRUE, ...) {
 
   if (is.null(data)) data <- ensure_nonempty_data
 
@@ -94,6 +100,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
       ylim = ylim,
       n = n,
       center = center,
+      normalize = normalize,
       na.rm = na.rm,
       ...
     )
@@ -107,11 +114,9 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
 #' @export
 StatVectorField <- ggproto("StatVectorField", Stat,
 
-  # setup_data = cpt_data,
+  default_aes = aes(color = after_stat(magnitude)),
 
-  # required_aes = c("x","y"),
-
-  compute_group = function(data, scales, fun, xlim, ylim, n = n, center) {
+  compute_group = function(data, scales, fun, xlim, ylim, n, center, normalize) {
     # Create a sequence of x and y values within the limits
     x_seq <- seq(xlim[1], xlim[2], length.out = n)
     y_seq <- seq(ylim[1], ylim[2], length.out = n)
@@ -129,21 +134,18 @@ StatVectorField <- ggproto("StatVectorField", Stat,
     )
 
     # Calculate magnitude
-    magnitude <- sqrt(data$u^2 + data$v^2)
+    data$magnitude <- sqrt(data$u^2 + data$v^2)
 
-    # Normalize the vectors
-    data$u_norm <- data$u / magnitude
-    data$v_norm <- data$v / magnitude
-
-    # Calculate the end points of the vectors
-    data$xend <- data$x + data$u_norm
-    data$yend <- data$y + data$v_norm
+    if(normalize){
+      # Normalize the vectors
+      data$u <- data$u / data$magnitude
+      data$v <- data$v / data$magnitude
+    }
 
     if(center) {
-
       # Calculate the half-length of the vectors
-      half_u <- data$u_norm / 2
-      half_v <- data$v_norm / 2
+      half_u <- data$u / 2
+      half_v <- data$v / 2
 
       # Calculate the end points of the vectors
       data$xend <- data$x + half_u
@@ -152,14 +154,12 @@ StatVectorField <- ggproto("StatVectorField", Stat,
       # Calculate the start points of the vectors
       data$x <- data$x - half_u
       data$y <- data$y - half_v
-
+    } else {
+      # Calculate the end points of the vectors
+      data$xend <- data$x + data$u
+      data$yend <- data$y + data$v
     }
 
     data
-
   }
-
 )
-
-
-

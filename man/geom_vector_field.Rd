@@ -21,6 +21,7 @@ geom_vector_field(
   ylim,
   n = 10,
   center = TRUE,
+  normalize = TRUE,
   ...
 )
 
@@ -37,6 +38,7 @@ stat_vector_field(
   ylim,
   n = 10,
   center = TRUE,
+  normalize = TRUE,
   ...
 )
 }
@@ -93,7 +95,11 @@ of the vector field.}
 
 \item{n}{An integer specifying the number of grid points along each axis.}
 
-\item{center}{TRUE / FALSE}
+\item{center}{Logical; if TRUE, centers the vector on the evaluated x/y
+location. If FALSE, the vector origin is on the evaluated x/y location.}
+
+\item{normalize}{Logical; if TRUE, normalizes the vector to a length of unit
+1.}
 
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}. These are
 often aesthetics, used to set an aesthetic to a fixed value, like
