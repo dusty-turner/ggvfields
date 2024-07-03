@@ -122,10 +122,9 @@ StatVectorField <- ggproto("StatVectorField", Stat,
     grid <- expand.grid(
       x = seq(xlim[1], xlim[2], length.out = n),
       y = seq(ylim[1], ylim[2], length.out = n)
-    )
+    ) |> as.matrix()
 
-    # Evaluate the function to get vector components
-    vectors <- fun(v = grid)
+    vectors <- vectorize(fun)(grid)
 
     # Create a data frame for geom_segment
     data <- data.frame(
