@@ -128,10 +128,10 @@ StatVectorField <- ggproto("StatVectorField", Stat,
 
     # Create a data frame for geom_segment
     data <- data.frame(
-      x = grid$x,
-      y = grid$y,
-      u = vectors[[1]],
-      v = vectors[[2]]
+      x = grid[,1],
+      y = grid[,2],
+      u = vectors[,1],
+      v = vectors[,2]
     )
 
     # Calculate magnitude
