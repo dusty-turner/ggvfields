@@ -27,19 +27,70 @@ visualizations without dealing with the underlying math.
 
 ``` r
 # custom function
-f <- function(x, y) {
-  u <- -y
-  v <- x
-  list(u, v)
+f <- function(v) {
+    x <- v[1]
+    y <- v[2]
+    u <- unname(-y)
+    v <- unname(x)
+    c(u, v)
 }
 
 # create a ggplot with the vector field layer
 ggplot() +
-  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20, center = TRUE) +
+  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20, center = TRUE, normalize = TRUE) +
   coord_fixed()
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+
+This function also offers several aesthetic mappings which allow you to
+map several characteristics of the vector field to different aesthetic
+mappings.
+
+#### Vector Magnitude
+
+To visualize the magnitude of the vectors:
+
+``` r
+ggplot() +
+  geom_vector_field(aes(color = after_stat(magnitude)),
+                    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 21, center = TRUE, normalize = TRUE
+                    ) +
+  coord_fixed()
+#> Warning: Removed 1 rows containing missing values (`geom_vector_field()`).
+```
+
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+
+#### Divergence
+
+To visualize the divergence of the vector field:
+
+``` r
+ggplot() +
+  geom_vector_field(aes(color = after_stat(divergence)), 
+                    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 21, center = TRUE, normalize = TRUE
+                    ) +
+  coord_fixed()
+#> Warning: Removed 1 rows containing missing values (`geom_vector_field()`).
+```
+
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+
+#### Magnitude of the Curl
+
+To visualize the magnitude of the curl of the vector field:
+
+``` r
+ggplot() +
+  geom_vector_field(aes(color = after_stat(curl)), 
+                    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 21, center = TRUE, normalize = TRUE 
+                    ) +
+  coord_fixed()
+#> Warning: Removed 1 rows containing missing values (`geom_vector_field()`).
+```
+
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
 ### `geom_complex_function()`
 
@@ -61,7 +112,7 @@ ggplot() +
   coord_fixed()
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
 
 ## License
 

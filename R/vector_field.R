@@ -114,16 +114,18 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
 #' @export
 StatVectorField <- ggproto("StatVectorField", Stat,
 
-  default_aes = aes(color = after_stat(magnitude)),
+  # default_aes = aes(color = after_stat(magnitude)),
 
   compute_group = function(data, scales, fun, xlim, ylim, n, center, normalize) {
+
     # Create a sequence of x and y values within the limits
-    x_seq <- seq(xlim[1], xlim[2], length.out = n)
-    y_seq <- seq(ylim[1], ylim[2], length.out = n)
-    grid <- expand.grid(x = x_seq, y = y_seq)
+    grid <- expand.grid(
+      x = seq(xlim[1], xlim[2], length.out = n),
+      y = seq(ylim[1], ylim[2], length.out = n)
+    )
 
     # Evaluate the function to get vector components
-    vectors <- fun(grid$x, grid$y)
+    vectors <- fun(v = grid)
 
     # Create a data frame for geom_segment
     data <- data.frame(
@@ -134,15 +136,15 @@ StatVectorField <- ggproto("StatVectorField", Stat,
     )
 
     # Calculate magnitude
-    data$magnitude <- sqrt(data$u^2 + data$v^2)
+    data$magnitude <- sqrt(data$u ^ 2 + data$v ^ 2)
 
-    if(normalize){
+    if (normalize) {
       # Normalize the vectors
       data$u <- data$u / data$magnitude
       data$v <- data$v / data$magnitude
     }
 
-    if(center) {
+    if (center) {
       # Calculate the half-length of the vectors
       half_u <- data$u / 2
       half_v <- data$v / 2
@@ -160,6 +162,16 @@ StatVectorField <- ggproto("StatVectorField", Stat,
       data$yend <- data$y + data$v
     }
 
+    ## calculate divergence -- will remove pipes when I verify this is correctly calculated
+    grad <- grid |> apply(1, numDeriv::grad, func = f) |> t()# |> apply(1, sum)
+    grad_u <- grad[,1]
+    grad_v <- grad[,2]
+    ## Divergence
+    data$divergence <- grad_u + grad_v
+    ## Curl
+    data$curl <- grad_u - grad_v
+
     data
   }
 )
+
