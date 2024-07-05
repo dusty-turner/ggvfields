@@ -23,16 +23,36 @@
 #' @examples
 #'
 #' # example user-defined function
-#' f <- function(x, y) {
-#'   u <- -y
-#'   v <- x
-#'   list(u, v)
+#' f <- function(v) {
+#'   x <- v[1]; y <- v[2]
+#'   c(-y, x)
 #' }
 #'
-#' # Create a ggplot with the vector field layer
+#' # create a ggplot with the vector field layer
 #' ggplot() +
 #'   geom_vector_field(
-#'     fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20, center = TRUE,
+#'     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
+#'   )
+#'
+#' # add arrowheads
+#' ggplot() +
+#'   geom_vector_field(
+#'     fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
+#'     arrow = arrow(length = unit(.015, "npc"), type = "closed")
+#'   )
+#'
+#' # various options
+#' ggplot() +
+#'   geom_vector_field(
+#'     aes(color = after_stat(magnitude)),
+#'     fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
+#'     arrow = arrow(length = unit(1, "mm"))
+#'   )
+#'
+#' ggplot() +
+#'   geom_vector_field(
+#'     fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
+#'     n = 10, center = FALSE, normalize = FALSE,
 #'     arrow = arrow(length = unit(1, "mm"))
 #'   )
 #'
@@ -45,7 +65,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
                               stat = "vectorfield",
                               position = "identity", na.rm = FALSE,
                               show.legend = NA, inherit.aes = TRUE,
-                              fun, xlim, ylim, u = 0, v = 0, n = 10,
+                              fun, xlim, ylim, u = 0, v = 0, n = 16,
                               center = TRUE, normalize = TRUE, ...) {
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
