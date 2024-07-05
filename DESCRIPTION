@@ -28,7 +28,8 @@ Depends:
     ggplot2 (>= 3.3.0)
 Imports:
     farver,
-    tibble
+    tibble,
+    numDeriv 
 URL: https://github.com/dusty-turner/ggvfields
 BugReports: https://github.com/dusty-turner/ggvfields/issues
 Suggests: 

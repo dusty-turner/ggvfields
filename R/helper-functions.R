@@ -45,3 +45,14 @@ vectorize <- function(f, drop = TRUE) {
     if ((nrow(out) == 1L) && drop) out[1,] else out
   }
 }
+
+## helper functions for hession / laplacian
+extract_component_function <- function(f, index) {
+  function(v) f(v)[index]
+}
+
+## helper functions for hession / laplacian
+compute_laplacian <- function(func, v) {
+  hessian_matrix <- numDeriv::hessian(func, v)
+  sum(diag(hessian_matrix))
+}
