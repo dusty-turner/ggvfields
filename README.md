@@ -92,6 +92,21 @@ ggplot() +
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
+#### Laplace Operator
+
+To visualize the Laplace operator of the vector field:
+
+``` r
+ggplot() +
+  geom_vector_field(aes(color = after_stat(laplacian)), 
+                    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 21, center = TRUE, normalize = TRUE 
+                    ) +
+  coord_fixed()
+#> Warning: Removed 1 rows containing missing values (`geom_vector_field()`).
+```
+
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
+
 ### `geom_complex_function()`
 
 The `geom_complex_function()` function generates a vector field plot
@@ -112,7 +127,7 @@ ggplot() +
   coord_fixed()
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
 
 ## License
 
