@@ -107,6 +107,26 @@ ggplot() +
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
 
+#### Directional Derivative
+
+To visualize the directional derivative from any point to another point
+`c(u, v)` within the vector field:
+
+``` r
+x1 <- 5
+y1 <- 6
+
+ggplot() +
+  geom_vector_field(aes(color = after_stat(directional_derivative)),
+                    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20, center = TRUE, normalize = TRUE, 
+                    u = x1, v = y1) +
+  geom_point(aes(x = x1, y = y1)) +
+  scale_color_viridis_c() +
+  coord_fixed()
+```
+
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+
 ### `geom_complex_function()`
 
 The `geom_complex_function()` function generates a vector field plot
@@ -127,7 +147,7 @@ ggplot() +
   coord_fixed()
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
 
 ## License
 
