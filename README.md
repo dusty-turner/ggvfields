@@ -28,16 +28,13 @@ visualizations without dealing with the underlying math.
 ``` r
 # custom function
 f <- function(v) {
-    x <- v[1]
-    y <- v[2]
-    u <- unname(-y)
-    v <- unname(x)
-    c(u, v)
+  x <- v[1]; y <- v[2]
+  c(-y, x) # = f(x,y)
 }
 
 # create a ggplot with the vector field layer
 ggplot() +
-  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20, center = TRUE, normalize = TRUE) +
+  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) +
   coord_fixed()
 ```
 
@@ -47,17 +44,17 @@ This function also offers several aesthetic mappings which allow you to
 map several characteristics of the vector field to different aesthetic
 mappings.
 
-#### Vector Magnitude
+#### Vector magnitude
 
 To visualize the magnitude of the vectors:
 
 ``` r
 ggplot() +
-  geom_vector_field(aes(color = after_stat(magnitude)),
-                    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 21, center = TRUE, normalize = TRUE
-                    ) +
+  geom_vector_field(
+    aes(color = after_stat(magnitude)),
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
+  ) +
   coord_fixed()
-#> Warning: Removed 1 rows containing missing values (`geom_vector_field()`).
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
@@ -68,46 +65,46 @@ To visualize the divergence of the vector field:
 
 ``` r
 ggplot() +
-  geom_vector_field(aes(color = after_stat(divergence)), 
-                    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 21, center = TRUE, normalize = TRUE
-                    ) +
+  geom_vector_field(
+    aes(color = after_stat(divergence)), 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
+  ) +
   coord_fixed()
-#> Warning: Removed 1 rows containing missing values (`geom_vector_field()`).
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
-#### Magnitude of the Curl
+#### Magnitude of the curl
 
 To visualize the magnitude of the curl of the vector field:
 
 ``` r
 ggplot() +
-  geom_vector_field(aes(color = after_stat(curl)), 
-                    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 21, center = TRUE, normalize = TRUE 
-                    ) +
+  geom_vector_field(
+    aes(color = after_stat(curl)), 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
+  ) +
   coord_fixed()
-#> Warning: Removed 1 rows containing missing values (`geom_vector_field()`).
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
-#### Laplace Operator
+#### Laplace operator
 
 To visualize the Laplace operator of the vector field:
 
 ``` r
 ggplot() +
-  geom_vector_field(aes(color = after_stat(laplacian)), 
-                    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 21, center = TRUE, normalize = TRUE 
-                    ) +
+  geom_vector_field(
+    aes(color = after_stat(laplacian)), 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
+  ) +
   coord_fixed()
-#> Warning: Removed 1 rows containing missing values (`geom_vector_field()`).
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
 
-#### Directional Derivative
+#### Directional derivative
 
 To visualize the directional derivative from any point to another point
 `c(u, v)` within the vector field:
@@ -117,9 +114,10 @@ x1 <- 5
 y1 <- 6
 
 ggplot() +
-  geom_vector_field(aes(color = after_stat(directional_derivative)),
-                    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), n = 20, center = TRUE, normalize = TRUE, 
-                    u = x1, v = y1) +
+  geom_vector_field(
+    aes(color = after_stat(directional_derivative)),
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
+    u = x1, v = y1) +
   geom_point(aes(x = x1, y = y1)) +
   scale_color_viridis_c() +
   coord_fixed()

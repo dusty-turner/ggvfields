@@ -35,8 +35,8 @@ The `geom_vector_field()`{.R} function generates a vector field plot layer using
 ```{r}
 # custom function
 f <- function(v) {
-    x <- v[1]; y <- v[2]
-    c(-y, x)
+  x <- v[1]; y <- v[2]
+  c(-y, x) # = f(x,y)
 }
 
 # create a ggplot with the vector field layer
@@ -47,7 +47,7 @@ ggplot() +
 
 This function also offers several aesthetic mappings which allow you to map several characteristics of the vector field to different aesthetic mappings.
 
-#### Vector Magnitude
+#### Vector magnitude
 
 To visualize the magnitude of the vectors:
 
@@ -73,7 +73,7 @@ ggplot() +
   coord_fixed()
 ```
 
-#### Magnitude of the Curl
+#### Magnitude of the curl
 
 To visualize the magnitude of the curl of the vector field:
 
@@ -86,7 +86,7 @@ ggplot() +
   coord_fixed()
 ```
 
-#### Laplace Operator
+#### Laplace operator
 
 To visualize the Laplace operator of the vector field:
 
@@ -99,7 +99,7 @@ ggplot() +
   coord_fixed()
 ```
 
-#### Directional Derivative
+#### Directional derivative
 
 To visualize the directional derivative from any point to another point `c(u, v)` within the vector field:
 
@@ -147,6 +147,6 @@ For any questions or issues, please [open an issue](https://github.com/dusty-tur
 
 You can install the development version from GitHub:
 
-```{r}
+```{r, eval=FALSE}
 devtools::install_github("dusty-turner/ggvfields")
 ```
