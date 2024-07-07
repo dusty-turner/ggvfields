@@ -172,14 +172,18 @@ StatVectorField <- ggproto("StatVectorField", Stat,
     grad <- grid |> apply(1, numDeriv::grad, func = f) |> t()# |> apply(1, sum)
     grad_u <- grad[,1]
     grad_v <- grad[,2]
+
     ## Divergence
     data$divergence <- grad_u + grad_v
+
     ## Curl
     data$curl <- grad_u - grad_v
+
     ## Laplacian
     hess_u <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = f, 1))
     hess_v <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = f, 2))
     data$laplacian <- hess_u + hess_v
+
     ## Directional Derivative ## needs to be verified
     data$directional_derivative <- grad %*% (c(u , v) / sqrt(u ^ 2 + v ^ 2))
 
