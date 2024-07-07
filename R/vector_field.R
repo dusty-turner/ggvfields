@@ -16,6 +16,7 @@
 #'   location. If FALSE, the vector origin is on the evaluated x/y location.
 #' @param normalize Logical; if TRUE, normalizes the vector to a length of unit
 #'   1.
+#' @param arrow Arrow specification, as created by `grid::arrow()`.
 #' @return A ggplot2 layer that can be added to a ggplot object to produce a
 #'   vector field plot.
 #' @name geom_vector_field
@@ -66,7 +67,9 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
                               position = "identity", na.rm = FALSE,
                               show.legend = NA, inherit.aes = TRUE,
                               fun, xlim, ylim, u = 0, v = 0, n = 16,
-                              center = TRUE, normalize = TRUE, ...) {
+                              center = TRUE, normalize = TRUE,
+                              arrow = grid::arrow(length = unit(0.015, "npc"), type = "closed"),
+                              ...) {
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
 
@@ -87,6 +90,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
       v = v,
       center = center,
       normalize = normalize,
+      arrow = arrow,
       na.rm = na.rm,
       ...
     )
@@ -106,7 +110,9 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
                               position = "identity", na.rm = FALSE,
                               show.legend = NA, inherit.aes = TRUE,
                               fun, xlim, ylim, u = 0, v = 0, n = 16,
-                              center = TRUE, normalize = TRUE, ...) {
+                              center = TRUE, normalize = TRUE,
+                              arrow = grid::arrow(length = unit(0.015, "npc"), type = "closed"),
+                              ...) {
 
   if (is.null(data)) data <- ensure_nonempty_data
 
@@ -127,11 +133,13 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
       v = v,
       center = center,
       normalize = normalize,
+      arrow = arrow,
       na.rm = na.rm,
       ...
     )
   )
 }
+
 
 
 #' @rdname geom_vector_field

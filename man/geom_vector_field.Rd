@@ -24,6 +24,7 @@ geom_vector_field(
   n = 16,
   center = TRUE,
   normalize = TRUE,
+  arrow = grid::arrow(length = unit(0.015, "npc"), type = "closed"),
   ...
 )
 
@@ -43,6 +44,7 @@ stat_vector_field(
   n = 16,
   center = TRUE,
   normalize = TRUE,
+  arrow = grid::arrow(length = unit(0.015, "npc"), type = "closed"),
   ...
 )
 }
@@ -107,6 +109,8 @@ location. If FALSE, the vector origin is on the evaluated x/y location.}
 
 \item{normalize}{Logical; if TRUE, normalizes the vector to a length of unit
 1.}
+
+\item{arrow}{Arrow specification, as created by \code{grid::arrow()}.}
 
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}. These are
 often aesthetics, used to set an aesthetic to a fixed value, like
