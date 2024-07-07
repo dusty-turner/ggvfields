@@ -52,7 +52,7 @@
 #' ggplot() +
 #'   geom_vector_field(
 #'     fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
-#'     n = 10, center = FALSE, normalize = FALSE,
+#'     n = 16, center = FALSE, normalize = FALSE,
 #'     arrow = arrow(length = unit(1, "mm"))
 #'   )
 #'
@@ -105,7 +105,7 @@ GeomVectorField <- ggproto("GeomVectorField", GeomSegment)
 stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
                               position = "identity", na.rm = FALSE,
                               show.legend = NA, inherit.aes = TRUE,
-                              fun, xlim, ylim, u = 0, v = 0, n = 10,
+                              fun, xlim, ylim, u = 0, v = 0, n = 16,
                               center = TRUE, normalize = TRUE, ...) {
 
   if (is.null(data)) data <- ensure_nonempty_data
