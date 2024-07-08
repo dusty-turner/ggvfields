@@ -169,3 +169,8 @@ You can install the development version from GitHub:
 ``` r
 devtools::install_github("dusty-turner/ggvfields")
 ```
+
+## Related projects
+
+**ggvfields** is similar to
+[**ggquiver**](http://pkg.mitchelloharawild.com/ggquiver/).
