@@ -40,34 +40,32 @@ ggplot() +
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
-This function also offers several aesthetic mappings which allow you to
-map several characteristics of the vector field to different aesthetic
-mappings.
+By default, the magnitude (or length/norm) of the vector lengths is
+mapped to the color aesthetic.
 
-#### Vector Magnitude
-
-The magnitude (or length) of a vector $\mathbf{w} = (u, v)$ is given by:
+The norm of a vector $\mathbf{w} = (u, v)$ is given by:
 
 $|\mathbf{w}| = \sqrt{u^2 + v^2}$
 
-To visualize the magnitude of the vectors:
-
-``` r
-ggplot() +
-  geom_vector_field(
-    aes(color = after_stat(norm)),
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
-  ) +
-  coord_fixed()
-```
-
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+This function also offers several other aesthetic mappings which allow
+you to map several characteristics of the vector field to different
+aesthetic mappings.
 
 #### Divergence
 
-The divergence of a vector field $\mathbf{F} = (F_x, F_y)$ is given by:
+Divergence is an operation on a vector field that tells us how the field
+behaves toward or away from a point. Locally, the divergence of a vector
+field $\mathbf{F}$ in $\mathbb{R}^2$ at a particular point is a measure
+of the “outflowing-ness” of the vector field at that particular point.
+The divergence of a vector field results in a scalar function.
 
-$\nabla \cdot \mathbf{F} = \frac{\partial F_x}{\partial x} + \frac{\partial F_y}{\partial y}$
+If $\mathbf{F} = \langle \mathbf{F}_x(x,y), \mathbf{F}_y(x,y) \rangle$
+is a vector field in $\mathbb{R}^2$, then the divergence of $\mathbf{F}$
+is defined by:
+
+$$
+\text{div} \, \mathbf{F} = \frac{\partial \mathbf{F}_x}{\partial x} + \frac{\partial \mathbf{F}_y}{\partial y}
+$$
 
 To visualize the divergence of the vector field:
 
@@ -80,15 +78,24 @@ ggplot() +
   coord_fixed()
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
-#### Laplace Operator
+#### Curl
 
-For a vector field $\mathbf{F} = (F_x, F_y)$, the Laplacian is given by:
+Curl is an operation on a vector field that measures the rotation or
+swirling strength at a point. In two dimensions, the curl of a vector
+field $\mathbf{F}$ in $\mathbb{R}^2$ is a scalar value that indicates
+how much the vector field tends to rotate around that point.
 
-$\Delta \mathbf{F} = \left( \frac{\partial^2 F_x}{\partial x^2} + \frac{\partial^2 F_x}{\partial y^2}, \frac{\partial^2 F_y}{\partial x^2} + \frac{\partial^2 F_y}{\partial y^2} \right)$
+If $\mathbf{F} = \langle \mathbf{F}_x(x,y), \mathbf{F}_y(x,y) \rangle$
+is a vector field in $\mathbb{R}^2$, then the curl of $\mathbf{F}$ is
+defined by:
 
-To visualize the Laplace operator of the vector field:
+$$
+\text{curl} \, \mathbf{F} = \frac{\partial \mathbf{F}_y}{\partial x} - \frac{\partial \mathbf{F}_x}{\partial y}
+$$
+
+To visualize the magnitude of the curl:
 
 ``` r
 ggplot() +
@@ -99,20 +106,64 @@ ggplot() +
   coord_fixed()
 ```
 
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+
+#### Laplace Operator
+
+The Laplace operator (or Laplacian) measures the rate at which the
+average value of a function around a point differs from the value at
+that point. It is commonly used to understand how a scalar field spreads
+out or compresses in space.
+
+If $\mathbf{F} = \langle \mathbf{F}_x(x,y), \mathbf{F}_y(x,y) \rangle$
+is a vector field in $\mathbb{R}^2$, then the Laplacian of $\mathbf{F}$
+is defined by taking the sum of the second partial derivatives of each
+component of the vector field.
+
+The Laplacian of the vector field $\mathbf{F}$ is thus given by:
+
+$$
+\Delta \mathbf{F} = \frac{\partial^2 \mathbf{F}_x}{\partial x^2} + \frac{\partial^2 \mathbf{F}_x}{\partial y^2} + \frac{\partial^2 \mathbf{F}_y}{\partial x^2} + \frac{\partial^2 \mathbf{F}_y}{\partial y^2}
+$$
+
+This results in a scalar value that describes how the vector field
+spreads out or compresses at different points in the field.
+
+To visualize the Laplace operator of the vector field:
+
+``` r
+ggplot() +
+  geom_vector_field(
+    aes(color = after_stat(laplacian)), 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
+  ) +
+  coord_fixed()
+```
+
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
-#### Directional Derivative
+#### Laplace Operator
 
-The directional derivative of a vector field $\mathbf{F} = (F_x, F_y)$
-in the direction of a vector $\mathbf{v} = (v_x, v_y)$ is given by:
+The Laplace operator (or Laplacian) measures the rate at which the
+average value of a function around a point differs from the value at
+that point. It is commonly used to understand how a scalar field spreads
+out or compresses in space.
 
-$D_{\mathbf{v}} \mathbf{F} = \left( \frac{\partial F_x}{\partial x} v_x + \frac{\partial F_x}{\partial y} v_y, \frac{\partial F_y}{\partial x} v_x + \frac{\partial F_y}{\partial y} v_y \right)$
+If $\mathbf{F} = \langle \mathbf{F}_x(x,y), \mathbf{F}_y(x,y) \rangle$
+is a vector field in $\mathbb{R}^2$, then the Laplacian of $\mathbf{F}$
+is defined by taking the sum of the second partial derivatives of each
+component of the vector field.
 
-For a vector field, it is the rate of change of the field in the given
-direction.
+The Laplacian of the vector field $\mathbf{F}$ is thus given by:
 
-To visualize the directional derivative from any point to another point
-`c(u, v)` within the vector field:
+$$
+\Delta \mathbf{F} = \frac{\partial^2 \mathbf{F}_x}{\partial x^2} + \frac{\partial^2 \mathbf{F}_x}{\partial y^2} + \frac{\partial^2 \mathbf{F}_y}{\partial x^2} + \frac{\partial^2 \mathbf{F}_y}{\partial y^2}
+$$
+
+This results in a scalar value that describes how the vector field
+spreads out or compresses at different points in the field.
+
+To visualize the Laplace operator of the vector field:
 
 ``` r
 x1 <- 5

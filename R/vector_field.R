@@ -149,7 +149,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
 # Define the custom stat
 StatVectorField <- ggproto("StatVectorField", Stat,
 
-  # default_aes = aes(color = after_stat(norm)),
+  default_aes = aes(color = after_stat(norm)),
 
   compute_group = function(data, scales, fun, xlim, ylim, u = 0, v = 0, n, center, normalize, ...) {
 
