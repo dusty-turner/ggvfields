@@ -58,7 +58,7 @@ To visualize the magnitude of the vectors:
 ```{r}
 ggplot() +
   geom_vector_field(
-    aes(color = after_stat(magnitude)),
+    aes(color = after_stat(norm)),
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
   ) +
   coord_fixed()

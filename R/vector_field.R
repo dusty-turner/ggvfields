@@ -45,7 +45,7 @@
 #' # various options
 #' ggplot() +
 #'   geom_vector_field(
-#'     aes(color = after_stat(magnitude)),
+#'     aes(color = after_stat(norm)),
 #'     fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
 #'     arrow = arrow(length = unit(1, "mm"))
 #'   )
@@ -68,7 +68,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
                               show.legend = NA, inherit.aes = TRUE,
                               fun, xlim, ylim, u = 0, v = 0, n = 16,
                               center = TRUE, normalize = TRUE,
-                              arrow = grid::arrow(length = unit(0.015, "npc"), type = "closed"),
+                              arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                               ...) {
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
@@ -111,7 +111,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
                               show.legend = NA, inherit.aes = TRUE,
                               fun, xlim, ylim, u = 0, v = 0, n = 16,
                               center = TRUE, normalize = TRUE,
-                              arrow = grid::arrow(length = unit(0.015, "npc"), type = "closed"),
+                              arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                               ...) {
 
   if (is.null(data)) data <- ensure_nonempty_data
@@ -149,7 +149,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
 # Define the custom stat
 StatVectorField <- ggproto("StatVectorField", Stat,
 
-  # default_aes = aes(color = after_stat(magnitude)),
+  # default_aes = aes(color = after_stat(norm)),
 
   compute_group = function(data, scales, fun, xlim, ylim, u = 0, v = 0, n, center, normalize, ...) {
 
@@ -170,12 +170,12 @@ StatVectorField <- ggproto("StatVectorField", Stat,
     )
 
     # Calculate magnitude
-    data$magnitude <- sqrt(data$u ^ 2 + data$v ^ 2)
+    data$norm <- sqrt(data$u ^ 2 + data$v ^ 2)
 
     if (normalize) {
       # Normalize the vectors
-      data$u <- data$u / data$magnitude
-      data$v <- data$v / data$magnitude
+      data$u <- data$u / data$norm
+      data$v <- data$v / data$norm
     }
 
     if (center) {

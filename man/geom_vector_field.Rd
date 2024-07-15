@@ -24,7 +24,7 @@ geom_vector_field(
   n = 16,
   center = TRUE,
   normalize = TRUE,
-  arrow = grid::arrow(length = unit(0.015, "npc"), type = "closed"),
+  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
 
@@ -44,7 +44,7 @@ stat_vector_field(
   n = 16,
   center = TRUE,
   normalize = TRUE,
-  arrow = grid::arrow(length = unit(0.015, "npc"), type = "closed"),
+  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
 }
@@ -154,7 +154,7 @@ ggplot() +
 # various options
 ggplot() +
   geom_vector_field(
-    aes(color = after_stat(magnitude)),
+    aes(color = after_stat(norm)),
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
     arrow = arrow(length = unit(1, "mm"))
   )
