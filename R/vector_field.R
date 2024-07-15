@@ -214,7 +214,7 @@ StatVectorField <- ggproto("StatVectorField", Stat,
     data$divergence <- grad_u + grad_v
 
     ## Curl
-    data$curl <- grad_u - grad_v
+    data$curl <- grad_v - grad_u
 
     ## Laplacian
     hess_u <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = f, 1))
