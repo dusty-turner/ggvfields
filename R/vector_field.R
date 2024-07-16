@@ -10,7 +10,7 @@
 #'   of the vector field.
 #' @param xlim,ylim A numeric vector of length 2 giving the x-axis limits.
 #' @param n An integer specifying the number of grid points along each axis.
-#' @param u,v Numeric values specifying the direction vector components for
+#' @param v Numeric vector specifying the direction vector components for
 #'   calculating the directional derivative.
 #' @param center Logical; if TRUE, centers the vector on the evaluated x/y
 #'   location. If FALSE, the vector origin is on the evaluated x/y location.
@@ -75,7 +75,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
                               stat = "vectorfield",
                               position = "identity", na.rm = FALSE,
                               show.legend = NA, inherit.aes = TRUE,
-                              fun, xlim, ylim, u = 0, v = 0, n = 16,
+                              fun, xlim, ylim, v = c(1,2), n = 16,
                               center = TRUE, normalize = TRUE,
                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                               ...) {
@@ -95,7 +95,6 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
       xlim = xlim,
       ylim = ylim,
       n = n,
-      u = u,
       v = v,
       center = center,
       normalize = normalize,
@@ -118,7 +117,7 @@ GeomVectorField <- ggproto("GeomVectorField", GeomSegment)
 stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
                               position = "identity", na.rm = FALSE,
                               show.legend = NA, inherit.aes = TRUE,
-                              fun, xlim, ylim, u = 0, v = 0, n = 16,
+                              fun, xlim, ylim, v = c(1,2), n = 16,
                               center = TRUE, normalize = TRUE,
                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                               ...) {
@@ -138,7 +137,6 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
       xlim = xlim,
       ylim = ylim,
       n = n,
-      u = u,
       v = v,
       center = center,
       normalize = normalize,
@@ -160,7 +158,7 @@ StatVectorField <- ggproto("StatVectorField", Stat,
 
   default_aes = aes(color = after_stat(norm)),
 
-  compute_group = function(data, scales, fun, xlim, ylim, u = 0, v = 0, n, center, normalize, ...) {
+  compute_group = function(data, scales, fun, xlim, ylim, v = c(1,2), n, center, normalize, ...) {
 
     # Create a sequence of x and y values within the limits
     grid <- expand.grid(
@@ -206,7 +204,7 @@ StatVectorField <- ggproto("StatVectorField", Stat,
     }
 
     ## calculate divergence -- will remove pipes when I verify this is correctly calculated
-    grad <- grid |> apply(1, numDeriv::grad, func = f) |> t()# |> apply(1, sum)
+    grad <- grid |> apply(1, numDeriv::grad, func = fun) |> t()# |> apply(1, sum)
     grad_u <- grad[,1]
     grad_v <- grad[,2]
 
@@ -217,12 +215,14 @@ StatVectorField <- ggproto("StatVectorField", Stat,
     data$curl <- grad_v - grad_u
 
     ## Laplacian
-    hess_u <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = f, 1))
-    hess_v <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = f, 2))
+    hess_u <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 1))
+    hess_v <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 2))
     data$laplacian <- hess_u + hess_v
 
     ## Directional Derivative ## needs to be verified
-    data$directional_derivative <- grad %*% (c(u , v) / sqrt(u ^ 2 + v ^ 2))
+    # Assign directional derivative vector
+    vx <- v[1]; vy <- v[2]
+    data$directional_derivative <- grad %*% (c(vx , vy) / sqrt(vx ^ 2 + vy ^ 2))
 
     data
   }

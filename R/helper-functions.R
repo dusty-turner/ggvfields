@@ -47,8 +47,8 @@ vectorize <- function(f, drop = TRUE) {
 }
 
 ## helper functions for hession / laplacian
-extract_component_function <- function(f, index) {
-  function(v) f(v)[index]
+extract_component_function <- function(fun, index) {
+  function(v) fun(v)[index]
 }
 
 ## helper functions for hession / laplacian

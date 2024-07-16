@@ -19,8 +19,7 @@ geom_vector_field(
   fun,
   xlim,
   ylim,
-  u = 0,
-  v = 0,
+  v = c(1, 2),
   n = 16,
   center = TRUE,
   normalize = TRUE,
@@ -39,8 +38,7 @@ stat_vector_field(
   fun,
   xlim,
   ylim,
-  u = 0,
-  v = 0,
+  v = c(1, 2),
   n = 16,
   center = TRUE,
   normalize = TRUE,
@@ -99,7 +97,7 @@ of the vector field.}
 
 \item{xlim, ylim}{A numeric vector of length 2 giving the x-axis limits.}
 
-\item{u, v}{Numeric values specifying the direction vector components for
+\item{v}{Numeric vector specifying the direction vector components for
 calculating the directional derivative.}
 
 \item{n}{An integer specifying the number of grid points along each axis.}

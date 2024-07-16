@@ -11,6 +11,7 @@ numbers, and soon dual numbers and more.
 ``` r
 library("ggvfields")
 #> Loading required package: ggplot2
+options(ggplot2.continuous.colur="viridis")
 ```
 
 ## Usage
@@ -95,7 +96,7 @@ $$
 \text{curl} \, \mathbf{F} = \frac{\partial \mathbf{F}_y}{\partial x} - \frac{\partial \mathbf{F}_x}{\partial y}
 $$
 
-To visualize the magnitude of the curl:
+To visualize the the curl:
 
 ``` r
 ggplot() +
@@ -129,13 +130,20 @@ $$
 This results in a scalar value that describes how the vector field
 spreads out or compresses at different points in the field.
 
-To visualize the Laplace operator of the vector field:
+To visualize the Laplace operator of the vector field, lets look at a
+different vector field:
 
 ``` r
+g <- function(v) {
+  x <- v[1]
+  y <- v[2]
+  c(-sin(y), cos(x))
+}
+
 ggplot() +
   geom_vector_field(
-    aes(color = after_stat(laplacian)), 
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
+    aes(color = after_stat(laplacian)), n = 20,
+    fun = g, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi)
   ) +
   coord_fixed()
 ```
@@ -164,16 +172,14 @@ of the field in the direction specified by $\mathbf{v}$.
 To visualize the Laplace operator of the vector field:
 
 ``` r
-x1 <- 5
-y1 <- 6
+vec <- c(5, 6)
 
 ggplot() +
   geom_vector_field(
     aes(color = after_stat(directional_derivative)),
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
-    u = x1, v = y1) +
-  geom_point(aes(x = x1, y = y1)) +
-  scale_color_viridis_c() +
+    v = vec) +
+  geom_point(aes(x = vec[1], y = vec[2])) +
   coord_fixed()
 ```
 
@@ -221,5 +227,8 @@ devtools::install_github("dusty-turner/ggvfields")
 
 ## Related projects
 
-**ggvfields** is similar to
-[**ggquiver**](http://pkg.mitchelloharawild.com/ggquiver/).
+For creating vector fields, the
+[**ggquiver**](http://pkg.mitchelloharawild.com/ggquiver/) package
+provides quiver plots to visualize vector fields, while the
+[**ggarchery**](https://github.com/mdhall272/ggarchery) package can
+handling of segments with arrowheads.
