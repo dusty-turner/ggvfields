@@ -120,19 +120,17 @@ ggplot() +
   coord_fixed()
 ```
 
-#### Laplace Operator
+#### Directional Derivative
 
-The Laplace operator (or Laplacian) measures the rate at which the average value of a function around a point differs from the value at that point. It is commonly used to understand how a scalar field spreads out or compresses in space.
+The directional derivative of a vector field measures the rate of change of the field in a specified direction. It provides insight into how the field varies as you move in a particular direction.
 
-If $\mathbf{F} = \langle \mathbf{F}_x(x,y), \mathbf{F}_y(x,y) \rangle$ is a vector field in $\mathbb{R}^2$, then the Laplacian of $\mathbf{F}$ is defined by taking the sum of the second partial derivatives of each component of the vector field.
-
-The Laplacian of the vector field $\mathbf{F}$ is thus given by:
+If $\mathbf{F} = \langle \mathbf{F}_x(x,y), \mathbf{F}_y(x,y) \rangle$ is a vector field in $\mathbb{R}^2$, and $\mathbf{v} = \langle v_x, v_y \rangle$ is a direction vector, then the directional derivative of $\mathbf{F}$ in the direction of $\mathbf{v}$ is given by:
 
 $$
-\Delta \mathbf{F} = \frac{\partial^2 \mathbf{F}_x}{\partial x^2} + \frac{\partial^2 \mathbf{F}_x}{\partial y^2} + \frac{\partial^2 \mathbf{F}_y}{\partial x^2} + \frac{\partial^2 \mathbf{F}_y}{\partial y^2}
+D_{\mathbf{v}} \mathbf{F} = \frac{\partial \mathbf{F}_x}{\partial x} v_x + \frac{\partial \mathbf{F}_x}{\partial y} v_y + \frac{\partial \mathbf{F}_y}{\partial x} v_x + \frac{\partial \mathbf{F}_y}{\partial y} v_y
 $$
 
-This results in a scalar value that describes how the vector field spreads out or compresses at different points in the field.
+For a vector field, this represents the rate of change of each component of the field in the direction specified by $\mathbf{v}$.
 
 To visualize the Laplace operator of the vector field:
 
