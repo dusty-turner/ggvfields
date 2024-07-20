@@ -11,7 +11,6 @@ numbers, and soon dual numbers and more.
 ``` r
 library("ggvfields")
 #> Loading required package: ggplot2
-#> Warning: package 'ggplot2' was built under R version 4.3.3
 options(ggplot2.continuous.colur="viridis")
 ```
 
@@ -218,7 +217,6 @@ properties change across the field.
 
 ``` r
 library(biscale)
-#> Warning: package 'biscale' was built under R version 4.3.3
 library(cowplot)
 
 plot <-
