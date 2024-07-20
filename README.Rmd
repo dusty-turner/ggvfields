@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-**ggvfields** provides tools for visualizing vector fields, complex numbers, and soon dual numbers and more. 
+**ggvfields** provides tools for visualizing vector fields, complex numbers, and soon dual numbers and more.
 
 ```{r}
 library("ggvfields")
@@ -46,7 +46,7 @@ ggplot() +
   coord_fixed()
 ```
 
-By default, the magnitude (or length/norm) of the vector lengths is mapped to the color aesthetic. 
+By default, the magnitude (or length/norm) of the vector lengths is mapped to the color aesthetic.
 
 The norm of a vector $\mathbf{w} = (u, v)$ is given by:
 
@@ -121,7 +121,7 @@ g <- function(v) {
 
 ggplot() +
   geom_vector_field(
-    aes(color = after_stat(laplacian)), n = 20,
+    aes(color = after_stat(laplacian)), n = 16, 
     fun = g, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi)
   ) +
   coord_fixed()
@@ -140,7 +140,6 @@ $$
 For a vector field, this represents the rate of change of each component of the field in the direction specified by $\mathbf{v}$.
 
 To visualize the Laplace operator of the vector field:
-
 
 ```{r}
 vec <- c(5, 6)
@@ -165,7 +164,41 @@ f <- function(z) (z^2 + 1) / (z^2 - 1)
 # create a ggplot with the complex vector field layer
 ggplot() +
   geom_complex_function(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) +
-  coord_fixed()
+  labs(x = "Real", y = "Imaginary") +
+  coord_fixed() 
+```
+
+We can enhance this plot with a little help from biscale.
+
+Using biscale, we can apply a bivariate color scale to the plot, which allows us to represent two variables—angle (direction) and magnitude (intensity)—simultaneously. This makes it easier to visualize how these properties change across the field.
+
+```{r}
+library(biscale)
+library(cowplot)
+
+plot <-
+  ggplot() +
+  geom_complex_function(aes(fill = after_stat(bi_class)),
+    fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100
+    ) +
+    bi_scale_fill(pal = "DkBlue") +
+    labs(
+      title = "",
+      x = "Real (Re)",
+      y = "Imaginary (Im)"
+    ) +
+    bi_theme(base_size = 16) +
+    theme(legend.position = "none") +
+  coord_fixed() 
+  
+legend <- bi_legend(pal = "DkBlue",
+                    xlab = "Angle",
+                    ylab = "Magnitude",
+                    size = 6)
+
+ggdraw() +
+  draw_plot(plot, 0, 0, .8, 1) +  # Main plot without legend
+  draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3)
 ```
 
 
@@ -173,14 +206,11 @@ ggplot() +
 
 This package is licensed under the MIT License.
 
-
 ## Contact
 
 For any questions or issues, please [open an issue](https://github.com/dusty-turner/ggvfields/issues/new) on GitHub or contact the maintainer.
 
-
 ## Installation
-
 
 You can install the development version from GitHub:
 
@@ -188,7 +218,6 @@ You can install the development version from GitHub:
 devtools::install_github("dusty-turner/ggvfields")
 ```
 
-
 ## Related projects
 
-For creating vector fields, the [**ggquiver**](http://pkg.mitchelloharawild.com/ggquiver/) package provides quiver plots to visualize vector fields, while the [**ggarchery**](https://github.com/mdhall272/ggarchery) package can handling of segments with arrowheads. 
+For creating vector fields, the [**ggquiver**](http://pkg.mitchelloharawild.com/ggquiver/) package provides quiver plots to visualize vector fields, while the [**ggarchery**](https://github.com/mdhall272/ggarchery) package can handling of segments with arrowheads.

@@ -36,10 +36,10 @@ NULL
 #' @export
 
 geom_complex_function <- function(mapping = NULL, data = NULL,
-  stat = "complex_function",
-  position = "identity", na.rm = FALSE,
-  show.legend = TRUE, inherit.aes = TRUE,
-  fun, relim, imlim, n = 10, ...) {
+                                  stat = "complex_function",
+                                  position = "identity", na.rm = FALSE,
+                                  show.legend = TRUE, inherit.aes = TRUE,
+                                  fun, relim, imlim, n = 10, ...) {
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
 
@@ -104,25 +104,27 @@ stat_complex_function <- function(mapping = NULL, data = NULL, geom = "raster",
 #' @export
 
 StatComplexFunction <- ggproto("StatComplexFunction", Stat,
+  required_aes = c("relim", "imlim"),
 
-                               required_aes = c("relim", "imlim"),
+  compute_group = function(data, scales, fun, relim, imlim, n = n) {
+   # Create a sequence of real and imaginary values within the limits
+   re_seq <- seq(relim[1], relim[2], length.out = n)
+   im_seq <- seq(imlim[1], imlim[2], length.out = n)
+   grid <- expand.grid(re = re_seq, im = im_seq)
 
-                               compute_group = function(data, scales, fun, relim, imlim, n = n) {
-                                 # Create a sequence of real and imaginary values within the limits
-                                 re_seq <- seq(relim[1], relim[2], length.out = n)
-                                 im_seq <- seq(imlim[1], imlim[2], length.out = n)
-                                 grid <- expand.grid(re = re_seq, im = im_seq)
+   grid$z <- complex(real = grid$re, imaginary = grid$im)
+   grid$fz <- fun(grid$z)
+   grid$H <- rad2deg(Arg(grid$fz))
+   grid$S <- 80
+   grid$L <- 50 + times(times(atan(abs(grid$fz)),2/pi),50)
+   grid$fill <- farver::encode_colour(cbind(grid$H, grid$S, grid$L), from = "hsl")
 
-                                 grid$z <- complex(real = grid$re, imaginary = grid$im)
-                                 grid$fz <- fun(grid$z)
-                                 grid$H <- rad2deg(Arg(grid$fz))
-                                 grid$S <- 80
-                                 grid$L <- 50 + times(times(atan(abs(grid$fz)),2/pi),50)
-                                 grid$fill <- farver::encode_colour(cbind(grid$H, grid$S, grid$L), from = "hsl")
+   grid$x <- grid$re
+   grid$y <- grid$im
 
-                                 grid$x <- grid$re
-                                 grid$y <- grid$im
+   grid$Angle <- grid$H
+   grid$Magnitude <- grid$L
 
-                                 data <- grid
-                               }
+   data <- biscale::bi_class(grid, x = Angle, y = Magnitude, style = "quantile")
+  }
 )

@@ -11,6 +11,7 @@ numbers, and soon dual numbers and more.
 ``` r
 library("ggvfields")
 #> Loading required package: ggplot2
+#> Warning: package 'ggplot2' was built under R version 4.3.3
 options(ggplot2.continuous.colur="viridis")
 ```
 
@@ -142,7 +143,7 @@ g <- function(v) {
 
 ggplot() +
   geom_vector_field(
-    aes(color = after_stat(laplacian)), n = 20,
+    aes(color = after_stat(laplacian)), n = 16, 
     fun = g, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi)
   ) +
   coord_fixed()
@@ -202,10 +203,50 @@ f <- function(z) (z^2 + 1) / (z^2 - 1)
 # create a ggplot with the complex vector field layer
 ggplot() +
   geom_complex_function(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) +
-  coord_fixed()
+  labs(x = "Real", y = "Imaginary") +
+  coord_fixed() 
 ```
 
 <img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+
+We can enhance this plot with a little help from biscale.
+
+Using biscale, we can apply a bivariate color scale to the plot, which
+allows us to represent two variables—angle (direction) and magnitude
+(intensity)—simultaneously. This makes it easier to visualize how these
+properties change across the field.
+
+``` r
+library(biscale)
+#> Warning: package 'biscale' was built under R version 4.3.3
+library(cowplot)
+
+plot <-
+  ggplot() +
+  geom_complex_function(aes(fill = after_stat(bi_class)),
+    fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100
+    ) +
+    bi_scale_fill(pal = "DkBlue") +
+    labs(
+      title = "",
+      x = "Real (Re)",
+      y = "Imaginary (Im)"
+    ) +
+    bi_theme(base_size = 16) +
+    theme(legend.position = "none") +
+  coord_fixed() 
+  
+legend <- bi_legend(pal = "DkBlue",
+                    xlab = "Angle",
+                    ylab = "Magnitude",
+                    size = 6)
+
+ggdraw() +
+  draw_plot(plot, 0, 0, .8, 1) +  # Main plot without legend
+  draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3)
+```
+
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
 
 ## License
 
