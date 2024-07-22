@@ -15,7 +15,8 @@
 #' @param center Logical; if TRUE, centers the vector on the evaluated x/y
 #'   location. If FALSE, the vector origin is on the evaluated x/y location.
 #' @param normalize Logical; if TRUE, normalizes the vector to a length of unit
-#'   1.
+#'   1 and scales them to avoid overplotting based on grid density and plot
+#'   range.
 #' @param arrow Arrow specification, as created by `grid::arrow()`.
 #' @return A ggplot2 layer that can be added to a ggplot object to produce a
 #'   vector field plot.

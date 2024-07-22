@@ -106,7 +106,8 @@ calculating the directional derivative.}
 location. If FALSE, the vector origin is on the evaluated x/y location.}
 
 \item{normalize}{Logical; if TRUE, normalizes the vector to a length of unit
-1.}
+1 and scales them to avoid overplotting based on grid density and plot
+range.}
 
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}.}
 
