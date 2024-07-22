@@ -183,6 +183,17 @@ StatVectorField <- ggproto("StatVectorField", Stat,
       # Normalize the vectors
       data$u <- data$u / data$norm
       data$v <- data$v / data$norm
+
+      # Calculate the spacing between grid points
+      x_spacing <- (xlim[2] - xlim[1]) / (n - 1)
+      y_spacing <- (ylim[2] - ylim[1]) / (n - 1)
+      spacing <- min(x_spacing, y_spacing)
+
+      # Scale the vectors to avoid overplotting
+      scale_factor <- 0.6 * spacing
+      data$u <- data$u * scale_factor
+      data$v <- data$v * scale_factor
+
     }
 
     if (center) {

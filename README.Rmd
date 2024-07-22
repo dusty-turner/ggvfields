@@ -90,7 +90,7 @@ To visualize the the curl:
 ```{r}
 ggplot() +
   geom_vector_field(
-    aes(color = after_stat(curl)), 
+    aes(color = after_stat(curl)),
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
   ) +
   coord_fixed()
@@ -121,7 +121,7 @@ g <- function(v) {
 
 ggplot() +
   geom_vector_field(
-    aes(color = after_stat(laplacian)), n = 16, 
+    aes(color = after_stat(laplacian)), n = 15, 
     fun = g, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi)
   ) +
   coord_fixed()
