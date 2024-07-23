@@ -240,7 +240,7 @@ legend <- bi_legend(pal = "DkBlue",
                     size = 6)
 
 ggdraw() +
-  draw_plot(plot, 0, 0, .8, 1) +  # Main plot without legend
+  draw_plot(plot, 0, 0, .8, 1) +  
   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3)
 ```
 

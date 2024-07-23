@@ -197,8 +197,29 @@ legend <- bi_legend(pal = "DkBlue",
                     size = 6)
 
 ggdraw() +
-  draw_plot(plot, 0, 0, .8, 1) +  # Main plot without legend
+  draw_plot(plot, 0, 0, .8, 1) +  
   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3)
+```
+
+### `geom_streamplot()`{.R}
+
+The `geom_streamplot()`{.R} function generates a stream plot layer of a user-defined vector field function. The lines in the plot represent the flow of data points through the vector field.
+
+```{r}
+# Custom Function
+f <- function(v) {
+  x <- v[1]
+  y <- v[2]
+  c(-1 - x^2 + y, 1 + x - y^2)
+}
+
+# Plot using geom_streamplot
+ggplot() +
+  geom_streamplot(aes(group = after_stat(id)),
+                  fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000,
+                  max_steps = 10000, ds = .05, min_dist = .25) +
+  coord_fixed() +
+  theme_minimal()
 ```
 
 
