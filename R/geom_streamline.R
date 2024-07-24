@@ -136,6 +136,19 @@ StatStreamplot <- ggproto("StatStreamplot", Stat,
       data.frame(x = sapply(traj, `[[`, 1), y = sapply(traj, `[[`, 2), id = i)
     }))
 
+    trajectory_data$norm <- sqrt(trajectory_data$x^2 + trajectory_data$y^2)
+
+    for (current_id in unique(trajectory_data$id)) {
+      # Subset data for the current id
+      traj <- subset(trajectory_data, id == current_id)
+
+      # Calculate new id2 values
+      new_id2 <- paste(current_id, (seq_along(traj$id) - 1) %/% 10, sep = "_")
+
+      # Assign the new id2 values back to the original data
+      trajectory_data$id2[trajectory_data$id == current_id] <- new_id2
+    }
+
     return(trajectory_data)
   }
 )

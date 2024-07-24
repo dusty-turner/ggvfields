@@ -122,7 +122,7 @@ g <- function(v) {
 ggplot() +
   geom_vector_field(
     aes(color = after_stat(laplacian)), n = 15, 
-    fun = g, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi)
+    fun = g, xlim = c(-20*pi, 20*pi), ylim = c(-20*pi, 20*pi)
   ) +
   coord_fixed()
 ```

@@ -155,9 +155,9 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
 #' @usage NULL
 #' @export
 # Define the custom stat
-StatVectorField <- ggproto("StatVectorField", Stat,
 
-  default_aes = aes(color = after_stat(norm)),
+StatVectorField <- ggproto("StatVectorField", Stat,
+  default_aes = aes(color = after_stat(norm)),  # Default to color by norm
 
   compute_group = function(data, scales, fun, xlim, ylim, v = c(1,2), n, center, normalize, ...) {
 
@@ -194,7 +194,6 @@ StatVectorField <- ggproto("StatVectorField", Stat,
       scale_factor <- 0.6 * spacing
       data$u <- data$u * scale_factor
       data$v <- data$v * scale_factor
-
     }
 
     if (center) {
@@ -236,7 +235,13 @@ StatVectorField <- ggproto("StatVectorField", Stat,
     vx <- v[1]; vy <- v[2]
     data$directional_derivative <- grad %*% (c(vx , vy) / sqrt(vx ^ 2 + vy ^ 2))
 
+    if (!normalize) {
+      # default_aes = aes(color = after_stat(norm))
+      data$norm <- "black"  # Remove color when normalize is FALSE
+      # data$colour <- NULL  # Remove color when normalize is FALSE
+    } else {
+      # data$colour <- data$norm
+     }
     data
   }
 )
-
