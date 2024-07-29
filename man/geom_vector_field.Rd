@@ -23,6 +23,7 @@ geom_vector_field(
   n = 16,
   center = TRUE,
   normalize = TRUE,
+  scale_factor = 0.6,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
@@ -42,6 +43,7 @@ stat_vector_field(
   n = 16,
   center = TRUE,
   normalize = TRUE,
+  scale_factor = 0.6,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
@@ -109,6 +111,8 @@ location. If FALSE, the vector origin is on the evaluated x/y location.}
 1 and scales them to avoid overplotting based on grid density and plot
 range.}
 
+\item{scale_factor}{Numeric; a scaling factor applied to the vectors to adjust their length relative to the grid spacing. Defaults to 0.6.}
+
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}.}
 
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}. These are
@@ -155,13 +159,6 @@ ggplot() +
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
   )
 
-# add arrowheads
-ggplot() +
-  geom_vector_field(
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
-    arrow = arrow(length = unit(.015, "npc"), type = "closed")
-  )
-
 # various options
 ggplot() +
   geom_vector_field(
@@ -173,8 +170,15 @@ ggplot() +
 ggplot() +
   geom_vector_field(
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
-    n = 16, center = FALSE, normalize = FALSE,
+    n = 10, center = FALSE, normalize = FALSE,
     arrow = arrow(length = unit(1, "mm"))
+  )
+
+ggplot() +
+  geom_vector_field(
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
+    center = TRUE, color = "black",
+    scale_factor = .7
   )
 
 }

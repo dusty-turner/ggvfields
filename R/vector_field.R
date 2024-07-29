@@ -17,6 +17,7 @@
 #' @param normalize Logical; if TRUE, normalizes the vector to a length of unit
 #'   1 and scales them to avoid overplotting based on grid density and plot
 #'   range.
+#' @param scale_factor Numeric; a scaling factor applied to the vectors to adjust their length relative to the grid spacing. Defaults to 0.6.
 #' @param arrow Arrow specification, as created by `grid::arrow()`.
 #' @return A ggplot2 layer that can be added to a ggplot object to produce a
 #'   vector field plot.
@@ -36,13 +37,6 @@
 #'     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
 #'   )
 #'
-#' # add arrowheads
-#' ggplot() +
-#'   geom_vector_field(
-#'     fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
-#'     arrow = arrow(length = unit(.015, "npc"), type = "closed")
-#'   )
-#'
 #' # various options
 #' ggplot() +
 #'   geom_vector_field(
@@ -54,9 +48,17 @@
 #' ggplot() +
 #'   geom_vector_field(
 #'     fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
-#'     n = 16, center = FALSE, normalize = FALSE,
+#'     n = 10, center = FALSE, normalize = FALSE,
 #'     arrow = arrow(length = unit(1, "mm"))
 #'   )
+#'
+#' ggplot() +
+#'   geom_vector_field(
+#'     fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
+#'     center = TRUE, color = "black",
+#'     scale_factor = .7
+#'   )
+
 #'
 #' @section Computed variables:
 #'
@@ -78,6 +80,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
                               show.legend = NA, inherit.aes = TRUE,
                               fun, xlim, ylim, v = c(1,2), n = 16,
                               center = TRUE, normalize = TRUE,
+                              scale_factor = 0.6,
                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                               ...) {
 
@@ -99,13 +102,13 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
       v = v,
       center = center,
       normalize = normalize,
+      scale_factor = scale_factor,
       arrow = arrow,
       na.rm = na.rm,
       ...
     )
   )
 }
-
 
 #' @rdname geom_vector_field
 #' @format NULL
@@ -120,6 +123,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
                               show.legend = NA, inherit.aes = TRUE,
                               fun, xlim, ylim, v = c(1,2), n = 16,
                               center = TRUE, normalize = TRUE,
+                              scale_factor = 0.6,
                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                               ...) {
 
@@ -141,12 +145,14 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
       v = v,
       center = center,
       normalize = normalize,
+      scale_factor = scale_factor,
       arrow = arrow,
       na.rm = na.rm,
       ...
     )
   )
 }
+
 
 
 
@@ -159,7 +165,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
 StatVectorField <- ggproto("StatVectorField", Stat,
   default_aes = aes(color = after_stat(norm)),  # Default to color by norm
 
-  compute_group = function(data, scales, fun, xlim, ylim, v = c(1,2), n, center, normalize, ...) {
+  compute_group = function(data, scales, fun, xlim, ylim, v = c(1,2), n, center, normalize, scale_factor, ...) {
 
     # Create a sequence of x and y values within the limits
     grid <- expand.grid(
@@ -191,9 +197,8 @@ StatVectorField <- ggproto("StatVectorField", Stat,
       spacing <- min(x_spacing, y_spacing)
 
       # Scale the vectors to avoid overplotting
-      scale_factor <- 0.6 * spacing
-      data$u <- data$u * scale_factor
-      data$v <- data$v * scale_factor
+      data$u <- data$u * scale_factor * spacing
+      data$v <- data$v * scale_factor * spacing
     }
 
     if (center) {
@@ -235,13 +240,6 @@ StatVectorField <- ggproto("StatVectorField", Stat,
     vx <- v[1]; vy <- v[2]
     data$directional_derivative <- grad %*% (c(vx , vy) / sqrt(vx ^ 2 + vy ^ 2))
 
-    if (!normalize) {
-      # default_aes = aes(color = after_stat(norm))
-      data$norm <- "black"  # Remove color when normalize is FALSE
-      # data$colour <- NULL  # Remove color when normalize is FALSE
-    } else {
-      # data$colour <- data$norm
-     }
     data
   }
 )
