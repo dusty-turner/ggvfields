@@ -56,3 +56,36 @@ compute_laplacian <- function(func, v) {
   hessian_matrix <- numDeriv::hessian(func, v)
   sum(diag(hessian_matrix))
 }
+
+# Custom draw key function for length aesthetic
+draw_key_length <- function(data, params, size) {
+  rel_length <- data$length %||% 1
+  grid::linesGrob(
+    x = c(0.5 - 0.4 * rel_length, 0.5 + 0.4 * rel_length), y = c(0.5, 0.5),  # Adjust the length of the line
+    gp = grid::gpar(
+      col = alpha(data$colour %||% "black", data$alpha %||% NA),
+      lwd = 1  # Constant line width for the legend key
+    )
+  )
+}
+
+# Utility function to replace %||%
+`%||%` <- function(a, b) if (!is.null(a)) a else b
+
+# Helper function to extract expression inside after_stat
+extract_after_stat <- function(mapping, aes_name) {
+  if (!is.null(mapping[[aes_name]])) {
+    aes_expr <- as_label(mapping[[aes_name]])
+    # aes_expr <- as.character(mapping[[aes_name]])
+
+    pattern <- "after_stat\\(([^)]+)\\)"
+    match <- regexec(pattern, aes_expr)
+
+    if (length(match[[1]]) > 1) {
+      extracted <- regmatches(aes_expr, match)[[1]][2]
+      return(extracted)
+    }
+  }
+  return(NULL)
+}
+

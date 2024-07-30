@@ -18,6 +18,12 @@
 #'   streamline generation.
 #' @param min_dist A numeric value specifying the minimum distance between
 #'   streamlines.
+#' @param chop A logical value indicating whether to chop the trajectories into
+#'   segments.
+#' @param chop_fraction A numeric value specifying the maximum allowable segment
+#'   size as a fraction of the total range for chopping the trajectories.
+#' @param mask_shape_type A character string specifying the mask shape type:
+#'   "square", "diamond", or "inset_square".
 #' @param arrow Arrow specification, as created by `grid::arrow()`.
 #' @name geom_streamplot
 #' @rdname geom_streamplot
@@ -30,16 +36,19 @@
 #' library(ggplot2)
 #' # Example user-defined function
 #' f <- function(v) {
-#' x <- v[1]
-#' y <- v[2]
-#' c(-1 - x^2 + y, 1 + x - y^2)
+#'   x <- v[1]
+#'   y <- v[2]
+#'   c(-1 - x^2 + y, 1 + x - y^2)
 #' }
 #'
 #' # Create a ggplot with the stream plot layer
 #' ggplot() +
-#'   geom_streamplot(aes(group = after_stat(id)),
-#'                   fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000,
-#'                   max_steps = 10000, ds = .05, min_dist = .25) +
+#'   geom_streamplot(
+#'     aes(group = after_stat(id)), fun = f, xlim = c(-3, 3),
+#'         ylim = c(-3, 3), max_length = 10000, max_steps = 10000,
+#'         ds = .05, min_dist = .25, chop = TRUE, chop_fraction = 0.1,
+#'         mask_shape_type = "diamond"
+#'         ) +
 #'   coord_fixed() +
 #'   theme_minimal()
 #'
@@ -47,14 +56,13 @@ NULL
 
 #' @rdname geom_streamplot
 #' @export
-
 geom_streamplot <- function(mapping = NULL, data = NULL,
                             stat = "streamplot", position = "identity",
                             na.rm = FALSE, show.legend = TRUE, inherit.aes = TRUE,
                             fun, xlim, ylim, max_length, max_steps,
-                            ds, min_dist,
+                            ds, min_dist, mask_shape_type = "square",
                             arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                            ...) {
+                            chop = TRUE, chop_fraction = 0.1, ...) {
   if (is.null(data)) data <- ensure_nonempty_data(data)
 
   layer(
@@ -73,7 +81,10 @@ geom_streamplot <- function(mapping = NULL, data = NULL,
       max_steps = max_steps,
       ds = ds,
       min_dist = min_dist,
+      mask_shape_type = mask_shape_type,
       arrow = arrow,
+      chop = chop,
+      chop_fraction = chop_fraction,
       na.rm = na.rm,
       ...
     )
@@ -88,13 +99,13 @@ GeomStreamplot <- ggproto("GeomStreamplot", GeomPath)
 
 #' @rdname geom_streamplot
 #' @export
-
 stat_streamline <- function(mapping = NULL, data = NULL,
-                              stat = "streamplot", position = "identity",
-                              na.rm = FALSE, show.legend = TRUE, inherit.aes = TRUE,
-                              fun, xlim, ylim, max_length, max_steps,
-                              ds, min_dist, arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                              ...) {
+                            stat = "streamplot", position = "identity",
+                            na.rm = FALSE, show.legend = TRUE, inherit.aes = TRUE,
+                            fun, xlim, ylim, max_length, max_steps,
+                            ds, min_dist, mask_shape_type = "square",
+                            arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+                            chop = TRUE, chop_fraction = 0.1, ...) {
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
 
@@ -114,7 +125,10 @@ stat_streamline <- function(mapping = NULL, data = NULL,
       max_steps = max_steps,
       ds = ds,
       min_dist = min_dist,
+      mask_shape_type = mask_shape_type,
       arrow = arrow,
+      chop = chop,
+      chop_fraction = chop_fraction,
       na.rm = na.rm,
       ...
     )
@@ -125,11 +139,11 @@ stat_streamline <- function(mapping = NULL, data = NULL,
 #' @format NULL
 #' @usage NULL
 #' @export
-
 StatStreamplot <- ggproto("StatStreamplot", Stat,
-  compute_group = function(data, scales, fun, xlim, ylim, max_length, max_steps, ds, min_dist) {
 
-    trajectories <- streamplot(fun, xlim, ylim, max_length, max_steps, ds, min_dist)
+  compute_group = function(data, scales, fun, xlim, ylim, max_length, max_steps, ds, min_dist, chop, chop_fraction, mask_shape_type) {
+
+    trajectories <- streamplot(fun, xlim, ylim, max_length, max_steps, ds, min_dist, mask_shape_type)
 
     trajectory_data <- do.call(rbind, lapply(seq_along(trajectories), function(i) {
       traj <- trajectories[[i]]
@@ -138,17 +152,30 @@ StatStreamplot <- ggproto("StatStreamplot", Stat,
 
     trajectory_data$norm <- sqrt(trajectory_data$x^2 + trajectory_data$y^2)
 
-    for (current_id in unique(trajectory_data$id)) {
-      # Subset data for the current id
-      traj <- subset(trajectory_data, id == current_id)
+    if(chop){
 
-      # Calculate new id2 values
-      new_id2 <- paste(current_id, (seq_along(traj$id) - 1) %/% 10, sep = "_")
+      # Convert chop_fraction to an actual distance
+      divide_smaller_than <- max((xlim[2] - xlim[1]) * chop_fraction, (ylim[2] - ylim[1]) * chop_fraction)
 
-      # Assign the new id2 values back to the original data
-      trajectory_data$id2[trajectory_data$id == current_id] <- new_id2
+      # Calculate arclength
+      arclength <- numeric(nrow(trajectory_data))
+
+      for(i in seq_along(unique(trajectory_data$id))) {
+        id_indices <- which(trajectory_data$id == unique(trajectory_data$id)[i])
+        arclength[id_indices] <- c(0, cumsum(sqrt(diff(trajectory_data$x[id_indices])^2 + diff(trajectory_data$y[id_indices])^2)))
+      }
+
+      trajectory_data$arclength <- arclength
+
+      # Calculate total arclength for each id
+      total_arclength <- tapply(trajectory_data$arclength, trajectory_data$id, max)
+
+      # Add total_arclength to trajectory_data
+      trajectory_data$total_arclength <- total_arclength[as.character(trajectory_data$id)]
+
+      # Create new id with segment information
+      trajectory_data$id <- paste0(trajectory_data$id, "_", floor(trajectory_data$arclength / divide_smaller_than) + 1)
     }
-
     return(trajectory_data)
   }
 )

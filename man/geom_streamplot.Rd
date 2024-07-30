@@ -23,7 +23,10 @@ geom_streamplot(
   max_steps,
   ds,
   min_dist,
+  mask_shape_type = "square",
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  chop = TRUE,
+  chop_fraction = 0.1,
   ...
 )
 
@@ -42,7 +45,10 @@ stat_streamline(
   max_steps,
   ds,
   min_dist,
+  mask_shape_type = "square",
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  chop = TRUE,
+  chop_fraction = 0.1,
   ...
 )
 }
@@ -110,7 +116,16 @@ streamline generation.}
 \item{min_dist}{A numeric value specifying the minimum distance between
 streamlines.}
 
+\item{mask_shape_type}{A character string specifying the mask shape type:
+"square", "diamond", or "inset_square".}
+
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}.}
+
+\item{chop}{A logical value indicating whether to chop the trajectories into
+segments.}
+
+\item{chop_fraction}{A numeric value specifying the maximum allowable segment
+size as a fraction of the total range for chopping the trajectories.}
 
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}. These are
 often aesthetics, used to set an aesthetic to a fixed value, like
@@ -130,16 +145,19 @@ through the vector field.
 library(ggplot2)
 # Example user-defined function
 f <- function(v) {
-x <- v[1]
-y <- v[2]
-c(-1 - x^2 + y, 1 + x - y^2)
+  x <- v[1]
+  y <- v[2]
+  c(-1 - x^2 + y, 1 + x - y^2)
 }
 
 # Create a ggplot with the stream plot layer
 ggplot() +
-  geom_streamplot(aes(group = after_stat(id)),
-                  fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000,
-                  max_steps = 10000, ds = .05, min_dist = .25) +
+  geom_streamplot(
+    aes(group = after_stat(id)), fun = f, xlim = c(-3, 3),
+        ylim = c(-3, 3), max_length = 10000, max_steps = 10000,
+        ds = .05, min_dist = .25, chop = TRUE, chop_fraction = 0.1,
+        mask_shape_type = "diamond"
+        ) +
   coord_fixed() +
   theme_minimal()
 

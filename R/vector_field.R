@@ -1,6 +1,6 @@
 #' Create a Vector Field Plot Layer
 #'
-#' [geom_vector_field()] generates a vector field plot layer using a
+#' `geom_vector_field` generates a vector field plot layer using a
 #' user-defined function to compute the vector components. This is particularly
 #' useful for visualizing vector fields in a two-dimensional space.
 #' @inheritParams ggplot2::geom_raster
@@ -8,7 +8,6 @@
 #' @param fun A user-defined function that takes two arguments (x and y
 #'   coordinates) and returns a list of two components: the x and y components
 #'   of the vector field.
-#' @param xlim,ylim A numeric vector of length 2 giving the x-axis limits.
 #' @param n An integer specifying the number of grid points along each axis.
 #' @param v Numeric vector specifying the direction vector components for
 #'   calculating the directional derivative.
@@ -17,7 +16,8 @@
 #' @param normalize Logical; if TRUE, normalizes the vector to a length of unit
 #'   1 and scales them to avoid overplotting based on grid density and plot
 #'   range.
-#' @param scale_factor Numeric; a scaling factor applied to the vectors to adjust their length relative to the grid spacing. Defaults to 0.6.
+#' @param scale_factor Numeric; a scaling factor applied to the vectors to
+#'   adjust their length relative to the grid spacing. Defaults to 1.
 #' @param arrow Arrow specification, as created by `grid::arrow()`.
 #' @return A ggplot2 layer that can be added to a ggplot object to produce a
 #'   vector field plot.
@@ -58,7 +58,6 @@
 #'     center = TRUE, color = "black",
 #'     scale_factor = .7
 #'   )
-
 #'
 #' @section Computed variables:
 #'
@@ -71,20 +70,18 @@
 #'   }
 NULL
 
-
 #' @rdname geom_vector_field
 #' @export
-geom_vector_field <- function(mapping = NULL, data = NULL,
-                              stat = "vectorfield",
-                              position = "identity", na.rm = FALSE,
-                              show.legend = NA, inherit.aes = TRUE,
-                              fun, xlim, ylim, v = c(1,2), n = 16,
+geom_vector_field <- function(mapping = NULL, data = NULL, stat = "vectorfield",
+                              position = "identity", na.rm = FALSE, show.legend = TRUE,
+                              inherit.aes = TRUE, fun, xlim, ylim, v = c(1, 2), n = 16,
                               center = TRUE, normalize = TRUE,
-                              scale_factor = 0.6,
+                              scale_factor = 1,
                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                               ...) {
-
   if (is.null(data)) data <- ensure_nonempty_data(data)
+
+  length_var <- extract_after_stat(mapping, "length")
 
   layer(
     stat = StatVectorField,
@@ -105,29 +102,38 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
       scale_factor = scale_factor,
       arrow = arrow,
       na.rm = na.rm,
+      length_var = length_var,
       ...
     )
   )
 }
 
+
 #' @rdname geom_vector_field
 #' @format NULL
 #' @usage NULL
 #' @export
-GeomVectorField <- ggproto("GeomVectorField", GeomSegment)
+GeomVectorField <- ggproto("GeomVectorField", GeomSegment,
+                           draw_key = draw_key_length,
+                           required_aes = c("x", "y", "xend", "yend"),
+                           default_aes = aes(colour = "black", linewidth = 0.5, linetype = 1, alpha = 1, length = 1),
+                           setup_data = function(data, params) {
+                             data$length <- data$length %||% 1
+                             data
+                           }
+)
 
 #' @rdname geom_vector_field
 #' @export
 stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
                               position = "identity", na.rm = FALSE,
                               show.legend = NA, inherit.aes = TRUE,
-                              fun, xlim, ylim, v = c(1,2), n = 16,
+                              fun, xlim, ylim, v = c(1, 2), n = 16,
                               center = TRUE, normalize = TRUE,
-                              scale_factor = 0.6,
+                              scale_factor = 1,
                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                               ...) {
-
-  if (is.null(data)) data <- ensure_nonempty_data
+  if (is.null(data)) data <- ensure_nonempty_data()
 
   layer(
     stat = StatVectorField,
@@ -153,93 +159,121 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
   )
 }
 
-
-
-
 #' @rdname geom_vector_field
 #' @format NULL
 #' @usage NULL
 #' @export
-# Define the custom stat
-
 StatVectorField <- ggproto("StatVectorField", Stat,
-  default_aes = aes(color = after_stat(norm)),  # Default to color by norm
+                           default_aes = aes(color = after_stat(norm), length = after_stat(norm)),
 
-  compute_group = function(data, scales, fun, xlim, ylim, v = c(1,2), n, center, normalize, scale_factor, ...) {
+                           compute_group = function(data, scales, fun, xlim, ylim, v = c(1, 2), n, center, normalize, scale_factor, length_var, ...) {
+                             # Create a sequence of x and y values within the limits
+                             grid <- expand.grid(
+                               x = seq(xlim[1], xlim[2], length.out = n),
+                               y = seq(ylim[1], ylim[2], length.out = n)
+                             ) |> as.matrix()
 
-    # Create a sequence of x and y values within the limits
-    grid <- expand.grid(
-      x = seq(xlim[1], xlim[2], length.out = n),
-      y = seq(ylim[1], ylim[2], length.out = n)
-    ) |> as.matrix()
+                             vectors <- vectorize(fun)(grid)
 
-    vectors <- vectorize(fun)(grid)
+                             # Create a data frame for geom_segment
+                             data <- data.frame(
+                               x = grid[, 1],
+                               y = grid[, 2],
+                               u = vectors[, 1],
+                               v = vectors[, 2]
+                             )
 
-    # Create a data frame for geom_segment
-    data <- data.frame(
-      x = grid[,1],
-      y = grid[,2],
-      u = vectors[,1],
-      v = vectors[,2]
-    )
+                             # Calculate norm, divergence, curl, laplacian, and directional derivative
+                             # Calculate magnitude/norm
+                             data$norm <- sqrt(data$u ^ 2 + data$v ^ 2)
 
-    # Calculate magnitude
-    data$norm <- sqrt(data$u ^ 2 + data$v ^ 2)
+                             grad <- grid |> apply(1, numDeriv::grad, func = fun) |> t()
+                             grad_u <- grad[, 1]
+                             grad_v <- grad[, 2]
 
-    if (normalize) {
-      # Normalize the vectors
-      data$u <- data$u / data$norm
-      data$v <- data$v / data$norm
+                             # Divergence
+                             data$divergence <- grad_u + grad_v
 
-      # Calculate the spacing between grid points
-      x_spacing <- (xlim[2] - xlim[1]) / (n - 1)
-      y_spacing <- (ylim[2] - ylim[1]) / (n - 1)
-      spacing <- min(x_spacing, y_spacing)
+                             # Curl
+                             data$curl <- grad_v - grad_u
 
-      # Scale the vectors to avoid overplotting
-      data$u <- data$u * scale_factor * spacing
-      data$v <- data$v * scale_factor * spacing
-    }
+                             # Laplacian
+                             hess_u <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 1))
+                             hess_v <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 2))
+                             data$laplacian <- hess_u + hess_v
 
-    if (center) {
-      # Calculate the half-length of the vectors
-      half_u <- data$u / 2
-      half_v <- data$v / 2
+                             # Directional Derivative
+                             vx <- v[1]; vy <- v[2]
+                             data$directional_derivative <- grad %*% (c(vx, vy) / sqrt(vx ^ 2 + vy ^ 2))
 
-      # Calculate the end points of the vectors
-      data$xend <- data$x + half_u
-      data$yend <- data$y + half_v
+                             if (normalize) {
+                               # Calculate the spacing between grid points
+                               x_spacing <- (xlim[2] - xlim[1]) / (n - 1)
+                               y_spacing <- (ylim[2] - ylim[1]) / (n - 1)
+                               spacing <- min(x_spacing, y_spacing)
 
-      # Calculate the start points of the vectors
-      data$x <- data$x - half_u
-      data$y <- data$y - half_v
-    } else {
-      # Calculate the end points of the vectors
-      data$xend <- data$x + data$u
-      data$yend <- data$y + data$v
-    }
+                               # Determine the scale factor based on the length aesthetic
+                               scale_values <- if (!is.null(length_var)) {
+                                 if (length_var %in% colnames(data)) {
+                                   data[[length_var]]
+                                 } else {
+                                   data$norm
+                                 }
+                               } else {
+                                 data$norm
+                               }
 
-    ## calculate divergence -- will remove pipes when I verify this is correctly calculated
-    grad <- grid |> apply(1, numDeriv::grad, func = fun) |> t()# |> apply(1, sum)
-    grad_u <- grad[,1]
-    grad_v <- grad[,2]
+                               rescaled_values <- scales::rescale(scale_values, to = c(0, 1))
 
-    ## Divergence
-    data$divergence <- grad_u + grad_v
+                               # Normalize the vectors and scale to avoid overplotting
+                               data$u <- data$u / data$norm * rescaled_values * scale_factor * spacing
+                               data$v <- data$v / data$norm * rescaled_values * scale_factor * spacing
+                             }
 
-    ## Curl
-    data$curl <- grad_v - grad_u
+                             if (center) {
+                               # Calculate the half-length of the vectors
+                               half_u <- data$u / 2
+                               half_v <- data$v / 2
 
-    ## Laplacian
-    hess_u <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 1))
-    hess_v <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 2))
-    data$laplacian <- hess_u + hess_v
+                               # Calculate the end points of the vectors
+                               data$xend <- data$x + half_u
+                               data$yend <- data$y + half_v
 
-    ## Directional Derivative ## needs to be verified
-    # Assign directional derivative vector
-    vx <- v[1]; vy <- v[2]
-    data$directional_derivative <- grad %*% (c(vx , vy) / sqrt(vx ^ 2 + vy ^ 2))
+                               # Calculate the start points of the vectors
+                               data$x <- data$x - half_u
+                               data$y <- data$y - half_v
+                             } else {
+                               # Calculate the end points of the vectors
+                               data$xend <- data$x + data$u
+                               data$yend <- data$y + data$v
+                             }
 
-    data
-  }
+                             data
+                           }
 )
+
+
+#' Continuous Scale for Vector Length
+#'
+#' `scale_length_continuous` provides a continuous scale for the length
+#' aesthetic in `geom_vector_field`.
+#' @param name The name of the scale.
+#' @param n.breaks The number of breaks.
+#' @param ... Additional parameters passed on to `continuous_scale`.
+#' @export
+#' @examples
+#' f <- function(v) {
+#'   x <- v[1]; y <- v[2]
+#'   c(-y, x)
+#' }
+#' ggplot() +
+#'   geom_vector_field(aes(length = after_stat(norm)), fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) +
+#'   scale_length_continuous()
+scale_length_continuous <- function(name = waiver(), n.breaks = waiver(), ...) {
+  breaks <- pretty
+  labels <- function(x) format(x, scientific = FALSE)
+  continuous_scale(
+    aesthetics = "length", scale_name = "length_c", palette = identity,
+    name = name, breaks = function(x) rev(breaks(x)), labels = labels, ...
+  )
+}
