@@ -8,6 +8,7 @@
 #' @param fun A user-defined function that takes two arguments (x and y
 #'   coordinates) and returns a list of two components: the x and y components
 #'   of the vector field.
+#' @param xlim,ylim A numeric vector of length 2 giving the x-axis limits.
 #' @param n An integer specifying the number of grid points along each axis.
 #' @param v Numeric vector specifying the direction vector components for
 #'   calculating the directional derivative.
