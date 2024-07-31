@@ -8,7 +8,7 @@
 #' @param fun A user-defined function that takes two arguments (x and y
 #'   coordinates) and returns a list of two components: the x and y components
 #'   of the vector field.
-#' @param xlim,ylim A numeric vector of length 2 giving the x-axis limits.
+#' @param xlim,ylim A numeric vector of length 2 giving the x/y-axis limits.
 #' @param n An integer specifying the number of grid points along each axis.
 #' @param v Numeric vector specifying the direction vector components for
 #'   calculating the directional derivative.
@@ -108,21 +108,6 @@ geom_vector_field <- function(mapping = NULL, data = NULL, stat = "vectorfield",
     )
   )
 }
-
-
-#' @rdname geom_vector_field
-#' @format NULL
-#' @usage NULL
-#' @export
-GeomVectorField <- ggproto("GeomVectorField", GeomSegment,
-                           draw_key = draw_key_length,
-                           required_aes = c("x", "y", "xend", "yend"),
-                           default_aes = aes(colour = "black", linewidth = 0.5, linetype = 1, alpha = 1, length = 1),
-                           setup_data = function(data, params) {
-                             data$length <- data$length %||% 1
-                             data
-                           }
-)
 
 #' @rdname geom_vector_field
 #' @export
@@ -224,12 +209,19 @@ StatVectorField <- ggproto("StatVectorField", Stat,
                                  data$norm
                                }
 
-                               rescaled_values <- scales::rescale(scale_values, to = c(0, 1))
+                               rescaled_values <- scale_values
+                               rescaled_values[scale_values > .01] <- scales::rescale(scale_values[scale_values > .01], to = c(.1, 1))
 
                                # Normalize the vectors and scale to avoid overplotting
                                data$u <- data$u / data$norm * rescaled_values * scale_factor * spacing
                                data$v <- data$v / data$norm * rescaled_values * scale_factor * spacing
                              }
+
+                             # Scale arrow size based on the length aes
+                             # data$arrow_size <- scales::rescale(data$norm, to = c(0.005, 0.03))
+                             # data$arrow_size <- scales::rescale(scale_values, to = c(0.005, 0.015))
+                             data$arrow_size <- ifelse(scale_values <.001,0,.015)
+                             # data$arrow_size <- ifelse(scale_values >) scales::rescale(scale_values, to = c(0.005, 0.015))
 
                              if (center) {
                                # Calculate the half-length of the vectors
@@ -250,6 +242,23 @@ StatVectorField <- ggproto("StatVectorField", Stat,
                              }
 
                              data
+                           }
+)
+
+#' @rdname geom_vector_field
+#' @export
+GeomVectorField <- ggproto("GeomVectorField", GeomSegment,
+                           draw_key = draw_key_length,
+                           required_aes = c("x", "y", "xend", "yend"),
+                           default_aes = aes(colour = "black", linewidth = 0.5, linetype = 1, alpha = 1, length = 1, arrow_size = 1),
+                           setup_data = function(data, params) {
+                             data$length <- data$length %||% 1
+                             data
+                           },
+                           draw_panel = function(data, panel_params, coord, arrow = NULL, arrow_size = 1) {
+                             data$arrow_size <- data$arrow_size %||% arrow_size
+                             arrow <- modifyList(arrow, list(length = unit(data$arrow_size, "npc")))
+                             GeomSegment$draw_panel(data, panel_params, coord, arrow = arrow)
                            }
 )
 

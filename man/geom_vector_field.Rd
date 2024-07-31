@@ -3,10 +3,13 @@
 \docType{data}
 \name{geom_vector_field}
 \alias{geom_vector_field}
-\alias{GeomVectorField}
 \alias{stat_vector_field}
 \alias{StatVectorField}
+\alias{GeomVectorField}
 \title{Create a Vector Field Plot Layer}
+\format{
+An object of class \code{GeomVectorField} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 6.
+}
 \usage{
 geom_vector_field(
   mapping = NULL,
@@ -47,6 +50,8 @@ stat_vector_field(
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
+
+GeomVectorField
 }
 \arguments{
 \item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and
@@ -97,7 +102,7 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 coordinates) and returns a list of two components: the x and y components
 of the vector field.}
 
-\item{xlim, ylim}{A numeric vector of length 2 giving the x-axis limits.}
+\item{xlim, ylim}{A numeric vector of length 2 giving the x/y-axis limits.}
 
 \item{v}{Numeric vector specifying the direction vector components for
 calculating the directional derivative.}
