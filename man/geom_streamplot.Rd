@@ -132,7 +132,7 @@ streamline generation.}
 streamline generation.}
 
 \item{mask_shape_type}{A character string specifying the mask shape type:
-"square", "diamond", or "inset_square".}
+"square", "diamond", "inset_square", or "circle".}
 
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}.}
 

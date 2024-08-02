@@ -22,7 +22,7 @@
 #' @param chop_fraction A numeric value specifying the maximum allowable segment
 #'   size as a fraction of the total range for chopping the trajectories.
 #' @param mask_shape_type A character string specifying the mask shape type:
-#'   "square", "diamond", or "inset_square".
+#'   "square", "diamond", "inset_square", or "circle".
 #' @param arrow Arrow specification, as created by `grid::arrow()`.
 #' @name geom_streamplot
 #' @rdname geom_streamplot

@@ -105,6 +105,41 @@ update_mask_inset_square <- function(mask, xi, yi, xlim, ylim, n, inset_fraction
   return(mask)
 }
 
+# Circle mask
+is_within_circle <- function(xi, yi, x_center, y_center, radius) {
+  return(sqrt((xi - x_center)^2 + (yi - y_center)^2) <= radius)
+}
+
+is_too_close_circle <- function(xi, yi, mask, xlim, ylim, n, circle_fraction = 0.5) {
+  xi_index <- floor((xi - xlim[1]) / ((xlim[2] - xlim[1]) / n[1])) + 1
+  yi_index <- floor((yi - ylim[1]) / ((ylim[2] - ylim[1]) / n[2])) + 1
+
+  if (any(xi_index < 1) || any(yi_index < 1) || any(xi_index > ncol(mask)) || any(yi_index > nrow(mask))) {
+    return(TRUE)
+  }
+
+  x_center <- xlim[1] + (xi_index - 0.5) * ((xlim[2] - xlim[1]) / n[1])
+  y_center <- ylim[1] + (yi_index - 0.5) * ((ylim[2] - ylim[1]) / n[2])
+  radius <- min(c((xlim[2] - xlim[1]) / n[1], (ylim[2] - ylim[1]) / n[2])) * circle_fraction
+
+  return(mask[yi_index, xi_index] == 1 && is_within_circle(xi, yi, x_center, y_center, radius))
+}
+
+update_mask_circle <- function(mask, xi, yi, xlim, ylim, n, circle_fraction = 0.5) {
+  xi_index <- floor((xi - xlim[1]) / ((xlim[2] - xlim[1]) / n[1])) + 1
+  yi_index <- floor((yi - ylim[1]) / ((ylim[2] - ylim[1]) / n[2])) + 1
+
+  if (xi_index >= 1 && yi_index >= 1 && xi_index <= ncol(mask) && yi_index <= nrow(mask)) {
+    x_center <- xlim[1] + (xi_index - 0.5) * ((xlim[2] - xlim[1]) / n[1])
+    y_center <- ylim[1] + (yi_index - 0.5) * ((ylim[2] - ylim[1]) / n[2])
+    radius <- min(c((xlim[2] - xlim[1]) / n[1], (ylim[2] - ylim[1]) / n[2])) * circle_fraction
+
+    if (is_within_circle(xi, yi, x_center, y_center, radius)) {
+      mask[yi_index, xi_index] <- 1
+    }
+  }
+  return(mask)
+}
 # Combined function for bidirectional integration using Euler's method
 euler_integrate_bidirectional <- function(xi, yi, f, ds, max_length, max_steps, n, mask, xlim, ylim, is_too_close, update_mask) {
   integrate_fixed <- function(xi, yi, f, ds, max_length, max_steps, n, mask, xlim, ylim, is_too_close) {
@@ -185,6 +220,9 @@ streamplot <- function(f, xlim, ylim, n, max_length, max_steps, ds, mask_shape_t
     ## this inset_fraction is not currently available to the user
     is_too_close <- function(xi, yi, mask, xlim, ylim, n) is_too_close_inset_square(xi, yi, mask, xlim, ylim, n, inset_fraction = 0.5)
     update_mask <- function(mask, xi, yi, xlim, ylim, n) update_mask_inset_square(mask, xi, yi, xlim, ylim, n, inset_fraction = 0.5)
+  } else if (mask_shape_type == "circle") {
+    is_too_close <- function(xi, yi, mask, xlim, ylim, n) is_too_close_circle(xi, yi, mask, xlim, ylim, n, circle_fraction = .5)
+    update_mask <- function(mask, xi, yi, xlim, ylim, n) update_mask_circle(mask, xi, yi, xlim, ylim, n, circle_fraction = .5)
   } else {
     is_too_close <- switch(mask_shape_type,
                            square = is_too_close_square,
