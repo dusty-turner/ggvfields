@@ -1,20 +1,26 @@
+ensure_length_two <- function(n) {
+  if (length(n) == 1) n <- rep(n, 2)
+  if (length(n) != 2) stop("Length of 'n' must be 2")
+  return(n)
+}
+
 # Functions for different mask shapes
 
 # No inset shape (square mask)
-is_too_close_square <- function(xi, yi, mask, xlim, ylim, min_dist) {
-  xi_index <- floor((xi - xlim[1]) / min_dist) + 1
-  yi_index <- floor((yi - ylim[1]) / min_dist) + 1
+is_too_close_square <- function(xi, yi, mask, xlim, ylim, n) {
+  xi_index <- floor((xi - xlim[1]) / ((xlim[2] - xlim[1]) / n[1])) + 1
+  yi_index <- floor((yi - ylim[1]) / ((ylim[2] - ylim[1]) / n[2])) + 1
 
-  if (xi_index < 1 || yi_index < 1 || xi_index > ncol(mask) || yi_index > nrow(mask)) {
+  if (any(xi_index < 1) || any(yi_index < 1) || any(xi_index > ncol(mask)) || any(yi_index > nrow(mask))) {
     return(TRUE)
   }
 
   return(mask[yi_index, xi_index] == 1)
 }
 
-update_mask_square <- function(mask, xi, yi, xlim, ylim, min_dist) {
-  xi_index <- floor((xi - xlim[1]) / min_dist) + 1
-  yi_index <- floor((yi - ylim[1]) / min_dist) + 1
+update_mask_square <- function(mask, xi, yi, xlim, ylim, n) {
+  xi_index <- floor((xi - xlim[1]) / ((xlim[2] - xlim[1]) / n[1])) + 1
+  yi_index <- floor((yi - ylim[1]) / ((ylim[2] - ylim[1]) / n[2])) + 1
 
   if (xi_index >= 1 && yi_index >= 1 && xi_index <= ncol(mask) && yi_index <= nrow(mask)) {
     mask[yi_index, xi_index] <- 1
@@ -27,29 +33,29 @@ is_within_diamond <- function(xi, yi, x_center, y_center, half_diagonal) {
   return(abs(xi - x_center) + abs(yi - y_center) <= half_diagonal)
 }
 
-is_too_close_diamond <- function(xi, yi, mask, xlim, ylim, min_dist) {
-  xi_index <- floor((xi - xlim[1]) / min_dist) + 1
-  yi_index <- floor((yi - ylim[1]) / min_dist) + 1
+is_too_close_diamond <- function(xi, yi, mask, xlim, ylim, n) {
+  xi_index <- floor((xi - xlim[1]) / ((xlim[2] - xlim[1]) / n[1])) + 1
+  yi_index <- floor((yi - ylim[1]) / ((ylim[2] - ylim[1]) / n[2])) + 1
 
-  if (xi_index < 1 || yi_index < 1 || xi_index > ncol(mask) || yi_index > nrow(mask)) {
+  if (any(xi_index < 1) || any(yi_index < 1) || any(xi_index > ncol(mask)) || any(yi_index > nrow(mask))) {
     return(TRUE)
   }
 
-  x_center <- xlim[1] + (xi_index - 0.5) * min_dist
-  y_center <- ylim[1] + (yi_index - 0.5) * min_dist
-  half_diagonal <- min_dist / 2
+  x_center <- xlim[1] + (xi_index - 0.5) * ((xlim[2] - xlim[1]) / n[1])
+  y_center <- ylim[1] + (yi_index - 0.5) * ((ylim[2] - ylim[1]) / n[2])
+  half_diagonal <- min(c((xlim[2] - xlim[1]) / n[1], (ylim[2] - ylim[1]) / n[2])) / 2
 
   return(mask[yi_index, xi_index] == 1 && is_within_diamond(xi, yi, x_center, y_center, half_diagonal))
 }
 
-update_mask_diamond <- function(mask, xi, yi, xlim, ylim, min_dist) {
-  xi_index <- floor((xi - xlim[1]) / min_dist) + 1
-  yi_index <- floor((yi - ylim[1]) / min_dist) + 1
+update_mask_diamond <- function(mask, xi, yi, xlim, ylim, n) {
+  xi_index <- floor((xi - xlim[1]) / ((xlim[2] - xlim[1]) / n[1])) + 1
+  yi_index <- floor((yi - ylim[1]) / ((ylim[2] - ylim[1]) / n[2])) + 1
 
   if (xi_index >= 1 && yi_index >= 1 && xi_index <= ncol(mask) && yi_index <= nrow(mask)) {
-    x_center <- xlim[1] + (xi_index - 0.5) * min_dist
-    y_center <- ylim[1] + (yi_index - 0.5) * min_dist
-    half_diagonal <- min_dist / 2
+    x_center <- xlim[1] + (xi_index - 0.5) * ((xlim[2] - xlim[1]) / n[1])
+    y_center <- ylim[1] + (yi_index - 0.5) * ((ylim[2] - ylim[1]) / n[2])
+    half_diagonal <- min(c((xlim[2] - xlim[1]) / n[1], (ylim[2] - ylim[1]) / n[2])) / 2
 
     if (is_within_diamond(xi, yi, x_center, y_center, half_diagonal)) {
       mask[yi_index, xi_index] <- 1
@@ -68,29 +74,29 @@ is_within_inset_square <- function(xi, yi, x_center, y_center, inset_side) {
   return(xi >= x_min && xi <= x_max && yi >= y_min && yi <= y_max)
 }
 
-is_too_close_inset_square <- function(xi, yi, mask, xlim, ylim, min_dist, inset_fraction = 0.5) {
-  xi_index <- floor((xi - xlim[1]) / min_dist) + 1
-  yi_index <- floor((yi - ylim[1]) / min_dist) + 1
+is_too_close_inset_square <- function(xi, yi, mask, xlim, ylim, n, inset_fraction = 0.5) {
+  xi_index <- floor((xi - xlim[1]) / ((xlim[2] - xlim[1]) / n[1])) + 1
+  yi_index <- floor((yi - ylim[1]) / ((ylim[2] - ylim[1]) / n[2])) + 1
 
-  if (xi_index < 1 || yi_index < 1 || xi_index > ncol(mask) || yi_index > nrow(mask)) {
+  if (any(xi_index < 1) || any(yi_index < 1) || any(xi_index > ncol(mask)) || any(yi_index > nrow(mask))) {
     return(TRUE)
   }
 
-  x_center <- xlim[1] + (xi_index - 0.5) * min_dist
-  y_center <- ylim[1] + (yi_index - 0.5) * min_dist
-  inset_side <- min_dist * inset_fraction
+  x_center <- xlim[1] + (xi_index - 0.5) * ((xlim[2] - xlim[1]) / n[1])
+  y_center <- ylim[1] + (yi_index - 0.5) * ((ylim[2] - ylim[1]) / n[2])
+  inset_side <- min(c((xlim[2] - xlim[1]) / n[1], (ylim[2] - ylim[1]) / n[2])) * inset_fraction
 
   return(mask[yi_index, xi_index] == 1 && is_within_inset_square(xi, yi, x_center, y_center, inset_side))
 }
 
-update_mask_inset_square <- function(mask, xi, yi, xlim, ylim, min_dist, inset_fraction = 0.5) {
-  xi_index <- floor((xi - xlim[1]) / min_dist) + 1
-  yi_index <- floor((yi - ylim[1]) / min_dist) + 1
+update_mask_inset_square <- function(mask, xi, yi, xlim, ylim, n, inset_fraction = 0.5) {
+  xi_index <- floor((xi - xlim[1]) / ((xlim[2] - xlim[1]) / n[1])) + 1
+  yi_index <- floor((yi - ylim[1]) / ((ylim[2] - ylim[1]) / n[2])) + 1
 
   if (xi_index >= 1 && yi_index >= 1 && xi_index <= ncol(mask) && yi_index <= nrow(mask)) {
-    x_center <- xlim[1] + (xi_index - 0.5) * min_dist
-    y_center <- ylim[1] + (yi_index - 0.5) * min_dist
-    inset_side <- min_dist * inset_fraction
+    x_center <- xlim[1] + (xi_index - 0.5) * ((xlim[2] - xlim[1]) / n[1])
+    y_center <- ylim[1] + (yi_index - 0.5) * ((ylim[2] - ylim[1]) / n[2])
+    inset_side <- min(c((xlim[2] - xlim[1]) / n[1], (ylim[2] - ylim[1]) / n[2])) * inset_fraction
 
     if (is_within_inset_square(xi, yi, x_center, y_center, inset_side)) {
       mask[yi_index, xi_index] <- 1
@@ -100,8 +106,8 @@ update_mask_inset_square <- function(mask, xi, yi, xlim, ylim, min_dist, inset_f
 }
 
 # Combined function for bidirectional integration using Euler's method
-euler_integrate_bidirectional <- function(xi, yi, f, ds, max_length, max_steps, min_dist, mask, xlim, ylim, is_too_close, update_mask) {
-  integrate_fixed <- function(xi, yi, f, ds, max_length, max_steps, min_dist, mask, xlim, ylim, is_too_close) {
+euler_integrate_bidirectional <- function(xi, yi, f, ds, max_length, max_steps, n, mask, xlim, ylim, is_too_close, update_mask) {
+  integrate_fixed <- function(xi, yi, f, ds, max_length, max_steps, n, mask, xlim, ylim, is_too_close) {
     xy_traj <- list(c(xi, yi))
     steps <- 0
     length_traveled <- 0
@@ -121,7 +127,7 @@ euler_integrate_bidirectional <- function(xi, yi, f, ds, max_length, max_steps, 
       yi <- yi + dy
       length_traveled <- length_traveled + sqrt(dx^2 + dy^2)
 
-      if (is_too_close(xi, yi, mask, xlim, ylim, min_dist)) break
+      if (is_too_close(xi, yi, mask, xlim, ylim, n)) break
 
       xy_traj <- append(xy_traj, list(c(xi, yi)))
     }
@@ -129,14 +135,14 @@ euler_integrate_bidirectional <- function(xi, yi, f, ds, max_length, max_steps, 
     return(list(traj = xy_traj))
   }
 
-  forward_result <- integrate_fixed(xi, yi, f, ds, max_length, max_steps, min_dist, mask, xlim, ylim, is_too_close)
+  forward_result <- integrate_fixed(xi, yi, f, ds, max_length, max_steps, n, mask, xlim, ylim, is_too_close)
   reverse_f <- function(v) -f(v)
-  backward_result <- integrate_fixed(xi, yi, reverse_f, ds, max_length, max_steps, min_dist, mask, xlim, ylim, is_too_close)
+  backward_result <- integrate_fixed(xi, yi, reverse_f, ds, max_length, max_steps, n, mask, xlim, ylim, is_too_close)
 
   combined_traj <- c(rev(backward_result$traj[-1]), forward_result$traj)
 
   for (point in combined_traj) {
-    mask <- update_mask(mask, point[1], point[2], xlim, ylim, min_dist)
+    mask <- update_mask(mask, point[1], point[2], xlim, ylim, n)
   }
 
   return(list(traj = combined_traj, mask = mask))
@@ -166,9 +172,10 @@ generate_starting_points <- function(mask_shape) {
   return(points)
 }
 
-streamplot <- function(f, xlim, ylim, max_length, max_steps, ds, min_dist, mask_shape_type = "square") {
+# Main function for generating stream plots
+streamplot <- function(f, xlim, ylim, n, max_length, max_steps, ds, mask_shape_type = "square") {
 
-  mask_shape <- c(ceiling((ylim[2] - ylim[1]) / min_dist), ceiling((xlim[2] - xlim[1]) / min_dist))
+  mask_shape <- c(n[2], n[1])
   mask <- matrix(0, nrow = mask_shape[1], ncol = mask_shape[2])
 
   trajectories <- list()
@@ -176,8 +183,8 @@ streamplot <- function(f, xlim, ylim, max_length, max_steps, ds, min_dist, mask_
 
   if (mask_shape_type == "inset_square") {
     ## this inset_fraction is not currently available to the user
-    is_too_close <- function(xi, yi, mask, xlim, ylim, min_dist) is_too_close_inset_square(xi, yi, mask, xlim, ylim, min_dist, inset_fraction = 0.5)
-    update_mask <- function(mask, xi, yi, xlim, ylim, min_dist) update_mask_inset_square(mask, xi, yi, xlim, ylim, min_dist, inset_fraction = 0.5)
+    is_too_close <- function(xi, yi, mask, xlim, ylim, n) is_too_close_inset_square(xi, yi, mask, xlim, ylim, n, inset_fraction = 0.5)
+    update_mask <- function(mask, xi, yi, xlim, ylim, n) update_mask_inset_square(mask, xi, yi, xlim, ylim, n, inset_fraction = 0.5)
   } else {
     is_too_close <- switch(mask_shape_type,
                            square = is_too_close_square,
@@ -189,11 +196,11 @@ streamplot <- function(f, xlim, ylim, max_length, max_steps, ds, min_dist, mask_
   }
 
   for (start in generate_starting_points(mask_shape)) {
-    xi <- xlim[1] + (start[[1]] - 0.5) * ((xlim[2] - xlim[1]) / mask_shape[1])
+    xi <- xlim[1] + (start[[1]] - 0.5) * ((xlim[2] - xlim[1]) / mask_shape[2])
     yi <- ylim[1] + (start[[2]] - 0.5) * ((ylim[2] - ylim[1]) / mask_shape[1])
 
-    if (!is_too_close(xi, yi, mask, xlim, ylim, min_dist)) {
-      result <- euler_integrate_bidirectional(xi, yi, f, ds, max_length, max_steps, min_dist, mask, xlim, ylim, is_too_close, update_mask)
+    if (!is_too_close(xi, yi, mask, xlim, ylim, n)) {
+      result <- euler_integrate_bidirectional(xi, yi, f, ds, max_length, max_steps, n, mask, xlim, ylim, is_too_close, update_mask)
       traj <- result$traj
       mask <- result$mask
       if (length(traj) > 1) {

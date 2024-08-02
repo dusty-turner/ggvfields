@@ -19,10 +19,10 @@ geom_streamplot(
   fun,
   xlim,
   ylim,
+  n = c(100, 100),
   max_length,
   max_steps,
   ds,
-  min_dist,
   mask_shape_type = "square",
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   chop = TRUE,
@@ -41,10 +41,10 @@ stat_streamline(
   fun,
   xlim,
   ylim,
+  n = c(100, 100),
   max_length,
   max_steps,
   ds,
-  min_dist,
   mask_shape_type = "square",
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   chop = TRUE,
@@ -120,6 +120,8 @@ returns a numeric vector of the same length.}
 
 \item{ylim}{A numeric vector of length 2 giving the y-axis limits.}
 
+\item{n}{A numeric vector of length 2 specifying the grid dimensions.}
+
 \item{max_length}{A numeric value specifying the maximum length of
 streamlines.}
 
@@ -128,9 +130,6 @@ streamline generation.}
 
 \item{ds}{A numeric value specifying the distance between steps for
 streamline generation.}
-
-\item{min_dist}{A numeric value specifying the minimum distance between
-streamlines.}
 
 \item{mask_shape_type}{A character string specifying the mask shape type:
 "square", "diamond", or "inset_square".}
@@ -192,11 +191,12 @@ f <- function(v) {
 # Create a ggplot with the stream plot layer
 ggplot() +
   geom_streamplot(
-    aes(group = after_stat(id)), fun = f, xlim = c(-3, 3),
-        ylim = c(-3, 3), max_length = 10000, max_steps = 10000,
-        ds = .05, min_dist = .25, chop = TRUE, chop_fraction = 0.1,
-        mask_shape_type = "diamond"
-        ) +
+    fun = f, xlim = c(-3, 3),
+    ylim = c(-3, 3), n = c(15, 15),
+    max_length = 10000, max_steps = 10000,
+    ds = .05, chop = TRUE, chop_fraction = 1,
+    mask_shape_type = "square"
+  ) +
   coord_fixed() +
   theme_minimal()
 
