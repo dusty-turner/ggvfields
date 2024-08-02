@@ -221,7 +221,7 @@ f <- function(v) {
 ggplot() +
   geom_streamplot(aes(group = after_stat(id)),
                   fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000,
-                  max_steps = 10000, ds = .05, n = 16, chop = FALSE) +
+                  max_steps = 10000, ds = .05, n = 16, chop = TRUE, chop_fraction = 1) +
   coord_fixed() +
   theme_minimal()
 ```
