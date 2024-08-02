@@ -77,7 +77,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL, stat = "vectorfield",
                               position = "identity", na.rm = FALSE, show.legend = TRUE,
                               inherit.aes = TRUE, fun, xlim, ylim, v = c(1, 2), n = 16,
                               center = TRUE, normalize = TRUE,
-                              scale_factor = 1,
+                              scale_factor = .9,
                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                               ...) {
   if (is.null(data)) data <- ensure_nonempty_data(data)
@@ -116,10 +116,12 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
                               show.legend = NA, inherit.aes = TRUE,
                               fun, xlim, ylim, v = c(1, 2), n = 16,
                               center = TRUE, normalize = TRUE,
-                              scale_factor = 1,
+                              scale_factor = .9,
                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                               ...) {
-  if (is.null(data)) data <- ensure_nonempty_data()
+  if (is.null(data)) data <- ensure_nonempty_data(data)
+
+  length_var <- extract_after_stat(mapping, "length")
 
   layer(
     stat = StatVectorField,
@@ -140,19 +142,18 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
       scale_factor = scale_factor,
       arrow = arrow,
       na.rm = na.rm,
+      length_var = length_var,
       ...
     )
   )
 }
 
+
 #' @rdname geom_vector_field
-#' @format NULL
-#' @usage NULL
 #' @export
 StatVectorField <- ggproto("StatVectorField", Stat,
-                           default_aes = aes(color = after_stat(norm), length = after_stat(norm)),
-
-                           compute_group = function(data, scales, fun, xlim, ylim, v = c(1, 2), n, center, normalize, scale_factor, length_var, ...) {
+                           # default_aes = aes(color = after_stat(norm)),
+                           compute_group = function(data, scales, fun, xlim, ylim, v = c(1, 2), n, center, normalize, scale_factor, length_var = NULL, ...) {
                              # Create a sequence of x and y values within the limits
                              grid <- expand.grid(
                                x = seq(xlim[1], xlim[2], length.out = n),
@@ -169,8 +170,7 @@ StatVectorField <- ggproto("StatVectorField", Stat,
                                v = vectors[, 2]
                              )
 
-                             # Calculate norm, divergence, curl, laplacian, and directional derivative
-                             # Calculate magnitude/norm
+                             # Calculate norm (magnitude) of the vectors
                              data$norm <- sqrt(data$u ^ 2 + data$v ^ 2)
 
                              grad <- grid |> apply(1, numDeriv::grad, func = fun) |> t()
@@ -198,30 +198,30 @@ StatVectorField <- ggproto("StatVectorField", Stat,
                                y_spacing <- (ylim[2] - ylim[1]) / (n - 1)
                                spacing <- min(x_spacing, y_spacing)
 
-                               # Determine the scale factor based on the length aesthetic
-                               scale_values <- if (!is.null(length_var)) {
-                                 if (length_var %in% colnames(data)) {
+                               if (is.null(length_var)) {
+                                 # If length_var is NULL, use a constant length for all arrows
+                                 data$u <- data$u / data$norm * scale_factor * spacing
+                                 data$v <- data$v / data$norm * scale_factor * spacing
+                               } else {
+                                 # Determine the scale factor based on the length aesthetic
+                                 scale_values <- if (length_var %in% colnames(data)) {
                                    data[[length_var]]
                                  } else {
                                    data$norm
                                  }
-                               } else {
-                                 data$norm
+
+                                 # Normalize the vectors and scale to avoid overplotting
+                                 data$u <- data$u / data$norm * scale_values * scale_factor * spacing
+                                 data$v <- data$v / data$norm * scale_values * scale_factor * spacing
                                }
-
-                               rescaled_values <- scale_values
-                               rescaled_values[scale_values > .01] <- scales::rescale(scale_values[scale_values > .01], to = c(.1, 1))
-
-                               # Normalize the vectors and scale to avoid overplotting
-                               data$u <- data$u / data$norm * rescaled_values * scale_factor * spacing
-                               data$v <- data$v / data$norm * rescaled_values * scale_factor * spacing
+                             } else if (is.null(length_var)) {
+                               # If not normalizing and length_var is NULL, ensure all arrows have the same length
+                               data$u <- data$u / data$norm * scale_factor
+                               data$v <- data$v / data$norm * scale_factor
                              }
 
                              # Scale arrow size based on the length aes
-                             # data$arrow_size <- scales::rescale(data$norm, to = c(0.005, 0.03))
-                             # data$arrow_size <- scales::rescale(scale_values, to = c(0.005, 0.015))
-                             data$arrow_size <- ifelse(scale_values <.001,0,.015)
-                             # data$arrow_size <- ifelse(scale_values >) scales::rescale(scale_values, to = c(0.005, 0.015))
+                             data$arrow_size <- ifelse(data$norm < 0.005, 0.005, 0.015)
 
                              if (center) {
                                # Calculate the half-length of the vectors
@@ -283,7 +283,7 @@ scale_length_continuous <- function(name = waiver(), n.breaks = waiver(), ...) {
   breaks <- pretty
   labels <- function(x) format(x, scientific = FALSE)
   continuous_scale(
-    aesthetics = "length", scale_name = "length_c", palette = identity,
+    aesthetics = "length", palette = identity,
     name = name, breaks = function(x) rev(breaks(x)), labels = labels, ...
   )
 }
