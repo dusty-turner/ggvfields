@@ -17,7 +17,7 @@
 #' @param normalize Logical; if TRUE, normalizes the vector to a length of unit
 #'   1 and scales them to avoid overplotting based on grid density and plot
 #'   range.
-#' @param scale_factor Numeric; a scaling factor applied to the vectors to
+#' @param scale_length Numeric; a scaling factor applied to the vectors to
 #'   adjust their length relative to the grid spacing. Defaults to 1.
 #' @param arrow Arrow specification, as created by `grid::arrow()`.
 #' @return A ggplot2 layer that can be added to a ggplot object to produce a
@@ -57,7 +57,7 @@
 #'   geom_vector_field(
 #'     fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
 #'     center = TRUE, color = "black",
-#'     scale_factor = .7
+#'     scale_length = .7
 #'   )
 #'
 #' @section Computed variables:
@@ -77,7 +77,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL, stat = "vectorfield",
                               position = "identity", na.rm = FALSE, show.legend = TRUE,
                               inherit.aes = TRUE, fun, xlim, ylim, v = c(1, 2), n = 16,
                               center = TRUE, normalize = TRUE,
-                              scale_factor = .9,
+                              scale_length = .9,
                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                               ...) {
   if (is.null(data)) data <- ensure_nonempty_data(data)
@@ -100,7 +100,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL, stat = "vectorfield",
       v = v,
       center = center,
       normalize = normalize,
-      scale_factor = scale_factor,
+      scale_length = scale_length,
       arrow = arrow,
       na.rm = na.rm,
       length_var = length_var,
@@ -116,7 +116,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
                               show.legend = NA, inherit.aes = TRUE,
                               fun, xlim, ylim, v = c(1, 2), n = 16,
                               center = TRUE, normalize = TRUE,
-                              scale_factor = .9,
+                              scale_length = .9,
                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                               ...) {
   if (is.null(data)) data <- ensure_nonempty_data(data)
@@ -139,7 +139,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
       v = v,
       center = center,
       normalize = normalize,
-      scale_factor = scale_factor,
+      scale_length = scale_length,
       arrow = arrow,
       na.rm = na.rm,
       length_var = length_var,
@@ -152,114 +152,132 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
 #' @rdname geom_vector_field
 #' @export
 StatVectorField <- ggproto("StatVectorField", Stat,
-                           # default_aes = aes(color = after_stat(norm)),
-                           compute_group = function(data, scales, fun, xlim, ylim, v = c(1, 2), n, center, normalize, scale_factor, length_var = NULL, ...) {
-                             # Create a sequence of x and y values within the limits
-                             grid <- expand.grid(
-                               x = seq(xlim[1], xlim[2], length.out = n),
-                               y = seq(ylim[1], ylim[2], length.out = n)
-                             ) |> as.matrix()
 
-                             vectors <- vectorize(fun)(grid)
+   # default_aes = aes(color = after_stat(norm)),
 
-                             # Create a data frame for geom_segment
-                             data <- data.frame(
-                               x = grid[, 1],
-                               y = grid[, 2],
-                               u = vectors[, 1],
-                               v = vectors[, 2]
-                             )
+   compute_group = function(data, scales, fun, xlim, ylim, v = c(1, 2), n, center, normalize, scale_length, length_var = NULL, ...) {
 
-                             # Calculate norm (magnitude) of the vectors
-                             data$norm <- sqrt(data$u ^ 2 + data$v ^ 2)
+     # Create a sequence of x and y values within the limits
+     grid <- expand.grid(
+       x = seq(xlim[1], xlim[2], length.out = n),
+       y = seq(ylim[1], ylim[2], length.out = n)
+     ) |> as.matrix()
+     vectors <- vectorize(fun)(grid)
 
-                             grad <- grid |> apply(1, numDeriv::grad, func = fun) |> t()
-                             grad_u <- grad[, 1]
-                             grad_v <- grad[, 2]
+     # Create a data frame for geom_segment
+     data <- data.frame(
+       x = grid[, 1],
+       y = grid[, 2],
+       u = vectors[, 1],
+       v = vectors[, 2]
+     )
 
-                             # Divergence
-                             data$divergence <- grad_u + grad_v
+     # Calculate norm (magnitude) of the vectors
+     data$norm <- sqrt(data$u ^ 2 + data$v ^ 2)
 
-                             # Curl
-                             data$curl <- grad_v - grad_u
+     grad <- grid |> apply(1, numDeriv::grad, func = fun) |> t()
+     grad_u <- grad[, 1]
+     grad_v <- grad[, 2]
 
-                             # Laplacian
-                             hess_u <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 1))
-                             hess_v <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 2))
-                             data$laplacian <- hess_u + hess_v
+     # Divergence
+     data$divergence <- grad_u + grad_v
 
-                             # Directional Derivative
-                             vx <- v[1]; vy <- v[2]
-                             data$directional_derivative <- grad %*% (c(vx, vy) / sqrt(vx ^ 2 + vy ^ 2))
+     # Curl
+     data$curl <- grad_v - grad_u
 
-                             if (normalize) {
-                               # Calculate the spacing between grid points
-                               x_spacing <- (xlim[2] - xlim[1]) / (n - 1)
-                               y_spacing <- (ylim[2] - ylim[1]) / (n - 1)
-                               spacing <- min(x_spacing, y_spacing)
+     # Laplacian
+     hess_u <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 1))
+     hess_v <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 2))
+     data$laplacian <- hess_u + hess_v
 
-                               if (is.null(length_var)) {
-                                 # If length_var is NULL, use a constant length for all arrows
-                                 data$u <- data$u / data$norm * scale_factor * spacing
-                                 data$v <- data$v / data$norm * scale_factor * spacing
-                               } else {
-                                 # Determine the scale factor based on the length aesthetic
-                                 scale_values <- if (length_var %in% colnames(data)) {
-                                   data[[length_var]]
-                                 } else {
-                                   data$norm
-                                 }
+     # Directional Derivative
+     vx <- v[1]; vy <- v[2]
+     data$directional_derivative <- grad %*% (c(vx, vy) / sqrt(vx ^ 2 + vy ^ 2))
 
-                                 # Normalize the vectors and scale to avoid overplotting
-                                 data$u <- data$u / data$norm * scale_values * scale_factor * spacing
-                                 data$v <- data$v / data$norm * scale_values * scale_factor * spacing
-                               }
-                             } else if (is.null(length_var)) {
-                               # If not normalizing and length_var is NULL, ensure all arrows have the same length
-                               data$u <- data$u / data$norm * scale_factor
-                               data$v <- data$v / data$norm * scale_factor
-                             }
+     if (normalize) {
 
-                             # Scale arrow size based on the length aes
-                             data$arrow_size <- ifelse(data$norm < 0.005, 0.005, 0.015)
+       # Calculate the spacing between grid points
+       x_spacing <- (xlim[2] - xlim[1]) / (n - 1)
+       y_spacing <- (ylim[2] - ylim[1]) / (n - 1)
+       spacing <- min(x_spacing, y_spacing)
 
-                             if (center) {
-                               # Calculate the half-length of the vectors
-                               half_u <- data$u / 2
-                               half_v <- data$v / 2
+       if (is.null(length_var)) {
 
-                               # Calculate the end points of the vectors
-                               data$xend <- data$x + half_u
-                               data$yend <- data$y + half_v
+         # If length_var is NULL, use a constant length for all arrows
+         data$u <- data$u / data$norm * scale_length * spacing
+         data$v <- data$v / data$norm * scale_length * spacing
 
-                               # Calculate the start points of the vectors
-                               data$x <- data$x - half_u
-                               data$y <- data$y - half_v
-                             } else {
-                               # Calculate the end points of the vectors
-                               data$xend <- data$x + data$u
-                               data$yend <- data$y + data$v
-                             }
+       } else {
 
-                             data
-                           }
+         # Determine the scale factor based on the length aesthetic
+         scale_values <- if (length_var %in% colnames(data)) {
+           data[[length_var]]
+         } else {
+           data$norm
+         }
+
+         # Normalize the vectors and scale to avoid overplotting
+         data$u <- data$u / data$norm * scale_values * scale_length * spacing
+         data$v <- data$v / data$norm * scale_values * scale_length * spacing
+
+       }
+
+     } else if (is.null(length_var)) {
+
+       # If not normalizing and length_var is NULL, ensure all arrows have the same length
+       data$u <- data$u / data$norm * scale_length
+       data$v <- data$v / data$norm * scale_length
+
+     }
+     # Scale arrow size based on the length aes
+
+     data$arrow_size <- ifelse(data$norm < 0.005, 0.005, 0.015)
+
+     if (center) {
+
+       # Calculate the half-length of the vectors
+       half_u <- data$u / 2
+       half_v <- data$v / 2
+
+       # Calculate the end points of the vectors
+       data$xend <- data$x + half_u
+       data$yend <- data$y + half_v
+
+       # Calculate the start points of the vectors
+       data$x <- data$x - half_u
+       data$y <- data$y - half_v
+     } else {
+
+       # Calculate the end points of the vectors
+       data$xend <- data$x + data$u
+       data$yend <- data$y + data$v
+
+     }
+     data
+   }
 )
 
 #' @rdname geom_vector_field
 #' @export
 GeomVectorField <- ggproto("GeomVectorField", GeomSegment,
-                           draw_key = draw_key_length,
-                           required_aes = c("x", "y", "xend", "yend"),
-                           default_aes = aes(colour = "black", linewidth = 0.5, linetype = 1, alpha = 1, length = 1, arrow_size = 1),
-                           setup_data = function(data, params) {
-                             data$length <- data$length %||% 1
-                             data
-                           },
-                           draw_panel = function(data, panel_params, coord, arrow = NULL, arrow_size = 1) {
-                             data$arrow_size <- data$arrow_size %||% arrow_size
-                             arrow <- modifyList(arrow, list(length = unit(data$arrow_size, "npc")))
-                             GeomSegment$draw_panel(data, panel_params, coord, arrow = arrow)
-                           }
+
+   draw_key = draw_key_length,
+
+   required_aes = c("x", "y", "xend", "yend"),
+
+   default_aes = aes(colour = "black", linewidth = 0.5, linetype = 1, alpha = 1, length = 1, arrow_size = 1),
+
+   setup_data = function(data, params) {
+     data$length <- data$length %||% 1
+     data
+   },
+
+   draw_panel = function(data, panel_params, coord, arrow = NULL, arrow_size = 1) {
+     data$arrow_size <- data$arrow_size %||% arrow_size
+     arrow <- modifyList(arrow, list(length = unit(data$arrow_size, "npc")))
+     GeomSegment$draw_panel(data, panel_params, coord, arrow = arrow)
+
+   }
 )
 
 
