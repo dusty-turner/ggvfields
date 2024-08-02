@@ -5,13 +5,17 @@
 
 ## Overview
 
-**ggvfields** provides tools for visualizing vector fields, complex
-numbers, and soon dual numbers and more.
+**ggvfields** provides tools for visualizing vector fields, stream
+plots, and soon complex numbers and more.
+
+``` r
+remotes::install_github("dusty-turner/ggvfields")
+```
 
 ``` r
 library("ggvfields")
 #> Loading required package: ggplot2
-options(ggplot2.continuous.colur="viridis")
+# options(ggplot2.continuous.colour="viridis")
 ```
 
 ## Usage
@@ -38,7 +42,7 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
 By default, the magnitude (or length/norm) of the vector lengths is
 mapped to the color and length aesthetics.
@@ -79,7 +83,7 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
 #### Curl
 
@@ -108,7 +112,7 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
 #### Laplace Operator
 
@@ -150,7 +154,7 @@ ggplot() +
   coord_fixed() 
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
 
 #### Directional Derivative
 
@@ -185,7 +189,7 @@ ggplot() +
   coord_fixed() 
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
 
 ### `geom_complex_function()`
 
@@ -207,7 +211,7 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
 
 We can enhance this plot with a little help from biscale.
 
@@ -245,7 +249,7 @@ ggdraw() +
   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3)
 ```
 
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
 
 ### `geom_streamplot()`
 
@@ -263,12 +267,12 @@ f <- function(v) {
 ggplot() +
   geom_streamplot(aes(group = after_stat(id)),
                   fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000,
-                  max_steps = 10000, ds = .05, min_dist = .25, chop = FALSE) +
+                  max_steps = 10000, ds = .05, n = 16, chop = FALSE) +
   coord_fixed() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
 The `chop` parameter allows you to chop the trajectories into segments.
 This can be useful for better visualization of the streamlines when they
@@ -280,13 +284,13 @@ plot.
 ggplot() +
   geom_streamplot(aes(group = after_stat(id)),
                   fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000,
-                  max_steps = 10000, ds = .05, min_dist = .25, 
+                  max_steps = 10000, ds = .05, n = 15,
                   chop = TRUE, chop_fraction = 0.1) +
   coord_fixed() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
 
 The `mask_shape_type` parameter allows you to specify the mask shape
 used for streamline generation which influences how the streamlines are
@@ -313,9 +317,13 @@ ggplot() +
                   mask_shape_type = "diamond") +
   coord_fixed() +
   theme_minimal()
+#> Warning in geom_streamplot(aes(group = after_stat(id)), fun = f, xlim = c(-3, :
+#> Ignoring unknown parameters: `min_dist`
+#> `geom_streamplot()`: Each group consists of only one observation.
+#> ℹ Do you need to adjust the group aesthetic?
 ```
 
-<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
 
 ## License
 

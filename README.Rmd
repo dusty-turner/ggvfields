@@ -20,11 +20,16 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-**ggvfields** provides tools for visualizing vector fields, complex numbers, and soon dual numbers and more.
+**ggvfields** provides tools for visualizing vector fields, stream plots, and soon complex numbers and more.
+
+```{r eval = FALSE}
+remotes::install_github("dusty-turner/ggvfields")
+```
+
 
 ```{r}
 library("ggvfields")
-options(ggplot2.continuous.colur="viridis")
+# options(ggplot2.continuous.colour="viridis")
 ```
 
 ## Usage
@@ -216,7 +221,7 @@ f <- function(v) {
 ggplot() +
   geom_streamplot(aes(group = after_stat(id)),
                   fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000,
-                  max_steps = 10000, ds = .05, min_dist = .25, chop = FALSE) +
+                  max_steps = 10000, ds = .05, n = 16, chop = FALSE) +
   coord_fixed() +
   theme_minimal()
 ```
@@ -227,7 +232,7 @@ The `chop` parameter allows you to chop the trajectories into segments. This can
 ggplot() +
   geom_streamplot(aes(group = after_stat(id)),
                   fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000,
-                  max_steps = 10000, ds = .05, min_dist = .25, 
+                  max_steps = 10000, ds = .05, n = 15,
                   chop = TRUE, chop_fraction = 0.1) +
   coord_fixed() +
   theme_minimal()

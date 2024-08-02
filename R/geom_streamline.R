@@ -59,7 +59,7 @@ NULL
 geom_streamplot <- function(mapping = NULL, data = NULL,
                             stat = "streamplot", position = "identity",
                             na.rm = FALSE, show.legend = TRUE, inherit.aes = TRUE,
-                            fun, xlim, ylim, n = c(100, 100), max_length, max_steps,
+                            fun, xlim, ylim, n = c(21, 21), max_length, max_steps,
                             ds, mask_shape_type = "square",
                             arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                             chop = TRUE, chop_fraction = 0.1, ...) {
@@ -102,7 +102,7 @@ GeomStreamplot <- ggproto("GeomStreamplot", GeomPath)
 stat_streamline <- function(mapping = NULL, data = NULL,
                             stat = "streamplot", position = "identity",
                             na.rm = FALSE, show.legend = TRUE, inherit.aes = TRUE,
-                            fun, xlim, ylim, n = c(100, 100), max_length, max_steps,
+                            fun, xlim, ylim, n = c(21, 21), max_length, max_steps,
                             ds, mask_shape_type = "square",
                             arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                             chop = TRUE, chop_fraction = 0.1, ...) {
