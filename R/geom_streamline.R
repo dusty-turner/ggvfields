@@ -19,7 +19,7 @@
 #'   streamline generation.
 #' @param chop A logical value indicating whether to chop the trajectories into
 #'   segments.
-#' @param chop_fraction A numeric value specifying the maximum allowable segment
+#' @param scale_stream A numeric value specifying the maximum allowable segment
 #'   size as a fraction of the total range for chopping the trajectories.
 #' @param mask_shape_type A character string specifying the mask shape type:
 #'   "square", "diamond", "inset_square", or "circle".
@@ -46,7 +46,7 @@
 #'     fun = f, xlim = c(-3, 3),
 #'     ylim = c(-3, 3), n = c(15, 15),
 #'     max_length = 10000, max_steps = 10000,
-#'     ds = .05, chop = TRUE, chop_fraction = 1,
+#'     ds = .05, chop = TRUE, scale_stream = 1,
 #'     mask_shape_type = "square"
 #'   ) +
 #'   coord_fixed() +
@@ -62,7 +62,7 @@ geom_streamplot <- function(mapping = NULL, data = NULL,
                             fun, xlim, ylim, n = c(21, 21), max_length, max_steps,
                             ds, mask_shape_type = "square",
                             arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                            chop = TRUE, chop_fraction = 0.1, ...) {
+                            chop = TRUE, scale_stream = 0.1, ...) {
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
   layer(
@@ -84,7 +84,7 @@ geom_streamplot <- function(mapping = NULL, data = NULL,
       mask_shape_type = mask_shape_type,
       arrow = arrow,
       chop = chop,
-      chop_fraction = chop_fraction,
+      scale_stream = scale_stream,
       na.rm = na.rm,
       ...
     )
@@ -105,7 +105,7 @@ stat_streamline <- function(mapping = NULL, data = NULL,
                             fun, xlim, ylim, n = c(21, 21), max_length, max_steps,
                             ds, mask_shape_type = "square",
                             arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                            chop = TRUE, chop_fraction = 0.1, ...) {
+                            chop = TRUE, scale_stream = 0.1, ...) {
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   layer(
@@ -127,7 +127,7 @@ stat_streamline <- function(mapping = NULL, data = NULL,
       mask_shape_type = mask_shape_type,
       arrow = arrow,
       chop = chop,
-      chop_fraction = chop_fraction,
+      scale_stream = scale_stream,
       na.rm = na.rm,
       ...
     )
@@ -142,7 +142,7 @@ StatStreamplot <- ggproto("StatStreamplot", Stat,
 
                           default_aes = aes(group = after_stat(id)),
 
-                          compute_group = function(data, scales, fun, xlim, ylim, n, max_length, max_steps, ds, chop, chop_fraction, mask_shape_type) {
+                          compute_group = function(data, scales, fun, xlim, ylim, n, max_length, max_steps, ds, chop, scale_stream, mask_shape_type) {
 
                             n <- ensure_length_two(n)
 
@@ -159,10 +159,10 @@ StatStreamplot <- ggproto("StatStreamplot", Stat,
 
                               dx <- (xlim[2] - xlim[1]) / n[1]
                               dy <- (ylim[2] - ylim[1]) / n[2]
-                              chop_limit <- sqrt(dx^2 + dy^2)
+                              dc <- sqrt(dx^2 + dy^2)
 
-                              # Convert chop_fraction to an actual distance
-                              divide_smaller_than <- chop_limit * chop_fraction
+                              # Convert scale_stream to an actual distance
+                              divide_smaller_than <- dc * scale_stream
 
                               # Calculate arclength
                               arclength <- numeric(nrow(trajectory_data))
