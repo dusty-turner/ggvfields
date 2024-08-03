@@ -153,109 +153,95 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
 #' @export
 StatVectorField <- ggproto("StatVectorField", Stat,
 
-   # default_aes = aes(color = after_stat(norm)),
+                           compute_group = function(data, scales, fun, xlim, ylim, v = c(1, 2), n, center, normalize, scale_length, length_var = NULL, ...) {
 
-   compute_group = function(data, scales, fun, xlim, ylim, v = c(1, 2), n, center, normalize, scale_length, length_var = NULL, ...) {
+                             # Create a sequence of x and y values within the limits
+                             grid <- expand.grid(
+                               x = seq(xlim[1], xlim[2], length.out = n),
+                               y = seq(ylim[1], ylim[2], length.out = n)
+                             ) |> as.matrix()
+                             vectors <- vectorize(fun)(grid)
 
-     # Create a sequence of x and y values within the limits
-     grid <- expand.grid(
-       x = seq(xlim[1], xlim[2], length.out = n),
-       y = seq(ylim[1], ylim[2], length.out = n)
-     ) |> as.matrix()
-     vectors <- vectorize(fun)(grid)
+                             # Create a data frame for geom_segment
+                             data <- data.frame(
+                               x = grid[, 1],
+                               y = grid[, 2],
+                               u = vectors[, 1],
+                               v = vectors[, 2]
+                             )
 
-     # Create a data frame for geom_segment
-     data <- data.frame(
-       x = grid[, 1],
-       y = grid[, 2],
-       u = vectors[, 1],
-       v = vectors[, 2]
-     )
+                             # Calculate norm (magnitude) of the vectors
+                             data$norm <- sqrt(data$u ^ 2 + data$v ^ 2)
 
-     # Calculate norm (magnitude) of the vectors
-     data$norm <- sqrt(data$u ^ 2 + data$v ^ 2)
+                             grad <- apply(grid, 1, numDeriv::grad, func = fun) |> t()
+                             grad_u <- grad[, 1]
+                             grad_v <- grad[, 2]
 
-     grad <- grid |> apply(1, numDeriv::grad, func = fun) |> t()
-     grad_u <- grad[, 1]
-     grad_v <- grad[, 2]
+                             # Divergence
+                             data$divergence <- grad_u + grad_v
 
-     # Divergence
-     data$divergence <- grad_u + grad_v
+                             # Curl
+                             data$curl <- grad_v - grad_u
 
-     # Curl
-     data$curl <- grad_v - grad_u
+                             # Laplacian
+                             hess_u <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 1))
+                             hess_v <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 2))
+                             data$laplacian <- hess_u + hess_v
 
-     # Laplacian
-     hess_u <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 1))
-     hess_v <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 2))
-     data$laplacian <- hess_u + hess_v
+                             # Directional Derivative
+                             vx <- v[1]; vy <- v[2]
+                             data$directional_derivative <- grad %*% (c(vx, vy) / sqrt(vx ^ 2 + vy ^ 2))
 
-     # Directional Derivative
-     vx <- v[1]; vy <- v[2]
-     data$directional_derivative <- grad %*% (c(vx, vy) / sqrt(vx ^ 2 + vy ^ 2))
+                             # Calculate value to scale vectors if needed
+                             scale_values <- if (!is.null(length_var) && length_var %in% colnames(data)) {
+                               data[[length_var]]
+                             } else {
+                               1
+                             }
 
-     if (normalize) {
+                             # message(length_var)
+                             if (normalize) {
+                               # Calculate the spacing between grid points
+                               x_spacing <- (xlim[2] - xlim[1]) / (n - 1)
+                               y_spacing <- (ylim[2] - ylim[1]) / (n - 1)
+                               spacing <- min(x_spacing, y_spacing)
 
-       # Calculate the spacing between grid points
-       x_spacing <- (xlim[2] - xlim[1]) / (n - 1)
-       y_spacing <- (ylim[2] - ylim[1]) / (n - 1)
-       spacing <- min(x_spacing, y_spacing)
+                               # if(!is.null(length_var))
+                               scale_values <- scales::rescale(scale_values, c(0,1))
 
-       if (is.null(length_var)) {
+                               # Normalize the vectors based on the length aesthetic or scale values
+                               data$u <- data$u / data$norm * scale_values * scale_length * spacing
+                               data$v <- data$v / data$norm * scale_values * scale_length * spacing
+                             } else{ ## this scales the vectors by the length_var
+                               data$u <- data$u / data$norm * scale_values
+                               data$v <- data$v / data$norm * scale_values
+                             }
 
-         # If length_var is NULL, use a constant length for all arrows
-         data$u <- data$u / data$norm * scale_length * spacing
-         data$v <- data$v / data$norm * scale_length * spacing
+                             # Scale arrow size based on the length aesthetic
+                             data$arrow_size <- ifelse(data$norm < 0.005, 0.005, 0.015)
 
-       } else {
+                             if (center) {
+                               # Calculate the half-length of the vectors
+                               half_u <- data$u / 2
+                               half_v <- data$v / 2
 
-         # Determine the scale factor based on the length aesthetic
-         scale_values <- if (length_var %in% colnames(data)) {
-           data[[length_var]]
-         } else {
-           data$norm
-         }
+                               # Calculate the end points of the vectors
+                               data$xend <- data$x + half_u
+                               data$yend <- data$y + half_v
 
-         # Normalize the vectors and scale to avoid overplotting
-         data$u <- data$u / data$norm * scale_values * scale_length * spacing
-         data$v <- data$v / data$norm * scale_values * scale_length * spacing
-
-       }
-
-     } else if (is.null(length_var)) {
-
-       # If not normalizing and length_var is NULL, ensure all arrows have the same length
-       data$u <- data$u / data$norm * scale_length
-       data$v <- data$v / data$norm * scale_length
-
-     }
-     # Scale arrow size based on the length aes
-
-     data$arrow_size <- ifelse(data$norm < 0.005, 0.005, 0.015)
-
-     if (center) {
-
-       # Calculate the half-length of the vectors
-       half_u <- data$u / 2
-       half_v <- data$v / 2
-
-       # Calculate the end points of the vectors
-       data$xend <- data$x + half_u
-       data$yend <- data$y + half_v
-
-       # Calculate the start points of the vectors
-       data$x <- data$x - half_u
-       data$y <- data$y - half_v
-     } else {
-
-       # Calculate the end points of the vectors
-       data$xend <- data$x + data$u
-       data$yend <- data$y + data$v
-
-     }
-     data
-   }
+                               # Calculate the start points of the vectors
+                               data$x <- data$x - half_u
+                               data$y <- data$y - half_v
+                             } else {
+                               # Calculate the end points of the vectors
+                               data$xend <- data$x + data$u
+                               data$yend <- data$y + data$v
+                             }
+                             data
+                           }
 )
+
+
 
 #' @rdname geom_vector_field
 #' @export
