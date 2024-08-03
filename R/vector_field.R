@@ -260,25 +260,24 @@ StatVectorField <- ggproto("StatVectorField", Stat,
 #' @rdname geom_vector_field
 #' @export
 GeomVectorField <- ggproto("GeomVectorField", GeomSegment,
+                           draw_key = draw_key_length,
 
-   draw_key = draw_key_length,
+                           required_aes = c("x", "y", "xend", "yend"),
 
-   required_aes = c("x", "y", "xend", "yend"),
+                           default_aes = aes(colour = "black", linewidth = 0.5, linetype = 1, alpha = 1, length = 1, arrow_size = 1),
 
-   default_aes = aes(colour = "black", linewidth = 0.5, linetype = 1, alpha = 1, length = 1, arrow_size = 1),
+                           setup_data = function(data, params) {
+                             data$length <- data$length %||% 1
+                             data
+                           },
 
-   setup_data = function(data, params) {
-     data$length <- data$length %||% 1
-     data
-   },
-
-   draw_panel = function(data, panel_params, coord, arrow = NULL, arrow_size = 1) {
-     data$arrow_size <- data$arrow_size %||% arrow_size
-     arrow <- modifyList(arrow, list(length = unit(data$arrow_size, "npc")))
-     GeomSegment$draw_panel(data, panel_params, coord, arrow = arrow)
-
-   }
+                           draw_panel = function(data, panel_params, coord, arrow = NULL, arrow_size = 1) {
+                             data$arrow_size <- data$arrow_size %||% arrow_size
+                             arrow <- modifyList(arrow, list(length = unit(data$arrow_size, "npc")))
+                             GeomSegment$draw_panel(data, panel_params, coord, arrow = arrow)
+                           }
 )
+
 
 
 #' Continuous Scale for Vector Length
@@ -302,6 +301,6 @@ scale_length_continuous <- function(name = waiver(), n.breaks = waiver(), ...) {
   labels <- function(x) format(x, scientific = FALSE)
   continuous_scale(
     aesthetics = "length", palette = identity,
-    name = name, breaks = function(x) rev(breaks(x)), labels = labels, ...
+    name = name, breaks = function(x) rev(breaks(x)), labels = labels, guide = "none", ...
   )
 }

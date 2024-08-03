@@ -141,14 +141,12 @@ update_mask_circle <- function(mask, xi, yi, xlim, ylim, n, circle_fraction = 0.
   return(mask)
 }
 # Combined function for bidirectional integration using Euler's method
-euler_integrate_bidirectional <- function(xi, yi, f, ds, max_length, max_steps, n, mask, xlim, ylim, is_too_close, update_mask) {
-  integrate_fixed <- function(xi, yi, f, ds, max_length, max_steps, n, mask, xlim, ylim, is_too_close) {
+euler_integrate_bidirectional <- function(xi, yi, f, ds, max_length, n, mask, xlim, ylim, is_too_close, update_mask) {
+  integrate_fixed <- function(xi, yi, f, ds, max_length, n, mask, xlim, ylim, is_too_close) {
     xy_traj <- list(c(xi, yi))
-    steps <- 0
     length_traveled <- 0
 
-    while (length_traveled < max_length && steps < max_steps) {
-      steps <- steps + 1
+    while (length_traveled < max_length) {
       uv <- f(c(xi, yi))
       u <- uv[1]
       v <- uv[2]
@@ -170,9 +168,9 @@ euler_integrate_bidirectional <- function(xi, yi, f, ds, max_length, max_steps, 
     return(list(traj = xy_traj))
   }
 
-  forward_result <- integrate_fixed(xi, yi, f, ds, max_length, max_steps, n, mask, xlim, ylim, is_too_close)
+  forward_result <- integrate_fixed(xi, yi, f, ds, max_length, n, mask, xlim, ylim, is_too_close)
   reverse_f <- function(v) -f(v)
-  backward_result <- integrate_fixed(xi, yi, reverse_f, ds, max_length, max_steps, n, mask, xlim, ylim, is_too_close)
+  backward_result <- integrate_fixed(xi, yi, reverse_f, ds, max_length, n, mask, xlim, ylim, is_too_close)
 
   combined_traj <- c(rev(backward_result$traj[-1]), forward_result$traj)
 
@@ -208,7 +206,9 @@ generate_starting_points <- function(mask_shape) {
 }
 
 # Main function for generating stream plots
-streamplot <- function(f, xlim, ylim, n, max_length, max_steps, ds, mask_shape_type = "square") {
+streamplot <- function(f, xlim, ylim, n, ds, mask_shape_type = "square") {
+
+  max_length <- max(c(diff(xlim),diff(ylim)))
 
   mask_shape <- c(n[2], n[1])
   mask <- matrix(0, nrow = mask_shape[1], ncol = mask_shape[2])
@@ -238,7 +238,7 @@ streamplot <- function(f, xlim, ylim, n, max_length, max_steps, ds, mask_shape_t
     yi <- ylim[1] + (start[[2]] - 0.5) * ((ylim[2] - ylim[1]) / mask_shape[1])
 
     if (!is_too_close(xi, yi, mask, xlim, ylim, n)) {
-      result <- euler_integrate_bidirectional(xi, yi, f, ds, max_length, max_steps, n, mask, xlim, ylim, is_too_close, update_mask)
+      result <- euler_integrate_bidirectional(xi, yi, f, ds, max_length, n, mask, xlim, ylim, is_too_close, update_mask)
       traj <- result$traj
       mask <- result$mask
       if (length(traj) > 1) {

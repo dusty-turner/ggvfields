@@ -11,10 +11,6 @@
 #' @param xlim A numeric vector of length 2 giving the x-axis limits.
 #' @param ylim A numeric vector of length 2 giving the y-axis limits.
 #' @param n A numeric vector of length 2 specifying the grid dimensions.
-#' @param max_length A numeric value specifying the maximum length of
-#'   streamlines.
-#' @param max_steps An integer specifying the maximum number of steps for
-#'   streamline generation.
 #' @param ds A numeric value specifying the distance between steps for
 #'   streamline generation.
 #' @param chop A logical value indicating whether to chop the trajectories into
@@ -59,10 +55,10 @@ NULL
 geom_streamplot <- function(mapping = NULL, data = NULL,
                             stat = "streamplot", position = "identity",
                             na.rm = FALSE, show.legend = TRUE, inherit.aes = TRUE,
-                            fun, xlim, ylim, n = c(21, 21), max_length, max_steps,
-                            ds, mask_shape_type = "square",
+                            fun, xlim, ylim, n = c(21, 21),
+                            ds = .05, mask_shape_type = "square",
                             arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                            chop = TRUE, scale_stream = 0.1, ...) {
+                            chop = TRUE, scale_stream = 1, ...) {
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
   layer(
@@ -78,8 +74,6 @@ geom_streamplot <- function(mapping = NULL, data = NULL,
       xlim = xlim,
       ylim = ylim,
       n = n,
-      max_length = max_length,
-      max_steps = max_steps,
       ds = ds,
       mask_shape_type = mask_shape_type,
       arrow = arrow,
@@ -102,10 +96,10 @@ GeomStreamplot <- ggproto("GeomStreamplot", GeomPath)
 stat_streamline <- function(mapping = NULL, data = NULL,
                             stat = "streamplot", position = "identity",
                             na.rm = FALSE, show.legend = TRUE, inherit.aes = TRUE,
-                            fun, xlim, ylim, n = c(21, 21), max_length, max_steps,
-                            ds, mask_shape_type = "square",
+                            fun, xlim, ylim, n = c(21, 21),
+                            ds = .05, mask_shape_type = "square",
                             arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                            chop = TRUE, scale_stream = 0.1, ...) {
+                            chop = TRUE, scale_stream = 1, ...) {
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   layer(
@@ -121,8 +115,6 @@ stat_streamline <- function(mapping = NULL, data = NULL,
       xlim = xlim,
       ylim = ylim,
       n = n,
-      max_length = max_length,
-      max_steps = max_steps,
       ds = ds,
       mask_shape_type = mask_shape_type,
       arrow = arrow,
@@ -142,11 +134,11 @@ StatStreamplot <- ggproto("StatStreamplot", Stat,
 
                           default_aes = aes(group = after_stat(id)),
 
-                          compute_group = function(data, scales, fun, xlim, ylim, n, max_length, max_steps, ds, chop, scale_stream, mask_shape_type) {
+                          compute_group = function(data, scales, fun, xlim, ylim, n, ds, chop, scale_stream, mask_shape_type) {
 
                             n <- ensure_length_two(n)
 
-                            trajectories <- streamplot(fun, xlim, ylim, n, max_length, max_steps, ds, mask_shape_type)
+                            trajectories <- streamplot(fun, xlim, ylim, n, ds, mask_shape_type)
 
                             trajectory_data <- do.call(rbind, lapply(seq_along(trajectories), function(i) {
                               traj <- trajectories[[i]]

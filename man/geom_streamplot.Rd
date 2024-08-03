@@ -19,14 +19,12 @@ geom_streamplot(
   fun,
   xlim,
   ylim,
-  n = c(100, 100),
-  max_length,
-  max_steps,
+  n = c(21, 21),
   ds,
   mask_shape_type = "square",
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   chop = TRUE,
-  chop_fraction = 0.1,
+  scale_stream = 1,
   ...
 )
 
@@ -41,14 +39,12 @@ stat_streamline(
   fun,
   xlim,
   ylim,
-  n = c(100, 100),
-  max_length,
-  max_steps,
+  n = c(21, 21),
   ds,
   mask_shape_type = "square",
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   chop = TRUE,
-  chop_fraction = 0.1,
+  scale_stream = 1,
   ...
 )
 }
@@ -122,12 +118,6 @@ returns a numeric vector of the same length.}
 
 \item{n}{A numeric vector of length 2 specifying the grid dimensions.}
 
-\item{max_length}{A numeric value specifying the maximum length of
-streamlines.}
-
-\item{max_steps}{An integer specifying the maximum number of steps for
-streamline generation.}
-
 \item{ds}{A numeric value specifying the distance between steps for
 streamline generation.}
 
@@ -139,7 +129,7 @@ streamline generation.}
 \item{chop}{A logical value indicating whether to chop the trajectories into
 segments.}
 
-\item{chop_fraction}{A numeric value specifying the maximum allowable segment
+\item{scale_stream}{A numeric value specifying the maximum allowable segment
 size as a fraction of the total range for chopping the trajectories.}
 
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}'s \code{params} argument. These
@@ -194,7 +184,7 @@ ggplot() +
     fun = f, xlim = c(-3, 3),
     ylim = c(-3, 3), n = c(15, 15),
     max_length = 10000, max_steps = 10000,
-    ds = .05, chop = TRUE, chop_fraction = 1,
+    ds = .05, chop = TRUE, scale_stream = 1,
     mask_shape_type = "square"
   ) +
   coord_fixed() +

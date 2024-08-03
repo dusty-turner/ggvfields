@@ -15,7 +15,7 @@ remotes::install_github("dusty-turner/ggvfields")
 ``` r
 library("ggvfields")
 #> Loading required package: ggplot2
-# options(ggplot2.continuous.colour="viridis")
+options(ggplot2.continuous.colour="viridis")
 ```
 
 ## Usage
@@ -44,16 +44,28 @@ ggplot() +
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
-By default, the magnitude (or length/norm) of the vector lengths is
-mapped to the color and length aesthetics.
+This function allows the user to map several characteristics of the
+vector field to different aesthetic mappings.
+
+#### Norm
 
 The norm of a vector $\mathbf{w} = (u, v)$ is given by:
 
 $|\mathbf{w}| = \sqrt{u^2 + v^2}$
 
-This function also offers several other aesthetic mappings which allow
-you to map several characteristics of the vector field to different
-aesthetic mappings.
+We can visualize the norm by mapping the value of the norm to the color
+aesthetic.
+
+``` r
+ggplot() +
+  geom_vector_field(
+    aes(color = after_stat(norm)),
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) +
+  coord_fixed() +
+  theme(legend.box = "horizontal")
+```
+
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
 #### Divergence
 
@@ -76,14 +88,14 @@ To visualize the divergence of the vector field:
 ``` r
 ggplot() +
   geom_vector_field(
-    aes(color = after_stat(divergence), length = after_stat(divergence)), 
+    aes(color = after_stat(divergence)), 
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
   ) +
   coord_fixed() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
 #### Curl
 
@@ -105,14 +117,14 @@ To visualize the the curl:
 ``` r
 ggplot() +
   geom_vector_field(
-    aes(color = after_stat(curl), length = after_stat(curl)), 
+    aes(color = after_stat(curl)), 
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
   ) +
   coord_fixed() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
 
 #### Laplace Operator
 
@@ -147,14 +159,14 @@ g <- function(v) {
 
 ggplot() +
   geom_vector_field(
-    aes(color = after_stat(laplacian), length = after_stat(laplacian)), 
+    aes(color = after_stat(laplacian)), 
     n = 15, 
     fun = g, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi)
   ) +
   coord_fixed() 
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
 
 #### Directional Derivative
 
@@ -182,14 +194,131 @@ vec <- c(5, 6)
 
 ggplot() +
   geom_vector_field(
-    aes(color = after_stat(directional_derivative), length = after_stat(directional_derivative)),
+    aes(color = after_stat(directional_derivative)),
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
     v = vec) +
   geom_point(aes(x = vec[1], y = vec[2])) +
   coord_fixed() 
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
+
+#### Aesthetics In Development
+
+Another aesthetic in development available for mapping is length. The
+length aesthetic maps the value of the computed measure to the length of
+the vector.
+
+``` r
+g <- function(v) {
+  x <- v[1]
+  y <- v[2]
+  c(-sin(y), cos(x))
+}
+
+ggplot() +
+  geom_vector_field(
+    aes(length = after_stat(norm), color = after_stat(norm)),
+    fun = g, xlim = c(-10, 10), ylim = c(-10, 10)) +
+  coord_fixed() +
+  theme(legend.box = "horizontal")
+```
+
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+
+### `geom_streamplot()`
+
+The `geom_streamplot()` function generates a stream plot layer of a
+user-defined vector field function. The lines in the plot represent the
+flow of data points through the vector field.
+
+``` r
+f <- function(v) {
+  x <- v[1]
+  y <- v[2]
+  c(-1 - x^2 + y, 1 + x - y^2)
+}
+
+ggplot() +
+  geom_streamplot(
+    fun = f, xlim = c(-3, 3), ylim = c(-3, 3), 
+    ) +
+  coord_fixed() +
+  theme_minimal()
+```
+
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+
+The `chop` parameter (defaulted to TRUE) allows you to chop the
+trajectories into segments. This can be useful for better visualization
+of the streamlines when they are long and complex.
+
+It may be useful to not break up the streamlines.
+
+``` r
+ggplot() +
+  geom_streamplot(
+    fun = f, xlim = c(-3, 3), ylim = c(-3, 3), 
+    chop = FALSE
+    ) +
+  coord_fixed() +
+  theme_minimal()
+```
+
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
+
+It may also be useful to break up the streamlines into more segments.
+The `scale_stream` parameter (defaults to 1) adjusts the segmentation of
+streamlines by specifying the proportion of the streamline length used
+to divide it into smaller segments.
+
+``` r
+ggplot() +
+  geom_streamplot(
+    fun = f, xlim = c(-3, 3), ylim = c(-3, 3), 
+    chop = TRUE, scale_stream = .9,
+    ) +
+  coord_fixed() +
+  theme_minimal()
+```
+
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
+
+The `mask_shape_type` parameter allows you to specify the mask shape
+used for streamline generation which influences how the streamlines are
+placed and how closely they can approach each other. The default mask
+shape is `"square"`, but you can also use `"diamond"`, `"inset_square"`,
+or `"circle"`. During streamline generation, when a streamline enters
+the specified shape, no other streamlines will enter that region.
+
+- **Square Mask (default)**: Streamlines are restricted to a grid where
+  each cell is a square. This generally results in evenly spaced
+  streamlines.
+- **Diamond Mask**: Streamlines are restricted to a square grid with
+  diamonds inset within each square. This can create a more dense
+  pattern which can have better visualizations for some functions. -
+  **Inset Square Mask**: Streamlines are restricted to a grid with
+  smaller squares inset within larger squares. This can create a denser
+  and more detailed pattern of streamlines.
+- **Diamond Mask**: Streamlines are restricted to a square grid with
+  diamonds inset within each square. This can create a more dense
+  pattern which can have better visualizations for some functions. -
+  **Circle Mask**: Streamlines are restricted to a grid with inset
+  circles inside the square grid.
+
+``` r
+ggplot() +
+  geom_streamplot(aes(group = after_stat(id)),
+                  fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000,
+                  max_steps = 10000, ds = .05, min_dist = .25, 
+                  mask_shape_type = "diamond") +
+  coord_fixed() +
+  theme_minimal()
+#> Warning in geom_streamplot(aes(group = after_stat(id)), fun = f, xlim = c(-3, :
+#> Ignoring unknown parameters: `max_length`, `max_steps`, and `min_dist`
+```
+
+<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
 
 ### `geom_complex_function()`
 
@@ -211,7 +340,7 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
 
 We can enhance this plot with a little help from biscale.
 
@@ -249,81 +378,7 @@ ggdraw() +
   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3)
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
-
-### `geom_streamplot()`
-
-The `geom_streamplot()` function generates a stream plot layer of a
-user-defined vector field function. The lines in the plot represent the
-flow of data points through the vector field.
-
-``` r
-f <- function(v) {
-  x <- v[1]
-  y <- v[2]
-  c(-1 - x^2 + y, 1 + x - y^2)
-}
-
-ggplot() +
-  geom_streamplot(aes(group = after_stat(id)),
-                  fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000,
-                  max_steps = 10000, ds = .05, n = 16, chop = FALSE) +
-  coord_fixed() +
-  theme_minimal()
-```
-
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
-
-The `chop` parameter allows you to chop the trajectories into segments.
-This can be useful for better visualization of the streamlines when they
-are long and complex. The `chop_fraction` parameter specifies the
-maximum allowable segment size as a fraction of the total range of the
-plot.
-
-``` r
-ggplot() +
-  geom_streamplot(aes(group = after_stat(id)),
-                  fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000,
-                  max_steps = 10000, ds = .05, n = 15,
-                  chop = TRUE, chop_fraction = 0.1) +
-  coord_fixed() +
-  theme_minimal()
-```
-
-<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
-
-The `mask_shape_type` parameter allows you to specify the mask shape
-used for streamline generation which influences how the streamlines are
-placed and how closely they can approach each other. The default mask
-shape is `"square"`, but you can also use `"diamond"` or
-`"inset_square"`. During streamline generation, when a streamline enters
-the specified shape, no other streamlines will enter that region.
-
-- **Square Mask (default)**: Streamlines are restricted to a grid where
-  each cell is a square. This generally results in evenly spaced
-  streamlines.
-- **Diamond Mask**: Streamlines are restricted to a square grid with
-  diamonds inset within each square. This can create a more dense
-  pattern which can have better visualizations for some functions.
-- **Inset Square Mask**: Streamlines are restricted to a grid with
-  smaller squares inset within larger squares. This can create a denser
-  and more detailed pattern of streamlines.
-
-``` r
-ggplot() +
-  geom_streamplot(aes(group = after_stat(id)),
-                  fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000,
-                  max_steps = 10000, ds = .05, min_dist = .25, 
-                  mask_shape_type = "diamond") +
-  coord_fixed() +
-  theme_minimal()
-#> Warning in geom_streamplot(aes(group = after_stat(id)), fun = f, xlim = c(-3, :
-#> Ignoring unknown parameters: `min_dist`
-#> `geom_streamplot()`: Each group consists of only one observation.
-#> ℹ Do you need to adjust the group aesthetic?
-```
-
-<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
 
 ## License
 
