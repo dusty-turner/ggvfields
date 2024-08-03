@@ -77,7 +77,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL, stat = "vectorfield",
                               position = "identity", na.rm = FALSE, show.legend = TRUE,
                               inherit.aes = TRUE, fun, xlim, ylim, v = c(1, 2), n = 16,
                               center = TRUE, normalize = TRUE,
-                              scale_length = .9,
+                              scale_length = 1.5,
                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                               ...) {
   if (is.null(data)) data <- ensure_nonempty_data(data)
@@ -116,7 +116,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
                               show.legend = NA, inherit.aes = TRUE,
                               fun, xlim, ylim, v = c(1, 2), n = 16,
                               center = TRUE, normalize = TRUE,
-                              scale_length = .9,
+                              scale_length = 1.5,
                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                               ...) {
   if (is.null(data)) data <- ensure_nonempty_data(data)

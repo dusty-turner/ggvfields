@@ -206,16 +206,10 @@ length aesthetic maps the value of the computed measure to the length of
 the vector.
 
 ``` r
-g <- function(v) {
-  x <- v[1]
-  y <- v[2]
-  c(-sin(y), cos(x))
-}
-
 ggplot() +
   geom_vector_field(
     aes(length = after_stat(norm), color = after_stat(norm)),
-    fun = g, xlim = c(-10, 10), ylim = c(-10, 10)) +
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) +
   coord_fixed() +
   theme(legend.box = "horizontal")
 ```
