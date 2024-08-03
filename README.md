@@ -38,8 +38,7 @@ f <- function(v) {
 
 ggplot() +
   geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) +
-  coord_fixed() +
-  theme(legend.box = "horizontal")
+  coord_fixed() 
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
@@ -61,8 +60,7 @@ ggplot() +
   geom_vector_field(
     aes(color = after_stat(norm)),
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) +
-  coord_fixed() +
-  theme(legend.box = "horizontal")
+  coord_fixed()
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
@@ -91,8 +89,7 @@ ggplot() +
     aes(color = after_stat(divergence)), 
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
   ) +
-  coord_fixed() +
-  theme(legend.box = "horizontal")
+  coord_fixed()
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
@@ -120,8 +117,7 @@ ggplot() +
     aes(color = after_stat(curl)), 
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
   ) +
-  coord_fixed() +
-  theme(legend.box = "horizontal")
+  coord_fixed()
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
