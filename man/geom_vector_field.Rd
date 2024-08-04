@@ -28,7 +28,7 @@ geom_vector_field(
   n = 16,
   center = TRUE,
   normalize = TRUE,
-  scale_length = 0.9,
+  scale_length = 1.5,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
@@ -48,7 +48,7 @@ stat_vector_field(
   n = 16,
   center = TRUE,
   normalize = TRUE,
-  scale_length = 0.9,
+  scale_length = 1.5,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )

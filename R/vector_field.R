@@ -272,6 +272,10 @@ GeomVectorField <- ggproto("GeomVectorField", GeomSegment,
 #' aesthetic in `geom_vector_field`.
 #' @param name The name of the scale.
 #' @param n.breaks The number of breaks.
+#' @param guide The guide to be used for this scale, such as a legend or color bar.
+#' Can be a string specifying the type of guide, or a guide object returned by
+#' a call to a guide function (e.g., `guide_legend` or `guide_colorbar`). Use `"none"`
+#' to hide the guide.
 #' @param ... Additional parameters passed on to `continuous_scale`.
 #' @export
 #' @examples
@@ -282,11 +286,11 @@ GeomVectorField <- ggproto("GeomVectorField", GeomSegment,
 #' ggplot() +
 #'   geom_vector_field(aes(length = after_stat(norm)), fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) +
 #'   scale_length_continuous()
-scale_length_continuous <- function(name = waiver(), n.breaks = waiver(), ...) {
+scale_length_continuous <- function(name = waiver(), n.breaks = waiver(), guide = "none", ...) {
   breaks <- pretty
   labels <- function(x) format(x, scientific = FALSE)
   continuous_scale(
     aesthetics = "length", palette = identity,
-    name = name, breaks = function(x) rev(breaks(x)), labels = labels, guide = "none", ...
+    name = name, breaks = function(x) rev(breaks(x)), labels = labels, guide = guide, ...
   )
 }

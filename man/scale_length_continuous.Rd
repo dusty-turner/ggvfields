@@ -4,12 +4,22 @@
 \alias{scale_length_continuous}
 \title{Continuous Scale for Vector Length}
 \usage{
-scale_length_continuous(name = waiver(), n.breaks = waiver(), ...)
+scale_length_continuous(
+  name = waiver(),
+  n.breaks = waiver(),
+  guide = "none",
+  ...
+)
 }
 \arguments{
 \item{name}{The name of the scale.}
 
 \item{n.breaks}{The number of breaks.}
+
+\item{guide}{The guide to be used for this scale, such as a legend or color bar.
+Can be a string specifying the type of guide, or a guide object returned by
+a call to a guide function (e.g., \code{guide_legend} or \code{guide_colorbar}). Use \code{"none"}
+to hide the guide.}
 
 \item{...}{Additional parameters passed on to \code{continuous_scale}.}
 }
