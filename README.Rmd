@@ -228,6 +228,29 @@ ggplot() +
   theme_minimal()
 ```
 
+### Animate `geom_streamplot()`{.R}
+
+```{r}
+#| cache: true
+# Create stream plot with rownum aesthetic
+
+p <- ggplot() +
+ geom_streamplot(
+   aes(rownum = after_stat(rownum)), 
+   fun = f, xlim = c(-3, 3), ylim = c(-3, 3)
+ ) +
+ coord_fixed() +
+ theme_bw()
+
+# Create an animation transition plot
+anim <- animation_transition(plot = p) +   
+ gganimate::transition_reveal(rownum) +
+ gganimate::ease_aes('linear')
+
+# Animate the plot
+gganimate::animate(anim, nframes = 25, fps = 5, end_pause = 0, renderer = gganimate::gifski_renderer())
+```
+
 
 The `mask_shape_type` parameter allows you to specify the mask shape used for streamline generation which influences how the streamlines are placed and how closely they can approach each other. The default mask shape is `"square"`, but you can also use `"diamond"`, `"inset_square"`, or `"circle"`.  During streamline generation, when a streamline enters the specified shape, no other streamlines will enter that region. 
 

@@ -274,6 +274,34 @@ ggplot() +
 
 <img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
 
+### Animate `geom_streamplot()`
+
+``` r
+# Create stream plot with rownum aesthetic
+
+p <- ggplot() +
+ geom_streamplot(
+   aes(rownum = after_stat(rownum)), 
+   fun = f, xlim = c(-3, 3), ylim = c(-3, 3)
+ ) +
+ coord_fixed() +
+ theme_bw()
+
+# Create an animation transition plot
+anim <- animation_transition(plot = p) +   
+ gganimate::transition_reveal(rownum) +
+ gganimate::ease_aes('linear')
+
+# Animate the plot
+gganimate::animate(anim, nframes = 25, fps = 5, end_pause = 0, renderer = gganimate::gifski_renderer())
+#> `geom_path()`: Each group consists of only one observation.
+#> ℹ Do you need to adjust the group aesthetic?
+#> `geom_path()`: Each group consists of only one observation.
+#> ℹ Do you need to adjust the group aesthetic?
+```
+
+<img src="man/figures/README-unnamed-chunk-14-1.gif" width="100%" />
+
 The `mask_shape_type` parameter allows you to specify the mask shape
 used for streamline generation which influences how the streamlines are
 placed and how closely they can approach each other. The default mask
@@ -308,7 +336,7 @@ ggplot() +
 #> Ignoring unknown parameters: `max_length`, `max_steps`, and `min_dist`
 ```
 
-<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
 
 ### `geom_complex_function()`
 
@@ -330,7 +358,7 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
 
 We can enhance this plot with a little help from biscale.
 
@@ -342,6 +370,11 @@ properties change across the field.
 ``` r
 library(biscale)
 library(cowplot)
+#> 
+#> Attaching package: 'cowplot'
+#> The following object is masked from 'package:lubridate':
+#> 
+#>     stamp
 
 plot <-
   ggplot() +
@@ -368,7 +401,7 @@ ggdraw() +
   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3)
 ```
 
-<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
 
 ## License
 
