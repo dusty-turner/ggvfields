@@ -370,11 +370,6 @@ properties change across the field.
 ``` r
 library(biscale)
 library(cowplot)
-#> 
-#> Attaching package: 'cowplot'
-#> The following object is masked from 'package:lubridate':
-#> 
-#>     stamp
 
 plot <-
   ggplot() +

@@ -213,8 +213,10 @@ StatVectorField <- ggproto("StatVectorField", Stat,
                                data$u <- data$u / data$norm * scale_values * scale_length * spacing
                                data$v <- data$v / data$norm * scale_values * scale_length * spacing
                              } else{ ## this scales the vectors by the length_var
-                               data$u <- data$u / data$norm * scale_values
-                               data$v <- data$v / data$norm * scale_values
+                               data$u <- data$u * scale_values
+                               data$v <- data$v * scale_values
+                               # data$u <- data$u / data$norm * scale_values
+                               # data$v <- data$v / data$norm * scale_values
                              }
 
                              # Scale arrow size based on the length aesthetic
