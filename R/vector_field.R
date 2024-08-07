@@ -74,7 +74,7 @@ NULL
 #' @rdname geom_vector_field
 #' @export
 geom_vector_field <- function(mapping = NULL, data = NULL, stat = "vectorfield",
-                              position = "identity", na.rm = FALSE, show.legend = TRUE,
+                              position = "identity", na.rm = FALSE, show.legend = NA,
                               inherit.aes = TRUE, fun, xlim, ylim, v = c(1, 2), n = 16,
                               center = TRUE, normalize = TRUE,
                               scale_length = 1.5,
@@ -254,7 +254,7 @@ GeomVectorField <- ggproto("GeomVectorField", GeomSegment,
 
                            required_aes = c("x", "y", "xend", "yend"),
 
-                           default_aes = aes(colour = "black", linewidth = 0.5, linetype = 1, alpha = 1, length = 1, arrow_size = 1),
+                           default_aes = aes(color = after_stat(norm), linewidth = 0.5, linetype = 1, alpha = 1, length = 1, arrow_size = 1),
 
                            setup_data = function(data, params) {
                              data$length <- data$length %||% 1
