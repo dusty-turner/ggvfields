@@ -244,7 +244,7 @@ StatVectorField <- ggproto("StatVectorField", Stat,
 
                              # data$color <- as.numeric(data$norm)
 
-                             print(head(data))
+                             # print(head(data))
 
                              data
                            }
