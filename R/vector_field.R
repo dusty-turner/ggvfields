@@ -241,6 +241,11 @@ StatVectorField <- ggproto("StatVectorField", Stat,
                                data$xend <- data$x + data$u
                                data$yend <- data$y + data$v
                              }
+
+                             # data$color <- as.numeric(data$norm)
+
+                             print(head(data))
+
                              data
                            }
 )
@@ -254,7 +259,7 @@ GeomVectorField <- ggproto("GeomVectorField", GeomSegment,
 
                            required_aes = c("x", "y", "xend", "yend"),
 
-                           default_aes = aes(color = after_stat(norm), linewidth = 0.5, linetype = 1, alpha = 1, length = 1, arrow_size = 1),
+                           default_aes = aes(colour = "black", linewidth = 0.5, linetype = 1, alpha = 1, length = 1, arrow_size = 1),
 
                            setup_data = function(data, params) {
                              data$length <- data$length %||% 1
