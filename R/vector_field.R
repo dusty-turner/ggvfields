@@ -153,6 +153,8 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = "segment",
 #' @export
 StatVectorField <- ggproto("StatVectorField", Stat,
 
+                           default_aes = aes(color = after_stat(norm)),
+
                            compute_group = function(data, scales, fun, xlim, ylim, v = c(1, 2), n, center, normalize, scale_length, length_var = NULL, ...) {
 
                              # Create a sequence of x and y values within the limits
