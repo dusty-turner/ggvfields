@@ -15,15 +15,32 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Move file to another repository
-        env:
-          PAT: ${{ secrets.PAT }}
+      - name: Set up Git
         run: |
           git config --global user.email "dusty.s.turner@gmail.com"
           git config --global user.name "dusty-turner"
 
+      - name: Print directory tree
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tree
+          tree
+
+      - name: Move file to another repository
+        env:
+          PAT: ${{ secrets.PAT }}
+        run: |
           # Clone the target repository
-          git clone https://github.com/dusty-turner/blog-reboot.git
+          git clone https://$PAT@github.com/dusty-turner/blog-reboot.git
+
+          # Check if docs directory exists and print its contents
+          if [ -d "docs" ]; then
+            echo "docs directory exists"
+            tree docs
+          else
+            echo "docs directory does not exist"
+            exit 1
+          fi
 
           # Move the file to the target repository
           mv -v docs/* blog-reboot/public/ggvfields/
