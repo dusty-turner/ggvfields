@@ -33,15 +33,6 @@ jobs:
           # Clone the target repository
           git clone https://$PAT@github.com/dusty-turner/blog-reboot.git
 
-          # Check if docs directory exists
-          if [ -d "docs" ]; then
-            echo "docs directory exists"
-            tree docs
-          else
-            echo "docs directory does not exist"
-            exit 1
-          fi
-
           # Move the file to the target repository
           mv -v docs/* blog-reboot/public/ggvfields/
 
