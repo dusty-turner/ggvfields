@@ -22,21 +22,18 @@ jobs:
           git config --global user.email "dusty.s.turner@gmail.com"
           git config --global user.name "dusty-turner"
 
-      - name: Print directory tree
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tree
-          tree
-
       - name: Move file to another repository
         env:
           PAT: ${{ secrets.PAT }}
         run: |
+          sudo apt-get update
+          sudo apt-get install -y rsync
+
           # Clone the target repository
           git clone https://$PAT@github.com/dusty-turner/blog-reboot.git
 
-          # Move the file to the target repository
-          mv -v docs/* blog-reboot/public/ggvfields/
+          # Synchronize the files to the target repository, replacing existing contents
+          rsync -av --delete docs/ blog-reboot/public/ggvfields/
 
           # Commit and push the changes
           cd blog-reboot
