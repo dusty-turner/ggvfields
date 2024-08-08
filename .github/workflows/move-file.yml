@@ -26,14 +26,14 @@ jobs:
           sudo apt-get install -y tree
           tree
 
-      - name: Clone target repository
+      - name: Move file to another repository
         env:
           PAT: ${{ secrets.PAT }}
         run: |
+          # Clone the target repository
           git clone https://$PAT@github.com/dusty-turner/blog-reboot.git
 
-      - name: Check if docs directory exists
-        run: |
+          # Check if docs directory exists
           if [ -d "docs" ]; then
             echo "docs directory exists"
             tree docs
@@ -42,16 +42,11 @@ jobs:
             exit 1
           fi
 
-      - name: Move file to another repository
-        run: |
           # Move the file to the target repository
           mv -v docs/* blog-reboot/public/ggvfields/
 
-      - name: Commit and push changes
-        env:
-          PAT: ${{ secrets.PAT }}
-        run: |
+          # Commit and push the changes
           cd blog-reboot
           git add .
           git commit -m "Move file from source repository"
-          git push https://$PAT@github.com/dusty-turner/blog-reboot.git HEAD:main
+          git push https://$PAT@github.com/dusty-turner/blog-reboot.git
