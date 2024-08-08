@@ -1,0 +1,35 @@
+name: Move File
+
+on:
+  push:
+    branches:
+      - main  # Change to your desired branch
+
+jobs:
+  move-file:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Move file to another repository
+        env:
+          PAT: ${{ secrets.PAT }}
+        run: |
+          git config --global user.email "dusty.s.turner@gmail.com"
+          git config --global user.name "dusty-turner"
+
+          # Clone the target repository
+          git clone https://github.com/dusty-turner/blog-reboot.git
+
+          # Move the file to the target repository
+          mv quarto-presentation/quarto-presentation/presentation.html blog-reboot/public/ggvfields/
+
+          # Commit and push the changes
+          cd blog-reboot
+          git add .
+          git commit -m "Move file from source repository"
+          git push https://$PAT@github.com/dusty-turner/blog-reboot.git

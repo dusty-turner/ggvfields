@@ -4,3 +4,5 @@ dusty_files*
 ^README\.Rmd$
 ^README_cache$
 ^docs$
+^_pkgdown\.yml$
+^pkgdown$
