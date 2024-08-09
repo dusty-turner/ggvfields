@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - main  # Change to your desired branch
-    # paths:
-      # - 'docs/**'  # Only trigger when files in the docs directory change
+    paths:
+      - 'docs/**'  # Only trigger when files in the docs directory change
 
 jobs:
   move-file:
