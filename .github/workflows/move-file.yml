@@ -38,5 +38,5 @@ jobs:
           # Commit and push the changes
           cd blog-reboot
           git add .
-          git commit -m "Move file from source repository"
+          git commit -m "Move docs from ggvfields"
           git push https://$PAT@github.com/dusty-turner/blog-reboot.git
