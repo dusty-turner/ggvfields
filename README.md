@@ -197,6 +197,20 @@ ggplot() +
 
 <img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
+### Map Calculus Measures to Aesthetics
+
+``` r
+ggplot() +
+  geom_streamplot(
+    fun = f, xlim = c(-3, 3), ylim = c(-3, 3), 
+    aes(color = after_stat(log(divergence + 10)))
+    ) +
+  coord_fixed() +
+  theme_minimal() 
+```
+
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
+
 ### Animate `geom_streamplot()`
 
 ``` r
@@ -223,7 +237,7 @@ gganimate::animate(anim, nframes = 25, fps = 5, end_pause = 0, renderer = gganim
 #> ℹ Do you need to adjust the group aesthetic?
 ```
 
-<img src="man/figures/README-unnamed-chunk-12-1.gif" width="100%" />
+<img src="man/figures/README-unnamed-chunk-13-1.gif" width="100%" />
 
 The `mask_shape_type` parameter allows you to specify the mask shape
 used for streamline generation which influences how the streamlines are
@@ -259,7 +273,7 @@ ggplot() +
 #> Ignoring unknown parameters: `max_length`, `max_steps`, and `min_dist`
 ```
 
-<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
 
 ### `geom_complex_function()`
 
@@ -281,7 +295,7 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
 
 We can enhance this plot with a little help from biscale.
 
@@ -319,7 +333,7 @@ ggdraw() +
   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3)
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
 
 ## License
 

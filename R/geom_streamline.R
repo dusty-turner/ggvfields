@@ -180,6 +180,18 @@ StatStreamplot <- ggproto("StatStreamplot", Stat,
     trajectory_data <- trajectory_data[order(trajectory_data$id), ]
     trajectory_data$rownum <- ave(trajectory_data$id, trajectory_data$id, FUN = seq_along) |> as.integer()
 
+    ## Calculus measures
+    grad <- apply(cbind(trajectory_data$x, trajectory_data$y), 1, numDeriv::grad, func = fun) |> t()
+
+    grad_u <- grad[, 1]
+    grad_v <- grad[, 2]
+
+    # Divergence
+    trajectory_data$divergence <- grad_u + grad_v
+
+    # Curl
+    trajectory_data$curl <- grad_v - grad_u
+
     return(trajectory_data)
 
     }

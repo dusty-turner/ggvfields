@@ -170,6 +170,20 @@ ggplot() +
   theme_minimal()
 ```
 
+### Map Calculus Measures to Aesthetics
+
+```{r}
+ggplot() +
+  geom_streamplot(
+    fun = f, xlim = c(-3, 3), ylim = c(-3, 3), 
+    aes(color = after_stat(log(divergence + 10)))
+    ) +
+  coord_fixed() +
+  theme_minimal() 
+```
+
+
+
 ### Animate `geom_streamplot()`{.R}
 
 ```{r}
