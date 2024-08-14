@@ -66,8 +66,6 @@
 #'     \item{norm}{The magnitude of the vector field, computed as \eqn{\|\mathbf{w}\| = \sqrt{u^2 + v^2}}.}
 #'     \item{divergence}{The divergence of the vector field, computed as \eqn{\nabla \cdot \mathbf{F} = \frac{\partial f_x}{\partial x} + \frac{\partial f_y}{\partial y}}.}
 #'     \item{curl}{The curl of the vector field, computed as \eqn{\text{curl} \, \mathbf{F} = \frac{\partial f_y}{\partial x} - \frac{\partial f_x}{\partial y}}.}
-#'     \item{laplacian}{The Laplacian of the vector field, computed as \eqn{\Delta \mathbf{F} = \frac{\partial^2 f_x}{\partial x^2} + \frac{\partial^2 f_x}{\partial y^2} + \frac{\partial^2 f_y}{\partial x^2} + \frac{\partial^2 f_y}{\partial y^2}}.}
-#'     \item{directional_derivative}{The directional derivative of the vector field, computed as \eqn{D_{\mathbf{v}} \mathbf{F} = \frac{\partial F_x}{\partial x} v_x + \frac{\partial F_x}{\partial y} v_y + \frac{\partial F_y}{\partial x} v_x + \frac{\partial F_y}{\partial y} v_y}.}
 #'   }
 NULL
 
@@ -185,14 +183,14 @@ StatVectorField <- ggproto("StatVectorField", Stat,
                              # Curl
                              data$curl <- grad_v - grad_u
 
-                             # Laplacian
-                             hess_u <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 1))
-                             hess_v <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 2))
-                             data$laplacian <- hess_u + hess_v
+                             # # Laplacian
+                             # hess_u <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 1))
+                             # hess_v <- apply(grid, 1, compute_laplacian, f = extract_component_function(f = fun, 2))
+                             # data$laplacian <- hess_u + hess_v
 
-                             # Directional Derivative
-                             vx <- v[1]; vy <- v[2]
-                             data$directional_derivative <- grad %*% (c(vx, vy) / sqrt(vx ^ 2 + vy ^ 2))
+                             # # Directional Derivative
+                             # vx <- v[1]; vy <- v[2]
+                             # data$directional_derivative <- grad %*% (c(vx, vy) / sqrt(vx ^ 2 + vy ^ 2))
 
                              # Calculate value to scale vectors if needed
                              scale_values <- if (!is.null(length_var) && length_var %in% colnames(data)) {

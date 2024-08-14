@@ -198,8 +198,6 @@ useful for visualizing vector fields in a two-dimensional space.
 \item{norm}{The magnitude of the vector field, computed as \eqn{\|\mathbf{w}\| = \sqrt{u^2 + v^2}}.}
 \item{divergence}{The divergence of the vector field, computed as \eqn{\nabla \cdot \mathbf{F} = \frac{\partial f_x}{\partial x} + \frac{\partial f_y}{\partial y}}.}
 \item{curl}{The curl of the vector field, computed as \eqn{\text{curl} \, \mathbf{F} = \frac{\partial f_y}{\partial x} - \frac{\partial f_x}{\partial y}}.}
-\item{laplacian}{The Laplacian of the vector field, computed as \eqn{\Delta \mathbf{F} = \frac{\partial^2 f_x}{\partial x^2} + \frac{\partial^2 f_x}{\partial y^2} + \frac{\partial^2 f_y}{\partial x^2} + \frac{\partial^2 f_y}{\partial y^2}}.}
-\item{directional_derivative}{The directional derivative of the vector field, computed as \eqn{D_{\mathbf{v}} \mathbf{F} = \frac{\partial F_x}{\partial x} v_x + \frac{\partial F_x}{\partial y} v_y + \frac{\partial F_y}{\partial x} v_x + \frac{\partial F_y}{\partial y} v_y}.}
 }
 }
 

@@ -122,83 +122,6 @@ ggplot() +
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
 
-#### Laplace Operator
-
-The Laplace operator (or Laplacian) measures the rate at which the
-average value of a function around a point differs from the value at
-that point. It is commonly used to understand how a scalar field spreads
-out or compresses in space.
-
-If $\mathbf{F} = \langle \mathbf{F}_x(x,y), \mathbf{F}_y(x,y) \rangle$
-is a vector field in $\mathbb{R}^2$, then the Laplacian of $\mathbf{F}$
-is defined by taking the sum of the second partial derivatives of each
-component of the vector field.
-
-The Laplacian of the vector field $\mathbf{F}$ is thus given by:
-
-$$
-\Delta \mathbf{F} = \frac{\partial^2 \mathbf{F}_x}{\partial x^2} + \frac{\partial^2 \mathbf{F}_x}{\partial y^2} + \frac{\partial^2 \mathbf{F}_y}{\partial x^2} + \frac{\partial^2 \mathbf{F}_y}{\partial y^2}
-$$
-
-This results in a scalar value that describes how the vector field
-spreads out or compresses at different points in the field.
-
-To visualize the Laplace operator of the vector field, lets look at a
-different vector field:
-
-``` r
-g <- function(v) {
-  x <- v[1]
-  y <- v[2]
-  c(-sin(y), cos(x))
-}
-
-ggplot() +
-  geom_vector_field(
-    aes(color = after_stat(laplacian)), 
-    n = 15, 
-    fun = g, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi)
-  ) +
-  coord_fixed() 
-```
-
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
-
-#### Directional Derivative
-
-The directional derivative of a vector field measures the rate of change
-of the field in a specified direction. It provides insight into how the
-field varies as you move in a particular direction.
-
-If $\mathbf{F} = \langle \mathbf{F}_x(x,y), \mathbf{F}_y(x,y) \rangle$
-is a vector field in $\mathbb{R}^2$, and
-$\mathbf{v} = \langle v_x, v_y \rangle$ is a direction vector, then the
-directional derivative of $\mathbf{F}$ in the direction of $\mathbf{v}$
-is given by:
-
-$$
-D_{\mathbf{v}} \mathbf{F} = \frac{\partial \mathbf{F}_x}{\partial x} v_x + \frac{\partial \mathbf{F}_x}{\partial y} v_y + \frac{\partial \mathbf{F}_y}{\partial x} v_x + \frac{\partial \mathbf{F}_y}{\partial y} v_y
-$$
-
-For a vector field, this represents the rate of change of each component
-of the field in the direction specified by $\mathbf{v}$.
-
-To visualize the Laplace operator of the vector field:
-
-``` r
-vec <- c(5, 6)
-
-ggplot() +
-  geom_vector_field(
-    aes(color = after_stat(directional_derivative)),
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
-    v = vec) +
-  geom_point(aes(x = vec[1], y = vec[2])) +
-  coord_fixed() 
-```
-
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
-
 #### Aesthetics In Development
 
 Another aesthetic in development available for mapping is length. The
@@ -214,7 +137,7 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
 
 ### `geom_streamplot()`
 
@@ -237,7 +160,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
 
 The `chop` parameter (defaulted to TRUE) allows you to chop the
 trajectories into segments. This can be useful for better visualization
@@ -255,7 +178,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
 
 It may also be useful to break up the streamlines into more segments.
 The `scale_stream` parameter (defaults to 1) adjusts the segmentation of
@@ -272,7 +195,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
 ### Animate `geom_streamplot()`
 
@@ -300,7 +223,7 @@ gganimate::animate(anim, nframes = 25, fps = 5, end_pause = 0, renderer = gganim
 #> ℹ Do you need to adjust the group aesthetic?
 ```
 
-<img src="man/figures/README-unnamed-chunk-14-1.gif" width="100%" />
+<img src="man/figures/README-unnamed-chunk-12-1.gif" width="100%" />
 
 The `mask_shape_type` parameter allows you to specify the mask shape
 used for streamline generation which influences how the streamlines are
@@ -336,7 +259,7 @@ ggplot() +
 #> Ignoring unknown parameters: `max_length`, `max_steps`, and `min_dist`
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
 
 ### `geom_complex_function()`
 
@@ -358,7 +281,7 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
 
 We can enhance this plot with a little help from biscale.
 
@@ -396,7 +319,7 @@ ggdraw() +
   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3)
 ```
 
-<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
 
 ## License
 
