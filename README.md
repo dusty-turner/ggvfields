@@ -139,6 +139,56 @@ ggplot() +
 
 <img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
 
+### `geom_vector()`
+
+The `geom_vector()` function generates a plot layer that visualizes
+vectors as line segments with optional arrowheads. It is designed to
+help you visualize directional data, such as wind directions, gradients,
+or flow fields. The vectors are defined by their start (`x`, `y`) and
+end (`xend`, `yend`) coordinates, or alternatively by their angular
+(`angle`) and distance (`distance`) components.
+
+#### Cartesian
+
+``` r
+set.seed(1234)
+n <- 10
+wind_data_polar <- data.frame(
+  lon = rnorm(n), 
+  lat = rnorm(n), 
+  wind_dir = runif(n, -pi, pi),
+  wind_spd = rchisq(n, df = 2)
+)
+
+wind_data_cartesian <- within(wind_data_polar, {
+  wind_lon_comp <- wind_spd * cos(wind_dir)
+  wind_lat_comp <- wind_spd * sin(wind_dir)
+  xend <- lon + wind_lon_comp
+  yend <- lat + wind_lat_comp
+})
+
+wind_data_cartesian |> 
+  ggplot() +
+  geom_vector(aes(x = lon, y = lat, xend = xend, yend = yend)) +
+  labs(title = "Wind Vectors (Cartesian Input)",
+       x = "Longitude", y = "Latitude")
+```
+
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
+
+#### Polar
+
+``` r
+
+wind_data_polar |> 
+  ggplot() +
+  geom_vector(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd)) +
+  labs(title = "Wind Vectors (Polar Input)",
+       x = "Longitude", y = "Latitude")
+```
+
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+
 ### `geom_streamplot()`
 
 The `geom_streamplot()` function generates a stream plot layer of a
@@ -160,7 +210,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
 The `chop` parameter (defaulted to TRUE) allows you to chop the
 trajectories into segments. This can be useful for better visualization
@@ -178,7 +228,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
 
 It may also be useful to break up the streamlines into more segments.
 The `scale_stream` parameter (defaults to 1) adjusts the segmentation of
@@ -195,7 +245,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
 
 ### Map Calculus Measures to Aesthetics
 
@@ -209,7 +259,7 @@ ggplot() +
   theme_minimal() 
 ```
 
-<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
 
 ### Animate `geom_streamplot()`
 
@@ -237,7 +287,7 @@ gganimate::animate(anim, nframes = 25, fps = 5, end_pause = 0, renderer = gganim
 #> ℹ Do you need to adjust the group aesthetic?
 ```
 
-<img src="man/figures/README-unnamed-chunk-13-1.gif" width="100%" />
+<img src="man/figures/README-unnamed-chunk-15-1.gif" width="100%" />
 
 The `mask_shape_type` parameter allows you to specify the mask shape
 used for streamline generation which influences how the streamlines are
@@ -273,7 +323,7 @@ ggplot() +
 #> Ignoring unknown parameters: `max_length`, `max_steps`, and `min_dist`
 ```
 
-<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
 
 ### `geom_complex_function()`
 
@@ -295,7 +345,7 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
 
 We can enhance this plot with a little help from biscale.
 
@@ -333,7 +383,7 @@ ggdraw() +
   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3)
 ```
 
-<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
 
 ## License
 

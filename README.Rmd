@@ -123,6 +123,48 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
+### `geom_vector()`{.R}
+
+The `geom_vector()`{.R} function generates a plot layer that visualizes vectors as line segments with optional arrowheads. It is designed to help you visualize directional data, such as wind directions, gradients, or flow fields. The vectors are defined by their start (`x`, `y`) and end (`xend`, `yend`) coordinates, or alternatively by their angular (`angle`) and distance (`distance`) components.
+
+#### Cartesian
+
+```{r}
+set.seed(1234)
+n <- 10
+wind_data_polar <- data.frame(
+  lon = rnorm(n), 
+  lat = rnorm(n), 
+  wind_dir = runif(n, -pi, pi),
+  wind_spd = rchisq(n, df = 2)
+)
+
+wind_data_cartesian <- within(wind_data_polar, {
+  wind_lon_comp <- wind_spd * cos(wind_dir)
+  wind_lat_comp <- wind_spd * sin(wind_dir)
+  xend <- lon + wind_lon_comp
+  yend <- lat + wind_lat_comp
+})
+
+wind_data_cartesian |> 
+  ggplot() +
+  geom_vector(aes(x = lon, y = lat, xend = xend, yend = yend)) +
+  labs(title = "Wind Vectors (Cartesian Input)",
+       x = "Longitude", y = "Latitude")
+```
+
+#### Polar
+
+```{r}
+
+wind_data_polar |> 
+  ggplot() +
+  geom_vector(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd)) +
+  labs(title = "Wind Vectors (Polar Input)",
+       x = "Longitude", y = "Latitude")
+
+```
+
 
 
 ### `geom_streamplot()`{.R}

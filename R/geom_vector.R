@@ -141,7 +141,7 @@ StatVector <- ggproto("StatVector", Stat,
 
                              }
 
-                             # Calculate norm (magnitude) of the vectors
+                             # Calculate norm of the vectors
                              data$norm <- sqrt((data$xend - data$x) ^ 2 + (data$yend - data$y) ^ 2)
 
                              # Scale arrow size based on the vector magnitude
