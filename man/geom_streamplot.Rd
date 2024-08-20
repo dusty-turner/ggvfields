@@ -4,7 +4,7 @@
 \name{geom_streamplot}
 \alias{geom_streamplot}
 \alias{GeomStreamplot}
-\alias{stat_streamline}
+\alias{stat_streamplot}
 \alias{StatStreamplot}
 \title{Create a Stream Plot Geom Layer}
 \usage{
@@ -20,15 +20,15 @@ geom_streamplot(
   xlim = c(-10, 10),
   ylim = c(-10, 10),
   n = c(21, 21),
-  ds = 0.05,
-  mask_shape_type = "square",
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  iterations = 100,
   chop = TRUE,
   scale_stream = 1,
+  threshold_distance = 0.5,
+  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
 
-stat_streamline(
+stat_streamplot(
   mapping = NULL,
   data = NULL,
   stat = "streamplot",
@@ -40,11 +40,11 @@ stat_streamline(
   xlim = c(-10, 10),
   ylim = c(-10, 10),
   n = c(21, 21),
-  ds = 0.05,
-  mask_shape_type = "square",
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  iterations = 100,
   chop = TRUE,
   scale_stream = 1,
+  threshold_distance = 0.5,
+  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
 }
@@ -110,27 +110,32 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{fun}{A user-defined function that takes a numeric vector as input and
-returns a numeric vector of the same length.}
+returns a numeric vector of the same length, representing the vector field.}
 
 \item{xlim}{A numeric vector of length 2 giving the x-axis limits.}
 
 \item{ylim}{A numeric vector of length 2 giving the y-axis limits.}
 
-\item{n}{A numeric vector of length 2 specifying the grid dimensions.}
+\item{n}{A numeric vector of length 2 specifying the grid dimensions for the
+starting points of the streamlines.}
 
-\item{ds}{A numeric value specifying the distance between steps for
-streamline generation.}
-
-\item{mask_shape_type}{A character string specifying the mask shape type:
-"square", "diamond", "inset_square", or "circle".}
-
-\item{arrow}{Arrow specification, as created by \code{grid::arrow()}.}
+\item{iterations}{A numeric value specifying the number of time steps for the
+ODE solver used in streamline generation. This determines the granularity
+of the streamline paths; higher values result in smoother, more detailed
+streamlines.}
 
 \item{chop}{A logical value indicating whether to chop the trajectories into
-segments.}
+segments based on their arclength.}
 
 \item{scale_stream}{A numeric value specifying the maximum allowable segment
 size as a fraction of the total range for chopping the trajectories.}
+
+\item{threshold_distance}{A numeric value specifying the minimum distance
+between streamlines to avoid overlap. If not provided, it defaults to half
+the Euclidean distance between adjacent grid points.}
+
+\item{arrow}{Arrow specification, as created by \code{grid::arrow()}, for adding
+arrows to the streamlines.}
 
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}'s \code{params} argument. These
 arguments broadly fall into one of 4 categories below. Notably, further
@@ -165,9 +170,14 @@ A ggplot2 layer that can be added to a ggplot object to produce a
 stream plot.
 }
 \description{
-\code{\link[=geom_streamplot]{geom_streamplot()}} generates a stream plot layer of a user-defined vector
+\code{geom_streamplot()} generates a stream plot layer for a user-defined vector
 field function. The lines in the plot represent the flow of data points
 through the vector field.
+}
+\details{
+The streamlines are computed using the \code{deSolve} package's ODE solver. The
+\code{rk4} method (a fourth-order Runge-Kutta method) is used by default for
+numerical integration of the streamlines.
 }
 \examples{
 library(ggplot2)
@@ -183,12 +193,11 @@ ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3),
     ylim = c(-3, 3), n = c(15, 15),
-    max_length = 10000, max_steps = 10000,
-    ds = .05, chop = TRUE, scale_stream = 1,
-    mask_shape_type = "square"
+    iterations = 100, chop = TRUE, scale_stream = 1,
+    threshold_distance = NULL,  # Default value
+    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
   ) +
   coord_fixed() +
   theme_minimal()
-
 }
 \keyword{datasets}

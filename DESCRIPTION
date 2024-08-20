@@ -29,7 +29,8 @@ Depends:
 Imports:
     farver,
     tibble,
-    numDeriv 
+    numDeriv,
+    deSolve
 URL: https://github.com/dusty-turner/ggvfields
 BugReports: https://github.com/dusty-turner/ggvfields/issues
 Suggests: 

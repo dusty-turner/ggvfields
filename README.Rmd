@@ -1,5 +1,6 @@
 ---
 output: github_document
+cache: refresh
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -11,8 +12,7 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%",
   dev = "png", dpi = 300,
-  fig.height = 3.5, 
-  cache = FALSE
+  fig.height = 3.5
 )
 ```
 
@@ -180,7 +180,7 @@ f <- function(v) {
 
 ggplot() +
   geom_streamplot(
-    fun = f, xlim = c(-3, 3), ylim = c(-3, 3), 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
     ) +
   coord_fixed() +
   theme_minimal()
@@ -193,7 +193,7 @@ It may be useful to not break up the streamlines.
 ```{r}
 ggplot() +
   geom_streamplot(
-    fun = f, xlim = c(-3, 3), ylim = c(-3, 3), 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
     chop = FALSE
     ) +
   coord_fixed() +
@@ -205,7 +205,7 @@ It may also be useful to break up the streamlines into more segments. The `scale
 ```{r}
 ggplot() +
   geom_streamplot(
-    fun = f, xlim = c(-3, 3), ylim = c(-3, 3), 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
     chop = TRUE, scale_stream = .9,
     ) +
   coord_fixed() +
@@ -217,7 +217,7 @@ ggplot() +
 ```{r}
 ggplot() +
   geom_streamplot(
-    fun = f, xlim = c(-3, 3), ylim = c(-3, 3), 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
     aes(color = after_stat(log(divergence + 10)))
     ) +
   coord_fixed() +
@@ -228,18 +228,16 @@ ggplot() +
 
 ### Animate `geom_streamplot()`{.R}
 
-```{r}
+```{r animation}
 #| cache: true
 # Create stream plot with rownum aesthetic
-
 p <- ggplot() +
  geom_streamplot(
    aes(rownum = after_stat(rownum)), 
-   fun = f, xlim = c(-3, 3), ylim = c(-3, 3)
+   fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
  ) +
  coord_fixed() +
  theme_bw()
-
 # Create an animation transition plot
 anim <- animation_transition(plot = p) +   
  gganimate::transition_reveal(rownum) +
@@ -250,22 +248,22 @@ gganimate::animate(anim, nframes = 25, fps = 5, end_pause = 0, renderer = gganim
 ```
 
 
-The `mask_shape_type` parameter allows you to specify the mask shape used for streamline generation which influences how the streamlines are placed and how closely they can approach each other. The default mask shape is `"square"`, but you can also use `"diamond"`, `"inset_square"`, or `"circle"`.  During streamline generation, when a streamline enters the specified shape, no other streamlines will enter that region. 
+<!-- The `mask_shape_type` parameter allows you to specify the mask shape used for streamline generation which influences how the streamlines are placed and how closely they can approach each other. The default mask shape is `"square"`, but you can also use `"diamond"`, `"inset_square"`, or `"circle"`.  During streamline generation, when a streamline enters the specified shape, no other streamlines will enter that region.  -->
 
-- **Square Mask (default)**: Streamlines are restricted to a grid where each cell is a square. This generally results in evenly spaced streamlines.
-- **Diamond Mask**: Streamlines are restricted to a square grid with diamonds inset within each square.  This can create a more dense pattern which can have better visualizations for some functions. - **Inset Square Mask**: Streamlines are restricted to a grid with smaller squares inset within larger squares. This can create a denser and more detailed pattern of streamlines.
-- **Diamond Mask**: Streamlines are restricted to a square grid with diamonds inset within each square.  This can create a more dense pattern which can have better visualizations for some functions. - **Circle Mask**: Streamlines are restricted to a grid with inset circles inside the square grid.
+<!-- - **Square Mask (default)**: Streamlines are restricted to a grid where each cell is a square. This generally results in evenly spaced streamlines. -->
+<!-- - **Diamond Mask**: Streamlines are restricted to a square grid with diamonds inset within each square.  This can create a more dense pattern which can have better visualizations for some functions. - **Inset Square Mask**: Streamlines are restricted to a grid with smaller squares inset within larger squares. This can create a denser and more detailed pattern of streamlines. -->
+<!-- - **Diamond Mask**: Streamlines are restricted to a square grid with diamonds inset within each square.  This can create a more dense pattern which can have better visualizations for some functions. - **Circle Mask**: Streamlines are restricted to a grid with inset circles inside the square grid. -->
 
 
-```{r}
-ggplot() +
-  geom_streamplot(aes(group = after_stat(id)),
-                  fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000,
-                  max_steps = 10000, ds = .05, min_dist = .25, 
-                  mask_shape_type = "diamond") +
-  coord_fixed() +
-  theme_minimal()
-```
+<!-- ```{r} -->
+<!-- ggplot() + -->
+<!--   geom_streamplot(aes(group = after_stat(id)), -->
+<!--                   fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000, -->
+<!--                   max_steps = 10000, ds = .05, min_dist = .25,  -->
+<!--                   mask_shape_type = "diamond") + -->
+<!--   coord_fixed() + -->
+<!--   theme_minimal() -->
+<!-- ``` -->
 
 ### `geom_complex_function()`{.R}
 

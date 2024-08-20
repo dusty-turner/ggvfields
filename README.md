@@ -204,7 +204,7 @@ f <- function(v) {
 
 ggplot() +
   geom_streamplot(
-    fun = f, xlim = c(-3, 3), ylim = c(-3, 3), 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
     ) +
   coord_fixed() +
   theme_minimal()
@@ -221,7 +221,7 @@ It may be useful to not break up the streamlines.
 ``` r
 ggplot() +
   geom_streamplot(
-    fun = f, xlim = c(-3, 3), ylim = c(-3, 3), 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
     chop = FALSE
     ) +
   coord_fixed() +
@@ -238,7 +238,7 @@ to divide it into smaller segments.
 ``` r
 ggplot() +
   geom_streamplot(
-    fun = f, xlim = c(-3, 3), ylim = c(-3, 3), 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
     chop = TRUE, scale_stream = .9,
     ) +
   coord_fixed() +
@@ -252,11 +252,12 @@ ggplot() +
 ``` r
 ggplot() +
   geom_streamplot(
-    fun = f, xlim = c(-3, 3), ylim = c(-3, 3), 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
     aes(color = after_stat(log(divergence + 10)))
     ) +
   coord_fixed() +
   theme_minimal() 
+#> Warning in log(divergence + 10): NaNs produced
 ```
 
 <img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
@@ -265,15 +266,13 @@ ggplot() +
 
 ``` r
 # Create stream plot with rownum aesthetic
-
 p <- ggplot() +
  geom_streamplot(
    aes(rownum = after_stat(rownum)), 
-   fun = f, xlim = c(-3, 3), ylim = c(-3, 3)
+   fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
  ) +
  coord_fixed() +
  theme_bw()
-
 # Create an animation transition plot
 anim <- animation_transition(plot = p) +   
  gganimate::transition_reveal(rownum) +
@@ -281,49 +280,23 @@ anim <- animation_transition(plot = p) +
 
 # Animate the plot
 gganimate::animate(anim, nframes = 25, fps = 5, end_pause = 0, renderer = gganimate::gifski_renderer())
-#> `geom_path()`: Each group consists of only one observation.
-#> ℹ Do you need to adjust the group aesthetic?
-#> `geom_path()`: Each group consists of only one observation.
-#> ℹ Do you need to adjust the group aesthetic?
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.gif" width="100%" />
+<img src="man/figures/README-animation-1.gif" width="100%" />
 
-The `mask_shape_type` parameter allows you to specify the mask shape
-used for streamline generation which influences how the streamlines are
-placed and how closely they can approach each other. The default mask
-shape is `"square"`, but you can also use `"diamond"`, `"inset_square"`,
-or `"circle"`. During streamline generation, when a streamline enters
-the specified shape, no other streamlines will enter that region.
-
-- **Square Mask (default)**: Streamlines are restricted to a grid where
-  each cell is a square. This generally results in evenly spaced
-  streamlines.
-- **Diamond Mask**: Streamlines are restricted to a square grid with
-  diamonds inset within each square. This can create a more dense
-  pattern which can have better visualizations for some functions. -
-  **Inset Square Mask**: Streamlines are restricted to a grid with
-  smaller squares inset within larger squares. This can create a denser
-  and more detailed pattern of streamlines.
-- **Diamond Mask**: Streamlines are restricted to a square grid with
-  diamonds inset within each square. This can create a more dense
-  pattern which can have better visualizations for some functions. -
-  **Circle Mask**: Streamlines are restricted to a grid with inset
-  circles inside the square grid.
-
-``` r
-ggplot() +
-  geom_streamplot(aes(group = after_stat(id)),
-                  fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000,
-                  max_steps = 10000, ds = .05, min_dist = .25, 
-                  mask_shape_type = "diamond") +
-  coord_fixed() +
-  theme_minimal()
-#> Warning in geom_streamplot(aes(group = after_stat(id)), fun = f, xlim = c(-3, :
-#> Ignoring unknown parameters: `max_length`, `max_steps`, and `min_dist`
-```
-
-<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
+<!-- The `mask_shape_type` parameter allows you to specify the mask shape used for streamline generation which influences how the streamlines are placed and how closely they can approach each other. The default mask shape is `"square"`, but you can also use `"diamond"`, `"inset_square"`, or `"circle"`.  During streamline generation, when a streamline enters the specified shape, no other streamlines will enter that region.  -->
+<!-- - **Square Mask (default)**: Streamlines are restricted to a grid where each cell is a square. This generally results in evenly spaced streamlines. -->
+<!-- - **Diamond Mask**: Streamlines are restricted to a square grid with diamonds inset within each square.  This can create a more dense pattern which can have better visualizations for some functions. - **Inset Square Mask**: Streamlines are restricted to a grid with smaller squares inset within larger squares. This can create a denser and more detailed pattern of streamlines. -->
+<!-- - **Diamond Mask**: Streamlines are restricted to a square grid with diamonds inset within each square.  This can create a more dense pattern which can have better visualizations for some functions. - **Circle Mask**: Streamlines are restricted to a grid with inset circles inside the square grid. -->
+<!-- ```{r} -->
+<!-- ggplot() + -->
+<!--   geom_streamplot(aes(group = after_stat(id)), -->
+<!--                   fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000, -->
+<!--                   max_steps = 10000, ds = .05, min_dist = .25,  -->
+<!--                   mask_shape_type = "diamond") + -->
+<!--   coord_fixed() + -->
+<!--   theme_minimal() -->
+<!-- ``` -->
 
 ### `geom_complex_function()`
 
@@ -345,7 +318,7 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
 
 We can enhance this plot with a little help from biscale.
 
@@ -383,7 +356,7 @@ ggdraw() +
   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3)
 ```
 
-<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
 
 ## License
 
