@@ -253,7 +253,7 @@ StatVectorField <- ggproto("StatVectorField", Stat,
 #' @rdname geom_vector_field
 #' @export
 GeomVectorField <- ggproto("GeomVectorField", GeomSegment,
-                           draw_key = draw_key_length,
+                           # draw_key = draw_key_length,
 
                            required_aes = c("x", "y", "xend", "yend"),
 

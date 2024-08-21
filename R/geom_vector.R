@@ -176,11 +176,15 @@ StatVector <- ggproto("StatVector", Stat,
 #' @rdname geom_vector
 #' @export
 GeomVector <- ggproto("GeomVector", GeomSegment,
-                      required_aes = c("x", "y", "xend", "yend"),
+
+                      required_aes = c("x", "y"),
+
+                      optional_aes = c("xend", "yend", "angle", "distance"),
 
                       default_aes = aes(color = "black", linewidth = 0.5, linetype = 1, alpha = 1),
 
-                      draw_panel = function(data, panel_params, coord, arrow = NULL, arrow_size = 1, center = TRUE) {
+                      draw_panel = function(data, panel_params, coord, arrow = NULL, arrow_size = 1, center) {
+
                         # Handle centering if specified
                         if (center) {
                           half_u <- (data$xend - data$x) / 2
@@ -190,6 +194,7 @@ GeomVector <- ggproto("GeomVector", GeomSegment,
                           data$y <- data$y - half_v
                           data$xend <- data$xend - half_u
                           data$yend <- data$yend - half_v
+
                         }
 
                         data$arrow_size <- data$arrow_size %||% arrow_size
@@ -197,6 +202,7 @@ GeomVector <- ggproto("GeomVector", GeomSegment,
                         GeomSegment$draw_panel(data, panel_params, coord, arrow = arrow)
                       }
 )
+
 
 
 
