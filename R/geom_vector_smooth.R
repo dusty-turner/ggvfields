@@ -63,7 +63,7 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
 
   required_aes = c("x", "y"),
 
-  compute_group = function(data, scales, n, center, ...) {
+  compute_group = function(data, scales, n, center, method, ...) {
 
     # Ensure that n has the correct length
     n <- ensure_length_two(n)
@@ -88,18 +88,29 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
     data$xend_norm <- data$x + (data$xend - data$x) / data$norm
     data$yend_norm <- data$y + (data$yend - data$y) / data$norm
 
-    # Fit the models for smoothing
-    fit_x <- lm(xend_norm ~ x + y, data = data)
-    fit_y <- lm(yend_norm ~ x + y, data = data)
-
     # Generate the grid for predictions
     x_seq <- seq(min(data$x), max(data$x), length.out = n[1])
     y_seq <- seq(min(data$y), max(data$y), length.out = n[2])
     grid <- expand.grid(x = x_seq, y = y_seq)
 
-    # Generate predictions
-    grid$xend_pred <- predict(fit_x, newdata = grid)
-    grid$yend_pred <- predict(fit_y, newdata = grid)
+    # Fit the models for smoothing
+    if (method == "lm") {
+        fit_x <- lm(xend_norm ~ x + y, data = data)
+        fit_y <- lm(yend_norm ~ x + y, data = data)
+        message("`geom_vector_smooth()` using method = 'lm' and formula 'xend ~ x + y' and 'yend ~ x + y'")
+        # Generate predictions
+        grid$xend_pred <- predict(fit_x, newdata = grid)
+        grid$yend_pred <- predict(fit_y, newdata = grid)
+    } else if (method == "loess") {
+        fit_x <- loess(xend_norm ~ x, data = data)
+        fit_y <- loess(yend_norm ~ y, data = data)
+        message("`geom_vector_smooth()` using method = 'loess' and formula 'xend ~ x' and 'yend ~ y'")
+        # Generate predictions
+        grid$xend_pred <- predict(fit_x, newdata = grid[,1])
+        grid$yend_pred <- predict(fit_y, newdata = grid[,2])
+    } else {
+        stop("Unsupported method. Please use 'lm' or 'loess'.")
+    }
 
     # Calculate the norm of the predicted values
     grid$norm_pred <- sqrt((grid$xend_pred - grid$x)^2 + (grid$yend_pred - grid$y)^2)
@@ -129,6 +140,7 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
         )
     }
 
+
     result
   }
 )
@@ -143,6 +155,7 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
                                inherit.aes = TRUE,
                                n = c(11, 11),
                                center = TRUE,
+                               method = "lm",
                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                                ...) {
 
@@ -157,6 +170,7 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
     params = list(
       n = n,
       center = center,
+      method = method,  # Pass the method argument to the params list
       arrow = arrow,
       na.rm = na.rm,
       ...
@@ -175,6 +189,7 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomVector,
                             default_aes = aes(color = "black", linewidth = 0.5, linetype = 1, alpha = 1),
 
                             draw_panel = function(data, panel_params, coord, arrow = NULL, arrow_size = 1, center = TRUE) {
+
                               # Handle both xend/yend and angle/distance
                               if ("angle" %in% names(data) && "distance" %in% names(data)) {
                                 data$angle <- data$angle * pi / 180  # Convert angle to radians
@@ -193,7 +208,15 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomVector,
                                 data$yend <- data$yend - half_v
                               }
 
-                              data$arrow_size <- data$arrow_size %||% arrow_size
+                              # Calculate the vector length
+                              data$vector_length <- sqrt((data$xend - data$x)^2 + (data$yend - data$y)^2)
+
+                              # Scale arrow size based on vector length, with a sensible scaling factor
+                              max_arrow_size <- 0.05  # Maximum size cap for arrows
+                              scaling_factor <- 0.02  # Base scaling factor
+                              data$arrow_size <- pmin(scaling_factor * data$vector_length, max_arrow_size)
+
+                              # Apply the calculated arrow size
                               arrow <- modifyList(arrow, list(length = unit(data$arrow_size, "npc")))
 
                               # Call the draw_panel from GeomSegment or GeomVector
@@ -207,12 +230,13 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomVector,
 #' @rdname geom_vector_smooth
 #' @export
 stat_vector_smooth <- function(mapping = NULL, data = NULL,
-                               geom = "vector",  # Default to the custom GeomVector
+                               geom = "vector",
                                position = "identity",
                                na.rm = FALSE, show.legend = NA,
                                inherit.aes = TRUE,
                                n = c(11, 11),
                                center = TRUE,
+                               method = "lm",
                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                                ...) {
 
@@ -226,13 +250,13 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
     inherit.aes = inherit.aes,
     params = list(
       n = n,
-      center = center,  # Pass the center argument to the params list
+      center = center,
+      method = method,
       arrow = arrow,
       na.rm = na.rm,
       ...
     )
   )
 }
-
 
 

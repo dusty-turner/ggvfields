@@ -96,16 +96,13 @@ geom_vector <- function(mapping = NULL, data = NULL, stat = "vector",
 
 #' @rdname geom_vector
 #' @export
-stat_vector <- function(mapping = NULL, data = NULL, geom = "segment",
-                              position = "identity", na.rm = FALSE,
-                              show.legend = NA, inherit.aes = TRUE,
-                              center = TRUE, normalize = TRUE,
-                              scale_length = 1,
-                              arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                              ...) {
-  # if (is.null(data)) data <- ensure_nonempty_data(data)
-
-  length_var <- extract_after_stat(mapping, "length")
+stat_vector <- function(mapping = NULL, data = NULL, geom = "vector",
+                        position = "identity", na.rm = FALSE,
+                        show.legend = NA, inherit.aes = TRUE,
+                        center = TRUE, normalize = TRUE,
+                        scale_length = 1, arrow_size = 1,
+                        arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+                        ...) {
 
   layer(
     stat = StatVector,
@@ -120,91 +117,90 @@ stat_vector <- function(mapping = NULL, data = NULL, geom = "segment",
       normalize = normalize,
       scale_length = scale_length,
       arrow = arrow,
+      arrow_size = arrow_size,  # Pass arrow_size in params
       na.rm = na.rm,
       ...
     )
   )
 }
 
-
 #' @rdname geom_vector
 #' @export
 StatVector <- ggproto("StatVector", Stat,
 
-                      required_aes = c("x", "y"),
+  required_aes = c("x", "y"),
 
-                      optional_aes = c("xend", "yend", "angle", "distance"),
+  optional_aes = c("xend", "yend", "angle", "distance"),
 
-                      compute_group = function(data, scales, normalize = TRUE, scale_length = 1, center, ...) {
+  compute_group = function(data, scales, normalize = TRUE, scale_length = 1, center, ...) {
 
-                        # Check if angle and distance are provided and calculate xend and yend
-                        if (!("xend" %in% names(data) && "yend" %in% names(data))) {
-                          if ("angle" %in% names(data) && "distance" %in% names(data)) {
-                            data$angle <- data$angle * pi / 180  # Convert angle to radians
-                            data$xend <- data$x + data$distance * cos(data$angle)
-                            data$yend <- data$y + data$distance * sin(data$angle)
-                          } else {
-                            stop("Either xend/yend or angle/distance must be provided.")
-                          }
-                        }
+    # Check if angle and distance are provided and calculate xend and yend
+    if (!("xend" %in% names(data) && "yend" %in% names(data))) {
+      if ("angle" %in% names(data) && "distance" %in% names(data)) {
+        data$angle <- data$angle * pi / 180  # Convert angle to radians
+        data$xend <- data$x + data$distance * cos(data$angle)
+        data$yend <- data$y + data$distance * sin(data$angle)
+      } else {
+        stop("Either xend/yend or angle/distance must be provided.")
+      }
+    }
 
-                        # Calculate the norm of the vectors
-                        data$norm <- sqrt((data$xend - data$x)^2 + (data$yend - data$y)^2)
+    # Calculate the norm of the vectors
+    data$norm <- sqrt((data$xend - data$x)^2 + (data$yend - data$y)^2)
 
-                        # Normalize if required
-                        if (normalize) {
-                          data$u <- data$xend - data$x
-                          data$v <- data$yend - data$y
+    # Normalize if required
+    if (normalize) {
+      data$u <- data$xend - data$x
+      data$v <- data$yend - data$y
 
-                          data$u <- data$u / data$norm
-                          data$v <- data$v / data$norm
+      data$u <- data$u / data$norm
+      data$v <- data$v / data$norm
 
-                          data$u <- data$u * scale_length
-                          data$v <- data$v * scale_length
+      data$u <- data$u * scale_length
+      data$v <- data$v * scale_length
 
-                          data$xend <- data$x + data$u
-                          data$yend <- data$y + data$v
-                        }
+      data$xend <- data$x + data$u
+      data$yend <- data$y + data$v
+    }
 
-                        return(data)
-                      }
+    return(data)
+  }
 )
-
-
-
 
 #' @rdname geom_vector
 #' @export
 GeomVector <- ggproto("GeomVector", GeomSegment,
 
-                      required_aes = c("x", "y"),
+  required_aes = c("x", "y"),
 
-                      optional_aes = c("xend", "yend", "angle", "distance"),
+  optional_aes = c("xend", "yend", "angle", "distance"),
 
-                      default_aes = aes(color = "black", linewidth = 0.5, linetype = 1, alpha = 1),
+  default_aes = aes(color = "black", linewidth = 0.5, linetype = 1, alpha = 1),
 
-                      draw_panel = function(data, panel_params, coord, arrow = NULL, arrow_size = 1, center) {
+  draw_panel = function(data, panel_params, coord, arrow = NULL, arrow_size = 1, center) {
 
-                        # Handle centering if specified
-                        if (center) {
-                          half_u <- (data$xend - data$x) / 2
-                          half_v <- (data$yend - data$y) / 2
+    # Handle centering if specified
+    if (center) {
+      half_u <- (data$xend - data$x) / 2
+      half_v <- (data$yend - data$y) / 2
 
-                          data$x <- data$x - half_u
-                          data$y <- data$y - half_v
-                          data$xend <- data$xend - half_u
-                          data$yend <- data$yend - half_v
+      data$x <- data$x - half_u
+      data$y <- data$y - half_v
+      data$xend <- data$xend - half_u
+      data$yend <- data$yend - half_v
+    }
 
-                        }
+    # Add vector length to the data
+    data$vector_length <-  data$vector_length <- sqrt((data$xend - data$x)^2 + (data$yend - data$y)^2)
 
-                        data$arrow_size <- data$arrow_size %||% arrow_size
-                        arrow <- modifyList(arrow, list(length = unit(data$arrow_size, "npc")))
-                        GeomSegment$draw_panel(data, panel_params, coord, arrow = arrow)
-                      }
+    # Scale arrow size based on vector length, with a sensible scaling factor
+    max_arrow_size <- 0.05  # Maximum size cap for arrows
+    scaling_factor <- 0.02  # Base scaling factor
+    data$arrow_size <- pmin(scaling_factor * data$vector_length, max_arrow_size)
+
+    arrow <- modifyList(arrow, list(length = unit(data$arrow_size, "npc")))
+
+    # Call GeomSegment's draw_panel function
+    GeomSegment$draw_panel(data, panel_params, coord, arrow = arrow)
+  }
 )
-
-
-
-
-
-
