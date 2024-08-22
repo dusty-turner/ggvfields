@@ -44,15 +44,22 @@
 #'
 #' # Example using Cartesian coordinates
 #' ggplot(wind_data_cartesian) +
-#'   geom_vector(aes(x = lon, y = lat, xend = xend, yend = yend), arrow_size = .01, color = "black", center = FALSE) +
-#'   geom_vector_smooth(aes(x = lon, y = lat, xend = xend, yend = yend), arrow_size = .01, alpha = .7, color = "red") +
-#'   geom_vector_smooth(aes(x = lon, y = lat, xend = xend, yend = yend), arrow_size = .01, alpha = .7, color = "darkgreen", center = FALSE)
+#' geom_vector(aes(x = lon, y = lat, xend = xend, yend = yend),
+#'                 arrow_size = .01, color = "black", center = FALSE) +
+#' geom_vector_smooth(aes(x = lon, y = lat, xend = xend, yend = yend),
+#'                        arrow_size = .01, alpha = .7, color = "red") +
+#' geom_vector_smooth(aes(x = lon, y = lat, xend = xend, yend = yend),
+#'                        arrow_size = .01, alpha = .7,
+#'                        color = "darkgreen", center = FALSE)
 #'
 #' # Example using Polar coordinates
 #' ggplot(wind_data_polar) +
-#'   geom_vector(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd), color = "black", arrow_size = .03) +
-#'   geom_vector_smooth(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd), arrow_size = .01, alpha = .7, color = "red") +
-#'   geom_vector_smooth(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd), arrow_size = .01, alpha = .7, color = "darkgreen", center = FALSE)
+#' geom_vector(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd),
+#'                 color = "black", arrow_size = .03) +
+#' geom_vector_smooth(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd),
+#'                        arrow_size = .01, alpha = .7, color = "red") +
+#' geom_vector_smooth(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd),
+#'                        arrow_size = .01, alpha = .7, color = "darkgreen", center = FALSE)
 #'
 #'
 NULL

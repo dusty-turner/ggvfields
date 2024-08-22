@@ -31,7 +31,7 @@ geom_vector(
 stat_vector(
   mapping = NULL,
   data = NULL,
-  geom = "segment",
+  geom = "vector",
   position = "identity",
   na.rm = FALSE,
   show.legend = NA,
@@ -39,6 +39,7 @@ stat_vector(
   center = TRUE,
   normalize = TRUE,
   scale_length = 1,
+  arrow_size = 1,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
