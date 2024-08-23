@@ -1,42 +1,56 @@
-generate_starting_points <- function(mask_shape) {
+generate_starting_points_flow <- function(mask_shape, build_type = "spiral_traversal") {
   # Extract dimensions from mask_shape
   nx <- mask_shape[2]
   ny <- mask_shape[1]
 
   points <- list()
-  x_min <- 1
-  x_max <- nx
-  y_min <- 1
-  y_max <- ny
 
-  while (x_min <= x_max && y_min <= y_max) {
-    # Top row (left to right)
-    for (x in x_min:x_max) {
-      points <- append(points, list(c(x, y_max)))
-    }
-    y_max <- y_max - 1
+  if (build_type == "spiral_traversal") {
+    # Spiral Traversal Logic
+    x_min <- 1
+    x_max <- nx
+    y_min <- 1
+    y_max <- ny
 
-    # Right column (top to bottom)
-    for (y in y_max:y_min) {
-      points <- append(points, list(c(x_max, y)))
-    }
-    x_max <- x_max - 1
-
-    # Bottom row (right to left)
-    if (y_min <= y_max) {
-      for (x in rev(x_min:x_max)) {
-        points <- append(points, list(c(x, y_min)))
+    while (x_min <= x_max && y_min <= y_max) {
+      # Top row (left to right)
+      for (x in x_min:x_max) {
+        points <- append(points, list(c(x, y_max)))
       }
-      y_min <- y_min + 1
+      y_max <- y_max - 1
+
+      # Right column (top to bottom)
+      for (y in y_max:y_min) {
+        points <- append(points, list(c(x_max, y)))
+      }
+      x_max <- x_max - 1
+
+      # Bottom row (right to left)
+      if (y_min <= y_max) {
+        for (x in rev(x_min:x_max)) {
+          points <- append(points, list(c(x, y_min)))
+        }
+        y_min <- y_min + 1
+      }
+
+      # Left column (bottom to top)
+      if (x_min <= x_max) {
+        for (y in rev(y_max:y_min)) {
+          points <- append(points, list(c(x_min, y)))
+        }
+        x_min <- x_min + 1
+      }
     }
 
-    # Left column (bottom to top)
-    if (x_min <= x_max) {
-      for (y in rev(y_max:y_min)) {
-        points <- append(points, list(c(x_min, y)))
+  } else if (build_type == "layer") {
+    # Layer by Layer (Top to Bottom, Left to Right) Logic
+    for (y in ny:1) {  # Start from the top row and move downward
+      for (x in 1:nx) {  # Traverse each row from left to right
+        points <- append(points, list(c(x, y)))
       }
-      x_min <- x_min + 1
     }
+  } else {
+    stop("Invalid build_type provided. Use 'spiral_traversal' or 'layer'.")
   }
 
   # Ensure unique points (removing any accidental duplicates)
@@ -44,7 +58,6 @@ generate_starting_points <- function(mask_shape) {
 
   return(points)
 }
-
 
 
 ensure_length_two <- function(n) {

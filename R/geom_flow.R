@@ -44,10 +44,9 @@
 #' # Create a ggplot with the flow plot layer
 #' ggplot() +
 #'   geom_flow(
-#'     fun = f, xlim = c(-3, 3),
-#'     ylim = c(-3, 3), n = c(15, 15),
-#'     iterations = 100, scale_flow = 1,
-#'     threshold_distance = NULL,  # Default value
+#'     fun = f, n = c(21, 21),
+#'     xlim = c(-10, 10), ylim = c(-10, 10),
+#'     iterations = 100, threshold_distance = NULL,
 #'     arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
 #'   ) +
 #'   coord_fixed() +
@@ -134,7 +133,7 @@ StatFlow <- ggproto("StatFlow", Stat,
 
                       n <- ensure_length_two(n)
 
-                      starting_points <- generate_starting_points(n)
+                      starting_points <- generate_starting_points_flow(n, build_type = "layer")
 
                       # Convert the starting points to actual coordinates
                       x_seq <- seq(xlim[1], xlim[2], length.out = n[2])
@@ -148,25 +147,27 @@ StatFlow <- ggproto("StatFlow", Stat,
                       forward_trajectories <- lapply(seq_along(grid_coords), function(i) {
 
                         initial_state <- c(x = grid_coords[[i]][1], y = grid_coords[[i]][2])
-                        forward_trajectory <- solve_flow(initial_state, fun, times = times_forward, xlim, ylim) |>
-                          mutate(stream_moves = iterations + row_number()) |>
-                          mutate(check_p_in_this_order = row_number()) |>
-                          mutate(direction = "forward")
+                        forward_trajectory <- solve_flow(initial_state, fun, times = times_forward, xlim, ylim)
+                        forward_trajectory$stream_moves <- iterations + seq_len(nrow(forward_trajectory))
+                        forward_trajectory$check_p_in_this_order <- seq_len(nrow(forward_trajectory))
+                        forward_trajectory$direction <- "forward"
 
                         if(nrow(forward_trajectory) == 1){
                           forward_trajectory <- NULL
                         }
 
-                        reverse_trajectory <- solve_flow(initial_state, fun, times_backward, xlim, ylim) |>
-                          mutate(stream_moves = n() - row_number()) |>
-                          mutate(check_p_in_this_order = iterations + 1 + n() - row_number()) |>
-                          mutate(direction = "reverse")
+                        combined_trajectory <- forward_trajectory
 
-                        if(nrow(reverse_trajectory) == 1){
-                          reverse_trajectory <- NULL
-                        }
-                        # print(i)
-                        combined_trajectory <- rbind(forward_trajectory, reverse_trajectory)
+                        # reverse_trajectory <- solve_flow(initial_state, fun, times_backward, xlim, ylim) |>
+                        #   mutate(stream_moves = n() - row_number()) |>
+                        #   mutate(check_p_in_this_order = iterations + 1 + n() - row_number()) |>
+                        #   mutate(direction = "reverse")
+                        #
+                        # if(nrow(reverse_trajectory) == 1){
+                        #   reverse_trajectory <- NULL
+                        # }
+                        # # print(i)
+                        # combined_trajectory <- rbind(forward_trajectory, reverse_trajectory)
                         combined_trajectory <- combined_trajectory[!duplicated(combined_trajectory[, c("x", "y")]), ]
 
                         if (!is.null(combined_trajectory) && nrow(combined_trajectory) > 0) {
@@ -189,16 +190,16 @@ StatFlow <- ggproto("StatFlow", Stat,
                         }
                       }))
 
-                      new_coords <- t(apply(trajectory_data, 1, function(row) {
-                        v <- c(row['x'], row['y'])
-                        result <- f(as.numeric(v))
-                        return(result)
-                      }))
-
-                      new_coords_df <- data.frame(xnew = new_coords[, 1], ynew = new_coords[, 2])
-
-                      trajectory_data <-
-                        cbind(trajectory_data, new_coords_df)
+                      # new_coords <- t(apply(trajectory_data, 1, function(row) {
+                      #   v <- c(row['x'], row['y'])
+                      #   result <- f(as.numeric(v))
+                      #   return(result)
+                      # }))
+                      #
+                      # new_coords_df <- data.frame(xnew = new_coords[, 1], ynew = new_coords[, 2])
+                      #
+                      # trajectory_data <-
+                      #   cbind(trajectory_data, new_coords_df)
 
                       # Add a rownum column within each trajectory group (id)
                       trajectory_data$rownum <- ave(trajectory_data$x, trajectory_data$id, FUN = seq_along)
@@ -213,38 +214,21 @@ StatFlow <- ggproto("StatFlow", Stat,
 
                       # Proximity Check
                       for (id in unique(trajectory_data$id)[-1]) {  # Skip the first id since it has no previous trajectories
-                      # for (id in unique(trajectory_data$id)[c(2:58)]) {  # Skip the first id since it has no previous trajectories
                         current_traj <- trajectory_data[trajectory_data$id == id, ]
                         previous_trajs <- trajectory_data[trajectory_data$id < id, ]
 
                         truncation_occurred <- FALSE
-                        start_point_index <- NA
 
-                        # Find the first valid starting point
+                        # Start from the first point and check along the trajectory
                         for (k in seq_along(current_traj$x)) {
                           distances <- sqrt((current_traj$x[k] - previous_trajs$x)^2 + (current_traj$y[k] - previous_trajs$y)^2)
 
-                          if (all(distances >= threshold_distance)) {
-                            start_point_index <- k
-                            break
+                          # If any point is within the threshold_distance, delete the rest of the points
+                          if (any(distances < threshold_distance)) {
+                            trajectory_data <- trajectory_data[!(trajectory_data$id == id & trajectory_data$rownum >= current_traj$rownum[k]), ]
+                            truncation_occurred <- TRUE
+                            break  # Stop checking further points in this trajectory
                           }
-                        }
-
-                        # If a valid starting point is found, process from there
-                        if (!is.na(start_point_index)) {
-                          for (k in seq(start_point_index, length.out = length(current_traj$x) - start_point_index + 1)) {
-                            distances <- sqrt((current_traj$x[k] - previous_trajs$x)^2 + (current_traj$y[k] - previous_trajs$y)^2)
-
-                            if (any(distances < threshold_distance)) {
-                              # Truncate the current trajectory at the point where it comes too close
-                              trajectory_data <- trajectory_data[!(trajectory_data$id == id & trajectory_data$rownum >= current_traj$rownum[k]), ]
-                              truncation_occurred <- TRUE
-                              break
-                            }
-                          }
-                        } else {
-                          # If no valid start point is found, remove the entire trajectory
-                          trajectory_data <- trajectory_data[trajectory_data$id != id, ]
                         }
 
                         # Remove trajectories that end up with only one point after truncation
@@ -253,6 +237,7 @@ StatFlow <- ggproto("StatFlow", Stat,
                           trajectory_data <- trajectory_data[trajectory_data$id != id, ]
                         }
                       }
+
 
 
                       # Prepare for animation

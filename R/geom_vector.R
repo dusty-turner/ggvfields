@@ -117,7 +117,7 @@ stat_vector <- function(mapping = NULL, data = NULL, geom = "vector",
       normalize = normalize,
       scale_length = scale_length,
       arrow = arrow,
-      arrow_size = arrow_size,  # Pass arrow_size in params
+      arrow_size = arrow_size,
       na.rm = na.rm,
       ...
     )
