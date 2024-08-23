@@ -13,8 +13,13 @@
 #' @param center Logical; if `TRUE`, centers the vector on the evaluated x/y
 #'   location. If `FALSE`, the vector origin is at the evaluated x/y location.
 #'   When centering is enabled, the vector's midpoint aligns with the original
-#'   x/y location. This parameter is passed to the `GeomVector` object and is
-#'   applied during the rendering of the vectors.
+#'   x/y location.
+#' @param normalize Logical; if `TRUE`, normalizes the vector's length to a unit
+#'   length before applying other transformations like centering. If `FALSE`,
+#'   vectors retain their original lengths.
+#' @param method Character; specifies the smoothing method to be used.
+#'   Accepts `"lm"` for linear modeling or `"loess"` for locally estimated
+#'   scatterplot smoothing.
 #' @param arrow Arrow specification, as created by `grid::arrow()`. This
 #'   controls the appearance of the arrowheads at the end of the vectors,
 #'   including properties like angle, length, and type.
@@ -43,23 +48,6 @@
 #' })
 #'
 #' # Example using Cartesian coordinates
-#' ggplot(wind_data_cartesian) +
-#' geom_vector(aes(x = lon, y = lat, xend = xend, yend = yend),
-#'                 arrow_size = .01, color = "black", center = FALSE) +
-#' geom_vector_smooth(aes(x = lon, y = lat, xend = xend, yend = yend),
-#'                        arrow_size = .01, alpha = .7, color = "red") +
-#' geom_vector_smooth(aes(x = lon, y = lat, xend = xend, yend = yend),
-#'                        arrow_size = .01, alpha = .7,
-#'                        color = "darkgreen", center = FALSE)
-#'
-#' # Example using Polar coordinates
-#' ggplot(wind_data_polar) +
-#' geom_vector(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd),
-#'                 color = "black", arrow_size = .03) +
-#' geom_vector_smooth(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd),
-#'                        arrow_size = .01, alpha = .7, color = "red") +
-#' geom_vector_smooth(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd),
-#'                        arrow_size = .01, alpha = .7, color = "darkgreen", center = FALSE)
 #'
 #'
 NULL
@@ -70,7 +58,9 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
 
   required_aes = c("x", "y"),
 
-  compute_group = function(data, scales, n, center, method, ...) {
+  default_aes = aes(color = after_stat(norm), linewidth = 0.5, linetype = 1, alpha = 1),
+
+  compute_group = function(data, scales, n, center, method, normalize, ...) {
 
     # Ensure that n has the correct length
     n <- ensure_length_two(n)
@@ -91,9 +81,30 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
     # Calculate the norm of the vectors
     data$norm <- sqrt((data$xend - data$x)^2 + (data$yend - data$y)^2)
 
-    # Normalize the end points
-    data$xend_norm <- data$x + (data$xend - data$x) / data$norm
-    data$yend_norm <- data$y + (data$yend - data$y) / data$norm
+    # Normalize if required
+    if (normalize) {
+      data$u <- data$xend - data$x
+      data$v <- data$yend - data$y
+
+      data$u <- data$u / data$norm
+      data$v <- data$v / data$norm
+
+      data$u <- data$u * scale_length
+      data$v <- data$v * scale_length
+
+      data$xend <- data$x + data$u
+      data$yend <- data$y + data$v
+    }
+
+    if (center) {
+      half_u <- (data$xend - data$x) / 2
+      half_v <- (data$yend - data$y) / 2
+
+      data$x <- data$x - half_u
+      data$y <- data$y - half_v
+      data$xend <- data$xend - half_u
+      data$yend <- data$yend - half_v
+    }
 
     # Generate the grid for predictions
     x_seq <- seq(min(data$x), max(data$x), length.out = n[1])
@@ -102,15 +113,15 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
 
     # Fit the models for smoothing
     if (method == "lm") {
-        fit_x <- lm(xend_norm ~ x + y, data = data)
-        fit_y <- lm(yend_norm ~ x + y, data = data)
+        fit_x <- lm(xend ~ x + y, data = data)
+        fit_y <- lm(yend ~ x + y, data = data)
         message("`geom_vector_smooth()` using method = 'lm' and formula 'xend ~ x + y' and 'yend ~ x + y'")
         # Generate predictions
         grid$xend_pred <- predict(fit_x, newdata = grid)
         grid$yend_pred <- predict(fit_y, newdata = grid)
     } else if (method == "loess") {
-        fit_x <- loess(xend_norm ~ x, data = data)
-        fit_y <- loess(yend_norm ~ y, data = data)
+        fit_x <- loess(xend ~ x, data = data)
+        fit_y <- loess(yend ~ y, data = data)
         message("`geom_vector_smooth()` using method = 'loess' and formula 'xend ~ x' and 'yend ~ y'")
         # Generate predictions
         grid$xend_pred <- predict(fit_x, newdata = grid[,1])
@@ -122,9 +133,11 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
     # Calculate the norm of the predicted values
     grid$norm_pred <- sqrt((grid$xend_pred - grid$x)^2 + (grid$yend_pred - grid$y)^2)
 
-    # Normalize the predicted end points
-    grid$xend_pred_norm <- grid$x + (grid$xend_pred - grid$x) / grid$norm_pred
-    grid$yend_pred_norm <- grid$y + (grid$yend_pred - grid$y) / grid$norm_pred
+    if(normalize){
+      # Normalize the predicted end points
+      grid$xend_pred <- grid$x + (grid$xend_pred - grid$x) / grid$norm_pred
+      grid$yend_pred <- grid$y + (grid$yend_pred - grid$y) / grid$norm_pred
+    }
 
     # If the original input was angle and distance, convert back
     if (original_input) {
@@ -142,8 +155,9 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
         result <- data.frame(
           x = grid$x,
           y = grid$y,
-          xend = grid$xend_pred_norm,
-          yend = grid$yend_pred_norm
+          xend = grid$xend_pred,
+          yend = grid$yend_pred,
+          norm = grid$norm_pred
         )
     }
 
@@ -161,7 +175,7 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
                                na.rm = FALSE, show.legend = NA,
                                inherit.aes = TRUE,
                                n = c(11, 11),
-                               center = TRUE,
+                               center = TRUE, normalize,
                                method = "lm",
                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                                ...) {
@@ -177,7 +191,8 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
     params = list(
       n = n,
       center = center,
-      method = method,  # Pass the method argument to the params list
+      normalize = normalize,
+      method = method,
       arrow = arrow,
       na.rm = na.rm,
       ...
@@ -195,7 +210,7 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomVector,
 
                             default_aes = aes(color = "black", linewidth = 0.5, linetype = 1, alpha = 1),
 
-                            draw_panel = function(data, panel_params, coord, arrow = NULL, arrow_size = 1, center = TRUE) {
+                            draw_panel = function(data, panel_params, coord, arrow = NULL, arrow_size = 1) {
 
                               # Handle both xend/yend and angle/distance
                               if ("angle" %in% names(data) && "distance" %in% names(data)) {
@@ -204,16 +219,16 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomVector,
                                 data$yend <- data$y + data$distance * sin(data$angle)
                               }
 
-                              # Handle centering if specified
-                              if (center) {
-                                half_u <- (data$xend - data$x) / 2
-                                half_v <- (data$yend - data$y) / 2
-
-                                data$x <- data$x - half_u
-                                data$y <- data$y - half_v
-                                data$xend <- data$xend - half_u
-                                data$yend <- data$yend - half_v
-                              }
+                              # # Handle centering if specified
+                              # if (center) {
+                              #   half_u <- (data$xend - data$x) / 2
+                              #   half_v <- (data$yend - data$y) / 2
+                              #
+                              #   data$x <- data$x - half_u
+                              #   data$y <- data$y - half_v
+                              #   data$xend <- data$xend - half_u
+                              #   data$yend <- data$yend - half_v
+                              # }
 
                               # Calculate the vector length
                               data$vector_length <- sqrt((data$xend - data$x)^2 + (data$yend - data$y)^2)
@@ -242,7 +257,7 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
                                na.rm = FALSE, show.legend = NA,
                                inherit.aes = TRUE,
                                n = c(11, 11),
-                               center = TRUE,
+                               center = TRUE, normalize,
                                method = "lm",
                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                                ...) {
@@ -258,6 +273,7 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
     params = list(
       n = n,
       center = center,
+      normalize = normalize,
       method = method,
       arrow = arrow,
       na.rm = na.rm,

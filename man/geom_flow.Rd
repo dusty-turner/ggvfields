@@ -180,10 +180,9 @@ f <- function(v) {
 # Create a ggplot with the flow plot layer
 ggplot() +
   geom_flow(
-    fun = f, xlim = c(-3, 3),
-    ylim = c(-3, 3), n = c(15, 15),
-    iterations = 100, scale_flow = 1,
-    threshold_distance = NULL,  # Default value
+    fun = f, n = c(21, 21),
+    xlim = c(-10, 10), ylim = c(-10, 10),
+    iterations = 100, threshold_distance = NULL,
     arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
   ) +
   coord_fixed() +

@@ -8,7 +8,7 @@
 \alias{GeomVector}
 \title{Create a Vector Plot Layer}
 \format{
-An object of class \code{StatVector} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
+An object of class \code{StatVector} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 5.
 
 An object of class \code{GeomVector} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 5.
 }
@@ -39,7 +39,6 @@ stat_vector(
   center = TRUE,
   normalize = TRUE,
   scale_length = 1,
-  arrow_size = 1,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )

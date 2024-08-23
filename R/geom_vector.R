@@ -100,7 +100,7 @@ stat_vector <- function(mapping = NULL, data = NULL, geom = "vector",
                         position = "identity", na.rm = FALSE,
                         show.legend = NA, inherit.aes = TRUE,
                         center = TRUE, normalize = TRUE,
-                        scale_length = 1, arrow_size = 1,
+                        scale_length = 1,
                         arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                         ...) {
 
@@ -117,7 +117,6 @@ stat_vector <- function(mapping = NULL, data = NULL, geom = "vector",
       normalize = normalize,
       scale_length = scale_length,
       arrow = arrow,
-      arrow_size = arrow_size,
       na.rm = na.rm,
       ...
     )
@@ -127,6 +126,8 @@ stat_vector <- function(mapping = NULL, data = NULL, geom = "vector",
 #' @rdname geom_vector
 #' @export
 StatVector <- ggproto("StatVector", Stat,
+
+  default_aes = aes(color = after_stat(norm)),
 
   required_aes = c("x", "y"),
 
@@ -163,6 +164,18 @@ StatVector <- ggproto("StatVector", Stat,
       data$yend <- data$y + data$v
     }
 
+    if (center) {
+      half_u <- (data$xend - data$x) / 2
+      half_v <- (data$yend - data$y) / 2
+
+      data$x <- data$x - half_u
+      data$y <- data$y - half_v
+      data$xend <- data$xend - half_u
+      data$yend <- data$yend - half_v
+    }
+
+
+
     return(data)
   }
 )
@@ -177,18 +190,18 @@ GeomVector <- ggproto("GeomVector", GeomSegment,
 
   default_aes = aes(color = "black", linewidth = 0.5, linetype = 1, alpha = 1),
 
-  draw_panel = function(data, panel_params, coord, arrow = NULL, arrow_size = 1, center) {
+  draw_panel = function(data, panel_params, coord, arrow = NULL) {
 
     # Handle centering if specified
-    if (center) {
-      half_u <- (data$xend - data$x) / 2
-      half_v <- (data$yend - data$y) / 2
-
-      data$x <- data$x - half_u
-      data$y <- data$y - half_v
-      data$xend <- data$xend - half_u
-      data$yend <- data$yend - half_v
-    }
+    # if (center) {
+    #   half_u <- (data$xend - data$x) / 2
+    #   half_v <- (data$yend - data$y) / 2
+    #
+    #   data$x <- data$x - half_u
+    #   data$y <- data$y - half_v
+    #   data$xend <- data$xend - half_u
+    #   data$yend <- data$yend - half_v
+    # }
 
     # Add vector length to the data
     data$vector_length <-  data$vector_length <- sqrt((data$xend - data$x)^2 + (data$yend - data$y)^2)

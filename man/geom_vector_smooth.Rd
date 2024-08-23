@@ -8,7 +8,7 @@
 \alias{stat_vector_smooth}
 \title{Create a Smooth Vector Plot Layer}
 \format{
-An object of class \code{StatVectorSmooth} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
+An object of class \code{StatVectorSmooth} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
 
 An object of class \code{GeomVectorSmooth} (inherits from \code{GeomVector}, \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 5.
 }
@@ -25,6 +25,7 @@ geom_vector_smooth(
   inherit.aes = TRUE,
   n = c(11, 11),
   center = TRUE,
+  normalize,
   method = "lm",
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
@@ -42,6 +43,7 @@ stat_vector_smooth(
   inherit.aes = TRUE,
   n = c(11, 11),
   center = TRUE,
+  normalize,
   method = "lm",
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
@@ -114,8 +116,15 @@ axis.}
 \item{center}{Logical; if \code{TRUE}, centers the vector on the evaluated x/y
 location. If \code{FALSE}, the vector origin is at the evaluated x/y location.
 When centering is enabled, the vector's midpoint aligns with the original
-x/y location. This parameter is passed to the \code{GeomVector} object and is
-applied during the rendering of the vectors.}
+x/y location.}
+
+\item{normalize}{Logical; if \code{TRUE}, normalizes the vector's length to a unit
+length before applying other transformations like centering. If \code{FALSE},
+vectors retain their original lengths.}
+
+\item{method}{Character; specifies the smoothing method to be used.
+Accepts \code{"lm"} for linear modeling or \code{"loess"} for locally estimated
+scatterplot smoothing.}
 
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}. This
 controls the appearance of the arrowheads at the end of the vectors,
@@ -194,23 +203,6 @@ wind_data_cartesian <- within(wind_data_polar, {
 })
 
 # Example using Cartesian coordinates
-ggplot(wind_data_cartesian) +
-geom_vector(aes(x = lon, y = lat, xend = xend, yend = yend),
-                arrow_size = .01, color = "black", center = FALSE) +
-geom_vector_smooth(aes(x = lon, y = lat, xend = xend, yend = yend),
-                       arrow_size = .01, alpha = .7, color = "red") +
-geom_vector_smooth(aes(x = lon, y = lat, xend = xend, yend = yend),
-                       arrow_size = .01, alpha = .7,
-                       color = "darkgreen", center = FALSE)
-
-# Example using Polar coordinates
-ggplot(wind_data_polar) +
-geom_vector(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd),
-                color = "black", arrow_size = .03) +
-geom_vector_smooth(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd),
-                       arrow_size = .01, alpha = .7, color = "red") +
-geom_vector_smooth(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd),
-                       arrow_size = .01, alpha = .7, color = "darkgreen", center = FALSE)
 
 
 }

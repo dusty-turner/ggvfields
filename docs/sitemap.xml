@@ -1,17 +1,45 @@
-<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
-<url><loc>/404.html</loc></url>
-<url><loc>/authors.html</loc></url>
-<url><loc>/index.html</loc></url>
-<url><loc>/LICENSE-text.html</loc></url>
-<url><loc>/reference/animation_transition.html</loc></url>
-<url><loc>/reference/geom_complex_function.html</loc></url>
-<url><loc>/reference/geom_flow.html</loc></url>
-<url><loc>/reference/geom_streamplot.html</loc></url>
-<url><loc>/reference/geom_vector.html</loc></url>
-<url><loc>/reference/geom_vector_field.html</loc></url>
-<url><loc>/reference/geom_vector_smooth.html</loc></url>
-<url><loc>/reference/ggvfields.html</loc></url>
-<url><loc>/reference/index.html</loc></url>
-<url><loc>/reference/scale_length_continuous.html</loc></url>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>/404.html</loc>
+  </url>
+  <url>
+    <loc>/authors.html</loc>
+  </url>
+  <url>
+    <loc>/index.html</loc>
+  </url>
+  <url>
+    <loc>/LICENSE-text.html</loc>
+  </url>
+  <url>
+    <loc>/reference/animation_transition.html</loc>
+  </url>
+  <url>
+    <loc>/reference/geom_complex_function.html</loc>
+  </url>
+  <url>
+    <loc>/reference/geom_flow.html</loc>
+  </url>
+  <url>
+    <loc>/reference/geom_streamplot.html</loc>
+  </url>
+  <url>
+    <loc>/reference/geom_vector.html</loc>
+  </url>
+  <url>
+    <loc>/reference/geom_vector_field.html</loc>
+  </url>
+  <url>
+    <loc>/reference/geom_vector_smooth.html</loc>
+  </url>
+  <url>
+    <loc>/reference/ggvfields.html</loc>
+  </url>
+  <url>
+    <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/scale_length_continuous.html</loc>
+  </url>
 </urlset>
-

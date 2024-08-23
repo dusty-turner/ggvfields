@@ -10,6 +10,7 @@
 #'
 #' @inheritParams ggplot2::geom_path
 #' @inheritParams ggplot2::stat_identity
+#' @importFrom stats na.omit
 #' @param fun A user-defined function that takes a numeric vector as input and
 #'   returns a numeric vector of the same length, representing the vector field.
 #' @param xlim A numeric vector of length 2 giving the x-axis limits.
