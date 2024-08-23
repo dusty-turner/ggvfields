@@ -1,12 +1,21 @@
 # List of non-expored and non-documented functions
 
 ensure_nonempty_data <- function(data) {
-  if (length(data) == 0) {
-    data.frame(x = 1)
-  } else {
+  if (empty(data)) {
+    tibble0(group = 1, .size = 1)
+  }
+  else {
     data
   }
 }
+
+# ensure_nonempty_data <- function(data) {
+#   if (length(data) == 0) {
+#     data.frame(x = 1)
+#   } else {
+#     data
+#   }
+# }
 
 
 
@@ -24,15 +33,6 @@ tibble0 <- function(...) {
 
 empty <- function(df) {
   is.null(df) || nrow(df) == 0 || ncol(df) == 0 || inherits(df, "waiver")
-}
-
-ensure_nonempty_data <- function(data) {
-  if (empty(data)) {
-    tibble0(group = 1, .size = 1)
-  }
-  else {
-    data
-  }
 }
 
 vectorize <- function(f, drop = TRUE) {

@@ -1,26 +1,51 @@
-# Function to generate starting points for flowlines
 generate_starting_points <- function(mask_shape) {
-  points <- list()
+  # Extract dimensions from mask_shape
   nx <- mask_shape[2]
   ny <- mask_shape[1]
 
-  for (x in 1:nx) points <- append(points, list(c(x, ny)))
-  for (y in (ny-1):1) points <- append(points, list(c(nx, y)))
-  for (x in (nx-1):1) points <- append(points, list(c(x, 1)))
-  for (y in 2:(ny-1)) points <- append(points, list(c(1, y)))
+  points <- list()
+  x_min <- 1
+  x_max <- nx
+  y_min <- 1
+  y_max <- ny
 
-  layer <- 1
-  while (layer <= floor(min(nx, ny) / 2)) {
-    for (x in layer:(nx - layer)) points <- append(points, list(c(x, ny - layer + 1)))
-    for (y in (ny - layer):(layer + 1)) points <- append(points, list(c(nx - layer + 1, y)))
-    for (x in (nx - layer + 1):(layer + 1)) points <- append(points, list(c(x, layer)))
-    for (y in (layer + 1):(ny - layer)) points <- append(points, list(c(layer, y)))
+  while (x_min <= x_max && y_min <= y_max) {
+    # Top row (left to right)
+    for (x in x_min:x_max) {
+      points <- append(points, list(c(x, y_max)))
+    }
+    y_max <- y_max - 1
 
-    layer <- layer + 1
+    # Right column (top to bottom)
+    for (y in y_max:y_min) {
+      points <- append(points, list(c(x_max, y)))
+    }
+    x_max <- x_max - 1
+
+    # Bottom row (right to left)
+    if (y_min <= y_max) {
+      for (x in rev(x_min:x_max)) {
+        points <- append(points, list(c(x, y_min)))
+      }
+      y_min <- y_min + 1
+    }
+
+    # Left column (bottom to top)
+    if (x_min <= x_max) {
+      for (y in rev(y_max:y_min)) {
+        points <- append(points, list(c(x_min, y)))
+      }
+      x_min <- x_min + 1
+    }
   }
+
+  # Ensure unique points (removing any accidental duplicates)
+  points <- unique(points)
 
   return(points)
 }
+
+
 
 ensure_length_two <- function(n) {
   if (length(n) == 1) n <- rep(n, 2)
@@ -47,6 +72,8 @@ flow_ode <- function(time, state, parameters) {
   xlim <- parameters$xlim
   ylim <- parameters$ylim
 
+  # print(time)
+  # print(c(x,y))
   # If x or y is NA, return NA to stop the solver
   if (is.na(x) || is.na(y)) {
     return(list(c(NA, NA)))
@@ -60,6 +87,7 @@ flow_ode <- function(time, state, parameters) {
   # Calculate the derivatives
   dx <- parameters$fun(c(x, y))[1]
   dy <- parameters$fun(c(x, y))[2]
+  # print(c(dx,dy))
   return(list(c(dx, dy)))
 }
 

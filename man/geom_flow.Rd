@@ -3,9 +3,8 @@
 \docType{data}
 \name{geom_flow}
 \alias{geom_flow}
-\alias{GeomFlow}
 \alias{stat_flow}
-\alias{StatFlow}
+\alias{GeomFlow}
 \title{Create a Flow Plot Geom Layer}
 \usage{
 geom_flow(
