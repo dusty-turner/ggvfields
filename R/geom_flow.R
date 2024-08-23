@@ -213,6 +213,7 @@ StatFlow <- ggproto("StatFlow", Stat,
 
                       # Proximity Check
                       for (id in unique(trajectory_data$id)[-1]) {  # Skip the first id since it has no previous trajectories
+                      # for (id in unique(trajectory_data$id)[c(2:58)]) {  # Skip the first id since it has no previous trajectories
                         current_traj <- trajectory_data[trajectory_data$id == id, ]
                         previous_trajs <- trajectory_data[trajectory_data$id < id, ]
 
@@ -270,7 +271,7 @@ StatFlow <- ggproto("StatFlow", Stat,
                       # Curl
                       trajectory_data$curl <- grad_v - grad_u
 
-                      # trajectory_data <- trajectory_data |> filter(id <=80)
+                      # trajectory_data <- trajectory_data |> filter(id ==61)
 
                       return(trajectory_data)
                     }
