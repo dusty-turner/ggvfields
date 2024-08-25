@@ -27,6 +27,21 @@
 #'   vector plot.
 #' @name geom_vector
 #' @rdname geom_vector
+#'
+#' @section Aesthetics:
+#' `geom_vector` understands the following aesthetics (required aesthetics are in bold):
+#' - **`x`**: x-coordinate of the start point of the vector.
+#' - **`y`**: y-coordinate of the start point of the vector.
+#' - `xend`: x-coordinate of the end point of the vector (optional if `angle` and `distance` are provided).
+#' - `yend`: y-coordinate of the end point of the vector (optional if `angle` and `distance` are provided).
+#' - `angle`: The angle of the vector in degrees (optional, used with `distance`).
+#' - `distance`: The distance/magnitude of the vector (optional, used with `angle`).
+#' - `color`: The color of the vector line.
+#' - `linewidth`: The thickness of the vector line.
+#' - `linetype`: The type of the vector line (solid, dashed, etc.).
+#' - `alpha`: The transparency level of the vector.
+#' - `arrow`: Specification for arrowheads at the end of the vector.
+#'
 #' @examples
 #'
 #' # Example using Cartesian input: precomputed xend and yend

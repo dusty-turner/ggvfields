@@ -27,29 +27,53 @@
 #'   smooth vector field plot.
 #' @name geom_vector_smooth
 #' @rdname geom_vector_smooth
-#' @examples
 #'
-#' # Example data
-#' set.seed(1234)
-#' n <- 10
-#' wind_data_polar <- data.frame(
-#'   lon = rnorm(n),
-#'   lat = rnorm(n),
-#'   wind_dir = runif(n, -pi, pi),
-#'   wind_spd = rchisq(n, df = 2)
+#' @section Aesthetics:
+#' `geom_vector_smooth` understands the following aesthetics (required aesthetics are in bold):
+#'
+#' - **`x`**: x-coordinate of the start point of the vector.
+#' - **`y`**: y-coordinate of the start point of the vector.
+#' - `xend`: x-coordinate of the end point of the vector (optional if `angle` and `distance` are provided).
+#' - `yend`: y-coordinate of the end point of the vector (optional if `angle` and `distance` are provided).
+#' - `angle`: The angle of the vector in degrees (optional, used with `distance`).
+#' - `distance`: The distance/magnitude of the vector (optional, used with `angle`).
+#' - `color`: The color of the vector line.
+#' - `linewidth`: The thickness of the vector line.
+#' - `linetype`: The type of the vector line (solid, dashed, etc.).
+#' - `alpha`: The transparency level of the vector.
+#' - `arrow`: Specification for arrowheads at the end of the vector.
+#'
+#' Additionally, when using smoothing:
+#' - `norm`: A computed variable representing the magnitude of each smoothed vector.
+#'
+#' @examples
+#' # Define the function
+#' f <- function(v) {
+#'   x <- v[1]
+#'   y <- v[2]
+#'   c(-1 - x^2 + y, 1 + x - y^2)
+#' }
+#'
+#' # Generate sample points
+#' set.seed(123)
+#' sample_points <- data.frame(
+#'   x = runif(10, min = -10, max = 10),
+#'   y = runif(10, min = -10, max = 10)
 #' )
 #'
-#' # Cartesian transformation
-#' wind_data_cartesian <- within(wind_data_polar, {
-#'   wind_lon_comp <- wind_spd * cos(wind_dir)
-#'   wind_lat_comp <- wind_spd * sin(wind_dir)
-#'   xend <- lon + wind_lon_comp
-#'   yend <- lat + wind_lat_comp
-#' })
+#' # Apply the function to each point
+#' result <- t(apply(sample_points, 1, f))
+#' sample_points$xend <- result[, 1]
+#' sample_points$yend <- result[, 2]
 #'
-#' # Example using Cartesian coordinates
+#' # Load ggplot2 library
+#' library(ggplot2)
 #'
-#'
+#' # Plot the vectors
+#' sample_points |>
+#'   ggplot(aes(x = x, y = y, xend = xend, yend = yend)) +
+#'     geom_vector_smooth(normalize = TRUE, center = TRUE, arrow = grid::arrow()) +
+#'     geom_vector(color = "red")
 NULL
 
 #' @rdname geom_vector_smooth
@@ -60,7 +84,7 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
 
   default_aes = aes(color = after_stat(norm), linewidth = 0.5, linetype = 1, alpha = 1),
 
-  compute_group = function(data, scales, n, center, method, normalize, ...) {
+  compute_group = function(data, scales, n, center, method, normalize, scale_length, xseq, ...) {
 
     # Ensure that n has the correct length
     n <- ensure_length_two(n)
@@ -161,6 +185,11 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
         )
     }
 
+    ## work on standard error
+    if (is.null(xseq)) {
+
+    }
+    print(xseq)
 
     result
   }
@@ -174,9 +203,9 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
                                position = "identity",
                                na.rm = FALSE, show.legend = NA,
                                inherit.aes = TRUE,
-                               n = c(11, 11),
+                               n = c(11, 11), scale_length = 1,
                                center = TRUE, normalize,
-                               method = "lm",
+                               method = "lm", xseq = NULL,
                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                                ...) {
 
@@ -192,6 +221,8 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
       n = n,
       center = center,
       normalize = normalize,
+      scale_length = scale_length,
+      xseq = xseq,
       method = method,
       arrow = arrow,
       na.rm = na.rm,
@@ -256,9 +287,9 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
                                position = "identity",
                                na.rm = FALSE, show.legend = NA,
                                inherit.aes = TRUE,
-                               n = c(11, 11),
+                               n = c(11, 11), scale_length = 1,
                                center = TRUE, normalize,
-                               method = "lm",
+                               method = "lm", xseq = NULL,
                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                                ...) {
 
@@ -274,6 +305,8 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
       n = n,
       center = center,
       normalize = normalize,
+      scale_length = scale_length,
+      xseq = xseq,
       method = method,
       arrow = arrow,
       na.rm = na.rm,

@@ -179,6 +179,24 @@ segments with optional arrowheads. The vectors are defined by start (\code{x},
 \code{y}) and end (\code{xend}, \code{yend}) coordinates, which can be directly provided or
 derived from angular (\code{angle}) and distance (\code{distance}) information.
 }
+\section{Aesthetics}{
+
+\code{geom_vector} understands the following aesthetics (required aesthetics are in bold):
+\itemize{
+\item \strong{\code{x}}: x-coordinate of the start point of the vector.
+\item \strong{\code{y}}: y-coordinate of the start point of the vector.
+\item \code{xend}: x-coordinate of the end point of the vector (optional if \code{angle} and \code{distance} are provided).
+\item \code{yend}: y-coordinate of the end point of the vector (optional if \code{angle} and \code{distance} are provided).
+\item \code{angle}: The angle of the vector in degrees (optional, used with \code{distance}).
+\item \code{distance}: The distance/magnitude of the vector (optional, used with \code{angle}).
+\item \code{color}: The color of the vector line.
+\item \code{linewidth}: The thickness of the vector line.
+\item \code{linetype}: The type of the vector line (solid, dashed, etc.).
+\item \code{alpha}: The transparency level of the vector.
+\item \code{arrow}: Specification for arrowheads at the end of the vector.
+}
+}
+
 \section{Computed variables}{
 
 
