@@ -62,6 +62,26 @@ instead of scalar data.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="va">StatVectorSmooth</span></span>
 <span></span>
+<span><span class="va">GeomVectorSmooth</span></span>
+<span></span>
+<span><span class="fu">stat_vector_smooth</span><span class="op">(</span></span>
+<span>  mapping <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  geom <span class="op">=</span> <span class="st">"vector_smooth"</span>,</span>
+<span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">11</span>, <span class="fl">11</span><span class="op">)</span>,</span>
+<span>  scale_length <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">normalize</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"lm"</span>,</span>
+<span>  se <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">geom_vector_smooth</span><span class="op">(</span></span>
 <span>  mapping <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -71,27 +91,11 @@ instead of scalar data.</p>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">11</span>, <span class="fl">11</span><span class="op">)</span>,</span>
+<span>  scale_length <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">normalize</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"lm"</span>,</span>
-<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">GeomVectorSmooth</span></span>
-<span></span>
-<span><span class="fu">stat_vector_smooth</span><span class="op">(</span></span>
-<span>  mapping <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  geom <span class="op">=</span> <span class="st">"vector"</span>,</span>
-<span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
-<span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">11</span>, <span class="fl">11</span><span class="op">)</span>,</span>
-<span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  <span class="va">normalize</span>,</span>
-<span>  method <span class="op">=</span> <span class="st">"lm"</span>,</span>
+<span>  se <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -100,7 +104,7 @@ instead of scalar data.</p>
     <div class="section level2">
     <h2 id="format">Format<a class="anchor" aria-label="anchor" href="#format"></a></h2>
     <p>An object of class <code>StatVectorSmooth</code> (inherits from <code>Stat</code>, <code>ggproto</code>, <code>gg</code>) of length 4.</p>
-<p>An object of class <code>GeomVectorSmooth</code> (inherits from <code>GeomVector</code>, <code>GeomSegment</code>, <code>Geom</code>, <code>ggproto</code>, <code>gg</code>) of length 5.</p>
+<p>An object of class <code>GeomVectorSmooth</code> (inherits from <code>GeomSegment</code>, <code>Geom</code>, <code>ggproto</code>, <code>gg</code>) of length 5.</p>
     </div>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
@@ -125,16 +129,16 @@ will be used as the layer data. A <code>function</code> can be created
 from a <code>formula</code> (e.g. <code>~ head(.x, 10)</code>).</p></dd>
 
 
-<dt>stat</dt>
-<dd><p>The statistical transformation to use on the data for this layer.
-When using a <code>geom_*()</code> function to construct a layer, the <code>stat</code>
-argument can be used the override the default coupling between geoms and
-stats. The <code>stat</code> argument accepts the following:</p><ul><li><p>A <code>Stat</code> ggproto subclass, for example <code>StatCount</code>.</p></li>
-<li><p>A string naming the stat. To give the stat as a string, strip the
-function name of the <code>stat_</code> prefix. For example, to use <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">stat_count()</a></code>,
-give the stat as <code>"count"</code>.</p></li>
-<li><p>For more information and other ways to specify the stat, see the
-<a href="https://ggplot2.tidyverse.org/reference/layer_stats.html" class="external-link">layer stat</a> documentation.</p></li>
+<dt>geom</dt>
+<dd><p>The geometric object to use to display the data for this layer.
+When using a <code>stat_*()</code> function to construct a layer, the <code>geom</code> argument
+can be used to override the default coupling between stats and geoms. The
+<code>geom</code> argument accepts the following:</p><ul><li><p>A <code>Geom</code> ggproto subclass, for example <code>GeomPoint</code>.</p></li>
+<li><p>A string naming the geom. To give the geom as a string, strip the
+function name of the <code>geom_</code> prefix. For example, to use <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point()</a></code>,
+give the geom as <code>"point"</code>.</p></li>
+<li><p>For more information and other ways to specify the geom, see the
+<a href="https://ggplot2.tidyverse.org/reference/layer_geoms.html" class="external-link">layer geom</a> documentation.</p></li>
 </ul></dd>
 
 
@@ -176,6 +180,13 @@ the default plot specification, e.g. <code><a href="https://ggplot2.tidyverse.or
 axis.</p></dd>
 
 
+<dt>scale_length</dt>
+<dd><p>Numeric; a scaling factor applied to the vectors to
+adjust their length. Defaults to <code>1</code>. This value is applied after
+normalization (if <code>normalize = TRUE</code>), allowing you to control the final
+vector lengths.</p></dd>
+
+
 <dt>center</dt>
 <dd><p>Logical; if <code>TRUE</code>, centers the vector on the evaluated x/y
 location. If <code>FALSE</code>, the vector origin is at the evaluated x/y location.
@@ -193,6 +204,10 @@ vectors retain their original lengths.</p></dd>
 <dd><p>Character; specifies the smoothing method to be used.
 Accepts <code>"lm"</code> for linear modeling or <code>"loess"</code> for locally estimated
 scatterplot smoothing.</p></dd>
+
+
+<dt>se</dt>
+<dd><p>Logical; if <code>TRUE</code>, plots the confidence intervals around the smoothed vectors.</p></dd>
 
 
 <dt>arrow</dt>
@@ -229,16 +244,16 @@ lists which parameters it can accept.</p></li>
 </ul></dd>
 
 
-<dt>geom</dt>
-<dd><p>The geometric object to use to display the data for this layer.
-When using a <code>stat_*()</code> function to construct a layer, the <code>geom</code> argument
-can be used to override the default coupling between stats and geoms. The
-<code>geom</code> argument accepts the following:</p><ul><li><p>A <code>Geom</code> ggproto subclass, for example <code>GeomPoint</code>.</p></li>
-<li><p>A string naming the geom. To give the geom as a string, strip the
-function name of the <code>geom_</code> prefix. For example, to use <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point()</a></code>,
-give the geom as <code>"point"</code>.</p></li>
-<li><p>For more information and other ways to specify the geom, see the
-<a href="https://ggplot2.tidyverse.org/reference/layer_geoms.html" class="external-link">layer geom</a> documentation.</p></li>
+<dt>stat</dt>
+<dd><p>The statistical transformation to use on the data for this layer.
+When using a <code>geom_*()</code> function to construct a layer, the <code>stat</code>
+argument can be used the override the default coupling between geoms and
+stats. The <code>stat</code> argument accepts the following:</p><ul><li><p>A <code>Stat</code> ggproto subclass, for example <code>StatCount</code>.</p></li>
+<li><p>A string naming the stat. To give the stat as a string, strip the
+function name of the <code>stat_</code> prefix. For example, to use <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">stat_count()</a></code>,
+give the stat as <code>"count"</code>.</p></li>
+<li><p>For more information and other ways to specify the stat, see the
+<a href="https://ggplot2.tidyverse.org/reference/layer_stats.html" class="external-link">layer stat</a> documentation.</p></li>
 </ul></dd>
 
 </dl></div>
@@ -249,31 +264,57 @@ give the geom as <code>"point"</code>.</p></li>
 <p>A <code>ggplot2</code> layer that can be added to a ggplot object to produce a
 smooth vector field plot.</p>
     </div>
+    <div class="section level2">
+    <h2 id="aesthetics">Aesthetics<a class="anchor" aria-label="anchor" href="#aesthetics"></a></h2>
+    
+
+<p><code>geom_vector_smooth</code> understands the following aesthetics (required aesthetics are in bold):</p><ul><li><p><strong><code>x</code></strong>: x-coordinate of the start point of the vector.</p></li>
+<li><p><strong><code>y</code></strong>: y-coordinate of the start point of the vector.</p></li>
+<li><p><code>xend</code>: x-coordinate of the end point of the vector (optional if <code>angle</code> and <code>distance</code> are provided).</p></li>
+<li><p><code>yend</code>: y-coordinate of the end point of the vector (optional if <code>angle</code> and <code>distance</code> are provided).</p></li>
+<li><p><code>angle</code>: The angle of the vector in degrees (optional, used with <code>distance</code>).</p></li>
+<li><p><code>distance</code>: The distance/magnitude of the vector (optional, used with <code>angle</code>).</p></li>
+<li><p><code>color</code>: The color of the vector line.</p></li>
+<li><p><code>linewidth</code>: The thickness of the vector line.</p></li>
+<li><p><code>linetype</code>: The type of the vector line (solid, dashed, etc.).</p></li>
+<li><p><code>alpha</code>: The transparency level of the vector.</p></li>
+<li><p><code>arrow</code>: Specification for arrowheads at the end of the vector.</p></li>
+</ul><p>Additionally, when using smoothing:</p><ul><li><p><code>norm</code>: A computed variable representing the magnitude of each smoothed vector.</p></li>
+</ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example data</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></span>
-<span class="r-in"><span><span class="va">wind_data_polar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  wind_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="op">-</span><span class="va">pi</span>, <span class="va">pi</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  wind_spd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Chisquare.html" class="external-link">rchisq</a></span><span class="op">(</span><span class="va">n</span>, df <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Define the function</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></span>
+<span class="r-in"><span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">-</span> <span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">y</span>, <span class="fl">1</span> <span class="op">+</span> <span class="va">x</span> <span class="op">-</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Generate sample points</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sample_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, min <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>, max <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, min <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>, max <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Cartesian transformation</span></span></span>
-<span class="r-in"><span><span class="va">wind_data_cartesian</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span><span class="va">wind_data_polar</span>, <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">wind_lon_comp</span> <span class="op">&lt;-</span> <span class="va">wind_spd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="va">wind_dir</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">wind_lat_comp</span> <span class="op">&lt;-</span> <span class="va">wind_spd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">wind_dir</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">xend</span> <span class="op">&lt;-</span> <span class="va">lon</span> <span class="op">+</span> <span class="va">wind_lon_comp</span></span></span>
-<span class="r-in"><span>  <span class="va">yend</span> <span class="op">&lt;-</span> <span class="va">lat</span> <span class="op">+</span> <span class="va">wind_lat_comp</span></span></span>
-<span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Apply the function to each point</span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">sample_points</span>, <span class="fl">1</span>, <span class="va">f</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">xend</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">yend</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example using Cartesian coordinates</span></span></span>
+<span class="r-in"><span><span class="co"># Load ggplot2 library</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Plot the vectors</span></span></span>
+<span class="r-in"><span><span class="va">sample_points</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu">geom_vector_smooth</span><span class="op">(</span>normalize <span class="op">=</span> <span class="cn">TRUE</span>, center <span class="op">=</span> <span class="cn">TRUE</span>, se <span class="op">=</span> <span class="cn">TRUE</span>, arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Computation failed in `stat_vector_smooth()`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Caused by error in `mutate()`:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> could not find function "mutate"</span>
+<span class="r-plt img"><img src="geom_vector_smooth-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

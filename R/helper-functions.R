@@ -23,7 +23,12 @@ ensure_length_two <- function(n) {
 #   }
 # }
 
-
+# Function to normalize angles to the range [-pi, pi]
+normalize_angle <- function(angle) {
+  angle <- angle %% (2 * pi)
+  angle[angle > pi] <- angle[angle > pi] - 2 * pi
+  return(angle)
+}
 
 times <- `*`
 
