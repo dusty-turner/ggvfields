@@ -59,13 +59,6 @@ generate_starting_points_flow <- function(mask_shape, build_type = "spiral_trave
   return(points)
 }
 
-
-ensure_length_two <- function(n) {
-  if (length(n) == 1) n <- rep(n, 2)
-  if (length(n) != 2) stop("Length of 'n' must be 2")
-  return(n)
-}
-
 # Function to solve the ODE using deSolve with boundary checking
 #' @importFrom deSolve ode
 solve_flow <- function(initial_state, fun, times, xlim, ylim) {

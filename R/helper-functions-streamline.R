@@ -1,9 +1,3 @@
-ensure_length_two <- function(n) {
-  if (length(n) == 1) n <- rep(n, 2)
-  if (length(n) != 2) stop("Length of 'n' must be 2")
-  return(n)
-}
-
 # Functions for different mask shapes
 
 # No inset shape (square mask)

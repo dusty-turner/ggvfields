@@ -10,10 +10,30 @@
 \format{
 An object of class \code{StatVectorSmooth} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
 
-An object of class \code{GeomVectorSmooth} (inherits from \code{GeomVector}, \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 5.
+An object of class \code{GeomVectorSmooth} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 5.
 }
 \usage{
 StatVectorSmooth
+
+GeomVectorSmooth
+
+stat_vector_smooth(
+  mapping = NULL,
+  data = NULL,
+  geom = "vector_smooth",
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  n = c(11, 11),
+  scale_length = 1,
+  center = TRUE,
+  normalize,
+  method = "lm",
+  se = TRUE,
+  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  ...
+)
 
 geom_vector_smooth(
   mapping = NULL,
@@ -28,25 +48,7 @@ geom_vector_smooth(
   center = TRUE,
   normalize,
   method = "lm",
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-  ...
-)
-
-GeomVectorSmooth
-
-stat_vector_smooth(
-  mapping = NULL,
-  data = NULL,
-  geom = "vector",
-  position = "identity",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  n = c(11, 11),
-  scale_length = 1,
-  center = TRUE,
-  normalize,
-  method = "lm",
+  se = TRUE,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
@@ -72,17 +74,17 @@ the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
-\item{stat}{The statistical transformation to use on the data for this layer.
-When using a \verb{geom_*()} function to construct a layer, the \code{stat}
-argument can be used the override the default coupling between geoms and
-stats. The \code{stat} argument accepts the following:
+\item{geom}{The geometric object to use to display the data for this layer.
+When using a \verb{stat_*()} function to construct a layer, the \code{geom} argument
+can be used to override the default coupling between stats and geoms. The
+\code{geom} argument accepts the following:
 \itemize{
-\item A \code{Stat} ggproto subclass, for example \code{StatCount}.
-\item A string naming the stat. To give the stat as a string, strip the
-function name of the \code{stat_} prefix. For example, to use \code{stat_count()},
-give the stat as \code{"count"}.
-\item For more information and other ways to specify the stat, see the
-\link[ggplot2:layer_stats]{layer stat} documentation.
+\item A \code{Geom} ggproto subclass, for example \code{GeomPoint}.
+\item A string naming the geom. To give the geom as a string, strip the
+function name of the \code{geom_} prefix. For example, to use \code{geom_point()},
+give the geom as \code{"point"}.
+\item For more information and other ways to specify the geom, see the
+\link[ggplot2:layer_geoms]{layer geom} documentation.
 }}
 
 \item{position}{A position adjustment to use on the data for this layer. This
@@ -133,6 +135,8 @@ vectors retain their original lengths.}
 Accepts \code{"lm"} for linear modeling or \code{"loess"} for locally estimated
 scatterplot smoothing.}
 
+\item{se}{Logical; if \code{TRUE}, plots the confidence intervals around the smoothed vectors.}
+
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}. This
 controls the appearance of the arrowheads at the end of the vectors,
 including properties like angle, length, and type.}
@@ -165,17 +169,17 @@ lists which parameters it can accept.
 \link[ggplot2:draw_key]{key glyphs}, to change the display of the layer in the legend.
 }}
 
-\item{geom}{The geometric object to use to display the data for this layer.
-When using a \verb{stat_*()} function to construct a layer, the \code{geom} argument
-can be used to override the default coupling between stats and geoms. The
-\code{geom} argument accepts the following:
+\item{stat}{The statistical transformation to use on the data for this layer.
+When using a \verb{geom_*()} function to construct a layer, the \code{stat}
+argument can be used the override the default coupling between geoms and
+stats. The \code{stat} argument accepts the following:
 \itemize{
-\item A \code{Geom} ggproto subclass, for example \code{GeomPoint}.
-\item A string naming the geom. To give the geom as a string, strip the
-function name of the \code{geom_} prefix. For example, to use \code{geom_point()},
-give the geom as \code{"point"}.
-\item For more information and other ways to specify the geom, see the
-\link[ggplot2:layer_geoms]{layer geom} documentation.
+\item A \code{Stat} ggproto subclass, for example \code{StatCount}.
+\item A string naming the stat. To give the stat as a string, strip the
+function name of the \code{stat_} prefix. For example, to use \code{stat_count()},
+give the stat as \code{"count"}.
+\item For more information and other ways to specify the stat, see the
+\link[ggplot2:layer_stats]{layer stat} documentation.
 }}
 }
 \value{
@@ -238,7 +242,7 @@ library(ggplot2)
 # Plot the vectors
 sample_points |>
   ggplot(aes(x = x, y = y, xend = xend, yend = yend)) +
-    geom_vector_smooth(normalize = TRUE, center = TRUE, arrow = grid::arrow()) +
+    geom_vector_smooth(normalize = TRUE, center = TRUE, se = TRUE, arrow = grid::arrow()) +
     geom_vector(color = "red")
 }
 \keyword{datasets}
