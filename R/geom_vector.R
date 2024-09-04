@@ -153,7 +153,7 @@ StatVector <- ggproto("StatVector", Stat,
     # Check if angle and distance are provided and calculate xend and yend
     if (!("xend" %in% names(data) && "yend" %in% names(data))) {
       if ("angle" %in% names(data) && "distance" %in% names(data)) {
-        data$angle <- data$angle * pi / 180  # Convert angle to radians
+        data$angle <- data$angle  # Convert angle to radians
         data$xend <- data$x + data$distance * cos(data$angle)
         data$yend <- data$y + data$distance * sin(data$angle)
       } else {
