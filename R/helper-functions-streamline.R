@@ -1,26 +1,28 @@
-# Functions for different mask shapes
-
-# No inset shape (square mask)
-is_too_close_square <- function(xi, yi, mask, xlim, ylim, n) {
-  xi_index <- floor((xi - xlim[1]) / ((xlim[2] - xlim[1]) / n[1])) + 1
-  yi_index <- floor((yi - ylim[1]) / ((ylim[2] - ylim[1]) / n[2])) + 1
-
-  if (any(xi_index < 1) || any(yi_index < 1) || any(xi_index > ncol(mask)) || any(yi_index > nrow(mask))) {
-    return(TRUE)
-  }
-
-  return(mask[yi_index, xi_index] == 1)
+calculate_indices <- function(x, y, xlim, ylim, n) {
+  xi <- min(floor((x - xlim[1]) / ((xlim[2] - xlim[1]) / n[2])) + 1, n[2])
+  yi <- min(floor((y - ylim[1]) / ((ylim[2] - ylim[1]) / n[1])) + 1, n[1])
+  return(c(xi, yi))
 }
 
-update_mask_square <- function(mask, xi, yi, xlim, ylim, n) {
-  xi_index <- floor((xi - xlim[1]) / ((xlim[2] - xlim[1]) / n[1])) + 1
-  yi_index <- floor((yi - ylim[1]) / ((ylim[2] - ylim[1]) / n[2])) + 1
+flip_y_index <- function(yi, n) {
+  return(n[1] - yi + 1)
+}
 
-  if (xi_index >= 1 && yi_index >= 1 && xi_index <= ncol(mask) && yi_index <= nrow(mask)) {
-    mask[yi_index, xi_index] <- 1
-  }
+update_mask_square <- function(mask, xi, yi, n) {
+  xi_index <- xi
+  yi_index <- flip_y_index(yi, n = n)  # Flip the y-index here if necessary for mask
+
+  mask[yi_index, xi_index] <- 1
   return(mask)
 }
+
+is_too_close_square <- function(xi, yi, n, mask) {
+  xi_index <- xi
+  yi_index <- flip_y_index(yi, n)
+
+    return(mask[yi_index, xi] == 1)
+}
+
 
 # Diamond mask
 is_within_diamond <- function(xi, yi, x_center, y_center, half_diagonal) {
@@ -135,63 +137,35 @@ update_mask_circle <- function(mask, xi, yi, xlim, ylim, n, circle_fraction = 0.
   return(mask)
 }
 # Combined function for bidirectional integration using Euler's method
-euler_integrate_bidirectional <- function(xi, yi, f, ds, max_length, n, mask, xlim, ylim, is_too_close, update_mask) {
-  integrate_fixed <- function(xi, yi, f, ds, max_length, n, mask, xlim, ylim, is_too_close) {
-    xy_traj <- list(c(xi, yi))
-    length_traveled <- 0
 
-    while (length_traveled < max_length) {
-      uv <- f(c(xi, yi))
-      u <- uv[1]
-      v <- uv[2]
-      norm <- sqrt(u^2 + v^2)
-      if (norm == 0) break
 
-      dx <- ds * (u / norm)
-      dy <- ds * (v / norm)
-
-      xi <- xi + dx
-      yi <- yi + dy
-      length_traveled <- length_traveled + sqrt(dx^2 + dy^2)
-
-      if (is_too_close(xi, yi, mask, xlim, ylim, n)) break
-
-      xy_traj <- append(xy_traj, list(c(xi, yi)))
-    }
-
-    return(list(traj = xy_traj))
-  }
-
-  forward_result <- integrate_fixed(xi, yi, f, ds, max_length, n, mask, xlim, ylim, is_too_close)
-  reverse_f <- function(v) -f(v)
-  backward_result <- integrate_fixed(xi, yi, reverse_f, ds, max_length, n, mask, xlim, ylim, is_too_close)
-
-  combined_traj <- c(rev(backward_result$traj[-1]), forward_result$traj)
-
-  for (point in combined_traj) {
-    mask <- update_mask(mask, point[1], point[2], xlim, ylim, n)
-  }
-
-  return(list(traj = combined_traj, mask = mask))
-}
-
-# Function to generate starting points for streamlines
 generate_starting_points <- function(mask_shape) {
   points <- list()
   nx <- mask_shape[2]
   ny <- mask_shape[1]
 
-  for (x in 1:nx) points <- append(points, list(c(x, ny)))
-  for (y in (ny-1):1) points <- append(points, list(c(nx, y)))
-  for (x in (nx-1):1) points <- append(points, list(c(x, 1)))
-  for (y in 2:(ny-1)) points <- append(points, list(c(1, y)))
+  layer <- 0
 
-  layer <- 1
-  while (layer <= floor(min(nx, ny) / 2)) {
-    for (x in layer:(nx - layer)) points <- append(points, list(c(x, ny - layer + 1)))
-    for (y in (ny - layer):(layer + 1)) points <- append(points, list(c(nx - layer + 1, y)))
-    for (x in (nx - layer + 1):(layer + 1)) points <- append(points, list(c(x, layer)))
-    for (y in (layer + 1):(ny - layer)) points <- append(points, list(c(layer, y)))
+  while (layer < ceiling(min(nx, ny) / 2)) {
+    # Top row, left to right
+    for (x in (1 + layer):(nx - layer)) {
+      points <- append(points, list(c(x, ny - layer)))
+    }
+
+    # Right column, top to bottom (excluding the corner we've already added)
+    for (y in (ny - 1 - layer):(1 + layer + 1)) {
+      points <- append(points, list(c(nx - layer, y)))
+    }
+
+    # Bottom row, right to left (excluding the corners we've already added)
+    for (x in (nx - 1 - layer):(1 + layer)) {
+      points <- append(points, list(c(x, 1 + layer)))
+    }
+
+    # Left column, bottom to top (excluding the corners we've already added)
+    for (y in (2 + layer):(ny - 1 - layer)) {
+      points <- append(points, list(c(1 + layer, y)))
+    }
 
     layer <- layer + 1
   }
@@ -199,49 +173,41 @@ generate_starting_points <- function(mask_shape) {
   return(points)
 }
 
-# Main function for generating stream plots
-streamplot <- function(f, xlim, ylim, n, ds, mask_shape_type = "square") {
 
-  max_length <- max(c(diff(xlim),diff(ylim)))
 
-  mask_shape <- c(n[2], n[1])
-  mask <- matrix(0, nrow = mask_shape[1], ncol = mask_shape[2])
 
-  trajectories <- list()
-  traj_id <- 1
 
-  if (mask_shape_type == "inset_square") {
-    ## this inset_fraction is not currently available to the user
-    is_too_close <- function(xi, yi, mask, xlim, ylim, n) is_too_close_inset_square(xi, yi, mask, xlim, ylim, n, inset_fraction = 0.5)
-    update_mask <- function(mask, xi, yi, xlim, ylim, n) update_mask_inset_square(mask, xi, yi, xlim, ylim, n, inset_fraction = 0.5)
-  } else if (mask_shape_type == "circle") {
-    is_too_close <- function(xi, yi, mask, xlim, ylim, n) is_too_close_circle(xi, yi, mask, xlim, ylim, n, circle_fraction = .5)
-    update_mask <- function(mask, xi, yi, xlim, ylim, n) update_mask_circle(mask, xi, yi, xlim, ylim, n, circle_fraction = .5)
-  } else {
-    is_too_close <- switch(mask_shape_type,
-                           square = is_too_close_square,
-                           diamond = is_too_close_diamond)
+solve_flow <- function(initial_state, fun, times, xlim, ylim) {
+  parameters <- list(fun = fun, xlim = xlim, ylim = ylim)
 
-    update_mask <- switch(mask_shape_type,
-                          square = update_mask_square,
-                          diamond = update_mask_diamond)
+  result <- ode(y = initial_state, times = times, func = flow_ode, parms = parameters, method = "rk4")
+
+  # Drop rows with NA values, since these indicate where the solver stopped
+  result <- as.data.frame(na.omit(result))
+
+  return(result)
+}
+
+
+flow_ode <- function(time, state, parameters) {
+  x <- state[1]
+  y <- state[2]
+  xlim <- parameters$xlim
+  ylim <- parameters$ylim
+
+  # If x or y is NA, return NA to stop the solver
+  if (is.na(x) || is.na(y)) {
+    return(list(c(NA, NA)))
   }
 
-  for (start in generate_starting_points(mask_shape)) {
-    xi <- xlim[1] + (start[[1]] - 0.5) * ((xlim[2] - xlim[1]) / mask_shape[2])
-    yi <- ylim[1] + (start[[2]] - 0.5) * ((ylim[2] - ylim[1]) / mask_shape[1])
-
-    if (!is_too_close(xi, yi, mask, xlim, ylim, n)) {
-      result <- euler_integrate_bidirectional(xi, yi, f, ds, max_length, n, mask, xlim, ylim, is_too_close, update_mask)
-      traj <- result$traj
-      mask <- result$mask
-      if (length(traj) > 1) {
-        traj <- lapply(traj, function(point) c(point, id = traj_id))
-        trajectories <- append(trajectories, list(traj))
-        traj_id <- traj_id + 1
-      }
-    }
+  # Check if x or y is outside the boundary
+  if (x < xlim[1] || x > xlim[2] || y < ylim[1] || y > ylim[2]) {
+    return(list(c(NA, NA)))  # Returning NA will stop the solver
   }
 
-  return(trajectories)
+  # Calculate the derivatives
+  dx <- parameters$fun(c(x, y))[1]
+  dy <- parameters$fun(c(x, y))[2]
+
+  return(list(c(dx, dy)))
 }

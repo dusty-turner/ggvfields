@@ -4,7 +4,7 @@
 \name{geom_streamplot}
 \alias{geom_streamplot}
 \alias{GeomStreamplot}
-\alias{stat_streamline}
+\alias{stat_streamplot}
 \alias{StatStreamplot}
 \title{Create a Stream Plot Geom Layer}
 \usage{
@@ -20,15 +20,15 @@ geom_streamplot(
   xlim = c(-10, 10),
   ylim = c(-10, 10),
   n = c(21, 21),
-  ds = 0.05,
   mask_shape_type = "square",
+  iterations = 100,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   chop = TRUE,
   scale_stream = 1,
   ...
 )
 
-stat_streamline(
+stat_streamplot(
   mapping = NULL,
   data = NULL,
   stat = "streamplot",
@@ -40,8 +40,8 @@ stat_streamline(
   xlim = c(-10, 10),
   ylim = c(-10, 10),
   n = c(21, 21),
-  ds = 0.05,
   mask_shape_type = "square",
+  iterations = 100,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   chop = TRUE,
   scale_stream = 1,
@@ -118,11 +118,10 @@ returns a numeric vector of the same length.}
 
 \item{n}{A numeric vector of length 2 specifying the grid dimensions.}
 
-\item{ds}{A numeric value specifying the distance between steps for
-streamline generation.}
-
 \item{mask_shape_type}{A character string specifying the mask shape type:
 "square", "diamond", "inset_square", or "circle".}
+
+\item{iterations}{need to put more info here}
 
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}.}
 
@@ -183,8 +182,8 @@ ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3),
     ylim = c(-3, 3), n = c(15, 15),
-    max_length = 10000, max_steps = 10000,
-    ds = .05, chop = TRUE, scale_stream = 1,
+    iterations = 100,
+    chop = TRUE, scale_stream = 1,
     mask_shape_type = "square"
   ) +
   coord_fixed() +
