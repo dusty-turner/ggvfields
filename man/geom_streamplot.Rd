@@ -121,7 +121,8 @@ returns a numeric vector of the same length.}
 \item{mask_shape_type}{A character string specifying the mask shape type:
 "square", "diamond", "inset_square", or "circle".}
 
-\item{iterations}{need to put more info here}
+\item{iterations}{An integer specifying the number of steps to perform for
+the numerical integration of the flow.}
 
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}.}
 
@@ -176,18 +177,13 @@ f <- function(v) {
   y <- v[2]
   c(-1 - x^2 + y, 1 + x - y^2)
 }
-
-# Create a ggplot with the stream plot layer
 ggplot() +
   geom_streamplot(
-    fun = f, xlim = c(-3, 3),
-    ylim = c(-3, 3), n = c(15, 15),
-    iterations = 100,
-    chop = TRUE, scale_stream = 1,
+    fun = f, xlim = c(-3, 3), ylim = c(-3, 3), n = c(15, 15),
+    iterations = 100, chop = TRUE, scale_stream = 1,
     mask_shape_type = "square"
   ) +
   coord_fixed() +
   theme_minimal()
-
 }
 \keyword{datasets}
