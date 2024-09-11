@@ -22,6 +22,7 @@ geom_streamplot(
   n = c(21, 21),
   mask_shape_type = "square",
   iterations = 100,
+  stream_density = 1,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   chop = TRUE,
   scale_stream = 1,
@@ -42,6 +43,7 @@ stat_streamplot(
   n = c(21, 21),
   mask_shape_type = "square",
   iterations = 100,
+  stream_density = 1,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   chop = TRUE,
   scale_stream = 1,
@@ -123,6 +125,9 @@ returns a numeric vector of the same length.}
 
 \item{iterations}{An integer specifying the number of steps to perform for
 the numerical integration of the flow.}
+
+\item{stream_density}{A numeric value that controls the density of the streamlines.
+Higher values produce more streamlines. Default is 1.}
 
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}.}
 

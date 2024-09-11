@@ -19,6 +19,8 @@
 #'   size as a fraction of the total range for chopping the trajectories.
 #' @param mask_shape_type A character string specifying the mask shape type:
 #'   "square", "diamond", "inset_square", or "circle".
+#' @param stream_density A numeric value that controls the density of the streamlines.
+#'   Higher values produce more streamlines. Default is 1.
 #' @param arrow Arrow specification, as created by `grid::arrow()`.
 #' @name geom_streamplot
 #' @rdname geom_streamplot
@@ -52,7 +54,7 @@ geom_streamplot <- function(mapping = NULL, data = NULL, stat = "streamplot",
                             show.legend = TRUE, inherit.aes = TRUE,
                             fun, xlim = c(-10, 10), ylim = c(-10, 10),
                             n = c(21, 21), mask_shape_type = "square",
-                            iterations = 100,
+                            iterations = 100, stream_density = 1,
                             arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                             chop = TRUE, scale_stream = 1, ...) {
   if (is.null(data)) data <- ensure_nonempty_data(data)
@@ -72,6 +74,7 @@ geom_streamplot <- function(mapping = NULL, data = NULL, stat = "streamplot",
       n = n,
       mask_shape_type = mask_shape_type,
       iterations = iterations,
+      stream_density = stream_density,  # Add stream_density here
       arrow = arrow,
       chop = chop,
       scale_stream = scale_stream,
@@ -96,7 +99,7 @@ stat_streamplot <- function(mapping = NULL, data = NULL,
                             na.rm = FALSE, show.legend = TRUE,
                             inherit.aes = TRUE, fun, xlim = c(-10, 10),
                             ylim = c(-10, 10), n = c(21, 21),
-                            mask_shape_type = "square", iterations = 100,
+                            mask_shape_type = "square", iterations = 100, stream_density = 1,
                             arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                             chop = TRUE, scale_stream = 1, ...) {
   if (is.null(data)) data <- ensure_nonempty_data(data)
@@ -115,6 +118,7 @@ stat_streamplot <- function(mapping = NULL, data = NULL,
       n = n,
       mask_shape_type = mask_shape_type,
       iterations = iterations,
+      stream_density = stream_density,  # Add stream_density here
       arrow = arrow,
       chop = chop,
       scale_stream = scale_stream,
@@ -133,12 +137,14 @@ StatStreamplot <- ggproto("StatStreamplot", Stat,
 
   default_aes = aes(group = after_stat(super_id), rownum = after_stat(rownum)),
 
-  compute_group = function(data, scales, fun, xlim, ylim, n, chop, scale_stream, mask_shape_type, iterations) {
+  compute_group = function(data, scales, fun, xlim, ylim, n, chop, scale_stream, stream_density, mask_shape_type, iterations) {
+
+    stream_density <- floor(stream_density)
 
     n <- ensure_length_two(n)
 
     # Initialize mask
-    mask_shape <- c(n[2], n[1])
+    mask_shape <- c(n[2]*stream_density, n[1]*stream_density)
     mask <- matrix(0, nrow = mask_shape[1], ncol = mask_shape[2])
 
     # Generate starting points and convert them to coordinates
@@ -195,12 +201,12 @@ StatStreamplot <- ggproto("StatStreamplot", Stat,
         # First pass: remove rows in masked areas
         valid_rows <- logical(nrow(combined_trajectory))
         for (j in seq_len(nrow(combined_trajectory))) {
-          indices <- calculate_indices(combined_trajectory$x[j], combined_trajectory$y[j], xlim, ylim, n)
+          indices <- calculate_indices(combined_trajectory$x[j], combined_trajectory$y[j], xlim, ylim, mask_shape)
           xi <- indices[1]
           yi <- indices[2]
 
           # Check for mask overlap
-          if (!is_masked_area(xi, yi, n, mask)) {
+          if (!is_masked_area(xi, yi, mask_shape, mask)) {
             valid_rows[j] <- TRUE
             ids[j] <- combined_trajectory$id[j]
             id2s[j] <- current_id2
@@ -223,13 +229,13 @@ StatStreamplot <- ggproto("StatStreamplot", Stat,
           yi <- combined_trajectory$y[j]
 
           if (mask_shape_type == "square") {
-            mask <- update_mask_square(mask, xi, yi, xlim, ylim, n)
+            mask <- update_mask_square(mask, xi, yi, xlim, ylim, mask_shape)
           } else if (mask_shape_type == "diamond") {
-            mask <- update_mask_diamond(mask, xi, yi, xlim, ylim, n)
+            mask <- update_mask_diamond(mask, xi, yi, xlim, ylim, mask_shape)
           } else if (mask_shape_type == "inset_square") {
-            mask <- update_mask_inset_square(mask, xi, yi, xlim, ylim, n)
+            mask <- update_mask_inset_square(mask, xi, yi, xlim, ylim, mask_shape)
           } else if (mask_shape_type == "circle") {
-            mask <- update_mask_circle(mask, xi, yi, xlim, ylim, n)
+            mask <- update_mask_circle(mask, xi, yi, xlim, ylim, mask_shape)
           }
         }
         # print(mask)
@@ -277,6 +283,18 @@ StatStreamplot <- ggproto("StatStreamplot", Stat,
     trajectory_data$norm <- sqrt(trajectory_data$x^2 + trajectory_data$y^2)
     trajectory_data <- trajectory_data[order(trajectory_data$id), ]
     trajectory_data$rownum <- ave(trajectory_data$id, trajectory_data$id, FUN = seq_along) |> as.integer()
+
+    ## Calculus measures
+    grad <- apply(cbind(trajectory_data$x, trajectory_data$y), 1, numDeriv::grad, func = fun) |> t()
+
+    grad_u <- grad[, 1]
+    grad_v <- grad[, 2]
+
+    # Divergence
+    trajectory_data$divergence <- grad_u + grad_v
+
+    # Curl
+    trajectory_data$curl <- grad_v - grad_u
 
     return(trajectory_data)
   }

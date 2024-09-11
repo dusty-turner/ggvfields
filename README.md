@@ -171,7 +171,8 @@ wind_data_cartesian |>
   ggplot() +
   geom_vector(aes(x = lon, y = lat, xend = xend, yend = yend)) +
   labs(title = "Wind Vectors (Cartesian Input)",
-       x = "Longitude", y = "Latitude")
+       x = "Longitude", y = "Latitude") +
+  coord_equal()
 ```
 
 <img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
@@ -184,7 +185,8 @@ wind_data_polar |>
   ggplot() +
   geom_vector(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd)) +
   labs(title = "Wind Vectors (Polar Input)",
-       x = "Longitude", y = "Latitude")
+       x = "Longitude", y = "Latitude") +
+  coord_equal()
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
@@ -204,7 +206,7 @@ f <- function(v) {
 
 ggplot() +
   geom_streamplot(
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
+    fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
     ) +
   coord_fixed() +
   theme_minimal()
@@ -221,7 +223,7 @@ It may be useful to not break up the streamlines.
 ``` r
 ggplot() +
   geom_streamplot(
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
+    fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
     chop = FALSE
     ) +
   coord_fixed() +
@@ -238,7 +240,7 @@ to divide it into smaller segments.
 ``` r
 ggplot() +
   geom_streamplot(
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
+    fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
     chop = TRUE, scale_stream = .9,
     ) +
   coord_fixed() +
@@ -252,7 +254,7 @@ ggplot() +
 ``` r
 ggplot() +
   geom_streamplot(
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
+    fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
     aes(color = after_stat(log(divergence + 10)))
     ) +
   coord_fixed() +
@@ -269,7 +271,7 @@ ggplot() +
 p <- ggplot() +
  geom_streamplot(
    aes(rownum = after_stat(rownum)), 
-   fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
+    fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
  ) +
  coord_fixed() +
  theme_bw()

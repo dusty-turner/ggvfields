@@ -60,7 +60,7 @@ geom_flow <- function(mapping = NULL, data = NULL,
                       stat = "flow", position = "identity",
                       na.rm = FALSE, show.legend = TRUE, inherit.aes = TRUE,
                       fun, xlim = c(-10,10), ylim = c(-10,10), n = c(21, 21),
-                      iterations = 100, threshold_distance = .5,
+                      iterations = 100, threshold_distance = .5, T = 1,
                       arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                       ...) {
   if (is.null(data)) data <- ensure_nonempty_data(data)
@@ -80,6 +80,7 @@ geom_flow <- function(mapping = NULL, data = NULL,
       n = n,
       iterations = iterations,
       threshold_distance = threshold_distance,
+      T = T,
       arrow = arrow,
       na.rm = na.rm,
       ...
@@ -93,7 +94,7 @@ stat_flow <- function(mapping = NULL, data = NULL,
                       stat = "flow", position = "identity",
                       na.rm = FALSE, show.legend = TRUE, inherit.aes = TRUE,
                       fun, xlim = c(-10,10), ylim = c(-10,10), n = c(21, 21),
-                      iterations = 100, threshold_distance = .5,
+                      iterations = 100, threshold_distance = .5, T = 1,
                       arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                       ...) {
 
@@ -113,6 +114,7 @@ stat_flow <- function(mapping = NULL, data = NULL,
       n = n,
       iterations = iterations,
       threshold_distance = threshold_distance,
+      T = T,
       arrow = arrow,
       na.rm = na.rm,
       ...
@@ -128,9 +130,9 @@ GeomFlow <- ggproto("GeomFlow", GeomPath)
 
 
 StatFlow <- ggproto("StatFlow", Stat,
-                    default_aes = aes(group = after_stat(id), rownum = after_stat(rownum)),
+                    default_aes = aes(group = after_stat(id), rownum = after_stat(rownum), color = after_stat(t)),
 
-                    compute_group = function(data, scales, fun, xlim, ylim, n, iterations, threshold_distance = NULL) {
+                    compute_group = function(data, scales, fun, xlim, ylim, n, iterations, threshold_distance = NULL, T) {
 
                       n <- ensure_length_two(n)
 
@@ -141,8 +143,8 @@ StatFlow <- ggproto("StatFlow", Stat,
                       y_seq <- seq(ylim[1], ylim[2], length.out = n[1])
                       grid_coords <- lapply(starting_points, function(p) c(x_seq[p[1]], y_seq[p[2]]))
 
-                      times_forward <- seq(0, 1, length.out = iterations)  # Time sequence for ODE solver
-                      times_backward <- seq(0, -1, length.out = iterations)  # Time sequence for ODE solver
+                      times_forward <- seq(0, T, length.out = iterations)  # Time sequence for ODE solver
+                      times_backward <- seq(0, -T, length.out = iterations)  # Time sequence for ODE solver
 
                       # Generate the forward flow
                       forward_trajectories <- lapply(seq_along(grid_coords), function(i) {
