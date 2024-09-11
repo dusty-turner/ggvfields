@@ -286,6 +286,92 @@ gganimate::animate(anim, nframes = 25, fps = 5, end_pause = 0, renderer = gganim
 
 <img src="man/figures/README-animation-1.gif" width="100%" />
 
+### `geom_flow()`
+
+The `geom_flow()` function generates a flow plot layer for a
+user-defined vector field function. The lines in the plot represent the
+flow of data points through the vector field, visualizing the trajectory
+of particles over time. Each flow line traces where a “marble” would
+move through the vector field if dropped at a specific starting point,
+making this an intuitive way to visualize dynamic systems.
+
+By default, the color of each flow line corresponds to time (`t`),
+meaning the color transitions along the path represent the progression
+of time. As the flow line evolves, it shows how a particle would move
+over time if following the vector field. You can change the coloring by
+mapping aesthetics to other computed measures if needed, but time
+remains the default.
+
+Flows are computed using the `deSolve` package’s ODE solver, with the
+`rk4` method (a fourth-order Runge-Kutta method) used for numerical
+integration. This solver ensures accurate and efficient computation of
+flow lines, abstracting away complex calculations for the user.
+
+``` r
+ggplot() +
+  geom_flow(
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
+    ) +
+  coord_fixed() +
+  theme_minimal()
+```
+
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
+
+In this example, flow lines evolve according to the vector field defined
+by `f`. The color along each line will show how the particle moves over
+time (`t`) within the vector field.
+
+#### Adaptive Parameters
+
+Several parameters in `geom_flow()` are adaptive, meaning they adjust
+automatically based on the characteristics of the vector field and the
+plot limits. These adaptive parameters help optimize the flow
+visualization without requiring manual tuning:
+
+- **`threshold_distance`**: This parameter controls the minimum distance
+  between adjacent flow lines to prevent them from overlapping. If not
+  specified, it is calculated automatically as half the Euclidean
+  distance between adjacent grid points. This ensures the plot remains
+  uncluttered, with flow lines spaced appropriately based on the grid
+  dimensions (`n`) and the axis limits (`xlim`, `ylim`).
+
+- **`T`**: This parameter represents the total time span for the ODE
+  solver to trace the flow paths. If `T` is `NULL`, it is automatically
+  computed by starting from the center of the plot and estimating how
+  long it would take a particle to travel from the center to the
+  farthest boundary of the vector field - assuming that the vector field
+  is not cyclic nor does it reach a sync. This ensures that the
+  trajectories capture the significant dynamics of the vector field
+  without extending unnecessarily.
+
+- **`iterations`**: This parameter defines the number of time steps for
+  the ODE solver to use when tracing the flow lines. A higher number of
+  iterations results in smoother and more detailed flows. If
+  `iterations` is left as `NULL`, it is computed adaptively based on the
+  value of `T`, ensuring that longer time spans result in more
+  iterations for smoother paths.
+
+These adaptive parameters allow `geom_flow()` to create a well-balanced
+plot by dynamically adjusting the precision and spacing of flow lines,
+based on the underlying vector field and plot limits.
+
+#### Example with Custom Parameters
+
+Below is an example where we customize the grid size, time span (`T`),
+number of iterations, and the threshold distance between flow lines:
+
+``` r
+ggplot() +
+  geom_flow(
+    fun = f, n = c(21, 21), xlim = c(-10, 10), ylim = c(-10, 10),
+    iterations = 1000, threshold_distance = 0.5, T = 5) +
+  coord_fixed() +
+  theme_minimal()
+```
+
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
+
 <!-- The `mask_shape_type` parameter allows you to specify the mask shape used for streamline generation which influences how the streamlines are placed and how closely they can approach each other. The default mask shape is `"square"`, but you can also use `"diamond"`, `"inset_square"`, or `"circle"`.  During streamline generation, when a streamline enters the specified shape, no other streamlines will enter that region.  -->
 <!-- - **Square Mask (default)**: Streamlines are restricted to a grid where each cell is a square. This generally results in evenly spaced streamlines. -->
 <!-- - **Diamond Mask**: Streamlines are restricted to a square grid with diamonds inset within each square.  This can create a more dense pattern which can have better visualizations for some functions. - **Inset Square Mask**: Streamlines are restricted to a grid with smaller squares inset within larger squares. This can create a denser and more detailed pattern of streamlines. -->
@@ -320,7 +406,7 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
 
 We can enhance this plot with a little help from biscale.
 
@@ -358,7 +444,7 @@ ggdraw() +
   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3)
 ```
 
-<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
 
 ## License
 

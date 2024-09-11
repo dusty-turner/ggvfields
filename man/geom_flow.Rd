@@ -19,8 +19,9 @@ geom_flow(
   xlim = c(-10, 10),
   ylim = c(-10, 10),
   n = c(21, 21),
-  iterations = 100,
-  threshold_distance = 0.5,
+  iterations = NULL,
+  threshold_distance = NULL,
+  T = NULL,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
@@ -37,8 +38,9 @@ stat_flow(
   xlim = c(-10, 10),
   ylim = c(-10, 10),
   n = c(21, 21),
-  iterations = 100,
-  threshold_distance = 0.5,
+  iterations = NULL,
+  threshold_distance = NULL,
+  T = NULL,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
@@ -104,27 +106,33 @@ rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
-\item{fun}{A user-defined function that takes a numeric vector as input and
-returns a numeric vector of the same length, representing the vector field.}
+\item{fun}{A user-defined function that takes a numeric vector of length 2
+(representing the x and y coordinates) and returns a numeric vector of the
+same length, representing the vector field at that point.}
 
-\item{xlim}{A numeric vector of length 2 giving the x-axis limits.}
+\item{xlim}{A numeric vector of length 2 specifying the x-axis limits for the plot.}
 
-\item{ylim}{A numeric vector of length 2 giving the y-axis limits.}
+\item{ylim}{A numeric vector of length 2 specifying the y-axis limits for the plot.}
 
-\item{n}{A numeric vector of length 2 specifying the grid dimensions for the
-starting points of the flows.}
+\item{n}{A numeric vector of length 2 specifying the grid dimensions (number of rows
+and columns) for the starting points of the flows.}
 
 \item{iterations}{A numeric value specifying the number of time steps for the
-ODE solver used in flow generation. This determines the granularity
-of the flow paths; higher values result in smoother, more detailed
-flows.}
+ODE solver used to generate flow paths. Higher values result in smoother
+and more detailed flows. If \code{NULL}, a default value is calculated based on the
+time span (\code{T}).}
 
 \item{threshold_distance}{A numeric value specifying the minimum distance
-between flows to avoid overlap. If not provided, it defaults to half
-the Euclidean distance between adjacent grid points.}
+between adjacent flow lines to prevent overlap. If not provided, it defaults to
+half the Euclidean distance between adjacent grid points.}
+
+\item{T}{A numeric value representing the total time span for the ODE solver
+to trace the flow. If \code{NULL}, it is automatically calculated based on the
+distance between the longest-separated points in the vector field.}
 
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}, for adding
-arrows to the flows.}
+arrows to the flow lines. Defaults to an arrow with angle 20, length 0.015
+of the plot, and closed type.}
 
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}'s \code{params} argument. These
 arguments broadly fall into one of 4 categories below. Notably, further
@@ -155,29 +163,31 @@ lists which parameters it can accept.
 }}
 }
 \value{
-A ggplot2 layer that can be added to a ggplot object to produce a
-flow plot.
+A ggplot2 layer that adds flow lines to a ggplot object, visualizing
+the movement of points in the vector field.
 }
 \description{
-\code{geom_flow()} generates a flow plot layer for a user-defined vector
+\code{geom_flow()} generates a flow plot layer based on a user-defined vector
 field function. The lines in the plot represent the flow of data points
-through the vector field.
+through the vector field, visualizing how vectors evolve over a grid of points.
 }
 \details{
-The flows are computed using the \code{deSolve} package's ODE solver. The
-\code{rk4} method (a fourth-order Runge-Kutta method) is used by default for
-numerical integration of the flows.
+The flow paths are computed using the \code{deSolve} package's ODE solver,
+with the \code{rk4} method (a fourth-order Runge-Kutta method) used by default for
+numerical integration.
 }
 \examples{
 library(ggplot2)
-# Example user-defined function
+library(grid) # For arrow()
+
+# Example vector field function
 f <- function(v) {
   x <- v[1]
   y <- v[2]
   c(-1 - x^2 + y, 1 + x - y^2)
 }
 
-# Create a ggplot with the flow plot layer
+# Create a flow plot
 ggplot() +
   geom_flow(
     fun = f, n = c(21, 21),
