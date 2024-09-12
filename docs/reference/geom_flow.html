@@ -69,6 +69,7 @@ through the vector field, visualizing how vectors evolve over a grid of points.<
 <span>  iterations <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  threshold_distance <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  T <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  starting_points <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
@@ -88,6 +89,7 @@ through the vector field, visualizing how vectors evolve over a grid of points.<
 <span>  iterations <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  threshold_distance <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  T <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  starting_points <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -200,6 +202,30 @@ to trace the flow. If <code>NULL</code>, it is automatically calculated based on
 distance between the longest-separated points in the vector field.</p></dd>
 
 
+<dt>starting_points</dt>
+<dd><p>A list of coordinate pairs specifying the starting points
+for each flow stream. Each element of the list should be a numeric vector of
+length 2, where the first value represents the row number and the second value
+represents the column number on an <code>n x n</code> grid. The starting points are numbered
+from (1, 1) at the top-left of the grid to (n, n) at the bottom-right. If <code>NULL</code>,
+starting points are generated automatically based on the grid dimensions <code>n</code>.
+Example:</p><div class="sourceCode"><pre><code>
+  [[1]]
+  [1]  1 11
+
+  [[2]]
+  [1]  2 11
+
+  ...
+
+  [[121]]
+  [1] 11 1
+  </code></pre></div>
+
+<p>Users can manually define starting points to have finer control over which points
+initiate flow lines.</p></dd>
+
+
 <dt>arrow</dt>
 <dd><p>Arrow specification, as created by <code><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">grid::arrow()</a></code>, for adding
 arrows to the flow lines. Defaults to an arrow with angle 20, length 0.015
@@ -270,9 +296,6 @@ numerical integration.</p>
 <span class="r-in"><span>  <span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Computation failed in `stat_flow()`.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> Caused by error in `compute_group()`:</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> object 'f' not found</span>
 <span class="r-plt img"><img src="geom_flow-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>

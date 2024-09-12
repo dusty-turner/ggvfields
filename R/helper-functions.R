@@ -15,14 +15,6 @@ ensure_length_two <- function(n) {
   return(n)
 }
 
-# ensure_nonempty_data <- function(data) {
-#   if (length(data) == 0) {
-#     data.frame(x = 1)
-#   } else {
-#     data
-#   }
-# }
-
 # Function to normalize angles to the range [-pi, pi]
 normalize_angle <- function(angle) {
   angle <- angle %% (2 * pi)

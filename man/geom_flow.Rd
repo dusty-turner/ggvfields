@@ -22,6 +22,7 @@ geom_flow(
   iterations = NULL,
   threshold_distance = NULL,
   T = NULL,
+  starting_points = NULL,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
@@ -41,6 +42,7 @@ stat_flow(
   iterations = NULL,
   threshold_distance = NULL,
   T = NULL,
+  starting_points = NULL,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
@@ -129,6 +131,29 @@ half the Euclidean distance between adjacent grid points.}
 \item{T}{A numeric value representing the total time span for the ODE solver
 to trace the flow. If \code{NULL}, it is automatically calculated based on the
 distance between the longest-separated points in the vector field.}
+
+\item{starting_points}{A list of coordinate pairs specifying the starting points
+for each flow stream. Each element of the list should be a numeric vector of
+length 2, where the first value represents the row number and the second value
+represents the column number on an \verb{n x n} grid. The starting points are numbered
+from (1, 1) at the top-left of the grid to (n, n) at the bottom-right. If \code{NULL},
+starting points are generated automatically based on the grid dimensions \code{n}.
+Example:
+\preformatted{
+  [[1]]
+  [1]  1 11
+
+  [[2]]
+  [1]  2 11
+
+  ...
+
+  [[121]]
+  [1] 11 1
+  }
+
+Users can manually define starting points to have finer control over which points
+initiate flow lines.}
 
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}, for adding
 arrows to the flow lines. Defaults to an arrow with angle 20, length 0.015
