@@ -117,11 +117,6 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 \item{n}{An integer vector specifying the number of grid points along each
 axis.}
 
-\item{scale_length}{Numeric; a scaling factor applied to the vectors to
-adjust their length. Defaults to \code{1}. This value is applied after
-normalization (if \code{normalize = TRUE}), allowing you to control the final
-vector lengths.}
-
 \item{center}{Logical; if \code{TRUE}, centers the vector on the evaluated x/y
 location. If \code{FALSE}, the vector origin is at the evaluated x/y location.
 When centering is enabled, the vector's midpoint aligns with the original

@@ -17,7 +17,8 @@ Authors@R:
            email = "rodney_sturdivant@baylor.edu"))
 Maintainer: Dusty Turner <dusty.s.turner@gmail.com>
 Description: A ggplot2 extension for visualizing vector fields in a two-dimensional space. 
-             Provides functions to create vector field layers using user-defined vector field functions.
+             Provides functions to create vector field layers using user-defined vector field functions
+             and the `grid` package for rendering vector fields as graphical objects.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -30,7 +31,8 @@ Imports:
     farver,
     tibble,
     numDeriv,
-    deSolve
+    deSolve,
+    grid  
 URL: https://github.com/dusty-turner/ggvfields
 BugReports: https://github.com/dusty-turner/ggvfields/issues
 Suggests: 
