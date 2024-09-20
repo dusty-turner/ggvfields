@@ -14,11 +14,12 @@
 #'   applying any scaling. Normalization is useful for avoiding overplotting and ensuring
 #'   visual consistency, especially in dense plots.
 #' @param add_points Logical; if `TRUE`, adds a point at the start of each vector.
-#' @param arrow Arrow specification, as created by `grid::arrow()`. This controls the appearance
-#'   of the arrowheads at the end of the vectors, including properties like angle, length, and type.
+#' @param arrow Arrow specification for vector arrowheads, created by `grid::arrow()`.
+#'   This controls the appearance of the arrowheads at the end of the vectors, including properties like angle, length, and type.
 #' @return A `ggplot2` layer that can be added to a ggplot object to produce a vector plot.
 #' @name geom_vector
 #' @rdname geom_vector
+#' @export
 #'
 #' @section Aesthetics:
 #' `geom_vector` understands the following aesthetics (required aesthetics are in bold):
@@ -28,6 +29,7 @@
 #' - `yend`: y-coordinate of the end point of the vector (optional if `angle` and `distance` are provided).
 #' - `angle`: The angle of the vector in degrees (optional, used with `distance`).
 #' - `distance`: The distance/magnitude of the vector (optional, used with `angle`).
+#' - `length`: The length of the vector (optional, overrides `distance` when mapped as an aesthetic).
 #' - `color`: The color of the vector line.
 #' - `fill`: The fill color of vector arrowheads and points.
 #' - `linewidth`: The thickness of the vector line.
@@ -65,7 +67,6 @@
 #'   labs(title = "Wind Vectors (Polar Input)",
 #'        x = "Longitude", y = "Latitude")
 #'
-
 #' @section Computed variables:
 #' \describe{
 #'   \item{norm}{The magnitude of each vector, calculated as \eqn{\|\mathbf{v}\| = \sqrt{(xend - x)^2 + (yend - y)^2}}.}
@@ -73,6 +74,56 @@
 NULL
 
 #' @rdname geom_vector
+#' @export
+geom_vector <- function(mapping = NULL, data = NULL, stat = StatVector,
+                        position = "identity", ..., na.rm = FALSE, show.legend = NA,
+                        arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+                        inherit.aes = TRUE, center = TRUE, normalize = FALSE, add_points = FALSE) {
+  layer(
+    stat = StatVector, geom = GeomVector, mapping = mapping, data = data,
+    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
+    params = list(na.rm = na.rm, arrow = arrow, center = center, normalize = normalize, add_points = add_points, ...)
+  )
+}
+
+#' @rdname geom_vector
+#' @export
+stat_vector <- function(mapping = NULL, data = NULL, geom = GeomVector,
+                        position = "identity", ..., na.rm = FALSE, show.legend = NA,
+                        arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+                        inherit.aes = TRUE, center = TRUE, normalize = FALSE, add_points = FALSE) {
+  layer(
+    stat = StatVector, geom = geom, mapping = mapping, data = data,
+    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
+    params = list(na.rm = na.rm, arrow = arrow, center = center, normalize = normalize, add_points = add_points, ...)
+  )
+}
+
+#' @rdname geom_vector
+#' @export
+StatVector <- ggproto("StatVector", Stat,
+                            required_aes = c("x", "y"),
+                            default_aes = aes(dx = NA, dy = NA, distance = NA, angle = NA, length = NA,
+                                              color = "black", fill = "black", linewidth = 0.5, linetype = 1, alpha = 1),
+                            compute_group = function(data, scales, center = FALSE, ...) {
+                              if (all(is.na(data$dx)) | all(is.na(data$dy))) {
+                                if (!is.na(data$distance[1]) && !is.na(data$angle[1])) {
+                                  data$dx <- data$distance * cos(data$angle)
+                                  data$dy <- data$distance * sin(data$angle)
+                                } else {
+                                  stop("Either dx/dy or distance/angle must be provided.")
+                                }
+                              }
+
+                              data$xend <- data$x + data$dx
+                              data$yend <- data$y + data$dy
+
+                              data$norm <- sqrt(data$dx^2 + data$dy^2)
+
+                              return(data)
+                            }
+)
+
 draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = NULL, center = FALSE, normalize = FALSE, add_points = FALSE) {
 
   # If length is not mapped, normalize and center using the original data before transformation
@@ -197,8 +248,8 @@ draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = 
   }
 }
 
-
 #' @rdname geom_vector
+#' @export
 draw_key_vector <- function(data, params, size) {
   dx <- data$dx
   dy <- data$dy
@@ -206,9 +257,7 @@ draw_key_vector <- function(data, params, size) {
   x0 <- unit(0.1, "npc")
   y0 <- unit(0.5, "npc")
 
-  # Use the length calculated by the stat
   length_value <- data$length
-
   x1 <- x0 + unit(length_value, "cm")
   y1 <- y0
 
@@ -221,79 +270,20 @@ draw_key_vector <- function(data, params, size) {
 
 #' @rdname geom_vector
 #' @export
-geom_vector <- function(mapping = NULL, data = NULL, stat = "vector_length",
-                        position = "identity", ..., na.rm = FALSE, show.legend = NA,
-                        arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                        inherit.aes = TRUE, center = TRUE, normalize = FALSE, add_points = FALSE) {
-  layer(
-    stat = StatVectorLength, geom = GeomVector, mapping = mapping, data = data,
-    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, arrow = arrow, center = center, normalize = normalize, add_points = add_points, ...)  # Include normalize and add_points in the params list
+scale_length_continuous <- function(...) {
+  continuous_scale(
+    aesthetic = "length",
+    palette = scales::rescale_pal(c(0.1, .5)),
+    ...
   )
 }
-
-#' @rdname geom_vector
-#' @export
-stat_vector <- function(mapping = NULL, data = NULL, geom = "vector",
-                        position = "identity", ..., na.rm = FALSE, show.legend = NA,
-                        arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                        inherit.aes = TRUE, center = TRUE, normalize = FALSE, add_points = FALSE) {
-  layer(
-    stat = StatVectorLength, geom = GeomVector, mapping = mapping, data = data,
-    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, arrow = arrow, center = center, normalize = normalize, add_points = add_points, ...)  # Include normalize and add_points in the params list
-  )
-}
-
-
-#' @rdname geom_vector
-#' @export
-StatVectorLength <- ggproto("StatVectorLength", Stat,
-                            required_aes = c("x", "y"),  # Only require start points
-                            default_aes = aes(dx = NA, dy = NA, distance = NA, angle = NA, length = NA,
-                                              color = "black", fill = "black", linewidth = 0.5, linetype = 1, alpha = 1),
-                            compute_group = function(data, scales, center = FALSE, ...) {
-                              # If dx and dy are missing, calculate them from distance and angle
-                              if (all(is.na(data$dx)) | all(is.na(data$dy))) {
-                                if (!is.na(data$distance[1]) && !is.na(data$angle[1])) {
-                                  data$dx <- data$distance * cos(data$angle)
-                                  data$dy <- data$distance * sin(data$angle)
-                                } else {
-                                  stop("Either dx/dy or distance/angle must be provided.")
-                                }
-                              }
-
-                              # Calculate xend and yend from dx and dy
-                              data$xend <- data$x + data$dx
-                              data$yend <- data$y + data$dy
-
-                              # Calculate the norm (vector length)
-                              data$norm <- sqrt(data$dx^2 + data$dy^2)
-
-                              return(data)
-                            }
-)
 
 #' @rdname geom_vector
 #' @export
 GeomVector <- ggproto(
   "GeomVector", Geom,
-  required_aes = c("x", "y"),  # dx and dy or distance/angle will be inferred
+  required_aes = c("x", "y"),
   default_aes = aes(colour = "black", fill = "black", size = 0.5, length = NA, linewidth = 0.5, linetype = 1, alpha = 1),
   draw_panel = draw_panel_vector,
   draw_key = draw_key_vector
 )
-
-#' Continuous scale for vector length
-#'
-#' This function provides a continuous scale for vector lengths.
-#'
-#' @return A continuous scale for the vector lengths.
-scale_length_continuous <- function(...) {
-  continuous_scale(
-    aesthetic = "length",
-    palette = scales::rescale_pal(c(0.1, .5)),  # Automatically rescale the length aesthetic
-    ...
-  )
-}
-

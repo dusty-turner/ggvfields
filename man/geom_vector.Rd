@@ -3,35 +3,22 @@
 \docType{data}
 \name{geom_vector}
 \alias{geom_vector}
-\alias{draw_panel_vector}
-\alias{draw_key_vector}
 \alias{stat_vector}
-\alias{StatVectorLength}
+\alias{StatVector}
+\alias{draw_key_vector}
+\alias{scale_length_continuous}
 \alias{GeomVector}
 \title{Create a Vector Plot Layer}
 \format{
-An object of class \code{StatVectorLength} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
+An object of class \code{StatVector} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
 
 An object of class \code{GeomVector} (inherits from \code{Geom}, \code{ggproto}, \code{gg}) of length 5.
 }
 \usage{
-draw_panel_vector(
-  data,
-  panel_params,
-  coord,
-  na.rm = FALSE,
-  arrow = NULL,
-  center = FALSE,
-  normalize = FALSE,
-  add_points = FALSE
-)
-
-draw_key_vector(data, params, size)
-
 geom_vector(
   mapping = NULL,
   data = NULL,
-  stat = "vector_length",
+  stat = StatVector,
   position = "identity",
   ...,
   na.rm = FALSE,
@@ -46,7 +33,7 @@ geom_vector(
 stat_vector(
   mapping = NULL,
   data = NULL,
-  geom = "vector",
+  geom = GeomVector,
   position = "identity",
   ...,
   na.rm = FALSE,
@@ -58,11 +45,20 @@ stat_vector(
   add_points = FALSE
 )
 
-StatVectorLength
+StatVector
+
+draw_key_vector(data, params, size)
+
+scale_length_continuous(...)
 
 GeomVector
 }
 \arguments{
+\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and
+\code{inherit.aes = TRUE} (the default), it is combined with the default mapping
+at the top level of the plot. You must supply \code{mapping} if there is no plot
+mapping.}
+
 \item{data}{The data to be displayed in this layer. There are three
 options:
 
@@ -77,27 +73,6 @@ A \code{function} will be called with a single argument,
 the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
-
-\item{na.rm}{If \code{FALSE}, the default, missing values are removed with
-a warning. If \code{TRUE}, missing values are silently removed.}
-
-\item{arrow}{Arrow specification, as created by \code{grid::arrow()}. This controls the appearance
-of the arrowheads at the end of the vectors, including properties like angle, length, and type.}
-
-\item{center}{Logical; if \code{TRUE}, centers the vector on the specified (\code{x}, \code{y}) location.
-If \code{FALSE}, the vector origin is at the specified (\code{x}, \code{y}) location.
-When centering is enabled, the vector's midpoint aligns with the original (\code{x}, \code{y}) location.}
-
-\item{normalize}{Logical; if \code{TRUE}, normalizes each vector to a unit length before
-applying any scaling. Normalization is useful for avoiding overplotting and ensuring
-visual consistency, especially in dense plots.}
-
-\item{add_points}{Logical; if \code{TRUE}, adds a point at the start of each vector.}
-
-\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and
-\code{inherit.aes = TRUE} (the default), it is combined with the default mapping
-at the top level of the plot. You must supply \code{mapping} if there is no plot
-mapping.}
 
 \item{stat}{The statistical transformation to use on the data for this layer.
 When using a \verb{geom_*()} function to construct a layer, the \code{stat}
@@ -153,16 +128,32 @@ lists which parameters it can accept.
 \link[ggplot2:draw_key]{key glyphs}, to change the display of the layer in the legend.
 }}
 
+\item{na.rm}{If \code{FALSE}, the default, missing values are removed with
+a warning. If \code{TRUE}, missing values are silently removed.}
+
 \item{show.legend}{logical. Should this layer be included in the legends?
 \code{NA}, the default, includes if any aesthetics are mapped.
 \code{FALSE} never includes, and \code{TRUE} always includes.
 It can also be a named logical vector to finely select the aesthetics to
 display.}
 
+\item{arrow}{Arrow specification for vector arrowheads, created by \code{grid::arrow()}.
+This controls the appearance of the arrowheads at the end of the vectors, including properties like angle, length, and type.}
+
 \item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
+
+\item{center}{Logical; if \code{TRUE}, centers the vector on the specified (\code{x}, \code{y}) location.
+If \code{FALSE}, the vector origin is at the specified (\code{x}, \code{y}) location.
+When centering is enabled, the vector's midpoint aligns with the original (\code{x}, \code{y}) location.}
+
+\item{normalize}{Logical; if \code{TRUE}, normalizes each vector to a unit length before
+applying any scaling. Normalization is useful for avoiding overplotting and ensuring
+visual consistency, especially in dense plots.}
+
+\item{add_points}{Logical; if \code{TRUE}, adds a point at the start of each vector.}
 
 \item{geom}{The geometric object to use to display the data for this layer.
 When using a \verb{stat_*()} function to construct a layer, the \code{geom} argument
@@ -196,6 +187,7 @@ from angular (\code{angle}) and distance (\code{distance}) information.
 \item \code{yend}: y-coordinate of the end point of the vector (optional if \code{angle} and \code{distance} are provided).
 \item \code{angle}: The angle of the vector in degrees (optional, used with \code{distance}).
 \item \code{distance}: The distance/magnitude of the vector (optional, used with \code{angle}).
+\item \code{length}: The length of the vector (optional, overrides \code{distance} when mapped as an aesthetic).
 \item \code{color}: The color of the vector line.
 \item \code{fill}: The fill color of vector arrowheads and points.
 \item \code{linewidth}: The thickness of the vector line.
