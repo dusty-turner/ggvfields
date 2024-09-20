@@ -8,6 +8,7 @@ geom_vector_field(
   mapping = NULL,
   data = NULL,
   stat = StatVector,
+  geom = GeomVector,
   position = "identity",
   na.rm = FALSE,
   show.legend = NA,
@@ -56,6 +57,19 @@ give the stat as \code{"count"}.
 \link[ggplot2:layer_stats]{layer stat} documentation.
 }}
 
+\item{geom}{The geometric object to use to display the data for this layer.
+When using a \verb{stat_*()} function to construct a layer, the \code{geom} argument
+can be used to override the default coupling between stats and geoms. The
+\code{geom} argument accepts the following:
+\itemize{
+\item A \code{Geom} ggproto subclass, for example \code{GeomPoint}.
+\item A string naming the geom. To give the geom as a string, strip the
+function name of the \code{geom_} prefix. For example, to use \code{geom_point()},
+give the geom as \code{"point"}.
+\item For more information and other ways to specify the geom, see the
+\link[ggplot2:layer_geoms]{layer geom} documentation.
+}}
+
 \item{position}{A position adjustment to use on the data for this layer. This
 can be used in various ways, including to prevent overplotting and
 improving the display. The \code{position} argument accepts the following:
@@ -83,8 +97,8 @@ rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
-\item{fun}{A user-defined function that takes a vector (x, y) and returns a vector (xend, yend),
-the end points of the vector field at that point.}
+\item{fun}{A user-defined function that takes a vector (x, y) and returns a vector (dx, dy),
+representing the displacements at that point in the vector field.}
 
 \item{xlim, ylim}{Numeric vectors of length 2 giving the x/y-axis limits for the grid.}
 
@@ -94,54 +108,88 @@ the end points of the vector field at that point.}
 
 \item{normalize}{Logical; if \code{TRUE}, normalizes the vectors to unit length.}
 
-\item{arrow}{Arrow specification, as created by \code{grid::arrow()}.}
+\item{arrow}{Arrow specification, as created by \code{grid::arrow()}, to add arrowheads to vectors.}
 
-\item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}'s \code{params} argument. These
-arguments broadly fall into one of 4 categories below. Notably, further
-arguments to the \code{position} argument, or aesthetics that are required
-can \emph{not} be passed through \code{...}. Unknown arguments that are not part
-of the 4 categories below are ignored.
-\itemize{
-\item Static aesthetics that are not mapped to a scale, but are at a fixed
-value and apply to the layer as a whole. For example, \code{colour = "red"}
-or \code{linewidth = 3}. The geom's documentation has an \strong{Aesthetics}
-section that lists the available options. The 'required' aesthetics
-cannot be passed on to the \code{params}. Please note that while passing
-unmapped aesthetics as vectors is technically possible, the order and
-required length is not guaranteed to be parallel to the input data.
-\item When constructing a layer using
-a \verb{stat_*()} function, the \code{...} argument can be used to pass on
-parameters to the \code{geom} part of the layer. An example of this is
-\code{stat_density(geom = "area", outline.type = "both")}. The geom's
-documentation lists which parameters it can accept.
-\item Inversely, when constructing a layer using a
-\verb{geom_*()} function, the \code{...} argument can be used to pass on parameters
-to the \code{stat} part of the layer. An example of this is
-\code{geom_area(stat = "density", adjust = 0.5)}. The stat's documentation
-lists which parameters it can accept.
-\item The \code{key_glyph} argument of \code{\link[ggplot2:layer]{layer()}} may also be passed on through
-\code{...}. This can be one of the functions described as
-\link[ggplot2:draw_key]{key glyphs}, to change the display of the layer in the legend.
-}}
+\item{...}{Other arguments passed to \code{layer()}, such as aesthetic mappings.}
 }
 \value{
 A \code{ggplot2} layer that can be added to a ggplot object to produce a
-vector field plot.
+vector field plot. The layer includes optional calculations of:
+\subsection{Curl}{
+
+The curl of a vector field represents the rotation or "twisting" of the vectors around a point.
+
+$$
+\text{curl}(\mathbf{f})(x, y) = f_2^x(x, y) - f_1^y(x, y)
+$$
+where \( f_1^y(x, y) \) is the partial derivative of the first component with respect to \( y \), and \( f_2^x(x, y) \) is the partial derivative of the second component with respect to \( x \).
+}
+
+\subsection{Divergence}{
+
+The divergence of a vector field measures the rate at which vectors are "spreading out" from a point. This property helps visualize sources and sinks within the field, like areas of compression or expansion in fluid flow.
+
+$$
+\text{div}(\mathbf{f})(x, y) = f_1^x(x, y) + f_2^y(x, y)
+$$
+where \( f_1^x(x, y) \) is the partial derivative of the first component with respect to \( x \), and \( f_2^y(x, y) \) is the partial derivative of the second component with respect to \( y \).
+}
+
+\subsection{Norm}{
+
+The norm of a vector represents its magnitude (or length):
+
+$$
+\|\mathbf{f}(x, y)\| = \sqrt{dx^2 + dy^2}
+$$
+where \( dx \) and \( dy \) are the displacements in the x and y directions, respectively.
+}
 }
 \description{
 \code{geom_vector_field} generates a vector field plot layer using a
-user-defined function to compute the vector end points, which are converted
-into displacements (\code{dx}, \code{dy}) to be used by \code{geom_vector}. This is useful
-for visualizing vector fields in a two-dimensional space.
+user-defined function to compute the vector displacements (\code{dx}, \code{dy}) at each grid
+point. The function automatically generates a grid of points
+(specified by \code{xlim} and \code{ylim}) and evaluates the vector field displacements
+at those points.
 }
+\details{
+The user provides a function that takes a vector \verb{(x, y)} and returns the vector
+\strong{displacements} \verb{(dx, dy)} at that point in the vector field. The layer automatically
+computes calculus measures such as divergence, curl, and vector norm that can be mapped to
+aesthetics using \code{after_stat()}.
+}
+\section{Aesthetic mappings}{
+
+The following aesthetics can be mapped using \code{after_stat()}:
+\itemize{
+\item \code{divergence}: Divergence of the vector field at each point.
+\item \code{curl}: Curl of the vector field at each point.
+\item \code{norm}: Norm (magnitude) of the vector at each point.
+}
+
+For example, to map \code{norm} to color, you can use:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{aes(color = after_stat(norm))
+}\if{html}{\out{</div>}}
+}
+
 \examples{
 
-# example user-defined function
+# Example user-defined vector field function
 f <- function(v) {
   x <- v[1]; y <- v[2]
-  c(x + y, y - x)  # return end points
+  c(x + y, y - x)  # Return displacements (dx, dy)
 }
 
-# create a ggplot with the vector field layer
+# Create a ggplot with the vector field layer
+ggplot() +
+  geom_vector_field(fun = f, xlim = c(-5, 5), ylim = c(-5, 5), n = 20)
+
+# Example of mapping norm to length
+ggplot() +
+  geom_vector_field(fun = f, xlim = c(-5, 5), ylim = c(-5, 5),
+                    n = 20, normalize = FALSE,
+                    aes(length = after_stat(norm),
+                        color = after_stat(curl)))
 
 }

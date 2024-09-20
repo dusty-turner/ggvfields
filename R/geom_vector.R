@@ -261,7 +261,7 @@ draw_key_vector <- function(data, params, size) {
   x1 <- x0 + unit(length_value, "cm")
   y1 <- y0
 
-  segmentsGrob(
+  grid::segmentsGrob(
     x0 = x0, y0 = y0,
     x1 = x1, y1 = y1,
     gp = grid::gpar(col = data$colour, lwd = 2)
