@@ -145,8 +145,8 @@ The `geom_vector()` function generates a plot layer that visualizes
 vectors as line segments with optional arrowheads. It is designed to
 help you visualize directional data, such as wind directions, gradients,
 or flow fields. The vectors are defined by their start (`x`, `y`) and
-end (`xend`, `yend`) coordinates, or alternatively by their angular
-(`angle`) and distance (`distance`) components.
+vector components (`dx`, `dy`) coordinates, or alternatively by their
+angular (`angle`) and distance (`distance`) components.
 
 #### Cartesian
 
@@ -163,16 +163,17 @@ wind_data_polar <- data.frame(
 wind_data_cartesian <- within(wind_data_polar, {
   wind_lon_comp <- wind_spd * cos(wind_dir)
   wind_lat_comp <- wind_spd * sin(wind_dir)
-  xend <- lon + wind_lon_comp
-  yend <- lat + wind_lat_comp
+  dx <- wind_lon_comp
+  dy <- wind_lat_comp
 })
 
 wind_data_cartesian |> 
   ggplot() +
-  geom_vector(aes(x = lon, y = lat, xend = xend, yend = yend)) +
+  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy), 
+              add_points = TRUE, normalize = TRUE, center = TRUE) +
   labs(title = "Wind Vectors (Cartesian Input)",
-       x = "Longitude", y = "Latitude") +
-  coord_equal()
+       x = "Longitude", y = "Latitude")  +
+  lims(x = c(-3,2), y = c(-2,3))
 ```
 
 <img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
@@ -180,16 +181,31 @@ wind_data_cartesian |>
 #### Polar
 
 ``` r
-
 wind_data_polar |> 
   ggplot() +
-  geom_vector(aes(x = lon, y = lat, angle = wind_dir * 180 / pi, distance = wind_spd)) +
+  geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd),
+              add_points = TRUE, normalize = TRUE, center = TRUE) +
   labs(title = "Wind Vectors (Polar Input)",
        x = "Longitude", y = "Latitude") +
-  coord_equal()
+  lims(x = c(-3,2), y = c(-2,3))
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+
+#### Map Norm to Length Aesthetic
+
+``` r
+wind_data_cartesian |> 
+  ggplot() +
+  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)), 
+              add_points = TRUE, center = TRUE) +
+  labs(title = "Wind Vectors (Cartesian Input)",
+       x = "Longitude", y = "Latitude")  +
+  lims(x = c(-3,2), y = c(-2,3)) +
+  scale_length_continuous()
+```
+
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
 ### `geom_streamplot()`
 
@@ -212,7 +228,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
 
 The `chop` parameter (defaulted to TRUE) allows you to chop the
 trajectories into segments. This can be useful for better visualization
@@ -230,7 +246,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
 
 It may also be useful to break up the streamlines into more segments.
 The `scale_stream` parameter (defaults to 1) adjusts the segmentation of
@@ -247,7 +263,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
 
 ### Map Calculus Measures to Aesthetics
 
@@ -262,7 +278,7 @@ ggplot() +
 #> Warning in log(divergence + 10): NaNs produced
 ```
 
-<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
 
 ### Animate `geom_streamplot()`
 
@@ -316,7 +332,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
 
 In this example, flow lines evolve according to the vector field defined
 by `f`. The color along each line will show how the particle moves over
@@ -370,7 +386,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
 
 <!-- The `mask_shape_type` parameter allows you to specify the mask shape used for streamline generation which influences how the streamlines are placed and how closely they can approach each other. The default mask shape is `"square"`, but you can also use `"diamond"`, `"inset_square"`, or `"circle"`.  During streamline generation, when a streamline enters the specified shape, no other streamlines will enter that region.  -->
 <!-- - **Square Mask (default)**: Streamlines are restricted to a grid where each cell is a square. This generally results in evenly spaced streamlines. -->
@@ -406,7 +422,7 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
 
 We can enhance this plot with a little help from biscale.
 
@@ -444,7 +460,7 @@ ggdraw() +
   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3)
 ```
 
-<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-19-1.png" width="100%" />
 
 ## License
 
