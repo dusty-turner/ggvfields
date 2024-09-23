@@ -20,135 +20,14 @@ options(ggplot2.continuous.colour="viridis")
 
 ## Usage
 
-### `geom_vector_field()`
+### `geom_vector()`: Visualizing Individual Vectors
 
-The `geom_vector_field()` function generates a vector field plot layer
-using a user-defined function to compute the vector components. This
-function abstracts away the mathematical computations required to
-generate the vector field, so the user does not need to manually
-calculate and input the vector components into `geom_segment()`. It
-simplifies the process, making it easier to create vector field
-visualizations without dealing with the underlying math.
+`geom_vector()` is designed to visualize individual vectors, specified
+by either Cartesian (`dx`, `dy`) or polar (`angle`, `distance`)
+components. It’s especially useful for directional data like wind
+patterns or flow fields.
 
-``` r
-f <- function(v) {
-  x <- v[1]; y <- v[2]
-  c(-y, x) # = f(x,y)
-}
-
-ggplot() +
-  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) +
-  coord_fixed() 
-```
-
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
-
-This function allows the user to map several characteristics of the
-vector field to different aesthetic mappings.
-
-#### Norm
-
-The norm of a vector $\mathbf{w} = (u, v)$ is given by:
-
-$|\mathbf{w}| = \sqrt{u^2 + v^2}$
-
-We can visualize the norm by mapping the value of the norm to the color
-aesthetic.
-
-``` r
-ggplot() +
-  geom_vector_field(
-    aes(color = after_stat(norm)),
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) +
-  coord_fixed()
-```
-
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
-
-#### Divergence
-
-Divergence is an operation on a vector field that tells us how the field
-behaves toward or away from a point. Locally, the divergence of a vector
-field $\mathbf{F}$ in $\mathbb{R}^2$ at a particular point is a measure
-of the “outflowing-ness” of the vector field at that particular point.
-The divergence of a vector field results in a scalar function.
-
-If $\mathbf{F} = \langle \mathbf{F}_x(x,y), \mathbf{F}_y(x,y) \rangle$
-is a vector field in $\mathbb{R}^2$, then the divergence of $\mathbf{F}$
-is defined by:
-
-$$
-\text{div} \, \mathbf{F} = \frac{\partial \mathbf{F}_x}{\partial x} + \frac{\partial \mathbf{F}_y}{\partial y}
-$$
-
-To visualize the divergence of the vector field:
-
-``` r
-ggplot() +
-  geom_vector_field(
-    aes(color = after_stat(divergence)), 
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
-  ) +
-  coord_fixed()
-```
-
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
-
-#### Curl
-
-Curl is an operation on a vector field that measures the rotation or
-swirling strength at a point. In two dimensions, the curl of a vector
-field $\mathbf{F}$ in $\mathbb{R}^2$ is a scalar value that indicates
-how much the vector field tends to rotate around that point.
-
-If $\mathbf{F} = \langle \mathbf{F}_x(x,y), \mathbf{F}_y(x,y) \rangle$
-is a vector field in $\mathbb{R}^2$, then the curl of $\mathbf{F}$ is
-defined by:
-
-$$
-\text{curl} \, \mathbf{F} = \frac{\partial \mathbf{F}_y}{\partial x} - \frac{\partial \mathbf{F}_x}{\partial y}
-$$
-
-To visualize the the curl:
-
-``` r
-ggplot() +
-  geom_vector_field(
-    aes(color = after_stat(curl)), 
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
-  ) +
-  coord_fixed()
-```
-
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
-
-#### Aesthetics In Development
-
-Another aesthetic in development available for mapping is length. The
-length aesthetic maps the value of the computed measure to the length of
-the vector.
-
-``` r
-ggplot() +
-  geom_vector_field(
-    aes(length = after_stat(norm), color = after_stat(norm)),
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) +
-  coord_fixed() +
-  theme(legend.box = "horizontal")
-```
-
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
-
-### `geom_vector()`
-
-The `geom_vector()` function generates a plot layer that visualizes
-vectors as line segments with optional arrowheads. It is designed to
-help you visualize directional data, such as wind directions, gradients,
-or flow fields. The vectors are defined by their start (`x`, `y`) and
-vector components (`dx`, `dy`) coordinates, or alternatively by their
-angular (`angle`) and distance (`distance`) components.
-
-#### Cartesian
+#### Cartesian Example
 
 ``` r
 set.seed(1234)
@@ -176,9 +55,11 @@ wind_data_cartesian |>
   lims(x = c(-3,2), y = c(-2,3))
 ```
 
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
-#### Polar
+#### Polar Example
+
+For polar coordinates, the vector is defined by an angle and distance:
 
 ``` r
 wind_data_polar |> 
@@ -190,9 +71,49 @@ wind_data_polar |>
   lims(x = c(-3,2), y = c(-2,3))
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
-#### Map Norm to Length Aesthetic
+### New Feature: Mapping Norm to the Length Aesthetic
+
+One of the innovations of **ggvfields** is the ability to map the
+**norm** of vectors directly to their **length** using a length
+aesthetic. This feature allows for a more intuitive representation of
+vector magnitudes. The length of each vector directly corresponds to its
+computed norm - making it easy to compare vector magnitudes visually
+within the plot.
+
+Traditionally, vector fields represent direction and magnitude through
+arrows of uniform length. This leaves magnitude to be inferred from
+color gradients or external legends. With **ggvfields**, the **length**
+aesthetic allows users to visually intuit vector magnitude simplifying
+their interpretation.
+
+A particularly important aspect of this feature is that the vector
+lengths in the plot are **accurately reflected in the legend**. This
+allows viewers to match the visual representation of length directly
+with the legend’s magnitude scale. This frees up the color aesthetic for
+use in visualizing other information about the vector field.
+
+#### Why Use the Length Aesthetic?
+
+- **Clearer Representation**: Vectors with larger norms appear longer,
+  making magnitude comparison straightforward.
+- **Length-Consistent Legends**: The lengths of vectors in the plot are
+  directly tied to the values shown in the legend, ensuring a consistent
+  and accurate visual guide.
+- **Enhanced Visuals**: Length variations add an extra layer of
+  information to the plot, complementing existing aesthetics like color.
+- **Flexible Customization**: Combine length mapping with other
+  aesthetics such as color gradients or transparency for even richer
+  visualizations.
+
+### Example: Mapping Norm to Length
+
+By mapping the norm of a vector to the length aesthetic, users can
+directly observe differences in vector magnitude based on the vector’s
+actual size.
+
+In this example, the norm of the wind vectors is mapped to their length:
 
 ``` r
 wind_data_cartesian |> 
@@ -205,7 +126,138 @@ wind_data_cartesian |>
   scale_length_continuous()
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+
+### `geom_vector_field()`
+
+The `geom_vector_field()` function creates a vector field plot using a
+user-defined function to compute vector components. This abstraction
+simplifies the mathematical computations involved in vector field
+visualizations. Users no longer need to manually calculate vector
+components for `geom_segment()`.
+
+Two important options in `geom_vector_field()` are **normalize** and
+**center** - both of which default to `TRUE`. These options help control
+the visual representation of vectors:
+
+- **normalize**: When set to `TRUE`, this option scales each vector to
+  have a unit length, which can help avoid overplotting in dense vector
+  fields. This is especially useful when the direction of vectors is
+  more important than their magnitude. However, it’s important to note
+  that **normalize** is different from mapping the **norm** of the
+  vector to the **length** aesthetic. While normalization ensures that
+  all vectors are visually uniform in length, mapping the norm to length
+  preserves the relative differences in magnitude by varying the vector
+  lengths based on their actual norms.
+
+- **center**: By default, **center** is also set to `TRUE`, meaning the
+  midpoint of each vector is placed at the corresponding `(x, y)`
+  coordinate, effectively “centering” the vector on the point. When
+  `center` is `FALSE`, the base of the vector is anchored at the
+  `(x, y)` point, and the vector extends outward from there. This is
+  useful when the vector field is meant to represent flow starting
+  *from* a point, rather than centered around it.
+
+By using these two options, you can control whether vector lengths are
+uniform or reflect their actual magnitudes and how the vectors are
+positioned relative to their base coordinates.
+
+#### Example: Basic Vector Field Plot
+
+``` r
+f <- function(v) {
+  x <- v[1]; y <- v[2]
+  c(-y, x) # = f(x,y)
+}
+
+ggplot() +
+  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), normalize = TRUE, center = TRUE) +
+  coord_fixed() 
+```
+
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
+
+This function allows the user to map several characteristics of the
+vector field to different aesthetic mappings.
+
+### Norm
+
+The norm of a vector $\mathbf{w} = (u, v)$ is given by:
+
+$|\mathbf{w}| = \sqrt{u^2 + v^2}$
+
+We can visualize the norm by mapping it to the color aesthetic:
+
+``` r
+ggplot() +
+  geom_vector_field(
+    aes(color = after_stat(norm)),
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) +
+  coord_fixed()
+```
+
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+
+### Divergence
+
+Divergence is an operation on a vector field that describes how the
+field behaves at a point—whether vectors “spread out” from a point or
+“converge” toward it. Locally, the divergence of a vector field
+$\mathbf{F}$ in $\mathbb{R}^2$ at a particular point measures the
+“outflowing-ness” or rate of expansion of the vector field around that
+point. The divergence is a scalar value that can indicate sources
+(positive divergence) or sinks (negative divergence).
+
+If $\mathbf{F} = \langle F_x(x,y), F_y(x,y) \rangle$ is a vector field,
+its divergence is defined as:
+
+$$
+\text{div} \, \mathbf{F} = \frac{\partial F_x}{\partial x} + \frac{\partial F_y}{\partial y}
+$$
+
+To visualize the divergence of the vector field, you can map the
+divergence to the color aesthetic.
+
+``` r
+ggplot() +
+  geom_vector_field(
+    aes(color = after_stat(divergence)), 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
+  ) +
+  coord_fixed()
+```
+
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
+
+### Curl
+
+Curl is a measure of the rotation or swirling behavior of a vector field
+at a given point. In two dimensions, the curl of a vector field
+$\mathbf{F}$ in $\mathbb{R}^2$ is a scalar value that quantifies how
+much the vectors tend to rotate or circulate around a point. Positive
+curl values indicate counterclockwise rotation, while negative values
+represent clockwise rotation.
+
+If $\mathbf{F} = \langle F_x(x,y), F_y(x,y) \rangle$ is a vector field,
+its curl is defined as:
+
+$$
+\text{curl} \, \mathbf{F} = \frac{\partial F_y}{\partial x} - \frac{\partial F_x}{\partial y}
+$$
+
+To visualize the curl of the vector field, you can map the curl to the
+color aesthetic.
+
+``` r
+ggplot() +
+  geom_vector_field(
+    aes(color = after_stat(curl)), 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
+  ) +
+  coord_fixed()
+```
+
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
 
 ### `geom_streamplot()`
 
@@ -228,7 +280,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
 The `chop` parameter (defaulted to TRUE) allows you to chop the
 trajectories into segments. This can be useful for better visualization
@@ -246,7 +298,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
 
 It may also be useful to break up the streamlines into more segments.
 The `scale_stream` parameter (defaults to 1) adjusts the segmentation of
@@ -263,7 +315,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
 
 ### Map Calculus Measures to Aesthetics
 
@@ -278,7 +330,7 @@ ggplot() +
 #> Warning in log(divergence + 10): NaNs produced
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
 
 ### Animate `geom_streamplot()`
 
@@ -332,7 +384,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
 
 In this example, flow lines evolve according to the vector field defined
 by `f`. The color along each line will show how the particle moves over
@@ -386,7 +438,7 @@ ggplot() +
   theme_minimal()
 ```
 
-<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
 
 <!-- The `mask_shape_type` parameter allows you to specify the mask shape used for streamline generation which influences how the streamlines are placed and how closely they can approach each other. The default mask shape is `"square"`, but you can also use `"diamond"`, `"inset_square"`, or `"circle"`.  During streamline generation, when a streamline enters the specified shape, no other streamlines will enter that region.  -->
 <!-- - **Square Mask (default)**: Streamlines are restricted to a grid where each cell is a square. This generally results in evenly spaced streamlines. -->
@@ -422,7 +474,7 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
 
 We can enhance this plot with a little help from biscale.
 
@@ -460,7 +512,7 @@ ggdraw() +
   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3)
 ```
 
-<img src="man/figures/README-unnamed-chunk-19-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
 
 ## License
 

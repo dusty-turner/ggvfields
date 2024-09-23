@@ -28,27 +28,25 @@
 #' ### Curl
 #' The curl of a vector field represents the rotation or "twisting" of the vectors around a point.
 #'
-#' $$
-#' \text{curl}(\mathbf{f})(x, y) = f_2^x(x, y) - f_1^y(x, y)
-#' $$
-#' where \( f_1^y(x, y) \) is the partial derivative of the first component with respect to \( y \), and \( f_2^x(x, y) \) is the partial derivative of the second component with respect to \( x \).
+#' The formula for the curl is given by:
+#'
+#' \deqn{\text{curl}(\mathbf{f})(x, y) = \frac{\partial f_2}{\partial x}(x, y) - \frac{\partial f_1}{\partial y}(x, y)}
+#'
+#' where \eqn{\frac{\partial f_1}{\partial y}(x, y)} is the partial derivative of the first component with respect to \eqn{y}, and \eqn{\frac{\partial f_2}{\partial x}(x, y)} is the partial derivative of the second component with respect to \eqn{x}.
 #'
 #' ### Divergence
-#' The divergence of a vector field measures the rate at which vectors are "spreading out" from a point. This property helps visualize sources and sinks within the field, like areas of compression or expansion in fluid flow.
+#' The divergence of a vector field measures the rate at which vectors are "spreading out" from a point.
 #'
-#' $$
-#' \text{div}(\mathbf{f})(x, y) = f_1^x(x, y) + f_2^y(x, y)
-#' $$
-#' where \( f_1^x(x, y) \) is the partial derivative of the first component with respect to \( x \), and \( f_2^y(x, y) \) is the partial derivative of the second component with respect to \( y \).
+#' \deqn{\text{div}(\mathbf{f})(x, y) = \frac{\partial f_1}{\partial x}(x, y) + \frac{\partial f_2}{\partial y}(x, y)}
+#'
+#' where \eqn{\frac{\partial f_1}{\partial x}(x, y)} is the partial derivative of the first component with respect to \eqn{x}, and \eqn{\frac{\partial f_2}{\partial y}(x, y)} is the partial derivative of the second component with respect to \eqn{y}.
 #'
 #' ### Norm
 #' The norm of a vector represents its magnitude (or length):
 #'
-#' $$
-#' \|\mathbf{f}(x, y)\| = \sqrt{dx^2 + dy^2}
-#' $$
-#' where \( dx \) and \( dy \) are the displacements in the x and y directions, respectively.
+#' \deqn{\|\mathbf{f}(x, y)\| = \sqrt{dx^2 + dy^2}}
 #'
+#' where \eqn{dx} and \eqn{dy} are the displacements in the x and y directions, respectively.
 #' @section Aesthetic mappings:
 #' The following aesthetics can be mapped using `after_stat()`:
 #' - `divergence`: Divergence of the vector field at each point.
@@ -81,7 +79,7 @@
 #'                         color = after_stat(curl)))
 #'
 #' @export
-
+#' @importFrom utils modifyList
 geom_vector_field <- function(mapping = NULL, data = NULL, stat = StatVector,
                               geom = GeomVector, position = "identity", na.rm = FALSE,
                               show.legend = NA, inherit.aes = TRUE, fun,
@@ -90,30 +88,18 @@ geom_vector_field <- function(mapping = NULL, data = NULL, stat = StatVector,
                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                               ...) {
 
-  # Create a grid of points based on xlim, ylim, and n, then convert to matrix
+  # Create a grid of points based on xlim, ylim, and n
   grid <- expand.grid(
     x = seq(xlim[1], xlim[2], length.out = n),
     y = seq(ylim[1], ylim[2], length.out = n)
-  ) |> as.matrix()
+  )
 
   # Apply the user-defined vectorized function to the entire grid
-  vectors <- vectorize(fun)(grid)
+  vectors <- vectorize(fun)(as.matrix(grid))
 
   # Split the vectors into dx and dy components
-  grid <- as.data.frame(grid)  # Convert back to data frame for compatibility with ggplot2
   grid$dx <- vectors[, 1]
   grid$dy <- vectors[, 2]
-
-  # Calculate calculus measures: Gradient, Divergence, Curl
-  grad <- apply(grid[, c("x", "y")], 1, function(v) numDeriv::grad(fun, v)) |> t()
-  grad_u <- grad[, 1]
-  grad_v <- grad[, 2]
-
-  # Divergence: sum of partial derivatives of dx and dy
-  grid$divergence <- grad_u + grad_v
-
-  # Curl: difference between partial derivatives
-  grid$curl <- grad_v - grad_u
 
   # Ensure default mappings for x, y, dx, dy, if not provided
   if (is.null(mapping)) {
@@ -123,22 +109,50 @@ geom_vector_field <- function(mapping = NULL, data = NULL, stat = StatVector,
     mapping <- modifyList(mapping, aes(x = x, y = y, dx = dx, dy = dy))
   }
 
-  # Return the layer that will handle plotting via geom_vector and stat_vector
-  layer(
-    geom = geom,
-    stat = stat,
-    data = grid,
+  # Pass the grid and function along to geom_vector for further processing
+  geom_vector(
     mapping = mapping,
+    data = grid,
+    stat = stat,
     position = position,
+    na.rm = na.rm,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
-    params = list(
-      center = center,
-      normalize = normalize,
-      arrow = arrow,
-      na.rm = na.rm,
-      ...
-    )
+    fun = fun,  # Pass the user function for divergence/curl calculation
+    center = center,
+    normalize = normalize,
+    arrow = arrow,
+    ...
   )
 }
 
+#' @rdname geom_vector_field
+#' @export
+stat_vector_field <- function(mapping = NULL, data = NULL, geom = GeomVector,
+                              position = "identity", na.rm = FALSE, show.legend = NA,
+                              inherit.aes = TRUE, fun, xlim = c(-10, 10), ylim = c(-10, 10),
+                              n = 16, center = TRUE, normalize = TRUE,
+                              arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+                              ...) {
+  geom_vector_field(
+    mapping = mapping,
+    data = data,
+    stat = StatVector,
+    geom = geom,
+    position = position,
+    na.rm = na.rm,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    fun = fun,
+    xlim = xlim,
+    ylim = ylim,
+    n = n,
+    center = center,
+    normalize = normalize,
+    arrow = arrow,
+    ...
+  )
+}
+
+
+utils::globalVariables(c("x", "y", "dx", "dy"))

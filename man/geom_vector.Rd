@@ -27,7 +27,8 @@ geom_vector(
   inherit.aes = TRUE,
   center = TRUE,
   normalize = FALSE,
-  add_points = FALSE
+  add_points = FALSE,
+  fun = NULL
 )
 
 stat_vector(
@@ -155,6 +156,8 @@ visual consistency, especially in dense plots.}
 
 \item{add_points}{Logical; if \code{TRUE}, adds a point at the start of each vector.}
 
+\item{fun}{A function used to calculate vector fields (curl/divergence).}
+
 \item{geom}{The geometric object to use to display the data for this layer.
 When using a \verb{stat_*()} function to construct a layer, the \code{geom} argument
 can be used to override the default coupling between stats and geoms. The
@@ -167,6 +170,8 @@ give the geom as \code{"point"}.
 \item For more information and other ways to specify the geom, see the
 \link[ggplot2:layer_geoms]{layer geom} documentation.
 }}
+
+\item{size}{Size of the vector arrows.}
 }
 \value{
 A \code{ggplot2} layer that can be added to a ggplot object to produce a vector plot.
@@ -236,3 +241,4 @@ ggplot(wind_data_polar) +
 
 }
 \keyword{datasets}
+\keyword{internal}

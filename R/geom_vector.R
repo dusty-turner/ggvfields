@@ -7,6 +7,8 @@
 #'
 #' @inheritParams ggplot2::geom_segment
 #' @inheritParams ggplot2::stat_identity
+#' @param fun A function used to calculate vector fields (curl/divergence).
+#' @param size Size of the vector arrows.
 #' @param center Logical; if `TRUE`, centers the vector on the specified (`x`, `y`) location.
 #'   If `FALSE`, the vector origin is at the specified (`x`, `y`) location.
 #'   When centering is enabled, the vector's midpoint aligns with the original (`x`, `y`) location.
@@ -78,13 +80,15 @@ NULL
 geom_vector <- function(mapping = NULL, data = NULL, stat = StatVector,
                         position = "identity", ..., na.rm = FALSE, show.legend = NA,
                         arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                        inherit.aes = TRUE, center = TRUE, normalize = FALSE, add_points = FALSE) {
+                        inherit.aes = TRUE, center = TRUE, normalize = FALSE, add_points = FALSE,
+                        fun = NULL) {
   layer(
     stat = StatVector, geom = GeomVector, mapping = mapping, data = data,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, arrow = arrow, center = center, normalize = normalize, add_points = add_points, ...)
+    params = list(na.rm = na.rm, arrow = arrow, center = center, normalize = normalize, add_points = add_points, fun = fun, ...)
   )
 }
+
 
 #' @rdname geom_vector
 #' @export
@@ -102,28 +106,43 @@ stat_vector <- function(mapping = NULL, data = NULL, geom = GeomVector,
 #' @rdname geom_vector
 #' @export
 StatVector <- ggproto("StatVector", Stat,
-                            required_aes = c("x", "y"),
-                            default_aes = aes(dx = NA, dy = NA, distance = NA, angle = NA, length = NA,
-                                              color = "black", fill = "black", linewidth = 0.5, linetype = 1, alpha = 1),
-                            compute_group = function(data, scales, center = FALSE, ...) {
-                              if (all(is.na(data$dx)) | all(is.na(data$dy))) {
-                                if (!is.na(data$distance[1]) && !is.na(data$angle[1])) {
-                                  data$dx <- data$distance * cos(data$angle)
-                                  data$dy <- data$distance * sin(data$angle)
-                                } else {
-                                  stop("Either dx/dy or distance/angle must be provided.")
-                                }
-                              }
+                      required_aes = c("x", "y"),
+                      default_aes = aes(dx = NA, dy = NA, distance = NA, angle = NA, length = NA,
+                                        color = "black", fill = "black", linewidth = 0.5, linetype = 1, alpha = 1),
+                      compute_group = function(data, scales, center = FALSE, fun = NULL, ...) {
 
-                              data$xend <- data$x + data$dx
-                              data$yend <- data$y + data$dy
+                        # If a function is provided, calculate curl and divergence
+                        if (!is.null(fun)) {
+                          # Calculate the gradient for each point
+                          grad <- apply(data[, c("x", "y")], 1, function(v) numDeriv::grad(fun, v)) |> t()
+                          grad_u <- grad[, 1]
+                          grad_v <- grad[, 2]
 
-                              data$norm <- sqrt(data$dx^2 + data$dy^2)
+                          # Calculate divergence and curl
+                          data$divergence <- grad_u + grad_v
+                          data$curl <- grad_v - grad_u
+                        }
 
-                              return(data)
-                            }
+                        # If dx and dy are provided directly, use them
+                        if (all(is.na(data$dx)) | all(is.na(data$dy))) {
+                          if (!is.na(data$distance[1]) && !is.na(data$angle[1])) {
+                            data$dx <- data$distance * cos(data$angle)
+                            data$dy <- data$distance * sin(data$angle)
+                          } else {
+                            stop("Either dx/dy or distance/angle must be provided.")
+                          }
+                        }
+
+                        data$xend <- data$x + data$dx
+                        data$yend <- data$y + data$dy
+
+                        data$norm <- sqrt(data$dx^2 + data$dy^2)
+
+                        return(data)
+                      }
 )
 
+#' @keywords internal
 draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = NULL, center = FALSE, normalize = FALSE, add_points = FALSE) {
 
   # If length is not mapped, normalize and center using the original data before transformation
@@ -249,7 +268,7 @@ draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = 
 }
 
 #' @rdname geom_vector
-#' @export
+#' @keywords internal
 draw_key_vector <- function(data, params, size) {
   dx <- data$dx
   dy <- data$dy
@@ -272,7 +291,7 @@ draw_key_vector <- function(data, params, size) {
 #' @export
 scale_length_continuous <- function(...) {
   continuous_scale(
-    aesthetic = "length",
+    aesthetics = "length",
     palette = scales::rescale_pal(c(0.1, .5)),
     ...
   )
@@ -287,3 +306,4 @@ GeomVector <- ggproto(
   draw_panel = draw_panel_vector,
   draw_key = draw_key_vector
 )
+

@@ -6,3 +6,5 @@ dusty_files*
 ^docs$
 ^_pkgdown\.yml$
 ^pkgdown$
+^\\.github$
+.github

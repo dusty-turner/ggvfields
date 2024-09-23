@@ -2,12 +2,31 @@
 % Please edit documentation in R/geom_vector_field.R
 \name{geom_vector_field}
 \alias{geom_vector_field}
+\alias{stat_vector_field}
 \title{Create a Vector Field Plot Layer}
 \usage{
 geom_vector_field(
   mapping = NULL,
   data = NULL,
   stat = StatVector,
+  geom = GeomVector,
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  fun,
+  xlim = c(-10, 10),
+  ylim = c(-10, 10),
+  n = 16,
+  center = TRUE,
+  normalize = TRUE,
+  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  ...
+)
+
+stat_vector_field(
+  mapping = NULL,
+  data = NULL,
   geom = GeomVector,
   position = "identity",
   na.rm = FALSE,
@@ -119,30 +138,29 @@ vector field plot. The layer includes optional calculations of:
 
 The curl of a vector field represents the rotation or "twisting" of the vectors around a point.
 
-$$
-\text{curl}(\mathbf{f})(x, y) = f_2^x(x, y) - f_1^y(x, y)
-$$
-where \( f_1^y(x, y) \) is the partial derivative of the first component with respect to \( y \), and \( f_2^x(x, y) \) is the partial derivative of the second component with respect to \( x \).
+The formula for the curl is given by:
+
+\deqn{\text{curl}(\mathbf{f})(x, y) = \frac{\partial f_2}{\partial x}(x, y) - \frac{\partial f_1}{\partial y}(x, y)}
+
+where \eqn{\frac{\partial f_1}{\partial y}(x, y)} is the partial derivative of the first component with respect to \eqn{y}, and \eqn{\frac{\partial f_2}{\partial x}(x, y)} is the partial derivative of the second component with respect to \eqn{x}.
 }
 
 \subsection{Divergence}{
 
-The divergence of a vector field measures the rate at which vectors are "spreading out" from a point. This property helps visualize sources and sinks within the field, like areas of compression or expansion in fluid flow.
+The divergence of a vector field measures the rate at which vectors are "spreading out" from a point.
 
-$$
-\text{div}(\mathbf{f})(x, y) = f_1^x(x, y) + f_2^y(x, y)
-$$
-where \( f_1^x(x, y) \) is the partial derivative of the first component with respect to \( x \), and \( f_2^y(x, y) \) is the partial derivative of the second component with respect to \( y \).
+\deqn{\text{div}(\mathbf{f})(x, y) = \frac{\partial f_1}{\partial x}(x, y) + \frac{\partial f_2}{\partial y}(x, y)}
+
+where \eqn{\frac{\partial f_1}{\partial x}(x, y)} is the partial derivative of the first component with respect to \eqn{x}, and \eqn{\frac{\partial f_2}{\partial y}(x, y)} is the partial derivative of the second component with respect to \eqn{y}.
 }
 
 \subsection{Norm}{
 
 The norm of a vector represents its magnitude (or length):
 
-$$
-\|\mathbf{f}(x, y)\| = \sqrt{dx^2 + dy^2}
-$$
-where \( dx \) and \( dy \) are the displacements in the x and y directions, respectively.
+\deqn{\|\mathbf{f}(x, y)\| = \sqrt{dx^2 + dy^2}}
+
+where \eqn{dx} and \eqn{dy} are the displacements in the x and y directions, respectively.
 }
 }
 \description{
