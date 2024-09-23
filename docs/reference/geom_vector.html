@@ -69,7 +69,8 @@ from angular (<code>angle</code>) and distance (<code>distance</code>) informati
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  add_points <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  add_points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  fun <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">stat_vector</span><span class="op">(</span></span>
@@ -219,6 +220,10 @@ visual consistency, especially in dense plots.</p></dd>
 <dd><p>Logical; if <code>TRUE</code>, adds a point at the start of each vector.</p></dd>
 
 
+<dt>fun</dt>
+<dd><p>A function used to calculate vector fields (curl/divergence).</p></dd>
+
+
 <dt>geom</dt>
 <dd><p>The geometric object to use to display the data for this layer.
 When using a <code>stat_*()</code> function to construct a layer, the <code>geom</code> argument
@@ -230,6 +235,10 @@ give the geom as <code>"point"</code>.</p></li>
 <li><p>For more information and other ways to specify the geom, see the
 <a href="https://ggplot2.tidyverse.org/reference/layer_geoms.html" class="external-link">layer geom</a> documentation.</p></li>
 </ul></dd>
+
+
+<dt>size</dt>
+<dd><p>Size of the vector arrows.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -306,7 +315,7 @@ give the geom as <code>"point"</code>.</p></li>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Dusty Turner, David Kahle, Rodney Sturdivant.</p>
+  <p></p><p>Developed by Dusty Turner, David Kahle, Rodney X. Sturdivant.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -77,6 +77,24 @@ at those points.</p>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">stat_vector_field</span><span class="op">(</span></span>
+<span>  mapping <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  geom <span class="op">=</span> <span class="va">GeomVector</span>,</span>
+<span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">fun</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">16</span>,</span>
+<span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -201,10 +219,9 @@ vector field plot. The layer includes optional calculations of:</p><div class="s
 
 
 <p>The curl of a vector field represents the rotation or "twisting" of the vectors around a point.</p>
-<p>$$
-curl(f)(x, y) = f_2^x(x, y) - f_1^y(x, y)
-$$
-where \( f_1^y(x, y) \) is the partial derivative of the first component with respect to \( y \), and \( f_2^x(x, y) \) is the partial derivative of the second component with respect to \( x \).</p>
+<p>The formula for the curl is given by:</p>
+<p>$$\text{curl}(\mathbf{f})(x, y) = \frac{\partial f_2}{\partial x}(x, y) - \frac{\partial f_1}{\partial y}(x, y)$$</p>
+<p>where \(\frac{\partial f_1}{\partial y}(x, y)\) is the partial derivative of the first component with respect to \(y\), and \(\frac{\partial f_2}{\partial x}(x, y)\) is the partial derivative of the second component with respect to \(x\).</p>
 </div>
 
 
@@ -213,11 +230,9 @@ where \( f_1^y(x, y) \) is the partial derivative of the first component with re
 <h3 id="divergence">Divergence<a class="anchor" aria-label="anchor" href="#divergence"></a></h3>
 
 
-<p>The divergence of a vector field measures the rate at which vectors are "spreading out" from a point. This property helps visualize sources and sinks within the field, like areas of compression or expansion in fluid flow.</p>
-<p>$$
-div(f)(x, y) = f_1^x(x, y) + f_2^y(x, y)
-$$
-where \( f_1^x(x, y) \) is the partial derivative of the first component with respect to \( x \), and \( f_2^y(x, y) \) is the partial derivative of the second component with respect to \( y \).</p>
+<p>The divergence of a vector field measures the rate at which vectors are "spreading out" from a point.</p>
+<p>$$\text{div}(\mathbf{f})(x, y) = \frac{\partial f_1}{\partial x}(x, y) + \frac{\partial f_2}{\partial y}(x, y)$$</p>
+<p>where \(\frac{\partial f_1}{\partial x}(x, y)\) is the partial derivative of the first component with respect to \(x\), and \(\frac{\partial f_2}{\partial y}(x, y)\) is the partial derivative of the second component with respect to \(y\).</p>
 </div>
 
 
@@ -227,10 +242,8 @@ where \( f_1^x(x, y) \) is the partial derivative of the first component with re
 
 
 <p>The norm of a vector represents its magnitude (or length):</p>
-<p>$$
-\|f(x, y)\| = dx^2 + dy^2
-$$
-where \( dx \) and \( dy \) are the displacements in the x and y directions, respectively.</p>
+<p>$$\|\mathbf{f}(x, y)\| = \sqrt{dx^2 + dy^2}$$</p>
+<p>where \(dx\) and \(dy\) are the displacements in the x and y directions, respectively.</p>
 </div>
 
 
@@ -269,9 +282,10 @@ aesthetics using <code><a href="https://ggplot2.tidyverse.org/reference/aes_eval
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example of mapping norm to length</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_vector_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">20</span>,</span></span>
-<span class="r-in"><span>                    mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html" class="external-link">after_stat</a></span><span class="op">(</span><span class="va">norm</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Normalization is ignored because length is mapped using after_stat().</span>
+<span class="r-in"><span>  <span class="fu">geom_vector_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                    n <span class="op">=</span> <span class="fl">20</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>                    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html" class="external-link">after_stat</a></span><span class="op">(</span><span class="va">norm</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                        color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html" class="external-link">after_stat</a></span><span class="op">(</span><span class="va">curl</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="geom_vector_field-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -281,7 +295,7 @@ aesthetics using <code><a href="https://ggplot2.tidyverse.org/reference/aes_eval
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Dusty Turner, David Kahle, Rodney Sturdivant.</p>
+  <p></p><p>Developed by Dusty Turner, David Kahle, Rodney X. Sturdivant.</p>
 </div>
 
 <div class="pkgdown-footer-right">
