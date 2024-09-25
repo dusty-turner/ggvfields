@@ -26,7 +26,7 @@ geom_vector(
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   inherit.aes = TRUE,
   center = TRUE,
-  normalize = FALSE,
+  normalize = TRUE,
   add_points = FALSE,
   fun = NULL
 )
@@ -42,7 +42,7 @@ stat_vector(
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   inherit.aes = TRUE,
   center = TRUE,
-  normalize = FALSE,
+  normalize = TRUE,
   add_points = FALSE
 )
 

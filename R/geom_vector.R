@@ -148,31 +148,6 @@ draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = 
   # If length is not mapped, normalize and center using the original data before transformation
   if (is.na(data$length[1])) {
 
-    # Normalize dx and dy to unit vectors if normalize is TRUE
-    if (normalize) {
-      norms <- sqrt(data$dx^2 + data$dy^2)
-      norms[norms == 0] <- 1  # Avoid division by zero
-      data$dx <- data$dx / norms
-      data$dy <- data$dy / norms
-
-      # Recalculate xend and yend after normalization
-      data$xend <- data$x + data$dx
-      data$yend <- data$y + data$dy
-    }
-
-    # Handle centering if requested (using the original data)
-    if (center) {
-      # Calculate midpoint for centering the vector (using data, not coords)
-      half_dx <- (data$xend - data$x) / 2
-      half_dy <- (data$yend - data$y) / 2
-
-      # Adjust the original data to center the vector around its midpoint
-      data$x <- data$x - half_dx
-      data$y <- data$y - half_dy
-      data$xend <- data$xend - half_dx
-      data$yend <- data$yend - half_dy
-    }
-
     # Now transform the modified data into the coordinate system
     coords <- coord$transform(data, panel_params)
 
@@ -206,6 +181,11 @@ draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = 
     if (normalize) {
       message("Normalization is ignored because length is mapped using after_stat().")
     }
+
+    # data$y <- data$y * 2
+    # data$x <- data$x * 2
+    # data$xend <- data$xend * 2
+    # data$yend <- data$yend * 2
 
     # Transform data into the coordinate system
     coords <- coord$transform(data, panel_params)
@@ -301,9 +281,50 @@ scale_length_continuous <- function(...) {
 #' @export
 GeomVector <- ggproto(
   "GeomVector", Geom,
+
+  setup_data = function(data, params){
+
+  # if (is.na(data$length[1])) {
+  if (is.null(data$length[1])) {
+    # Normalize dx and dy to unit vectors if normalize is TRUE
+
+    if (params$normalize) {
+      norms <- sqrt(data$dx^2 + data$dy^2)
+      norms[norms == 0] <- 1  # Avoid division by zero
+      data$dx <- data$dx / norms
+      data$dy <- data$dy / norms
+
+      # Recalculate xend and yend after normalization
+      data$xend <- data$x + data$dx
+      data$yend <- data$y + data$dy
+    }
+
+    # Handle centering if requested (using the original data)
+    if (params$center) {
+      # Calculate midpoint for centering the vector (using data, not coords)
+      half_dx <- (data$xend - data$x) / 2
+      half_dy <- (data$yend - data$y) / 2
+
+      # Adjust the original data to center the vector around its midpoint
+      data$x <- data$x - half_dx
+      data$y <- data$y - half_dy
+      data$xend <- data$xend - half_dx
+      data$yend <- data$yend - half_dy
+    }
+  } else {
+     data$y <- data$y / 2
+     data$x <- data$x / 2
+     data$xend <- data$xend / 2
+     data$yend <- data$yend / 2
+
+  }
+
+
+    return(data)
+  },
+
   required_aes = c("x", "y"),
   default_aes = aes(colour = "black", fill = "black", size = 0.5, length = NA, linewidth = 0.5, linetype = 1, alpha = 1),
-  draw_panel = draw_panel_vector,
+  draw_group = draw_panel_vector,
   draw_key = draw_key_vector
 )
-
