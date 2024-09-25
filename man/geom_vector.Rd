@@ -7,12 +7,9 @@
 \alias{StatVector}
 \alias{draw_key_vector}
 \alias{scale_length_continuous}
-\alias{GeomVector}
 \title{Create a Vector Plot Layer}
 \format{
 An object of class \code{StatVector} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
-
-An object of class \code{GeomVector} (inherits from \code{Geom}, \code{ggproto}, \code{gg}) of length 5.
 }
 \usage{
 geom_vector(
@@ -26,7 +23,7 @@ geom_vector(
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   inherit.aes = TRUE,
   center = TRUE,
-  normalize = TRUE,
+  normalize = FALSE,
   add_points = FALSE,
   fun = NULL
 )
@@ -42,7 +39,7 @@ stat_vector(
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   inherit.aes = TRUE,
   center = TRUE,
-  normalize = TRUE,
+  normalize = FALSE,
   add_points = FALSE
 )
 
@@ -51,8 +48,6 @@ StatVector
 draw_key_vector(data, params, size)
 
 scale_length_continuous(...)
-
-GeomVector
 }
 \arguments{
 \item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and

@@ -182,10 +182,31 @@ draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = 
       message("Normalization is ignored because length is mapped using after_stat().")
     }
 
-    # data$y <- data$y * 2
-    # data$x <- data$x * 2
-    # data$xend <- data$xend * 2
-    # data$yend <- data$yend * 2
+    #### Untransform the data here ####
+    # Reverse the transformation done in setup_data to get the original data back
+
+    # 1. Undo centering if it was applied
+    if (center) {
+      half_dx <- (data$xend - data$x) / 2
+      half_dy <- (data$yend - data$y) / 2
+
+      # Restore the original positions by adding back the half_dx and half_dy
+      data$x <- data$x + half_dx
+      data$y <- data$y + half_dy
+      data$xend <- data$xend + half_dx
+      data$yend <- data$yend + half_dy
+    }
+
+    # 2. Undo the length scaling
+    data$dx <- data$xend - data$x  # Calculate dx from x and xend
+    data$dy <- data$yend - data$y  # Calculate dy from y and yend
+
+    # Normalize dx and dy (undoing the length scaling)
+    norms <- sqrt(data$dx^2 + data$dy^2)
+    norms[norms == 0] <- 1  # Avoid division by zero
+
+    data$dx <- data$dx / data$length / .01  # Undo the multiplication by length
+    data$dy <- data$dy / data$length / .01  # Undo the multiplication by length
 
     # Transform data into the coordinate system
     coords <- coord$transform(data, panel_params)
@@ -279,6 +300,8 @@ scale_length_continuous <- function(...) {
 
 #' @rdname geom_vector
 #' @export
+NULL
+
 GeomVector <- ggproto(
   "GeomVector", Geom,
 
@@ -312,14 +335,36 @@ GeomVector <- ggproto(
       data$yend <- data$yend - half_dy
     }
   } else {
-     data$y <- data$y / 2
-     data$x <- data$x / 2
-     data$xend <- data$xend / 2
-     data$yend <- data$yend / 2
+
+    # If length aesthetic is mapped
+
+    # 1. Normalize dx and dy to unit vectors (like in draw_panel)
+    norms <- sqrt(data$dx^2 + data$dy^2)
+    norms[norms == 0] <- 1  # Avoid division by zero
+    data$dx <- data$dx / norms
+    data$dy <- data$dy / norms
+
+    # 2. Multiply dx and dy by the length aesthetic
+    data$dx <- data$dx * data$length * .01
+    data$dy <- data$dy * data$length * .01
+
+    # 3. Recalculate xend and yend based on the new dx and dy
+    data$xend <- data$x + data$dx
+    data$yend <- data$y + data$dy
+
+    # 4. Handle centering if requested
+    if (params$center) {
+      half_dx <- (data$xend - data$x) / 2
+      half_dy <- (data$yend - data$y) / 2
+
+      # Adjust the original data to center the vector around its midpoint
+      data$x <- data$x - half_dx
+      data$y <- data$y - half_dy
+      data$xend <- data$xend - half_dx
+      data$yend <- data$yend - half_dy
+    }
 
   }
-
-
     return(data)
   },
 
