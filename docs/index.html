@@ -186,8 +186,9 @@
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, normalize <span class="op">=</span> <span class="cn">TRUE</span>, center <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
+<span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span></span>
+<span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, normalize <span class="op">=</span> <span class="cn">TRUE</span>, center <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>    <span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="100%"></p>
 <p>This function allows the user to map several characteristics of the vector field to different aesthetic mappings.</p>
 </div>
@@ -202,8 +203,8 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">norm</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span></span>
+<span>    <span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-8-1.png" width="100%"></p>
 </div>
 <div class="section level3">
@@ -220,8 +221,7 @@ $$</span></p>
 <span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">divergence</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-9-1.png" width="100%"></p>
 </div>
 <div class="section level3">
@@ -238,8 +238,7 @@ $$</span></p>
 <span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">curl</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-10-1.png" width="100%"></p>
 </div>
 <div class="section level3">
@@ -257,9 +256,7 @@ $$</span></p>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span></span>
 <span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>    <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-11-1.png" width="100%"></p>
 <p>The <code>chop</code> parameter (defaulted to TRUE) allows you to chop the trajectories into segments. This can be useful for better visualization of the streamlines when they are long and complex.</p>
 <p>It may be useful to not break up the streamlines.</p>
@@ -268,9 +265,7 @@ $$</span></p>
 <span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span></span>
 <span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
 <span>    chop <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span>    <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-12-1.png" width="100%"></p>
 <p>It may also be useful to break up the streamlines into more segments. The <code>scale_stream</code> parameter (defaults to 1) adjusts the segmentation of streamlines by specifying the proportion of the streamline length used to divide it into smaller segments.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -278,9 +273,7 @@ $$</span></p>
 <span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span></span>
 <span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
 <span>    chop <span class="op">=</span> <span class="cn">TRUE</span>, scale_stream <span class="op">=</span> <span class="fl">.9</span>,</span>
-<span>    <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-13-1.png" width="100%"></p>
 </div>
 <div class="section level3">
@@ -291,9 +284,7 @@ $$</span></p>
 <span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span></span>
 <span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">divergence</span> <span class="op">+</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> </span>
+<span>    <span class="op">)</span> </span>
 <span><span class="co">#&gt; Warning in log(divergence + 10): NaNs produced</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-14-1.png" width="100%"></p>
 </div>
@@ -316,7 +307,9 @@ $$</span></p>
 <span> <span class="fu">gganimate</span><span class="fu">::</span><span class="fu"><a href="https://gganimate.com/reference/ease_aes.html">ease_aes</a></span><span class="op">(</span><span class="st">'linear'</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Animate the plot</span></span>
-<span><span class="fu">gganimate</span><span class="fu">::</span><span class="fu"><a href="https://gganimate.com/reference/animate.html">animate</a></span><span class="op">(</span><span class="va">anim</span>, nframes <span class="op">=</span> <span class="fl">25</span>, fps <span class="op">=</span> <span class="fl">5</span>, end_pause <span class="op">=</span> <span class="fl">0</span>, renderer <span class="op">=</span> <span class="fu">gganimate</span><span class="fu">::</span><span class="fu"><a href="https://gganimate.com/reference/renderers.html">gifski_renderer</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">gganimate</span><span class="fu">::</span><span class="fu"><a href="https://gganimate.com/reference/animate.html">animate</a></span><span class="op">(</span></span>
+<span>  <span class="va">anim</span>, nframes <span class="op">=</span> <span class="fl">25</span>, fps <span class="op">=</span> <span class="fl">5</span>, end_pause <span class="op">=</span> <span class="fl">0</span>, renderer <span class="op">=</span> <span class="fu">gganimate</span><span class="fu">::</span><span class="fu"><a href="https://gganimate.com/reference/renderers.html">gifski_renderer</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-animation-1.gif" width="100%"></p>
 </div>
 <div class="section level3">
@@ -330,9 +323,7 @@ $$</span></p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_flow.html">geom_flow</a></span><span class="op">(</span></span>
 <span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span></span>
-<span>    <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-15-1.png" width="100%"></p>
 <p>In this example, flow lines evolve according to the vector field defined by <code>f</code>. The color along each line will show how the particle moves over time (<code>t</code>) within the vector field.</p>
 <div class="section level4">
@@ -354,9 +345,8 @@ $$</span></p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_flow.html">geom_flow</a></span><span class="op">(</span></span>
 <span>    fun <span class="op">=</span> <span class="va">f</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">21</span>, <span class="fl">21</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>,</span>
-<span>    iterations <span class="op">=</span> <span class="fl">1000</span>, threshold_distance <span class="op">=</span> <span class="fl">0.5</span>, T <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>    iterations <span class="op">=</span> <span class="fl">1000</span>, threshold_distance <span class="op">=</span> <span class="fl">0.5</span>, T <span class="op">=</span> <span class="fl">5</span></span>
+<span>    <span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-16-1.png" width="100%"></p>
 <!-- The `mask_shape_type` parameter allows you to specify the mask shape used for streamline generation which influences how the streamlines are placed and how closely they can approach each other. The default mask shape is `"square"`, but you can also use `"diamond"`, `"inset_square"`, or `"circle"`.  During streamline generation, when a streamline enters the specified shape, no other streamlines will enter that region.  -->
 <!-- - **Square Mask (default)**: Streamlines are restricted to a grid where each cell is a square. This generally results in evenly spaced streamlines. -->

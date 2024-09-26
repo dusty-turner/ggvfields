@@ -134,8 +134,9 @@ f <- function(v) {
 }
 
 ggplot() +
-  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), normalize = TRUE, center = TRUE) +
-  coord_fixed() 
+  geom_vector_field(
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), normalize = TRUE, center = TRUE
+    ) 
 ```
 
 This function allows the user to map several characteristics of the vector field to different aesthetic mappings.
@@ -152,8 +153,8 @@ We can visualize the norm by mapping it to the color aesthetic:
 ggplot() +
   geom_vector_field(
     aes(color = after_stat(norm)),
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) +
-  coord_fixed()
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
+    ) 
 ```
 
 ### Divergence
@@ -173,8 +174,7 @@ ggplot() +
   geom_vector_field(
     aes(color = after_stat(divergence)), 
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
-  ) +
-  coord_fixed()
+  ) 
 ```
 
 ### Curl
@@ -194,8 +194,7 @@ ggplot() +
   geom_vector_field(
     aes(color = after_stat(curl)), 
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
-  ) +
-  coord_fixed()
+  ) 
 ```
 
 ### `geom_streamplot()`{.R}
@@ -212,9 +211,7 @@ f <- function(v) {
 ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
-    ) +
-  coord_fixed() +
-  theme_minimal()
+    ) 
 ```
 
 The `chop` parameter (defaulted to TRUE) allows you to chop the trajectories into segments. This can be useful for better visualization of the streamlines when they are long and complex. 
@@ -226,9 +223,7 @@ ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
     chop = FALSE
-    ) +
-  coord_fixed() +
-  theme_minimal()
+    ) 
 ```
 
 It may also be useful to break up the streamlines into more segments. The `scale_stream` parameter (defaults to 1) adjusts the segmentation of streamlines by specifying the proportion of the streamline length used to divide it into smaller segments.
@@ -238,9 +233,7 @@ ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
     chop = TRUE, scale_stream = .9,
-    ) +
-  coord_fixed() +
-  theme_minimal()
+    ) 
 ```
 
 ### Map Calculus Measures to Aesthetics
@@ -250,9 +243,7 @@ ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
     aes(color = after_stat(log(divergence + 10)))
-    ) +
-  coord_fixed() +
-  theme_minimal() 
+    ) 
 ```
 
 
@@ -275,7 +266,9 @@ anim <- animation_transition(plot = p) +
  gganimate::ease_aes('linear')
 
 # Animate the plot
-gganimate::animate(anim, nframes = 25, fps = 5, end_pause = 0, renderer = gganimate::gifski_renderer())
+gganimate::animate(
+  anim, nframes = 25, fps = 5, end_pause = 0, renderer = gganimate::gifski_renderer()
+  )
 ```
 
 
@@ -291,9 +284,7 @@ Flows are computed using the `deSolve` package's ODE solver, with the `rk4` meth
 ggplot() +
   geom_flow(
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
-    ) +
-  coord_fixed() +
-  theme_minimal()
+    )
 ```
 
 In this example, flow lines evolve according to the vector field defined by `f`. The color along each line will show how the particle moves over time (`t`) within the vector field.
@@ -318,9 +309,8 @@ Below is an example where we customize the grid size, time span (`T`), number of
 ggplot() +
   geom_flow(
     fun = f, n = c(21, 21), xlim = c(-10, 10), ylim = c(-10, 10),
-    iterations = 1000, threshold_distance = 0.5, T = 5) +
-  coord_fixed() +
-  theme_minimal()
+    iterations = 1000, threshold_distance = 0.5, T = 5
+    ) 
 ```
 
 

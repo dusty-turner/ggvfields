@@ -171,8 +171,9 @@ f <- function(v) {
 }
 
 ggplot() +
-  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10), normalize = TRUE, center = TRUE) +
-  coord_fixed() 
+  geom_vector_field(
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), normalize = TRUE, center = TRUE
+    ) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
@@ -192,8 +193,8 @@ We can visualize the norm by mapping it to the color aesthetic:
 ggplot() +
   geom_vector_field(
     aes(color = after_stat(norm)),
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) +
-  coord_fixed()
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
+    ) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
@@ -223,8 +224,7 @@ ggplot() +
   geom_vector_field(
     aes(color = after_stat(divergence)), 
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
-  ) +
-  coord_fixed()
+  ) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
@@ -253,8 +253,7 @@ ggplot() +
   geom_vector_field(
     aes(color = after_stat(curl)), 
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
-  ) +
-  coord_fixed()
+  ) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
@@ -275,9 +274,7 @@ f <- function(v) {
 ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
-    ) +
-  coord_fixed() +
-  theme_minimal()
+    ) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
@@ -293,9 +290,7 @@ ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
     chop = FALSE
-    ) +
-  coord_fixed() +
-  theme_minimal()
+    ) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
@@ -310,9 +305,7 @@ ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
     chop = TRUE, scale_stream = .9,
-    ) +
-  coord_fixed() +
-  theme_minimal()
+    ) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
@@ -324,9 +317,7 @@ ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
     aes(color = after_stat(log(divergence + 10)))
-    ) +
-  coord_fixed() +
-  theme_minimal() 
+    ) 
 #> Warning in log(divergence + 10): NaNs produced
 ```
 
@@ -349,7 +340,9 @@ anim <- animation_transition(plot = p) +
  gganimate::ease_aes('linear')
 
 # Animate the plot
-gganimate::animate(anim, nframes = 25, fps = 5, end_pause = 0, renderer = gganimate::gifski_renderer())
+gganimate::animate(
+  anim, nframes = 25, fps = 5, end_pause = 0, renderer = gganimate::gifski_renderer()
+  )
 ```
 
 <img src="man/figures/README-animation-1.gif" width="100%" />
@@ -379,9 +372,7 @@ flow lines, abstracting away complex calculations for the user.
 ggplot() +
   geom_flow(
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
-    ) +
-  coord_fixed() +
-  theme_minimal()
+    )
 ```
 
 <img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
@@ -433,9 +424,8 @@ number of iterations, and the threshold distance between flow lines:
 ggplot() +
   geom_flow(
     fun = f, n = c(21, 21), xlim = c(-10, 10), ylim = c(-10, 10),
-    iterations = 1000, threshold_distance = 0.5, T = 5) +
-  coord_fixed() +
-  theme_minimal()
+    iterations = 1000, threshold_distance = 0.5, T = 5
+    ) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
