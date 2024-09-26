@@ -273,8 +273,8 @@ draw_key_vector <- function(data, params, size) {
   y0 <- unit(0.5, "npc")
 
   length_value <- data$length
-  x1 <- x0 + unit(length_value, "cm")
-  y1 <- y0
+  x1 <- rev(x0 + unit(length_value, "cm"))
+  y1 <- rev(y0)
 
   grid::segmentsGrob(
     x0 = x0, y0 = y0,
