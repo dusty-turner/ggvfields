@@ -31,7 +31,7 @@ from angular (angle) and distance (distance) information."><!-- mathjax --><scri
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
       <ul class="navbar-nav"><li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/dusty-turner/ggvfields/" aria-label="github">
+  <a class="nav-link" href="https://github.com/dusty-turner/ggvfields/" aria-label="github">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -44,7 +44,7 @@ from angular (angle) and distance (distance) information."><!-- mathjax --><scri
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Create a Vector Plot Layer</h1>
-      <small class="dont-index">Source: <a href="https://github.com/dusty-turner/ggvfields/blob/HEAD/R/geom_vector.R" class="external-link"><code>R/geom_vector.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/dusty-turner/ggvfields/blob/HEAD/R/geom_vector.R"><code>R/geom_vector.R</code></a></small>
       <div class="d-none name"><code>geom_vector.Rd</code></div>
     </div>
 
@@ -65,7 +65,7 @@ from angular (<code>angle</code>) and distance (<code>distance</code>) informati
 <span>  <span class="va">...</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
+<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -81,7 +81,7 @@ from angular (<code>angle</code>) and distance (<code>distance</code>) informati
 <span>  <span class="va">...</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
+<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -90,19 +90,18 @@ from angular (<code>angle</code>) and distance (<code>distance</code>) informati
 <span></span>
 <span><span class="va">StatVector</span></span>
 <span></span>
-<span><span class="fu">draw_key_vector</span><span class="op">(</span><span class="va">data</span>, <span class="va">params</span>, <span class="va">size</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">scale_length_continuous</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">GeomVector</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="format">Format<a class="anchor" aria-label="anchor" href="#format"></a></h2>
     <p>An object of class <code>StatVector</code> (inherits from <code>Stat</code>, <code>ggproto</code>, <code>gg</code>) of length 4.</p>
+<p>An object of class <code>GeomVector</code> (inherits from <code>Geom</code>, <code>ggproto</code>, <code>gg</code>) of length 6.</p>
     </div>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>mapping</dt>
-<dd><p>Set of aesthetic mappings created by <code><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes()</a></code>. If specified and
+<dd><p>Set of aesthetic mappings created by <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code>. If specified and
 <code>inherit.aes = TRUE</code> (the default), it is combined with the default mapping
 at the top level of the plot. You must supply <code>mapping</code> if there is no plot
 mapping.</p></dd>
@@ -112,10 +111,10 @@ mapping.</p></dd>
 <dd><p>The data to be displayed in this layer. There are three
 options:</p>
 <p>If <code>NULL</code>, the default, the data is inherited from the plot
-data as specified in the call to <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot()</a></code>.</p>
+data as specified in the call to <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code>.</p>
 <p>A <code>data.frame</code>, or other object, will override the plot
 data. All objects will be fortified to produce a data frame. See
-<code><a href="https://ggplot2.tidyverse.org/reference/fortify.html" class="external-link">fortify()</a></code> for which variables will be created.</p>
+<code><a href="https://ggplot2.tidyverse.org/reference/fortify.html">fortify()</a></code> for which variables will be created.</p>
 <p>A <code>function</code> will be called with a single argument,
 the plot data. The return value must be a <code>data.frame</code>, and
 will be used as the layer data. A <code>function</code> can be created
@@ -128,28 +127,28 @@ When using a <code>geom_*()</code> function to construct a layer, the <code>stat
 argument can be used the override the default coupling between geoms and
 stats. The <code>stat</code> argument accepts the following:</p><ul><li><p>A <code>Stat</code> ggproto subclass, for example <code>StatCount</code>.</p></li>
 <li><p>A string naming the stat. To give the stat as a string, strip the
-function name of the <code>stat_</code> prefix. For example, to use <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">stat_count()</a></code>,
+function name of the <code>stat_</code> prefix. For example, to use <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">stat_count()</a></code>,
 give the stat as <code>"count"</code>.</p></li>
 <li><p>For more information and other ways to specify the stat, see the
-<a href="https://ggplot2.tidyverse.org/reference/layer_stats.html" class="external-link">layer stat</a> documentation.</p></li>
+<a href="https://ggplot2.tidyverse.org/reference/layer_stats.html">layer stat</a> documentation.</p></li>
 </ul></dd>
 
 
 <dt>position</dt>
 <dd><p>A position adjustment to use on the data for this layer. This
 can be used in various ways, including to prevent overplotting and
-improving the display. The <code>position</code> argument accepts the following:</p><ul><li><p>The result of calling a position function, such as <code><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html" class="external-link">position_jitter()</a></code>.
+improving the display. The <code>position</code> argument accepts the following:</p><ul><li><p>The result of calling a position function, such as <code><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html">position_jitter()</a></code>.
 This method allows for passing extra arguments to the position.</p></li>
 <li><p>A string naming the position adjustment. To give the position as a
 string, strip the function name of the <code>position_</code> prefix. For example,
-to use <code><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html" class="external-link">position_jitter()</a></code>, give the position as <code>"jitter"</code>.</p></li>
+to use <code><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html">position_jitter()</a></code>, give the position as <code>"jitter"</code>.</p></li>
 <li><p>For more information and other ways to specify the position, see the
-<a href="https://ggplot2.tidyverse.org/reference/layer_positions.html" class="external-link">layer position</a> documentation.</p></li>
+<a href="https://ggplot2.tidyverse.org/reference/layer_positions.html">layer position</a> documentation.</p></li>
 </ul></dd>
 
 
 <dt>...</dt>
-<dd><p>Other arguments passed on to <code><a href="https://ggplot2.tidyverse.org/reference/layer.html" class="external-link">layer()</a></code>'s <code>params</code> argument. These
+<dd><p>Other arguments passed on to <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">layer()</a></code>'s <code>params</code> argument. These
 arguments broadly fall into one of 4 categories below. Notably, further
 arguments to the <code>position</code> argument, or aesthetics that are required
 can <em>not</em> be passed through <code>...</code>. Unknown arguments that are not part
@@ -170,9 +169,9 @@ documentation lists which parameters it can accept.</p></li>
 to the <code>stat</code> part of the layer. An example of this is
 <code>geom_area(stat = "density", adjust = 0.5)</code>. The stat's documentation
 lists which parameters it can accept.</p></li>
-<li><p>The <code>key_glyph</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/layer.html" class="external-link">layer()</a></code> may also be passed on through
+<li><p>The <code>key_glyph</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">layer()</a></code> may also be passed on through
 <code>...</code>. This can be one of the functions described as
-<a href="https://ggplot2.tidyverse.org/reference/draw_key.html" class="external-link">key glyphs</a>, to change the display of the layer in the legend.</p></li>
+<a href="https://ggplot2.tidyverse.org/reference/draw_key.html">key glyphs</a>, to change the display of the layer in the legend.</p></li>
 </ul></dd>
 
 
@@ -190,7 +189,7 @@ display.</p></dd>
 
 
 <dt>arrow</dt>
-<dd><p>Arrow specification for vector arrowheads, created by <code><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">grid::arrow()</a></code>.
+<dd><p>Arrow specification for vector arrowheads, created by <code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code>.
 This controls the appearance of the arrowheads at the end of the vectors, including properties like angle, length, and type.</p></dd>
 
 
@@ -198,7 +197,7 @@ This controls the appearance of the arrowheads at the end of the vectors, includ
 <dd><p>If <code>FALSE</code>, overrides the default aesthetics,
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
-the default plot specification, e.g. <code><a href="https://ggplot2.tidyverse.org/reference/borders.html" class="external-link">borders()</a></code>.</p></dd>
+the default plot specification, e.g. <code><a href="https://ggplot2.tidyverse.org/reference/borders.html">borders()</a></code>.</p></dd>
 
 
 <dt>center</dt>
@@ -227,15 +226,11 @@ When using a <code>stat_*()</code> function to construct a layer, the <code>geom
 can be used to override the default coupling between stats and geoms. The
 <code>geom</code> argument accepts the following:</p><ul><li><p>A <code>Geom</code> ggproto subclass, for example <code>GeomPoint</code>.</p></li>
 <li><p>A string naming the geom. To give the geom as a string, strip the
-function name of the <code>geom_</code> prefix. For example, to use <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point()</a></code>,
+function name of the <code>geom_</code> prefix. For example, to use <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code>,
 give the geom as <code>"point"</code>.</p></li>
 <li><p>For more information and other ways to specify the geom, see the
-<a href="https://ggplot2.tidyverse.org/reference/layer_geoms.html" class="external-link">layer geom</a> documentation.</p></li>
+<a href="https://ggplot2.tidyverse.org/reference/layer_geoms.html">layer geom</a> documentation.</p></li>
 </ul></dd>
-
-
-<dt>size</dt>
-<dd><p>Size of the vector arrows.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -276,32 +271,32 @@ give the geom as <code>"point"</code>.</p></li>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example using Cartesian input: precomputed dx and dy</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></span>
-<span class="r-in"><span><span class="va">wind_data_polar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  wind_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="op">-</span><span class="va">pi</span>, <span class="va">pi</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  wind_spd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Chisquare.html" class="external-link">rchisq</a></span><span class="op">(</span><span class="va">n</span>, df <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">wind_data_polar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  wind_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="op">-</span><span class="va">pi</span>, <span class="va">pi</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  wind_spd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Chisquare.html">rchisq</a></span><span class="op">(</span><span class="va">n</span>, df <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">wind_data_cartesian</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span><span class="va">wind_data_polar</span>, <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">wind_lon_comp</span> <span class="op">&lt;-</span> <span class="va">wind_spd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="va">wind_dir</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">wind_lat_comp</span> <span class="op">&lt;-</span> <span class="va">wind_spd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">wind_dir</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">wind_data_cartesian</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html">within</a></span><span class="op">(</span><span class="va">wind_data_polar</span>, <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">wind_lon_comp</span> <span class="op">&lt;-</span> <span class="va">wind_spd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">cos</a></span><span class="op">(</span><span class="va">wind_dir</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">wind_lat_comp</span> <span class="op">&lt;-</span> <span class="va">wind_spd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">wind_dir</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">dx</span> <span class="op">&lt;-</span> <span class="va">wind_lon_comp</span>  <span class="co"># dx represents the change in x (longitude component)</span></span></span>
 <span class="r-in"><span>  <span class="va">dy</span> <span class="op">&lt;-</span> <span class="va">wind_lat_comp</span>  <span class="co"># dy represents the change in y (latitude component)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">wind_data_cartesian</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_vector</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Wind Vectors (Cartesian Input)"</span>,</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data_cartesian</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">geom_vector</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Wind Vectors (Cartesian Input)"</span>,</span></span>
 <span class="r-in"><span>       x <span class="op">=</span> <span class="st">"Longitude"</span>, y <span class="op">=</span> <span class="st">"Latitude"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="geom_vector-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example using Polar input: angle (wind_dir) and distance (wind_spd)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">wind_data_polar</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_vector</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, angle <span class="op">=</span> <span class="va">wind_dir</span>, distance <span class="op">=</span> <span class="va">wind_spd</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Wind Vectors (Polar Input)"</span>,</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data_polar</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">geom_vector</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, angle <span class="op">=</span> <span class="va">wind_dir</span>, distance <span class="op">=</span> <span class="va">wind_spd</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Wind Vectors (Polar Input)"</span>,</span></span>
 <span class="r-in"><span>       x <span class="op">=</span> <span class="st">"Longitude"</span>, y <span class="op">=</span> <span class="st">"Latitude"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="geom_vector-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
@@ -316,7 +311,7 @@ give the geom as <code>"point"</code>.</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 2.0.7.</p>
 </div>
 
     </footer></div>

@@ -41,43 +41,6 @@ stat_vector_field(
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
-
-geom_vector_field(
-  mapping = NULL,
-  data = NULL,
-  stat = StatVector,
-  geom = GeomVector,
-  position = "identity",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  fun,
-  xlim = c(-10, 10),
-  ylim = c(-10, 10),
-  n = 16,
-  center = TRUE,
-  normalize = TRUE,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-  ...
-)
-
-stat_vector_field(
-  mapping = NULL,
-  data = NULL,
-  geom = GeomVector,
-  position = "identity",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  fun,
-  xlim = c(-10, 10),
-  ylim = c(-10, 10),
-  n = 16,
-  center = TRUE,
-  normalize = TRUE,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-  ...
-)
 }
 \arguments{
 \item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and
@@ -199,37 +162,6 @@ The norm of a vector represents its magnitude (or length):
 
 where \eqn{dx} and \eqn{dy} are the displacements in the x and y directions, respectively.
 }
-
-A \code{ggplot2} layer that can be added to a ggplot object to produce a
-vector field plot. The layer includes optional calculations of:
-\subsection{Curl}{
-
-The curl of a vector field represents the rotation or "twisting" of the vectors around a point.
-
-The formula for the curl is given by:
-
-\deqn{\text{curl}(\mathbf{f})(x, y) = \frac{\partial f_2}{\partial x}(x, y) - \frac{\partial f_1}{\partial y}(x, y)}
-
-where \eqn{\frac{\partial f_1}{\partial y}(x, y)} is the partial derivative of the first component with respect to \eqn{y}, and \eqn{\frac{\partial f_2}{\partial x}(x, y)} is the partial derivative of the second component with respect to \eqn{x}.
-}
-
-\subsection{Divergence}{
-
-The divergence of a vector field measures the rate at which vectors are "spreading out" from a point.
-
-\deqn{\text{div}(\mathbf{f})(x, y) = \frac{\partial f_1}{\partial x}(x, y) + \frac{\partial f_2}{\partial y}(x, y)}
-
-where \eqn{\frac{\partial f_1}{\partial x}(x, y)} is the partial derivative of the first component with respect to \eqn{x}, and \eqn{\frac{\partial f_2}{\partial y}(x, y)} is the partial derivative of the second component with respect to \eqn{y}.
-}
-
-\subsection{Norm}{
-
-The norm of a vector represents its magnitude (or length):
-
-\deqn{\|\mathbf{f}(x, y)\| = \sqrt{dx^2 + dy^2}}
-
-where \eqn{dx} and \eqn{dy} are the displacements in the x and y directions, respectively.
-}
 }
 \description{
 \code{geom_vector_field} generates a vector field plot layer using a
@@ -237,19 +169,8 @@ user-defined function to compute the vector displacements (\code{dx}, \code{dy})
 point. The function automatically generates a grid of points
 (specified by \code{xlim} and \code{ylim}) and evaluates the vector field displacements
 at those points.
-
-\code{geom_vector_field} generates a vector field plot layer using a
-user-defined function to compute the vector displacements (\code{dx}, \code{dy}) at each grid
-point. The function automatically generates a grid of points
-(specified by \code{xlim} and \code{ylim}) and evaluates the vector field displacements
-at those points.
 }
 \details{
-The user provides a function that takes a vector \verb{(x, y)} and returns the vector
-\strong{displacements} \verb{(dx, dy)} at that point in the vector field. The layer automatically
-computes calculus measures such as divergence, curl, and vector norm that can be mapped to
-aesthetics using \code{after_stat()}.
-
 The user provides a function that takes a vector \verb{(x, y)} and returns the vector
 \strong{displacements} \verb{(dx, dy)} at that point in the vector field. The layer automatically
 computes calculus measures such as divergence, curl, and vector norm that can be mapped to
@@ -268,40 +189,9 @@ For example, to map \code{norm} to color, you can use:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{aes(color = after_stat(norm))
 }\if{html}{\out{</div>}}
-
-
-The following aesthetics can be mapped using \code{after_stat()}:
-\itemize{
-\item \code{divergence}: Divergence of the vector field at each point.
-\item \code{curl}: Curl of the vector field at each point.
-\item \code{norm}: Norm (magnitude) of the vector at each point.
-}
-
-For example, to map \code{norm} to color, you can use:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{aes(color = after_stat(norm))
-}\if{html}{\out{</div>}}
 }
 
 \examples{
-
-# Example user-defined vector field function
-f <- function(v) {
-  x <- v[1]; y <- v[2]
-  c(x + y, y - x)  # Return displacements (dx, dy)
-}
-
-# Create a ggplot with the vector field layer
-ggplot() +
-  geom_vector_field(fun = f, xlim = c(-5, 5), ylim = c(-5, 5), n = 20)
-
-# Example of mapping norm to length
-ggplot() +
-  geom_vector_field(fun = f, xlim = c(-5, 5), ylim = c(-5, 5),
-                    n = 20, normalize = FALSE,
-                    aes(length = after_stat(norm),
-                        color = after_stat(curl)))
-
 
 # Example user-defined vector field function
 f <- function(v) {

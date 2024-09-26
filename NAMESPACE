@@ -3,6 +3,7 @@
 export(GeomComplexFunction)
 export(GeomFlow)
 export(GeomStreamplot)
+export(GeomVector)
 export(GeomVectorSmooth)
 export(StatComplexFunction)
 export(StatStreamplot)

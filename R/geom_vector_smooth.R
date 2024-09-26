@@ -10,6 +10,7 @@
 #' @inheritParams ggplot2::stat_identity
 #' @param n An integer vector specifying the number of grid points along each
 #'   axis.
+#' @param scale_length more to follow
 #' @param center Logical; if `TRUE`, centers the vector on the evaluated x/y
 #'   location. If `FALSE`, the vector origin is at the evaluated x/y location.
 #'   When centering is enabled, the vector's midpoint aligns with the original

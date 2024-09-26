@@ -8,7 +8,6 @@
 #' @inheritParams ggplot2::geom_segment
 #' @inheritParams ggplot2::stat_identity
 #' @param fun A function used to calculate vector fields (curl/divergence).
-#' @param size Size of the vector arrows.
 #' @param center Logical; if `TRUE`, centers the vector on the specified (`x`, `y`) location.
 #'   If `FALSE`, the vector origin is at the specified (`x`, `y`) location.
 #'   When centering is enabled, the vector's midpoint aligns with the original (`x`, `y`) location.
@@ -73,9 +72,6 @@
 #' \describe{
 #'   \item{norm}{The magnitude of each vector, calculated as \eqn{\|\mathbf{v}\| = \sqrt{(xend - x)^2 + (yend - y)^2}}.}
 #' }
-NULL
-
-#' @rdname geom_vector
 #' @export
 geom_vector <- function(mapping = NULL, data = NULL, stat = StatVector,
                         position = "identity", ..., na.rm = FALSE, show.legend = NA,
@@ -268,7 +264,6 @@ draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = 
   }
 }
 
-#' @rdname geom_vector
 #' @keywords internal
 draw_key_vector <- function(data, params, size) {
   dx <- data$dx
@@ -290,18 +285,6 @@ draw_key_vector <- function(data, params, size) {
 
 #' @rdname geom_vector
 #' @export
-scale_length_continuous <- function(...) {
-  continuous_scale(
-    aesthetics = "length",
-    palette = scales::rescale_pal(c(0.1, .5)),
-    ...
-  )
-}
-
-#' @rdname geom_vector
-#' @export
-NULL
-
 GeomVector <- ggproto(
   "GeomVector", Geom,
 
@@ -373,3 +356,20 @@ GeomVector <- ggproto(
   draw_group = draw_panel_vector,
   draw_key = draw_key_vector
 )
+
+#' Create a Continuous Scale for Vector Length
+#'
+#' `scale_length_continuous` provides a continuous scale for controlling the length
+#' aesthetic in a ggplot. This is particularly useful when working with vector plots
+#' where vector lengths are mapped to a continuous scale.
+#'
+#' @param ... Other arguments passed to `continuous_scale()`.
+#' @export
+scale_length_continuous <- function(...) {
+  continuous_scale(
+    aesthetics = "length",
+    palette = scales::rescale_pal(c(0.1, .5)),
+    ...
+  )
+}
+

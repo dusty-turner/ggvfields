@@ -5,11 +5,12 @@
 \alias{geom_vector}
 \alias{stat_vector}
 \alias{StatVector}
-\alias{draw_key_vector}
-\alias{scale_length_continuous}
+\alias{GeomVector}
 \title{Create a Vector Plot Layer}
 \format{
 An object of class \code{StatVector} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
+
+An object of class \code{GeomVector} (inherits from \code{Geom}, \code{ggproto}, \code{gg}) of length 6.
 }
 \usage{
 geom_vector(
@@ -45,9 +46,7 @@ stat_vector(
 
 StatVector
 
-draw_key_vector(data, params, size)
-
-scale_length_continuous(...)
+GeomVector
 }
 \arguments{
 \item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and
@@ -165,8 +164,6 @@ give the geom as \code{"point"}.
 \item For more information and other ways to specify the geom, see the
 \link[ggplot2:layer_geoms]{layer geom} documentation.
 }}
-
-\item{size}{Size of the vector arrows.}
 }
 \value{
 A \code{ggplot2} layer that can be added to a ggplot object to produce a vector plot.
@@ -236,4 +233,3 @@ ggplot(wind_data_polar) +
 
 }
 \keyword{datasets}
-\keyword{internal}

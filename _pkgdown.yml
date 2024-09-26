@@ -1,4 +1,25 @@
-url: ~
+# Configuration for pkgdown site
+
+# URL of the site (leave blank if not needed)
+url: ""
+
+# Use Bootstrap version 5 for styling
 template:
   bootstrap: 5
 
+# Reference section for function documentation
+reference:
+  - title: "Vector Functions"
+    contents:
+      - geom_vector
+      - stat_vector
+      - StatVector
+      - geom_vector_field
+      - stat_vector_field
+      - scale_length_continuous
+      - geom_complex_function
+      - geom_flow
+      - geom_streamplot
+      - geom_vector_smooth
+      - ggvfields
+      - animation_transition
