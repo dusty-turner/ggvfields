@@ -58,109 +58,10 @@ of the vector. The lightness of the color reflects the magnitude of the
 vector, providing a visual representation of both direction and intensity.</p>
     </div>
 
-    <div class="section level2">
-    <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">geom_complex_function</span><span class="op">(</span></span>
-<span>  mapping <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  stat <span class="op">=</span> <span class="st">"complex_function"</span>,</span>
-<span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
-<span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  show.legend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  <span class="va">fun</span>,</span>
-<span>  <span class="va">relim</span>,</span>
-<span>  <span class="va">imlim</span>,</span>
-<span>  n <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">stat_complex_function</span><span class="op">(</span></span>
-<span>  mapping <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  geom <span class="op">=</span> <span class="st">"raster"</span>,</span>
-<span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
-<span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  show.legend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  <span class="va">fun</span>,</span>
-<span>  <span class="va">relim</span>,</span>
-<span>  <span class="va">imlim</span>,</span>
-<span>  n <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-    </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>mapping</dt>
-<dd><p>Set of aesthetic mappings created by <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes()</a></code>. If specified and
-<code>inherit.aes = TRUE</code> (the default), it is combined with the default mapping
-at the top level of the plot. You must supply <code>mapping</code> if there is no plot
-mapping.</p></dd>
-
-
-<dt>data</dt>
-<dd><p>The data to be displayed in this layer. There are three
-options:</p>
-<p>If <code>NULL</code>, the default, the data is inherited from the plot
-data as specified in the call to <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code>.</p>
-<p>A <code>data.frame</code>, or other object, will override the plot
-data. All objects will be fortified to produce a data frame. See
-<code><a href="https://ggplot2.tidyverse.org/reference/fortify.html">fortify()</a></code> for which variables will be created.</p>
-<p>A <code>function</code> will be called with a single argument,
-the plot data. The return value must be a <code>data.frame</code>, and
-will be used as the layer data. A <code>function</code> can be created
-from a <code>formula</code> (e.g. <code>~ head(.x, 10)</code>).</p></dd>
-
-
-<dt>stat</dt>
-<dd><p>The statistical transformation to use on the data for this layer.
-When using a <code>geom_*()</code> function to construct a layer, the <code>stat</code>
-argument can be used the override the default coupling between geoms and
-stats. The <code>stat</code> argument accepts the following:</p><ul><li><p>A <code>Stat</code> ggproto subclass, for example <code>StatCount</code>.</p></li>
-<li><p>A string naming the stat. To give the stat as a string, strip the
-function name of the <code>stat_</code> prefix. For example, to use <code><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">stat_count()</a></code>,
-give the stat as <code>"count"</code>.</p></li>
-<li><p>For more information and other ways to specify the stat, see the
-<a href="https://ggplot2.tidyverse.org/reference/layer_stats.html">layer stat</a> documentation.</p></li>
-</ul></dd>
-
-
-<dt>position</dt>
-<dd><p>A position adjustment to use on the data for this layer. This
-can be used in various ways, including to prevent overplotting and
-improving the display. The <code>position</code> argument accepts the following:</p><ul><li><p>The result of calling a position function, such as <code><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html">position_jitter()</a></code>.
-This method allows for passing extra arguments to the position.</p></li>
-<li><p>A string naming the position adjustment. To give the position as a
-string, strip the function name of the <code>position_</code> prefix. For example,
-to use <code><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html">position_jitter()</a></code>, give the position as <code>"jitter"</code>.</p></li>
-<li><p>For more information and other ways to specify the position, see the
-<a href="https://ggplot2.tidyverse.org/reference/layer_positions.html">layer position</a> documentation.</p></li>
-</ul></dd>
-
-
-<dt>na.rm</dt>
-<dd><p>If <code>FALSE</code>, the default, missing values are removed with
-a warning. If <code>TRUE</code>, missing values are silently removed.</p></dd>
-
-
-<dt>show.legend</dt>
-<dd><p>logical. Should this layer be included in the legends?
-<code>NA</code>, the default, includes if any aesthetics are mapped.
-<code>FALSE</code> never includes, and <code>TRUE</code> always includes.
-It can also be a named logical vector to finely select the aesthetics to
-display.</p></dd>
-
-
-<dt>inherit.aes</dt>
-<dd><p>If <code>FALSE</code>, overrides the default aesthetics,
-rather than combining with them. This is most useful for helper functions
-that define both data and aesthetics and shouldn't inherit behaviour from
-the default plot specification, e.g. <code><a href="https://ggplot2.tidyverse.org/reference/borders.html">borders()</a></code>.</p></dd>
-
-
-<dt>fun</dt>
+    <dl><dt>fun</dt>
 <dd><p>A user-defined function that takes a complex number as input and
 returns a complex number.</p></dd>
 
@@ -176,47 +77,6 @@ returns a complex number.</p></dd>
 <dt>n</dt>
 <dd><p>An integer specifying the number of grid points along each axis.</p></dd>
 
-
-<dt>...</dt>
-<dd><p>Other arguments passed on to <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">layer()</a></code>'s <code>params</code> argument. These
-arguments broadly fall into one of 4 categories below. Notably, further
-arguments to the <code>position</code> argument, or aesthetics that are required
-can <em>not</em> be passed through <code>...</code>. Unknown arguments that are not part
-of the 4 categories below are ignored.</p><ul><li><p>Static aesthetics that are not mapped to a scale, but are at a fixed
-value and apply to the layer as a whole. For example, <code>colour = "red"</code>
-or <code>linewidth = 3</code>. The geom's documentation has an <strong>Aesthetics</strong>
-section that lists the available options. The 'required' aesthetics
-cannot be passed on to the <code>params</code>. Please note that while passing
-unmapped aesthetics as vectors is technically possible, the order and
-required length is not guaranteed to be parallel to the input data.</p></li>
-<li><p>When constructing a layer using
-a <code>stat_*()</code> function, the <code>...</code> argument can be used to pass on
-parameters to the <code>geom</code> part of the layer. An example of this is
-<code>stat_density(geom = "area", outline.type = "both")</code>. The geom's
-documentation lists which parameters it can accept.</p></li>
-<li><p>Inversely, when constructing a layer using a
-<code>geom_*()</code> function, the <code>...</code> argument can be used to pass on parameters
-to the <code>stat</code> part of the layer. An example of this is
-<code>geom_area(stat = "density", adjust = 0.5)</code>. The stat's documentation
-lists which parameters it can accept.</p></li>
-<li><p>The <code>key_glyph</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">layer()</a></code> may also be passed on through
-<code>...</code>. This can be one of the functions described as
-<a href="https://ggplot2.tidyverse.org/reference/draw_key.html">key glyphs</a>, to change the display of the layer in the legend.</p></li>
-</ul></dd>
-
-
-<dt>geom</dt>
-<dd><p>The geometric object to use to display the data for this layer.
-When using a <code>stat_*()</code> function to construct a layer, the <code>geom</code> argument
-can be used to override the default coupling between stats and geoms. The
-<code>geom</code> argument accepts the following:</p><ul><li><p>A <code>Geom</code> ggproto subclass, for example <code>GeomPoint</code>.</p></li>
-<li><p>A string naming the geom. To give the geom as a string, strip the
-function name of the <code>geom_</code> prefix. For example, to use <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point()</a></code>,
-give the geom as <code>"point"</code>.</p></li>
-<li><p>For more information and other ways to specify the geom, see the
-<a href="https://ggplot2.tidyverse.org/reference/layer_geoms.html">layer geom</a> documentation.</p></li>
-</ul></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -228,16 +88,16 @@ vector field plot.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># Example user-defined function</span></span></span>
-<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">z</span><span class="op">)</span> <span class="op">(</span><span class="va">z</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="va">z</span><span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">#library(ggplot2)</span></span></span>
+<span class="r-in"><span><span class="co">## Example user-defined function</span></span></span>
+<span class="r-in"><span><span class="co">#f &lt;- function(z) (z^2 + 1) / (z^2 - 1)</span></span></span>
+<span class="r-in"><span><span class="co">#</span></span></span>
+<span class="r-in"><span><span class="co">## Create a ggplot with the vector field layer</span></span></span>
+<span class="r-in"><span><span class="co">#ggplot() +</span></span></span>
+<span class="r-in"><span><span class="co">#  geom_complex_function(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) +</span></span></span>
+<span class="r-in"><span><span class="co">#  labs(x = "Real", y = "Imaginary")</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Create a ggplot with the vector field layer</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_complex_function</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, relim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, imlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Real"</span>, y <span class="op">=</span> <span class="st">"Imaginary"</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="geom_complex_function-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
+<span class="r-in"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

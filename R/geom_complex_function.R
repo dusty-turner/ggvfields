@@ -6,19 +6,14 @@
 #' of the vector. The lightness of the color reflects the magnitude of the
 #' vector, providing a visual representation of both direction and intensity.
 #'
-#' @inheritParams ggplot2::geom_raster
-#' @inheritParams ggplot2::stat_identity
 #' @param fun A user-defined function that takes a complex number as input and
 #'   returns a complex number.
 #' @param relim A numeric vector of length 2 giving the real-axis limits.
 #' @param imlim A numeric vector of length 2 giving the imaginary-axis limits.
 #' @param n An integer specifying the number of grid points along each axis.
-#' @name geom_complex_function
-#' @rdname geom_complex_function
-#'
 #' @return A ggplot2 layer that can be added to a ggplot object to produce a
 #'   vector field plot.
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' library(ggplot2)
@@ -29,10 +24,9 @@
 #' ggplot() +
 #'   geom_complex_function(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) +
 #'   labs(x = "Real", y = "Imaginary")
-#'
 NULL
 
-#' @rdname geom_complex_function
+#' @keywords internal
 geom_complex_function <- function(mapping = NULL, data = NULL,
                                   stat = "complex_function",
                                   position = "identity", na.rm = FALSE,
@@ -60,13 +54,10 @@ geom_complex_function <- function(mapping = NULL, data = NULL,
   )
 }
 
-#' @rdname geom_complex_function
-#' @format NULL
-#' @usage NULL
+#' @keywords internal
 GeomComplexFunction <- ggproto("GeomComplexFunction", GeomRaster)
 
-
-#' @rdname geom_complex_function
+#' @keywords internal
 stat_complex_function <- function(mapping = NULL, data = NULL, geom = "raster",
                                   position = "identity", na.rm = FALSE,
                                   show.legend = TRUE, inherit.aes = TRUE,
@@ -93,9 +84,7 @@ stat_complex_function <- function(mapping = NULL, data = NULL, geom = "raster",
   )
 }
 
-#' @rdname geom_complex_function
-#' @format NULL
-#' @usage NULL
+#' @keywords internal
 StatComplexFunction <- ggproto("StatComplexFunction", Stat,
   required_aes = c("relim", "imlim"),
 

@@ -13,11 +13,9 @@ reference:
     contents:
       - geom_vector
       - stat_vector
-      - StatVector
       - geom_vector_field
       - stat_vector_field
       - scale_length_continuous
-      - geom_complex_function
       - geom_flow
       - geom_streamplot
       - geom_vector_smooth
