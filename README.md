@@ -443,66 +443,43 @@ ggplot() +
 <!--   coord_fixed() + -->
 <!--   theme_minimal() -->
 <!-- ``` -->
-
-### `geom_complex_function()`
-
-The `geom_complex_function()` function generates a vector field plot
-layer using a user-defined function to compute the vector components.
-This function abstracts away the mathematical computations required to
-generate the vector field, so the user does not need to manually
-calculate and input the vector components into `geom_segment()`. It
-simplifies the process, making it easier to create vector field
-visualizations without dealing with the underlying math.
-
-``` r
-f <- function(z) (z^2 + 1) / (z^2 - 1)
-
-ggplot() +
-  geom_complex_function(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) +
-  labs(x = "Real", y = "Imaginary") +
-  coord_fixed() +
-  theme(legend.box = "horizontal")
-```
-
-<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
-
-We can enhance this plot with a little help from biscale.
-
-Using biscale, we can apply a bivariate color scale to the plot, which
-allows us to represent two variables—angle (direction) and magnitude
-(intensity)—simultaneously. This makes it easier to visualize how these
-properties change across the field.
-
-``` r
-library(biscale)
-library(cowplot)
-
-plot <-
-  ggplot() +
-  geom_complex_function(aes(fill = after_stat(bi_class)),
-    fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100
-    ) +
-    bi_scale_fill(pal = "DkBlue") +
-    labs(
-      title = "",
-      x = "Real (Re)",
-      y = "Imaginary (Im)"
-    ) +
-    bi_theme(base_size = 16) +
-    theme(legend.position = "none") +
-  coord_fixed() 
-  
-legend <- bi_legend(pal = "DkBlue",
-                    xlab = "Angle",
-                    ylab = "Magnitude",
-                    size = 6)
-
-ggdraw() +
-  draw_plot(plot, 0, 0, .8, 1) +  
-  draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3)
-```
-
-<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
+<!-- ### `geom_complex_function()`{.R} -->
+<!-- The `geom_complex_function()`{.R} function generates a vector field plot layer using a user-defined function to compute the vector components. This function abstracts away the mathematical computations required to generate the vector field, so the user does not need to manually calculate and input the vector components into `geom_segment()`{.R}. It simplifies the process, making it easier to create vector field visualizations without dealing with the underlying math. -->
+<!-- ```{r} -->
+<!-- f <- function(z) (z^2 + 1) / (z^2 - 1) -->
+<!-- ggplot() + -->
+<!--   geom_complex_function(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) + -->
+<!--   labs(x = "Real", y = "Imaginary") + -->
+<!--   coord_fixed() + -->
+<!--   theme(legend.box = "horizontal") -->
+<!-- ``` -->
+<!-- We can enhance this plot with a little help from biscale. -->
+<!-- Using biscale, we can apply a bivariate color scale to the plot, which allows us to represent two variables—angle (direction) and magnitude (intensity)—simultaneously. This makes it easier to visualize how these properties change across the field. -->
+<!-- ```{r} -->
+<!-- library(biscale) -->
+<!-- library(cowplot) -->
+<!-- plot <- -->
+<!--   ggplot() + -->
+<!--   geom_complex_function(aes(fill = after_stat(bi_class)), -->
+<!--     fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100 -->
+<!--     ) + -->
+<!--     bi_scale_fill(pal = "DkBlue") + -->
+<!--     labs( -->
+<!--       title = "", -->
+<!--       x = "Real (Re)", -->
+<!--       y = "Imaginary (Im)" -->
+<!--     ) + -->
+<!--     bi_theme(base_size = 16) + -->
+<!--     theme(legend.position = "none") + -->
+<!--   coord_fixed()  -->
+<!-- legend <- bi_legend(pal = "DkBlue", -->
+<!--                     xlab = "Angle", -->
+<!--                     ylab = "Magnitude", -->
+<!--                     size = 6) -->
+<!-- ggdraw() + -->
+<!--   draw_plot(plot, 0, 0, .8, 1) +   -->
+<!--   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3) -->
+<!-- ``` -->
 
 ## License
 

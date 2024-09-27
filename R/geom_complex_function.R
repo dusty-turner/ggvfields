@@ -33,8 +33,6 @@
 NULL
 
 #' @rdname geom_complex_function
-#' @export
-
 geom_complex_function <- function(mapping = NULL, data = NULL,
                                   stat = "complex_function",
                                   position = "identity", na.rm = FALSE,
@@ -65,13 +63,10 @@ geom_complex_function <- function(mapping = NULL, data = NULL,
 #' @rdname geom_complex_function
 #' @format NULL
 #' @usage NULL
-#' @export
 GeomComplexFunction <- ggproto("GeomComplexFunction", GeomRaster)
 
 
 #' @rdname geom_complex_function
-#' @export
-
 stat_complex_function <- function(mapping = NULL, data = NULL, geom = "raster",
                                   position = "identity", na.rm = FALSE,
                                   show.legend = TRUE, inherit.aes = TRUE,
@@ -101,8 +96,6 @@ stat_complex_function <- function(mapping = NULL, data = NULL, geom = "raster",
 #' @rdname geom_complex_function
 #' @format NULL
 #' @usage NULL
-#' @export
-
 StatComplexFunction <- ggproto("StatComplexFunction", Stat,
   required_aes = c("relim", "imlim"),
 
