@@ -28,7 +28,7 @@ stat_vector_smooth(
   n = c(11, 11),
   scale_length = 1,
   center = TRUE,
-  normalize,
+  normalize = TRUE,
   method = "lm",
   se = TRUE,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
@@ -46,7 +46,7 @@ geom_vector_smooth(
   n = c(11, 11),
   scale_length = 1,
   center = TRUE,
-  normalize,
+  normalize = TRUE,
   method = "lm",
   se = TRUE,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
@@ -214,32 +214,37 @@ Additionally, when using smoothing:
 }
 
 \examples{
-# Define the function
-f <- function(v) {
+# Generate a function to create random vectors based on input (x, y) values
+generate_vectors <- function(v) {
   x <- v[1]
   y <- v[2]
-  c(-1 - x^2 + y, 1 + x - y^2)
+  # Return new x and y values with added random noise
+  c(x + rnorm(1, 1, 1), y + rnorm(1, 1, 1))
 }
 
-# Generate sample points
+# Set seed for reproducibility
 set.seed(123)
+
+# Generate sample points for the vector field
 sample_points <- data.frame(
   x = runif(10, min = -10, max = 10),
   y = runif(10, min = -10, max = 10)
 )
 
-# Apply the function to each point
-result <- t(apply(sample_points, 1, f))
+# Apply the generate_vectors function to each row
+result <- t(apply(sample_points, 1, generate_vectors))
+
+# Create new columns for xend and yend coordinates
 sample_points$xend <- result[, 1]
 sample_points$yend <- result[, 2]
 
-# Load ggplot2 library
-library(ggplot2)
+# Calculate dx and dy (displacements)
+sample_points$dx <- sample_points$xend - sample_points$x
+sample_points$dy <- sample_points$yend - sample_points$y
 
-# Plot the vectors
-sample_points |>
-  ggplot(aes(x = x, y = y, xend = xend, yend = yend)) +
-    geom_vector_smooth(normalize = TRUE, center = TRUE, se = TRUE, arrow = grid::arrow()) +
-    geom_vector(color = "red")
+# Plot the original vectors and smoothed vectors using `ggplot2` from ggvfields
+ggplot(sample_points, aes(x = x, y = y)) +
+  geom_vector(aes(dx = dx, dy = dy), color = "red") +  # Original vectors in red
+  geom_vector_smooth(aes(dx = dx, dy = dy))            # Smoothed vectors
 }
 \keyword{datasets}

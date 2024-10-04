@@ -76,7 +76,7 @@
 geom_vector <- function(mapping = NULL, data = NULL, stat = StatVector,
                         position = "identity", ..., na.rm = FALSE, show.legend = NA,
                         arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                        inherit.aes = TRUE, center = TRUE, normalize = FALSE, add_points = FALSE,
+                        inherit.aes = TRUE, center = TRUE, normalize = TRUE, add_points = FALSE,
                         fun = NULL) {
   layer(
     stat = StatVector, geom = GeomVector, mapping = mapping, data = data,
@@ -91,7 +91,7 @@ geom_vector <- function(mapping = NULL, data = NULL, stat = StatVector,
 stat_vector <- function(mapping = NULL, data = NULL, geom = GeomVector,
                         position = "identity", ..., na.rm = FALSE, show.legend = NA,
                         arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                        inherit.aes = TRUE, center = TRUE, normalize = FALSE, add_points = FALSE) {
+                        inherit.aes = TRUE, center = TRUE, normalize = TRUE, add_points = FALSE) {
   layer(
     stat = StatVector, geom = geom, mapping = mapping, data = data,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
@@ -139,7 +139,7 @@ StatVector <- ggproto("StatVector", Stat,
 )
 
 #' @keywords internal
-draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = NULL, center = FALSE, normalize = FALSE, add_points = FALSE) {
+draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = NULL, center = TRUE, normalize = TRUE, add_points = FALSE) {
 
   # If length is not mapped, normalize and center using the original data before transformation
   if (is.na(data$length[1])) {
@@ -266,9 +266,6 @@ draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = 
 
 #' @keywords internal
 draw_key_vector <- function(data, params, size) {
-  dx <- data$dx
-  dy <- data$dy
-
   x0 <- unit(0.1, "npc")
   y0 <- unit(0.5, "npc")
 

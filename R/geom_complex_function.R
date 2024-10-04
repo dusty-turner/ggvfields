@@ -13,17 +13,18 @@
 #' @param n An integer specifying the number of grid points along each axis.
 #' @return A ggplot2 layer that can be added to a ggplot object to produce a
 #'   vector field plot.
+#' @name geom_complex_function
 #' @keywords internal
 #'
 #' @examples
-#' library(ggplot2)
+#' #library(ggplot2)
 #' # Example user-defined function
 #' f <- function(z) (z^2 + 1) / (z^2 - 1)
 #'
 #' # Create a ggplot with the vector field layer
-#' ggplot() +
-#'   geom_complex_function(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) +
-#'   labs(x = "Real", y = "Imaginary")
+#' #ggplot() +
+#'  # geom_complex_function(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) +
+#'  # labs(x = "Real", y = "Imaginary")
 NULL
 
 #' @keywords internal

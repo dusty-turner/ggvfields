@@ -55,3 +55,5 @@ animation_transition <- function(plot) {
   # plot$labels
   return(out)
 }
+
+utils::globalVariables(c("id", "rownum"))
