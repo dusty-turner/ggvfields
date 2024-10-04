@@ -124,6 +124,7 @@ wind_data_cartesian |>
        x = "Longitude", y = "Latitude")  +
   lims(x = c(-3,2), y = c(-2,3)) +
   scale_length_continuous()
+#> Normalization is ignored because length is mapped using after_stat().
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
@@ -187,14 +188,15 @@ The norm of a vector $\mathbf{w} = (u, v)$ is given by:
 
 $|\mathbf{w}| = \sqrt{u^2 + v^2}$
 
-We can visualize the norm by mapping it to the color aesthetic:
+We can visualize the norm by mapping it to the length aesthetic:
 
 ``` r
 ggplot() +
   geom_vector_field(
-    aes(color = after_stat(norm)),
+    aes(length = after_stat(norm)),
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
     ) 
+#> Normalization is ignored because length is mapped using after_stat().
 ```
 
 <img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
@@ -222,9 +224,10 @@ divergence to the color aesthetic.
 ``` r
 ggplot() +
   geom_vector_field(
-    aes(color = after_stat(divergence)), 
+    aes(length = after_stat(norm), color = after_stat(divergence)), 
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
   ) 
+#> Normalization is ignored because length is mapped using after_stat().
 ```
 
 <img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
@@ -480,6 +483,60 @@ ggplot() +
 <!--   draw_plot(plot, 0, 0, .8, 1) +   -->
 <!--   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3) -->
 <!-- ``` -->
+
+## In Development
+
+### `geom_vector_smooth()`
+
+The `geom_vector_smooth()` function is designed to provide a smoothed
+estimate of a vector field based on observed vector components. Just as
+`geom_smooth()` fits a regression line through data points,
+`geom_vector_smooth()` fits a smooth vector field through individual
+vector observations. It does this by applying statistical smoothing
+techniques to the vector components (`dx`, `dy`) to create a smooth
+representation of the direction and magnitude transitions across the
+field.
+
+#### Example Usage
+
+``` r
+# Create a function to generate random vectors based on (x, y) inputs
+generate_vectors <- function(v) {
+  x <- v[1]
+  y <- v[2]
+  c(x + rnorm(1, 1, 1), y + rnorm(1, 1, 1))  # Add random noise to simulate new x, y positions
+}
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Generate sample points for the vector field
+sample_points <- data.frame(
+  x = runif(10, min = -10, max = 10),  # Random x coordinates between -10 and 10
+  y = runif(10, min = -10, max = 10)   # Random y coordinates between -10 and 10
+)
+
+# Apply the generate_vectors function to each row to create displacements
+result <- t(apply(sample_points, 1, generate_vectors))
+
+# Create new columns for the end coordinates (xend, yend)
+sample_points$xend <- result[, 1]
+sample_points$yend <- result[, 2]
+
+# Calculate the displacements (dx, dy)
+sample_points$dx <- sample_points$xend - sample_points$x
+sample_points$dy <- sample_points$yend - sample_points$y
+
+# Visualize the original and smoothed vectors using `ggplot2` from ggvfields
+ggplot(sample_points, aes(x = x, y = y)) +
+  geom_vector(aes(dx = dx, dy = dy), color = "red") +  # Plot original vectors in red
+  geom_vector_smooth(aes(dx = dx, dy = dy))            # Overlay with smoothed vectors
+```
+
+<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
+
+This example demonstrates how `geom_vector_smooth()` can be used to fit
+a vector field to vector data.
 
 ## License
 
