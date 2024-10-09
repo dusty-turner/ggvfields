@@ -123,12 +123,13 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                 cos_residuals <- residuals(fit_cos)
                                 cov_sin_cos <- cov(sin_residuals, cos_residuals)
 
-                                # Reconstruct the angle from sine and cosine predictions
-                                grid$angle_pred <- atan2(pred_sin$fit, pred_cos$fit)
-                                grid$distance_pred <- pred_distance$fit
-
                                 # Calculate symmetric angle prediction intervals using Delta Method
                                 if (se) {
+
+                                  # Reconstruct the angle from sine and cosine predictions
+                                  grid$angle_pred <- atan2(pred_sin$fit, pred_cos$fit)
+                                  grid$distance_pred <- pred_distance$fit
+
                                   # Calculate the critical value for confidence intervals
                                   t_critical <- qt(1 - (1 - level) / 2, df = fit_distance$df.residual)
 
@@ -156,8 +157,8 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                   grid$xend_upper <- grid$x + grid$distance_pred * cos(grid$angle_upper)
                                   grid$yend_upper <- grid$y + grid$distance_pred * sin(grid$angle_upper)
                                 } else {
-                                  grid$angle_pred <- atan2(pred_sin$fit, pred_cos$fit)
-                                  grid$distance_pred <- pred_distance$fit
+                                  grid$angle_pred <- atan2(pred_sin, pred_cos)
+                                  grid$distance_pred <- pred_distance
 
                                   grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
                                   grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
@@ -258,12 +259,17 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
 
                             default_aes = aes(linewidth = 0.5, linetype = 1, alpha = 1, fill = "grey80", color = "#3366FF"),
 
-                            draw_panel = function(data, panel_params, coord, arrow = NULL) {
+                            draw_panel = function(data, panel_params, coord, arrow = NULL, se) {
 
                               # Reshape the data for polygons
                               data$id <- seq_len(nrow(data))
 
-                              if(!is.null(data$xend_upper)){
+                              circle_grob <- NULL
+                              polygon_grob <- NULL
+                              all_circle_data <- NULL
+                              polygon_data <- NULL
+
+                              if(se){
 
                                 radius <- sqrt((data$x[1] - data$xend[1])^2 + (data$y[1] - data$yend[1])^2)
 
@@ -308,22 +314,17 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                                   )
                                 }))
 
+                                # Draw the polygon if polygon data exists
+                                polygon_grob <- GeomPolygon$draw_panel(
+                                    data = polygon_data,
+                                    panel_params = panel_params,
+                                    coord = coord
+                                  )
 
-                              } else {
-                                polygon_data <- NULL
+
                               }
 
-                              # Draw the polygon if polygon data exists
-                              polygon_grob <- if (!is.null(polygon_data)) {
 
-                                GeomPolygon$draw_panel(
-                                  data = polygon_data,
-                                  panel_params = panel_params,
-                                  coord = coord
-                                )
-                              } else {
-                                NULL
-                              }
 
                               # Draw the vector lines
                               segments_grob <- GeomSegment$draw_panel(
@@ -333,7 +334,14 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                                 arrow = arrow
                               )
 
-                              grid::gList(circle_grob, polygon_grob, segments_grob)
+                              # Collect the grobs into a list
+                              grobs <- list(circle_grob, polygon_grob, segments_grob)
+
+                              # Filter out NULL entries
+                              grobs <- Filter(Negate(is.null), grobs)  # Remove NULL entries
+
+                              # Return the combined grobTree
+                              return(grid::grobTree(do.call(grid::gList, grobs)))
 
                             },
 
