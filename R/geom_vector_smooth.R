@@ -87,7 +87,7 @@ NULL
 #' @export
 StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                             required_aes = c("x", "y", "dx", "dy"),
-                            default_aes = aes(color = "black", linewidth = 0.5, linetype = 1, alpha = 1),
+                            default_aes = aes(color = "#3366FF", linewidth = 0.5, linetype = 1, alpha = 1),
 
                             compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_length, se = TRUE, level = .95, ...) {
 
@@ -105,9 +105,7 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                               # Generate the grid for predictions
                               x_seq <- seq(min(data$x), max(data$x), length.out = n[1])
                               y_seq <- seq(min(data$y), max(data$y), length.out = n[2])
-                              grid <- expand.grid(x = x_seq, y = y_seq)
-                              grid$id <- seq_len(nrow(grid))
-
+                              grid <- expand.grid(x = x_seq, y = y_seq) |> mutate(id = row_number())
 
                               # Fit models using regression on sin and cos for angle, and linear regression for distance
                               if (method == "lm") {
@@ -115,28 +113,40 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                 fit_cos <- lm(cos(angle) ~ x + y, data = data)
                                 fit_distance <- lm(distance ~ x + y, data = data)
 
-                                # Predict sine and cosine values with standard errors if `se = TRUE`
+                                # Predict the sine and cosine values
                                 pred_sin <- predict(fit_sin, newdata = grid, se.fit = se)
                                 pred_cos <- predict(fit_cos, newdata = grid, se.fit = se)
-                                pred_distance <- predict(fit_distance, newdata = grid)
+                                pred_distance <- predict(fit_distance, newdata = grid, se.fit = se)
+
+                                # Calculate residuals and covariance
+                                sin_residuals <- residuals(fit_sin)
+                                cos_residuals <- residuals(fit_cos)
+                                cov_sin_cos <- cov(sin_residuals, cos_residuals)
 
                                 # Reconstruct the angle from sine and cosine predictions
                                 grid$angle_pred <- atan2(pred_sin$fit, pred_cos$fit)
-                                grid$distance_pred <- pred_distance
+                                grid$distance_pred <- pred_distance$fit
 
+                                # Calculate symmetric angle prediction intervals using Delta Method
                                 if (se) {
-                                  # Calculate critical value for confidence intervals
-                                  t_critical <- qt(1 - (1 - level) / 2, df = fit_sin$df.residual)
+                                  # Calculate the critical value for confidence intervals
+                                  t_critical <- qt(1 - (1 - level) / 2, df = fit_distance$df.residual)
 
-                                  # Calculate lower and upper bounds for sin and cos predictions using standard errors
-                                  sin_lower <- pred_sin$fit - t_critical * pred_sin$se.fit
-                                  sin_upper <- pred_sin$fit + t_critical * pred_sin$se.fit
-                                  cos_lower <- pred_cos$fit - t_critical * pred_cos$se.fit
-                                  cos_upper <- pred_cos$fit + t_critical * pred_cos$se.fit
+                                  # Calculate the variance and standard error of the angle using Delta Method
+                                  sin_var <- pred_sin$se.fit^2
+                                  cos_var <- pred_cos$se.fit^2
 
-                                  # Construct angle prediction intervals
-                                  grid$angle_lower <- atan2(sin_lower, cos_lower)
-                                  grid$angle_upper <- atan2(sin_upper, cos_upper)
+                                  # Compute gradient components
+                                  partial_sin <- pred_cos$fit / (pred_sin$fit^2 + pred_cos$fit^2)
+                                  partial_cos <- -pred_sin$fit / (pred_sin$fit^2 + pred_cos$fit^2)
+
+                                  # Calculate angle variance using Delta Method with covariance
+                                  grid$angle_var <- sin_var * partial_sin^2 + cos_var * partial_cos^2 + 2 * cov_sin_cos * partial_sin * partial_cos
+                                  grid$angle_sd <- sqrt(grid$angle_var)
+
+                                  # Construct symmetric prediction intervals
+                                  grid$angle_lower <- grid$angle_pred - t_critical * grid$angle_sd
+                                  grid$angle_upper <- grid$angle_pred + t_critical * grid$angle_sd
 
                                   # Calculate xend and yend for lower, upper, and main predictions
                                   grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
@@ -146,22 +156,25 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                   grid$xend_upper <- grid$x + grid$distance_pred * cos(grid$angle_upper)
                                   grid$yend_upper <- grid$y + grid$distance_pred * sin(grid$angle_upper)
                                 } else {
+                                  grid$angle_pred <- atan2(pred_sin$fit, pred_cos$fit)
+                                  grid$distance_pred <- pred_distance$fit
+
                                   grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
                                   grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
                                 }
                               } else if (method == "loess") {
-                                # Use loess as an alternative smoothing method
                                 fit_angle <- loess(angle ~ x + y, data = data)
                                 fit_distance <- loess(distance ~ x + y, data = data)
                                 grid$angle_pred <- predict(fit_angle, newdata = grid)
                                 grid$distance_pred <- predict(fit_distance, newdata = grid)
                                 grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
                                 grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
+
                               } else {
                                 stop("Unsupported method. Please use 'lm' or 'loess'.")
                               }
 
-                              # Normalize vector lengths if required
+                              # Normalize vector lengths if needed
                               if (normalize) {
                                 grid$norm_pred <- sqrt((grid$xend_pred - grid$x)^2 + (grid$yend_pred - grid$y)^2)
                                 grid$xend_pred <- grid$x + (grid$xend_pred - grid$x) / grid$norm_pred * scale_length
@@ -228,13 +241,22 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
 )
 
 
+create_circle_data <- function(x, y, radius, n = 100) {
+  angle <- seq(0, 2 * pi, length.out = n)  # Generate angles from 0 to 2π
+  data.frame(
+    x = x + radius * cos(angle),  # X-coordinates for the circle
+    y = y + radius * sin(angle),  # Y-coordinates for the circle
+    group = 1  # Use a placeholder group ID; will be set uniquely for each circle
+  )
+}
+
 #' @rdname geom_vector_smooth
 #' @export
 GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
 
                             required_aes = c("x", "y", "xend", "yend"),
 
-                            default_aes = aes(linewidth = 0.5, linetype = 1, alpha = 1, fill = "grey80", color = "black"),
+                            default_aes = aes(linewidth = 0.5, linetype = 1, alpha = 1, fill = "grey80", color = "#3366FF"),
 
                             draw_panel = function(data, panel_params, coord, arrow = NULL) {
 
@@ -242,6 +264,35 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                               data$id <- seq_len(nrow(data))
 
                               if(!is.null(data$xend_upper)){
+
+                                radius <- sqrt((data$x[1] - data$xend[1])^2 + (data$y[1] - data$yend[1])^2)
+
+                                all_circle_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
+
+                                  # Create circle data for the current point
+                                  circle_data <- create_circle_data(
+                                    x = data$x[i], y = data$y[i], radius = radius
+                                  )
+
+                                  # Set unique group for each circle
+                                  circle_data$group <- i
+
+                                  # Ensure aesthetics are replicated to match the length of circle_data
+                                  # circle_data$colour <- rep(data$colour[i], nrow(circle_data))
+                                  circle_data$linewidth <- rep(data$linewidth[i], nrow(circle_data))
+                                  circle_data$alpha <- rep(0.4, nrow(circle_data))  # Set a fixed alpha value
+                                  circle_data$fill <- NA  # Set fill color for the circle
+                                  circle_data$colour <- rep("grey60", nrow(circle_data))  # Set fill color for the circle
+
+                                  return(circle_data)
+                                }))
+
+                                # Draw all circles using GeomPolygon's draw_panel method to apply fill
+                                circle_grob <- GeomPolygon$draw_panel(
+                                  data = all_circle_data,
+                                  panel_params = panel_params,
+                                  coord = coord
+                                )
 
                                 polygon_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
 
@@ -258,7 +309,7 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                                 }))
 
 
-                              } else{
+                              } else {
                                 polygon_data <- NULL
                               }
 
@@ -282,7 +333,7 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                                 arrow = arrow
                               )
 
-                              grid::gList(polygon_grob, segments_grob)
+                              grid::gList(circle_grob, polygon_grob, segments_grob)
 
                             },
 
