@@ -48,11 +48,9 @@ wind_data_cartesian <- within(wind_data_polar, {
 
 wind_data_cartesian |> 
   ggplot() +
-  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy), 
-              add_points = TRUE, normalize = TRUE, center = TRUE) +
+  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy)) +
   labs(title = "Wind Vectors (Cartesian Input)",
-       x = "Longitude", y = "Latitude")  +
-  lims(x = c(-3,2), y = c(-2,3))
+       x = "Longitude", y = "Latitude")  
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
@@ -64,11 +62,9 @@ For polar coordinates, the vector is defined by an angle and distance:
 ``` r
 wind_data_polar |> 
   ggplot() +
-  geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd),
-              add_points = TRUE, normalize = TRUE, center = TRUE) +
+  geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd)) +
   labs(title = "Wind Vectors (Polar Input)",
-       x = "Longitude", y = "Latitude") +
-  lims(x = c(-3,2), y = c(-2,3))
+       x = "Longitude", y = "Latitude") 
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
@@ -119,12 +115,11 @@ In this example, the norm of the wind vectors is mapped to their length:
 wind_data_cartesian |> 
   ggplot() +
   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)), 
-              add_points = TRUE, center = TRUE) +
+              tail_point = TRUE, center = TRUE) +
   labs(title = "Wind Vectors (Cartesian Input)",
-       x = "Longitude", y = "Latitude")  +
-  lims(x = c(-3,2), y = c(-2,3)) +
-  scale_length_continuous()
-#> Normalization is ignored because length is mapped using after_stat().
+       x = "Longitude", y = "Latitude") 
+#> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
+#> Ensure your `length` values reflect the intended scaling.
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
@@ -196,7 +191,8 @@ ggplot() +
     aes(length = after_stat(norm)),
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
     ) 
-#> Normalization is ignored because length is mapped using after_stat().
+#> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
+#> Ensure your `length` values reflect the intended scaling.
 ```
 
 <img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
@@ -227,7 +223,8 @@ ggplot() +
     aes(length = after_stat(norm), color = after_stat(divergence)), 
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
   ) 
-#> Normalization is ignored because length is mapped using after_stat().
+#> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
+#> Ensure your `length` values reflect the intended scaling.
 ```
 
 <img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />

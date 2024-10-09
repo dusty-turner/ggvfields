@@ -14,7 +14,8 @@
 #' @param normalize Logical; if `TRUE`, normalizes each vector to a unit length before
 #'   applying any scaling. Normalization is useful for avoiding overplotting and ensuring
 #'   visual consistency, especially in dense plots.
-#' @param add_points Logical; if `TRUE`, adds a point at the start of each vector.
+#' @param tail_point Logical; if `TRUE`, adds a point at the start of each vector.
+#' @param tail_point.size Integer; controls the size of points on the tail if `tail_point = TRUE`.
 #' @param arrow Arrow specification for vector arrowheads, created by `grid::arrow()`.
 #'   This controls the appearance of the arrowheads at the end of the vectors, including properties like angle, length, and type.
 #' @return A `ggplot2` layer that can be added to a ggplot object to produce a vector plot.
@@ -76,12 +77,13 @@
 geom_vector <- function(mapping = NULL, data = NULL, stat = StatVector,
                         position = "identity", ..., na.rm = FALSE, show.legend = NA,
                         arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                        inherit.aes = TRUE, center = TRUE, normalize = TRUE, add_points = FALSE,
-                        fun = NULL) {
+                        inherit.aes = TRUE, center = TRUE, normalize = TRUE, tail_point = FALSE,
+                        tail_point.size = 2, fun = NULL) {
   layer(
     stat = StatVector, geom = GeomVector, mapping = mapping, data = data,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, arrow = arrow, center = center, normalize = normalize, add_points = add_points, fun = fun, ...)
+    params = list(na.rm = na.rm, arrow = arrow, center = center, normalize = normalize,
+                  tail_point = tail_point, tail_point.size = tail_point.size, fun = fun, ...)
   )
 }
 
@@ -91,11 +93,13 @@ geom_vector <- function(mapping = NULL, data = NULL, stat = StatVector,
 stat_vector <- function(mapping = NULL, data = NULL, geom = GeomVector,
                         position = "identity", ..., na.rm = FALSE, show.legend = NA,
                         arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                        inherit.aes = TRUE, center = TRUE, normalize = TRUE, add_points = FALSE) {
+                        inherit.aes = TRUE, center = TRUE, normalize = TRUE, tail_point = FALSE,
+                        tail_point.size = 2) {
   layer(
     stat = StatVector, geom = geom, mapping = mapping, data = data,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, arrow = arrow, center = center, normalize = normalize, add_points = add_points, ...)
+    params = list(na.rm = na.rm, arrow = arrow, center = center, normalize = normalize,
+                  tail_point = tail_point, tail_point.size = tail_point.size, ...)
   )
 }
 
@@ -139,7 +143,9 @@ StatVector <- ggproto("StatVector", Stat,
 )
 
 #' @keywords internal
-draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = NULL, center = TRUE, normalize = TRUE, add_points = FALSE) {
+draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = NULL,
+                              center = TRUE, normalize = TRUE, tail_point = FALSE, tail_point.size = 2) {
+
 
   # If length is not mapped, normalize and center using the original data before transformation
   if (is.na(data$length[1])) {
@@ -156,12 +162,12 @@ draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = 
     )
 
     points_grob <- NULL
-    if (add_points) {
+    if (tail_point) {
       points_grob <- grid::pointsGrob(
         x = unit(coords$x, "npc"),  # The starting point (adjusted by centering)
         y = unit(coords$y, "npc"),
         pch = 16,  # Solid circle
-        size = unit(2, "mm"),
+        size = unit(tail_point.size, "mm"),
         gp = grid::gpar(col = coords$colour, fill = coords$fill)  # Use mapped fill
       )
     }
@@ -175,7 +181,7 @@ draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = 
     # When length is mapped, proceed as usual
     # Display a message and ignore normalization if normalize = TRUE
     if (normalize) {
-      message("Normalization is ignored because length is mapped using after_stat().")
+      message("Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.\nEnsure your `length` values reflect the intended scaling.")
     }
 
     #### Untransform the data here ####
@@ -228,7 +234,7 @@ draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = 
         arrow = arrow  # Pass the arrow parameter here
       )
       points_grob <- NULL
-      if (add_points) {
+      if (tail_point) {
         points_grob <- grid::pointsGrob(
           x = unit(coords$x, "npc") - unit(half_dx, "cm"),  # The starting point (adjusted by centering)
           y = unit(coords$y, "npc") - unit(half_dy, "cm"),
@@ -246,7 +252,7 @@ draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = 
         arrow = arrow  # Pass the arrow parameter here
       )
       points_grob <- NULL
-      if (add_points) {
+      if (tail_point) {
         points_grob <- grid::pointsGrob(
           x = unit(coords$x, "npc"),  # The starting point (adjusted by centering)
           y = unit(coords$y, "npc"),

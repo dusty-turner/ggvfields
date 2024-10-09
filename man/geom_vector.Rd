@@ -25,7 +25,8 @@ geom_vector(
   inherit.aes = TRUE,
   center = TRUE,
   normalize = TRUE,
-  add_points = FALSE,
+  tail_point = FALSE,
+  tail_point.size = 2,
   fun = NULL
 )
 
@@ -41,7 +42,8 @@ stat_vector(
   inherit.aes = TRUE,
   center = TRUE,
   normalize = TRUE,
-  add_points = FALSE
+  tail_point = FALSE,
+  tail_point.size = 2
 )
 
 StatVector
@@ -148,7 +150,9 @@ When centering is enabled, the vector's midpoint aligns with the original (\code
 applying any scaling. Normalization is useful for avoiding overplotting and ensuring
 visual consistency, especially in dense plots.}
 
-\item{add_points}{Logical; if \code{TRUE}, adds a point at the start of each vector.}
+\item{tail_point}{Logical; if \code{TRUE}, adds a point at the start of each vector.}
+
+\item{tail_point.size}{Integer; controls the size of points on the tail if \code{tail_point = TRUE}.}
 
 \item{fun}{A function used to calculate vector fields (curl/divergence).}
 

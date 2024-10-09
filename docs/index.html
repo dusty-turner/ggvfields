@@ -105,11 +105,9 @@
 <span></span>
 <span><span class="va">wind_data_cartesian</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span>, </span>
-<span>              add_points <span class="op">=</span> <span class="cn">TRUE</span>, normalize <span class="op">=</span> <span class="cn">TRUE</span>, center <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Wind Vectors (Cartesian Input)"</span>,</span>
-<span>       x <span class="op">=</span> <span class="st">"Longitude"</span>, y <span class="op">=</span> <span class="st">"Latitude"</span><span class="op">)</span>  <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">lims</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>,<span class="fl">2</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>       x <span class="op">=</span> <span class="st">"Longitude"</span>, y <span class="op">=</span> <span class="st">"Latitude"</span><span class="op">)</span>  </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="100%"></p>
 </div>
 <div class="section level4">
@@ -119,11 +117,9 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">wind_data_polar</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, angle <span class="op">=</span> <span class="va">wind_dir</span>, distance <span class="op">=</span> <span class="va">wind_spd</span><span class="op">)</span>,</span>
-<span>              add_points <span class="op">=</span> <span class="cn">TRUE</span>, normalize <span class="op">=</span> <span class="cn">TRUE</span>, center <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, angle <span class="op">=</span> <span class="va">wind_dir</span>, distance <span class="op">=</span> <span class="va">wind_spd</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Wind Vectors (Polar Input)"</span>,</span>
-<span>       x <span class="op">=</span> <span class="st">"Longitude"</span>, y <span class="op">=</span> <span class="st">"Latitude"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">lims</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>,<span class="fl">2</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>       x <span class="op">=</span> <span class="st">"Longitude"</span>, y <span class="op">=</span> <span class="st">"Latitude"</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="100%"></p>
 </div>
 </div>
@@ -157,12 +153,11 @@
 <code class="sourceCode R"><span><span class="va">wind_data_cartesian</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span>, length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">norm</span><span class="op">)</span><span class="op">)</span>, </span>
-<span>              add_points <span class="op">=</span> <span class="cn">TRUE</span>, center <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>              tail_point <span class="op">=</span> <span class="cn">TRUE</span>, center <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Wind Vectors (Cartesian Input)"</span>,</span>
-<span>       x <span class="op">=</span> <span class="st">"Longitude"</span>, y <span class="op">=</span> <span class="st">"Latitude"</span><span class="op">)</span>  <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">lims</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>,<span class="fl">2</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/scale_length_continuous.html">scale_length_continuous</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Normalization is ignored because length is mapped using after_stat().</span></span></code></pre></div>
+<span>       x <span class="op">=</span> <span class="st">"Longitude"</span>, y <span class="op">=</span> <span class="st">"Latitude"</span><span class="op">)</span> </span>
+<span><span class="co">#&gt; Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.</span></span>
+<span><span class="co">#&gt; Ensure your `length` values reflect the intended scaling.</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="100%"></p>
 </div>
 <div class="section level3">
@@ -205,7 +200,8 @@
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">norm</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span></span>
 <span>    <span class="op">)</span> </span>
-<span><span class="co">#&gt; Normalization is ignored because length is mapped using after_stat().</span></span></code></pre></div>
+<span><span class="co">#&gt; Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.</span></span>
+<span><span class="co">#&gt; Ensure your `length` values reflect the intended scaling.</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-8-1.png" width="100%"></p>
 </div>
 <div class="section level3">
@@ -223,7 +219,8 @@ $$</span></p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">norm</span><span class="op">)</span>, color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">divergence</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> </span>
-<span><span class="co">#&gt; Normalization is ignored because length is mapped using after_stat().</span></span></code></pre></div>
+<span><span class="co">#&gt; Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.</span></span>
+<span><span class="co">#&gt; Ensure your `length` values reflect the intended scaling.</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-9-1.png" width="100%"></p>
 </div>
 <div class="section level3">
@@ -285,9 +282,9 @@ $$</span></p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span></span>
 <span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">divergence</span> <span class="op">+</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="op">)</span> </span>
-<span><span class="co">#&gt; Warning in log(divergence + 10): NaNs produced</span></span></code></pre></div>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">divergence</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">divergence</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"adjusted\ndivergence"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-14-1.png" width="100%"></p>
 </div>
 <div class="section level3">

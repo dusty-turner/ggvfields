@@ -69,7 +69,8 @@ from angular (<code>angle</code>) and distance (<code>distance</code>) informati
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  add_points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  tail_point.size <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  fun <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -85,7 +86,8 @@ from angular (<code>angle</code>) and distance (<code>distance</code>) informati
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  add_points <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  tail_point.size <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">StatVector</span></span>
@@ -212,8 +214,12 @@ applying any scaling. Normalization is useful for avoiding overplotting and ensu
 visual consistency, especially in dense plots.</p></dd>
 
 
-<dt>add_points</dt>
+<dt>tail_point</dt>
 <dd><p>Logical; if <code>TRUE</code>, adds a point at the start of each vector.</p></dd>
+
+
+<dt>tail_point.size</dt>
+<dd><p>Integer; controls the size of points on the tail if <code>tail_point = TRUE</code>.</p></dd>
 
 
 <dt>fun</dt>
