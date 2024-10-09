@@ -242,8 +242,9 @@ ggplot() +
 ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
-    aes(color = after_stat(log(divergence + 10)))
-    ) 
+    aes(color = after_stat(log(divergence + abs(min(divergence)))))
+    ) +
+  labs(color = "adjusted\ndivergence")
 ```
 
 

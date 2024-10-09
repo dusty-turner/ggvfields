@@ -319,9 +319,9 @@ ggplot() +
 ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
-    aes(color = after_stat(log(divergence + 10)))
-    ) 
-#> Warning in log(divergence + 10): NaNs produced
+    aes(color = after_stat(log(divergence + abs(min(divergence)))))
+    ) +
+  labs(color = "adjusted\ndivergence")
 ```
 
 <img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
