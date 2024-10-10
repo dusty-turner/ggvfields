@@ -107,6 +107,12 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                               y_seq <- seq(min(data$y), max(data$y), length.out = n[2])
                               grid <- expand.grid(x = x_seq, y = y_seq) |> mutate(id = row_number())
 
+                              x_spacing <- diff(sort(unique(grid$x)))[1]  # Spacing between adjacent x-values
+                              y_spacing <- diff(sort(unique(grid$y)))[1]  # Spacing between adjacent y-values
+
+                              # Choose the radius as a fraction of the smaller spacing
+                              radius <- min(x_spacing, y_spacing) / 2.5
+
                               # Fit models using regression on sin and cos for angle, and linear regression for distance
                               if (method == "lm") {
                                 fit_sin <- lm(sin(angle) ~ x + y, data = data)
@@ -142,7 +148,7 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                   partial_cos <- -pred_sin$fit / (pred_sin$fit^2 + pred_cos$fit^2)
 
                                   # Calculate angle variance using Delta Method with covariance
-                                  grid$angle_var <- sin_var * partial_sin^2 + cos_var * partial_cos^2 + 2 * cov_sin_cos * partial_sin * partial_cos
+                                  grid$angle_var <- sin_var * partial_sin^2 + cos_var * partial_cos^2 + 2 * abs(cov_sin_cos * partial_sin * partial_cos)
                                   grid$angle_sd <- sqrt(grid$angle_var)
 
                                   # Construct symmetric prediction intervals
@@ -223,7 +229,8 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                   xend_lower = grid$xend_lower,
                                   yend_lower = grid$yend_lower,
                                   dx = grid$xend_pred - grid$x,
-                                  dy = grid$yend_pred - grid$y
+                                  dy = grid$yend_pred - grid$y,
+                                  radius = rep(radius,nrow(grid))
                                 )
                               } else {
                                 result <- data.frame(
@@ -251,6 +258,46 @@ create_circle_data <- function(x, y, radius, n = 100) {
   )
 }
 
+# Function to create the wedge shape
+create_wedge_data <- function(x, y, xend_upper, yend_upper, xend_lower, yend_lower, radius, id, n_points = 100) {
+
+  # Check for missing values and handle gracefully
+  if (any(is.na(c(x, y, xend_upper, yend_upper, xend_lower, yend_lower)))) {
+    warning(paste("Skipping wedge for id =", id, "due to missing values in coordinates"))
+    return(data.frame(x = numeric(0), y = numeric(0), group = numeric(0), id = numeric(0)))
+  }
+
+  # Calculate the angles for the upper and lower points
+  angle_upper <- atan2(yend_upper - y, xend_upper - x)
+  angle_lower <- atan2(yend_lower - y, xend_lower - x)
+
+  # Ensure angle_upper > angle_lower for proper sequence direction
+  if (angle_upper < angle_lower) {
+    angle_upper <- angle_upper + 2 * pi
+  }
+
+  # Create a sequence of angles for the arc points between lower and upper
+  arc_angles <- seq(angle_lower, angle_upper, length.out = n_points)
+
+  # Generate the arc points
+  arc_x <- x + radius * cos(arc_angles)
+  arc_y <- y + radius * sin(arc_angles)
+
+  # Combine into a data frame
+  wedge_data <- data.frame(
+    x = c(x, arc_x, x),  # Start at the origin, draw arc, and return to origin
+    y = c(y, arc_y, y),
+    group = rep(id, length.out = n_points + 2),  # Set group ID for each wedge
+    id = rep(id, length.out = n_points + 2)  # Same group ID for the whole wedge
+  )
+
+  return(wedge_data)
+}
+
+
+
+
+
 #' @rdname geom_vector_smooth
 #' @export
 GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
@@ -266,12 +313,15 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
 
                               circle_grob <- NULL
                               polygon_grob <- NULL
+                              wedge_grob <- NULL
                               all_circle_data <- NULL
                               polygon_data <- NULL
+                              wedge_data <- NULL
 
                               if(se){
 
-                                radius <- sqrt((data$x[1] - data$xend[1])^2 + (data$y[1] - data$yend[1])^2)
+                                # Choose the radius as a fraction of the smaller spacing
+                                radius <- data$radius[1]
 
                                 all_circle_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
 
@@ -284,7 +334,6 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                                   circle_data$group <- i
 
                                   # Ensure aesthetics are replicated to match the length of circle_data
-                                  # circle_data$colour <- rep(data$colour[i], nrow(circle_data))
                                   circle_data$linewidth <- rep(data$linewidth[i], nrow(circle_data))
                                   circle_data$alpha <- rep(0.4, nrow(circle_data))  # Set a fixed alpha value
                                   circle_data$fill <- NA  # Set fill color for the circle
@@ -300,31 +349,33 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                                   coord = coord
                                 )
 
-                                polygon_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
-
-                                  data.frame(
-                                    id = rep(data$id[i], 4),  # Repeat the ID to match the length of the other vectors
-                                    x = c(data$x[i], data$xend_upper[i], data$xend[i], data$xend_lower[i]),  # Define the x-coordinates
-                                    y = c(data$y[i], data$yend_upper[i], data$yend[i], data$yend_lower[i]),  # Define the y-coordinates
-                                    group = rep(data$id[i], 4),  # Repeat group ID to match the length of the other vectors
-                                    linewidth = rep(data$linewidth[i], 4),  # Inherit or repeat linewidth
-                                    fill = rep(data$fill[i], 4),  # Inherit or repeat fill
-                                    linetype = rep(data$linetype[i], 4),  # Inherit or repeat linetype
-                                    alpha = rep(data$alpha[i], 4)  # Inherit or repeat alpha
+                                wedge_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
+                                  # Create the wedge shape
+                                  wedge <- create_wedge_data(
+                                    x = data$x[i], y = data$y[i],
+                                    xend_upper = data$xend_upper[i], yend_upper = data$yend_upper[i],
+                                    xend_lower = data$xend_lower[i], yend_lower = data$yend_lower[i],
+                                    radius = radius,  # Pass the radius to the function
+                                    id = data$id[i],
+                                    n_points = 50  # Number of points for the arc to create smooth curves
                                   )
+
+                                  # Ensure aesthetics are replicated to match the length of wedge data
+                                  wedge$linewidth <- rep(data$linewidth[i], nrow(wedge))
+                                  wedge$alpha <- rep(0.4, nrow(wedge))  # Set a fixed alpha value
+                                  wedge$fill <- rep(data$fill[i], nrow(wedge))  # Set fill color for the wedge
+                                  wedge$colour <- rep("grey60", nrow(wedge))  # Set border color for the wedge
+
+                                  return(wedge)
                                 }))
-
-                                # Draw the polygon if polygon data exists
-                                polygon_grob <- GeomPolygon$draw_panel(
-                                    data = polygon_data,
-                                    panel_params = panel_params,
-                                    coord = coord
-                                  )
-
+                                # Draw the wedge if wedge data exists
+                                wedge_grob <- GeomPolygon$draw_panel(
+                                  data = wedge_data,
+                                  panel_params = panel_params,
+                                  coord = coord
+                                )
 
                               }
-
-
 
                               # Draw the vector lines
                               segments_grob <- GeomSegment$draw_panel(
@@ -335,7 +386,7 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                               )
 
                               # Collect the grobs into a list
-                              grobs <- list(circle_grob, polygon_grob, segments_grob)
+                              grobs <- list(circle_grob, wedge_grob, segments_grob)
 
                               # Filter out NULL entries
                               grobs <- Filter(Negate(is.null), grobs)  # Remove NULL entries
