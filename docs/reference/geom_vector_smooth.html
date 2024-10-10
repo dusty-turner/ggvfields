@@ -78,6 +78,7 @@ instead of scalar data.</p>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"lm"</span>,</span>
 <span>  se <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  se.circle <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
@@ -96,6 +97,7 @@ instead of scalar data.</p>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"lm"</span>,</span>
 <span>  se <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  se.circle <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -104,7 +106,7 @@ instead of scalar data.</p>
     <div class="section level2">
     <h2 id="format">Format<a class="anchor" aria-label="anchor" href="#format"></a></h2>
     <p>An object of class <code>StatVectorSmooth</code> (inherits from <code>Stat</code>, <code>ggproto</code>, <code>gg</code>) of length 4.</p>
-<p>An object of class <code>GeomVectorSmooth</code> (inherits from <code>GeomSegment</code>, <code>Geom</code>, <code>ggproto</code>, <code>gg</code>) of length 5.</p>
+<p>An object of class <code>GeomVectorSmooth</code> (inherits from <code>GeomSegment</code>, <code>Geom</code>, <code>ggproto</code>, <code>gg</code>) of length 6.</p>
     </div>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
@@ -176,12 +178,12 @@ the default plot specification, e.g. <code><a href="https://ggplot2.tidyverse.or
 
 
 <dt>n</dt>
-<dd><p>An integer vector specifying the number of grid points along each
-axis.</p></dd>
+<dd><p>An integer vector specifying the number of grid points along each axis.</p></dd>
 
 
 <dt>scale_length</dt>
-<dd><p>more to follow</p></dd>
+<dd><p>Numeric; scales the length of the vectors to a given value.
+Useful for ensuring consistent lengths for visualization.</p></dd>
 
 
 <dt>center</dt>
@@ -205,6 +207,12 @@ scatterplot smoothing.</p></dd>
 
 <dt>se</dt>
 <dd><p>Logical; if <code>TRUE</code>, plots the confidence intervals around the smoothed vectors.</p></dd>
+
+
+<dt>se.circle</dt>
+<dd><p>Logical; if <code>TRUE</code>, draws circles around the origin of the vectors to represent
+the radius of the confidence interval. This is useful for visualizing the spread and variability
+of the confidence intervals when <code>se = TRUE</code>.</p></dd>
 
 
 <dt>arrow</dt>
@@ -312,8 +320,9 @@ smooth vector field plot.</p>
 <span class="r-in"><span><span class="co"># Plot the original vectors and smoothed vectors using `ggplot2` from ggvfields</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">sample_points</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span>  <span class="co"># Original vectors in red</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_vector_smooth</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span>            <span class="co"># Smoothed vectors</span></span></span>
+<span class="r-in"><span>  <span class="fu">geom_vector_smooth</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span>, se <span class="op">=</span> <span class="cn">TRUE</span>, se.circle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>  <span class="co"># Smoothed vectors</span></span></span>
 <span class="r-plt img"><img src="geom_vector_smooth-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

@@ -10,7 +10,7 @@
 \format{
 An object of class \code{StatVectorSmooth} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
 
-An object of class \code{GeomVectorSmooth} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 5.
+An object of class \code{GeomVectorSmooth} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 6.
 }
 \usage{
 StatVectorSmooth
@@ -31,6 +31,7 @@ stat_vector_smooth(
   normalize = TRUE,
   method = "lm",
   se = TRUE,
+  se.circle = TRUE,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
@@ -49,6 +50,7 @@ geom_vector_smooth(
   normalize = TRUE,
   method = "lm",
   se = TRUE,
+  se.circle = TRUE,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
@@ -114,10 +116,10 @@ rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
-\item{n}{An integer vector specifying the number of grid points along each
-axis.}
+\item{n}{An integer vector specifying the number of grid points along each axis.}
 
-\item{scale_length}{more to follow}
+\item{scale_length}{Numeric; scales the length of the vectors to a given value.
+Useful for ensuring consistent lengths for visualization.}
 
 \item{center}{Logical; if \code{TRUE}, centers the vector on the evaluated x/y
 location. If \code{FALSE}, the vector origin is at the evaluated x/y location.
@@ -133,6 +135,10 @@ Accepts \code{"lm"} for linear modeling or \code{"loess"} for locally estimated
 scatterplot smoothing.}
 
 \item{se}{Logical; if \code{TRUE}, plots the confidence intervals around the smoothed vectors.}
+
+\item{se.circle}{Logical; if \code{TRUE}, draws circles around the origin of the vectors to represent
+the radius of the confidence interval. This is useful for visualizing the spread and variability
+of the confidence intervals when \code{se = TRUE}.}
 
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}. This
 controls the appearance of the arrowheads at the end of the vectors,
@@ -245,6 +251,7 @@ sample_points$dy <- sample_points$yend - sample_points$y
 # Plot the original vectors and smoothed vectors using `ggplot2` from ggvfields
 ggplot(sample_points, aes(x = x, y = y)) +
   geom_vector(aes(dx = dx, dy = dy), color = "red") +  # Original vectors in red
-  geom_vector_smooth(aes(dx = dx, dy = dy))            # Smoothed vectors
+  geom_vector_smooth(aes(dx = dx, dy = dy), se = TRUE, se.circle = TRUE)  # Smoothed vectors
+
 }
 \keyword{datasets}

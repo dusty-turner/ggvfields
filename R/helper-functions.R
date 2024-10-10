@@ -92,3 +92,44 @@ extract_after_stat <- function(mapping, aes_name) {
   return(NULL)
 }
 
+# create circles in geom_vector_smooth
+create_circle_data <- function(x, y, radius, n = 100) {
+  angle <- seq(0, 2 * pi, length.out = n)
+  data.frame(
+    x = x + radius * cos(angle),
+    y = y + radius * sin(angle),
+    group = 1
+  )
+}
+
+# create wedges in geom_vector_smooth
+create_wedge_data <- function(x, y, xend_upper, yend_upper, xend_lower, yend_lower, radius, id, n_points = 100) {
+
+
+  if (any(is.na(c(x, y, xend_upper, yend_upper, xend_lower, yend_lower)))) {
+    warning(paste("Skipping wedge for id =", id, "due to missing values in coordinates"))
+    return(data.frame(x = numeric(0), y = numeric(0), group = numeric(0), id = numeric(0)))
+  }
+
+  angle_upper <- atan2(yend_upper - y, xend_upper - x)
+  angle_lower <- atan2(yend_lower - y, xend_lower - x)
+
+  if (angle_upper < angle_lower) {
+    angle_upper <- angle_upper + 2 * pi
+  }
+
+  arc_angles <- seq(angle_lower, angle_upper, length.out = n_points)
+
+  arc_x <- x + radius * cos(arc_angles)
+  arc_y <- y + radius * sin(arc_angles)
+
+  wedge_data <- data.frame(
+    x = c(x, arc_x, x),
+    y = c(y, arc_y, y),
+    group = rep(id, length.out = n_points + 2),
+    id = rep(id, length.out = n_points + 2)
+  )
+
+  return(wedge_data)
+}
+

@@ -106,7 +106,7 @@ wind_data_cartesian |>
        x = "Longitude", y = "Latitude") 
 ```
 
-### `geom_vector_field()`{.R}
+### `geom_vector_field()`{.R}: Visualizing Vector Fields
 
 The `geom_vector_field()` function creates a vector field plot using a user-defined function to compute vector components. This abstraction simplifies the mathematical computations involved in vector field visualizations. Users no longer need to manually calculate vector components for `geom_segment()`.
 
@@ -385,7 +385,7 @@ The `geom_vector_smooth()` function is designed to provide a smoothed estimate o
 generate_vectors <- function(v) {
   x <- v[1]
   y <- v[2]
-  c(x + rnorm(1, 1, 1), y + rnorm(1, 1, 1))  # Add random noise to simulate new x, y positions
+  c(-1 - x^2 + y, 1 + x - y^2)  
 }
 
 # Set seed for reproducibility
@@ -393,8 +393,8 @@ set.seed(123)
 
 # Generate sample points for the vector field
 sample_points <- data.frame(
-  x = runif(10, min = -10, max = 10),  # Random x coordinates between -10 and 10
-  y = runif(10, min = -10, max = 10)   # Random y coordinates between -10 and 10
+  x = runif(50, min = -10, max = 10),  
+  y = runif(50, min = -10, max = 10)   
 )
 
 # Apply the generate_vectors function to each row to create displacements
@@ -410,8 +410,9 @@ sample_points$dy <- sample_points$yend - sample_points$y
 
 # Visualize the original and smoothed vectors using `ggplot2` from ggvfields
 ggplot(sample_points, aes(x = x, y = y)) +
-  geom_vector(aes(dx = dx, dy = dy), color = "red") +  # Plot original vectors in red
-  geom_vector_smooth(aes(dx = dx, dy = dy))            # Overlay with smoothed vectors
+  geom_vector(aes(dx = dx, dy = dy)) +  
+  geom_vector_smooth(aes(dx = dx, dy = dy), n = 6, center = FALSE) + 
+  coord_equal()
 ```
 
 This example demonstrates how `geom_vector_smooth()` can be used to fit a vector field to vector data. 
@@ -423,14 +424,6 @@ This package is licensed under the MIT License.
 ## Contact
 
 For any questions or issues, please [open an issue](https://github.com/dusty-turner/ggvfields/issues/new) on GitHub or contact the maintainer.
-
-## Installation
-
-You can install the development version from GitHub:
-
-```{r, eval=FALSE}
-devtools::install_github("dusty-turner/ggvfields")
-```
 
 ## Related projects
 

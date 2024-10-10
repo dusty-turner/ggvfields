@@ -8,9 +8,9 @@
 #'
 #' @inheritParams geom_vector
 #' @inheritParams ggplot2::stat_identity
-#' @param n An integer vector specifying the number of grid points along each
-#'   axis.
-#' @param scale_length more to follow
+#' @param n An integer vector specifying the number of grid points along each axis.
+#' @param scale_length Numeric; scales the length of the vectors to a given value.
+#'   Useful for ensuring consistent lengths for visualization.
 #' @param center Logical; if `TRUE`, centers the vector on the evaluated x/y
 #'   location. If `FALSE`, the vector origin is at the evaluated x/y location.
 #'   When centering is enabled, the vector's midpoint aligns with the original
@@ -22,6 +22,9 @@
 #'   Accepts `"lm"` for linear modeling or `"loess"` for locally estimated
 #'   scatterplot smoothing.
 #' @param se Logical; if `TRUE`, plots the confidence intervals around the smoothed vectors.
+#' @param se.circle Logical; if `TRUE`, draws circles around the origin of the vectors to represent
+#'   the radius of the confidence interval. This is useful for visualizing the spread and variability
+#'   of the confidence intervals when `se = TRUE`.
 #' @param arrow Arrow specification, as created by `grid::arrow()`. This
 #'   controls the appearance of the arrowheads at the end of the vectors,
 #'   including properties like angle, length, and type.
@@ -80,8 +83,10 @@
 #' # Plot the original vectors and smoothed vectors using `ggplot2` from ggvfields
 #' ggplot(sample_points, aes(x = x, y = y)) +
 #'   geom_vector(aes(dx = dx, dy = dy), color = "red") +  # Original vectors in red
-#'   geom_vector_smooth(aes(dx = dx, dy = dy))            # Smoothed vectors
+#'   geom_vector_smooth(aes(dx = dx, dy = dy), se = TRUE, se.circle = TRUE)  # Smoothed vectors
+#'
 NULL
+
 
 #' @rdname geom_vector_smooth
 #' @export
@@ -105,7 +110,8 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                               # Generate the grid for predictions
                               x_seq <- seq(min(data$x), max(data$x), length.out = n[1])
                               y_seq <- seq(min(data$y), max(data$y), length.out = n[2])
-                              grid <- expand.grid(x = x_seq, y = y_seq) |> mutate(id = row_number())
+                              grid <- expand.grid(x = x_seq, y = y_seq)
+                              grid$id <- 1:nrow(grid)
 
                               x_spacing <- diff(sort(unique(grid$x)))[1]  # Spacing between adjacent x-values
                               y_spacing <- diff(sort(unique(grid$y)))[1]  # Spacing between adjacent y-values
@@ -181,7 +187,6 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                 stop("Unsupported method. Please use 'lm' or 'loess'.")
                               }
 
-                              # Normalize vector lengths if needed
                               if (normalize) {
                                 grid$norm_pred <- sqrt((grid$xend_pred - grid$x)^2 + (grid$yend_pred - grid$y)^2)
                                 grid$xend_pred <- grid$x + (grid$xend_pred - grid$x) / grid$norm_pred * scale_length
@@ -198,7 +203,6 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                 }
                               }
 
-                              # Center the vectors if required
                               if (center) {
                                 half_u <- (grid$xend_pred - grid$x) / 2
                                 half_v <- (grid$yend_pred - grid$y) / 2
@@ -216,7 +220,6 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                 }
                               }
 
-                              # Prepare the final data to be returned based on se
                               if (se) {
                                 result <- data.frame(
                                   x = grid$x,
@@ -248,56 +251,6 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                             }
 )
 
-
-create_circle_data <- function(x, y, radius, n = 100) {
-  angle <- seq(0, 2 * pi, length.out = n)  # Generate angles from 0 to 2π
-  data.frame(
-    x = x + radius * cos(angle),  # X-coordinates for the circle
-    y = y + radius * sin(angle),  # Y-coordinates for the circle
-    group = 1  # Use a placeholder group ID; will be set uniquely for each circle
-  )
-}
-
-# Function to create the wedge shape
-create_wedge_data <- function(x, y, xend_upper, yend_upper, xend_lower, yend_lower, radius, id, n_points = 100) {
-
-  # Check for missing values and handle gracefully
-  if (any(is.na(c(x, y, xend_upper, yend_upper, xend_lower, yend_lower)))) {
-    warning(paste("Skipping wedge for id =", id, "due to missing values in coordinates"))
-    return(data.frame(x = numeric(0), y = numeric(0), group = numeric(0), id = numeric(0)))
-  }
-
-  # Calculate the angles for the upper and lower points
-  angle_upper <- atan2(yend_upper - y, xend_upper - x)
-  angle_lower <- atan2(yend_lower - y, xend_lower - x)
-
-  # Ensure angle_upper > angle_lower for proper sequence direction
-  if (angle_upper < angle_lower) {
-    angle_upper <- angle_upper + 2 * pi
-  }
-
-  # Create a sequence of angles for the arc points between lower and upper
-  arc_angles <- seq(angle_lower, angle_upper, length.out = n_points)
-
-  # Generate the arc points
-  arc_x <- x + radius * cos(arc_angles)
-  arc_y <- y + radius * sin(arc_angles)
-
-  # Combine into a data frame
-  wedge_data <- data.frame(
-    x = c(x, arc_x, x),  # Start at the origin, draw arc, and return to origin
-    y = c(y, arc_y, y),
-    group = rep(id, length.out = n_points + 2),  # Set group ID for each wedge
-    id = rep(id, length.out = n_points + 2)  # Same group ID for the whole wedge
-  )
-
-  return(wedge_data)
-}
-
-
-
-
-
 #' @rdname geom_vector_smooth
 #' @export
 GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
@@ -306,78 +259,87 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
 
                             default_aes = aes(linewidth = 0.5, linetype = 1, alpha = 1, fill = "grey80", color = "#3366FF"),
 
-                            draw_panel = function(data, panel_params, coord, arrow = NULL, se) {
+                            setup_data = function(data, params) {
 
-                              # Reshape the data for polygons
                               data$id <- seq_len(nrow(data))
 
+                              if(params$se){
+
+                                original_length <- sqrt((data$xend - data$x)^2 + (data$yend - data$y)^2)
+
+                                scaling_factor <- data$radius / original_length
+
+                                data$xend <- data$x + (data$xend - data$x) * scaling_factor
+                                data$yend <- data$y + (data$yend - data$y) * scaling_factor
+                              }
+
+
+                              return(data)
+                            },
+
+                            draw_panel = function(data, panel_params, coord, arrow = NULL, se = TRUE, se.circle) {
+
+
                               circle_grob <- NULL
-                              polygon_grob <- NULL
                               wedge_grob <- NULL
                               all_circle_data <- NULL
-                              polygon_data <- NULL
                               wedge_data <- NULL
 
-                              if(se){
+                              if (se) {
+                                if(se.circle){
 
-                                # Choose the radius as a fraction of the smaller spacing
-                                radius <- data$radius[1]
+                                  all_circle_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
 
-                                all_circle_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
+                                    circle_data <- create_circle_data(
+                                      x = data$x[i], y = data$y[i], radius = data$radius[i]
+                                    )
 
-                                  # Create circle data for the current point
-                                  circle_data <- create_circle_data(
-                                    x = data$x[i], y = data$y[i], radius = radius
+                                    circle_data$group <- i
+
+                                    circle_data$linewidth <- data$linewidth[i]
+                                    circle_data$alpha <- 0.4
+                                    circle_data$fill <- NA
+                                    circle_data$colour <- "grey60"
+
+                                    return(circle_data)
+                                  }))
+
+
+                                  circle_grob <- GeomPolygon$draw_panel(
+                                    data = all_circle_data,
+                                    panel_params = panel_params,
+                                    coord = coord
                                   )
+                                }
 
-                                  # Set unique group for each circle
-                                  circle_data$group <- i
-
-                                  # Ensure aesthetics are replicated to match the length of circle_data
-                                  circle_data$linewidth <- rep(data$linewidth[i], nrow(circle_data))
-                                  circle_data$alpha <- rep(0.4, nrow(circle_data))  # Set a fixed alpha value
-                                  circle_data$fill <- NA  # Set fill color for the circle
-                                  circle_data$colour <- rep("grey60", nrow(circle_data))  # Set fill color for the circle
-
-                                  return(circle_data)
-                                }))
-
-                                # Draw all circles using GeomPolygon's draw_panel method to apply fill
-                                circle_grob <- GeomPolygon$draw_panel(
-                                  data = all_circle_data,
-                                  panel_params = panel_params,
-                                  coord = coord
-                                )
 
                                 wedge_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
-                                  # Create the wedge shape
+
                                   wedge <- create_wedge_data(
                                     x = data$x[i], y = data$y[i],
                                     xend_upper = data$xend_upper[i], yend_upper = data$yend_upper[i],
                                     xend_lower = data$xend_lower[i], yend_lower = data$yend_lower[i],
-                                    radius = radius,  # Pass the radius to the function
+                                    radius = data$radius[i],
                                     id = data$id[i],
-                                    n_points = 50  # Number of points for the arc to create smooth curves
+                                    n_points = 50
                                   )
 
-                                  # Ensure aesthetics are replicated to match the length of wedge data
-                                  wedge$linewidth <- rep(data$linewidth[i], nrow(wedge))
-                                  wedge$alpha <- rep(0.4, nrow(wedge))  # Set a fixed alpha value
-                                  wedge$fill <- rep(data$fill[i], nrow(wedge))  # Set fill color for the wedge
-                                  wedge$colour <- rep("grey60", nrow(wedge))  # Set border color for the wedge
-
+                                  wedge$linewidth <- data$linewidth[i]
+                                  wedge$alpha <- 0.4
+                                  wedge$fill <- data$fill[i]
+                                  wedge$colour <- "grey60"
                                   return(wedge)
                                 }))
-                                # Draw the wedge if wedge data exists
+
+
                                 wedge_grob <- GeomPolygon$draw_panel(
                                   data = wedge_data,
                                   panel_params = panel_params,
                                   coord = coord
                                 )
-
                               }
 
-                              # Draw the vector lines
+
                               segments_grob <- GeomSegment$draw_panel(
                                 data = data,
                                 panel_params = panel_params,
@@ -385,19 +347,16 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                                 arrow = arrow
                               )
 
-                              # Collect the grobs into a list
                               grobs <- list(circle_grob, wedge_grob, segments_grob)
 
-                              # Filter out NULL entries
-                              grobs <- Filter(Negate(is.null), grobs)  # Remove NULL entries
+                              grobs <- Filter(Negate(is.null), grobs)
 
-                              # Return the combined grobTree
                               return(grid::grobTree(do.call(grid::gList, grobs)))
-
                             },
 
                             draw_key = draw_key_smooth
 )
+
 
 #' @rdname geom_vector_smooth
 #' @export
@@ -410,6 +369,7 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
                                center = TRUE, normalize = TRUE,
                                method = "lm",
                                se = TRUE,
+                               se.circle = TRUE,
                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                                ...) {
 
@@ -428,6 +388,7 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
       scale_length = scale_length,
       method = method,
       se = se,
+      se.circle = se.circle,
       arrow = arrow,
       na.rm = na.rm,
       ...
@@ -446,6 +407,7 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
                                center = TRUE, normalize = TRUE,
                                method = "lm",
                                se = TRUE,
+                               se.circle = TRUE,
                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                                ...) {
 
@@ -464,6 +426,7 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
       scale_length = scale_length,
       method = method,
       se = se,
+      se.circle = se.circle,
       arrow = arrow,
       na.rm = na.rm,
       ...

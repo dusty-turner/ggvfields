@@ -501,7 +501,7 @@ field.
 generate_vectors <- function(v) {
   x <- v[1]
   y <- v[2]
-  c(x + rnorm(1, 1, 1), y + rnorm(1, 1, 1))  # Add random noise to simulate new x, y positions
+  c(-1 - x^2 + y, 1 + x - y^2)  
 }
 
 # Set seed for reproducibility
@@ -509,8 +509,8 @@ set.seed(123)
 
 # Generate sample points for the vector field
 sample_points <- data.frame(
-  x = runif(10, min = -10, max = 10),  # Random x coordinates between -10 and 10
-  y = runif(10, min = -10, max = 10)   # Random y coordinates between -10 and 10
+  x = runif(50, min = -10, max = 10),  
+  y = runif(50, min = -10, max = 10)   
 )
 
 # Apply the generate_vectors function to each row to create displacements
@@ -526,8 +526,9 @@ sample_points$dy <- sample_points$yend - sample_points$y
 
 # Visualize the original and smoothed vectors using `ggplot2` from ggvfields
 ggplot(sample_points, aes(x = x, y = y)) +
-  geom_vector(aes(dx = dx, dy = dy), color = "red") +  # Plot original vectors in red
-  geom_vector_smooth(aes(dx = dx, dy = dy))            # Overlay with smoothed vectors
+  geom_vector(aes(dx = dx, dy = dy)) +  
+  geom_vector_smooth(aes(dx = dx, dy = dy), n = 6, center = FALSE) + 
+  coord_equal()
 ```
 
 <img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
@@ -544,14 +545,6 @@ This package is licensed under the MIT License.
 For any questions or issues, please [open an
 issue](https://github.com/dusty-turner/ggvfields/issues/new) on GitHub
 or contact the maintainer.
-
-## Installation
-
-You can install the development version from GitHub:
-
-``` r
-devtools::install_github("dusty-turner/ggvfields")
-```
 
 ## Related projects
 
