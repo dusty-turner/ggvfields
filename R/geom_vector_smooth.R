@@ -87,6 +87,20 @@
 #'
 NULL
 
+calculate_bounds <- function(fit, se, level) {
+  if (!se) return(NULL)
+
+  # Calculate critical t-value for the confidence level
+  t_critical <- qt(1 - (1 - level) / 2, df = fit$df)
+
+  # Calculate upper and lower bounds
+  lower_bound <- fit$fit - t_critical * fit$se.fit
+  upper_bound <- fit$fit + t_critical * fit$se.fit
+
+  # Return a list of bounds
+  return(list(lower = lower_bound, upper = upper_bound))
+}
+
 
 #' @rdname geom_vector_smooth
 #' @export
@@ -119,47 +133,29 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                               # Choose the radius as a fraction of the smaller spacing
                               radius <- min(x_spacing, y_spacing) / 2.5
 
-                              # Fit models using regression on sin and cos for angle, and linear regression for distance
                               if (method == "lm") {
                                 fit_sin <- lm(sin(angle) ~ x + y, data = data)
                                 fit_cos <- lm(cos(angle) ~ x + y, data = data)
                                 fit_distance <- lm(distance ~ x + y, data = data)
 
-                                # Predict the sine and cosine values
+                                # Predictions and confidence intervals using helper function
                                 pred_sin <- predict(fit_sin, newdata = grid, se.fit = se)
                                 pred_cos <- predict(fit_cos, newdata = grid, se.fit = se)
                                 pred_distance <- predict(fit_distance, newdata = grid, se.fit = se)
 
-                                # Calculate residuals and covariance
-                                sin_residuals <- residuals(fit_sin)
-                                cos_residuals <- residuals(fit_cos)
-                                cov_sin_cos <- cov(sin_residuals, cos_residuals)
+                                # Calculate confidence bounds using the helper function
+                                sin_bounds <- calculate_bounds(pred_sin, se, level)
+                                cos_bounds <- calculate_bounds(pred_cos, se, level)
+                                distance_bounds <- calculate_bounds(pred_distance, se, level)
 
-                                # Calculate symmetric angle prediction intervals using Delta Method
                                 if (se) {
-
-                                  # Reconstruct the angle from sine and cosine predictions
+                                  # Reconstruct the angle and distance predictions
                                   grid$angle_pred <- atan2(pred_sin$fit, pred_cos$fit)
                                   grid$distance_pred <- pred_distance$fit
 
-                                  # Calculate the critical value for confidence intervals
-                                  t_critical <- qt(1 - (1 - level) / 2, df = fit_distance$df.residual)
-
-                                  # Calculate the variance and standard error of the angle using Delta Method
-                                  sin_var <- pred_sin$se.fit^2
-                                  cos_var <- pred_cos$se.fit^2
-
-                                  # Compute gradient components
-                                  partial_sin <- pred_cos$fit / (pred_sin$fit^2 + pred_cos$fit^2)
-                                  partial_cos <- -pred_sin$fit / (pred_sin$fit^2 + pred_cos$fit^2)
-
-                                  # Calculate angle variance using Delta Method with covariance
-                                  grid$angle_var <- sin_var * partial_sin^2 + cos_var * partial_cos^2 + 2 * abs(cov_sin_cos * partial_sin * partial_cos)
-                                  grid$angle_sd <- sqrt(grid$angle_var)
-
-                                  # Construct symmetric prediction intervals
-                                  grid$angle_lower <- grid$angle_pred - t_critical * grid$angle_sd
-                                  grid$angle_upper <- grid$angle_pred + t_critical * grid$angle_sd
+                                  # Calculate the angle prediction intervals
+                                  grid$angle_lower <- atan2(sin_bounds$lower, cos_bounds$upper)
+                                  grid$angle_upper <- atan2(sin_bounds$upper, cos_bounds$lower)
 
                                   # Calculate xend and yend for lower, upper, and main predictions
                                   grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
@@ -169,9 +165,8 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                   grid$xend_upper <- grid$x + grid$distance_pred * cos(grid$angle_upper)
                                   grid$yend_upper <- grid$y + grid$distance_pred * sin(grid$angle_upper)
                                 } else {
-                                  grid$angle_pred <- atan2(pred_sin, pred_cos)
-                                  grid$distance_pred <- pred_distance
-
+                                  grid$angle_pred <- atan2(pred_sin$fit, pred_cos$fit)
+                                  grid$distance_pred <- pred_distance$fit
                                   grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
                                   grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
                                 }
@@ -182,7 +177,6 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                 grid$distance_pred <- predict(fit_distance, newdata = grid)
                                 grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
                                 grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
-
                               } else {
                                 stop("Unsupported method. Please use 'lm' or 'loess'.")
                               }
@@ -191,16 +185,6 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                 grid$norm_pred <- sqrt((grid$xend_pred - grid$x)^2 + (grid$yend_pred - grid$y)^2)
                                 grid$xend_pred <- grid$x + (grid$xend_pred - grid$x) / grid$norm_pred * scale_length
                                 grid$yend_pred <- grid$y + (grid$yend_pred - grid$y) / grid$norm_pred * scale_length
-
-                                if (se) {
-                                  grid$norm_lower <- sqrt((grid$xend_lower - grid$x)^2 + (grid$yend_lower - grid$y)^2)
-                                  grid$norm_upper <- sqrt((grid$xend_upper - grid$x)^2 + (grid$yend_upper - grid$y)^2)
-
-                                  grid$xend_lower <- grid$x + (grid$xend_lower - grid$x) / grid$norm_lower * scale_length
-                                  grid$yend_lower <- grid$y + (grid$yend_lower - grid$y) / grid$norm_lower * scale_length
-                                  grid$xend_upper <- grid$x + (grid$xend_upper - grid$x) / grid$norm_upper * scale_length
-                                  grid$yend_upper <- grid$y + (grid$yend_upper - grid$y) / grid$norm_upper * scale_length
-                                }
                               }
 
                               if (center) {
@@ -211,45 +195,30 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                 grid$y <- grid$y - half_v
                                 grid$xend_pred <- grid$xend_pred - half_u
                                 grid$yend_pred <- grid$yend_pred - half_v
-
-                                if (se) {
-                                  grid$xend_lower <- grid$xend_lower - half_u
-                                  grid$xend_upper <- grid$xend_upper - half_u
-                                  grid$yend_lower <- grid$yend_lower - half_v
-                                  grid$yend_upper <- grid$yend_upper - half_v
-                                }
                               }
 
+                              # Include radius and original dx, dy in the result
+                              result <- data.frame(
+                                x = grid$x,
+                                y = grid$y,
+                                xend = grid$xend_pred,
+                                yend = grid$yend_pred,
+                                radius = rep(radius, nrow(grid)),
+                                dx = grid$xend_pred - grid$x,  # Include dx
+                                dy = grid$yend_pred - grid$y  # Include dy
+                              )
+
                               if (se) {
-                                result <- data.frame(
-                                  x = grid$x,
-                                  y = grid$y,
-                                  xend = grid$xend_pred,
-                                  yend = grid$yend_pred,
-                                  norm = grid$distance_pred,
-                                  xend_upper = grid$xend_upper,
-                                  yend_upper = grid$yend_upper,
-                                  xend_lower = grid$xend_lower,
-                                  yend_lower = grid$yend_lower,
-                                  dx = grid$xend_pred - grid$x,
-                                  dy = grid$yend_pred - grid$y,
-                                  radius = rep(radius,nrow(grid))
-                                )
-                              } else {
-                                result <- data.frame(
-                                  x = grid$x,
-                                  y = grid$y,
-                                  xend = grid$xend_pred,
-                                  yend = grid$yend_pred,
-                                  norm = grid$distance_pred,
-                                  dx = grid$xend_pred - grid$x,
-                                  dy = grid$yend_pred - grid$y
-                                )
+                                result$xend_upper <- grid$xend_upper
+                                result$yend_upper <- grid$yend_upper
+                                result$xend_lower <- grid$xend_lower
+                                result$yend_lower <- grid$yend_lower
                               }
 
                               return(result)
                             }
 )
+
 
 #' @rdname geom_vector_smooth
 #' @export
