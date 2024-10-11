@@ -116,7 +116,7 @@ wind_data_cartesian |>
   ggplot() +
   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)), 
               tail_point = TRUE, center = TRUE) +
-  labs(title = "Wind Vectors (Cartesian Input)",
+  labs(title = "Wind Vectors",
        x = "Longitude", y = "Latitude") 
 #> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
 #> Ensure your `length` values reflect the intended scaling.
@@ -124,7 +124,7 @@ wind_data_cartesian |>
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
-### `geom_vector_field()`
+### `geom_vector_field()`: Visualizing Vector Fields
 
 The `geom_vector_field()` function creates a vector field plot using a
 user-defined function to compute vector components. This abstraction
@@ -154,9 +154,16 @@ the visual representation of vectors:
   useful when the vector field is meant to represent flow starting
   *from* a point, rather than centered around it.
 
-By using these two options, you can control whether vector lengths are
-uniform or reflect their actual magnitudes and how the vectors are
-positioned relative to their base coordinates.
+Additionally, **`geom_vector_field()` defaults to
+`length = after_stat(norm)`**, which maps the computed vector norms to
+the `length` aesthetic. This means that unless specified otherwise, the
+vectors’ lengths will automatically be proportional to their calculated
+magnitudes.
+
+By using these options, you can control whether vector lengths are
+uniform or reflect their actual magnitudes, how the vectors are
+positioned relative to their base coordinates, and how the `length`
+aesthetic is used in your plot.
 
 #### Example: Basic Vector Field Plot
 
@@ -168,7 +175,7 @@ f <- function(v) {
 
 ggplot() +
   geom_vector_field(
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), normalize = TRUE, center = TRUE
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), normalize = FALSE, center = TRUE
     ) 
 ```
 
@@ -254,6 +261,8 @@ ggplot() +
     aes(color = after_stat(curl)), 
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
   ) 
+#> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
+#> Ensure your `length` values reflect the intended scaling.
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />

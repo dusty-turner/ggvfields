@@ -102,7 +102,7 @@ wind_data_cartesian |>
   ggplot() +
   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)), 
               tail_point = TRUE, center = TRUE) +
-  labs(title = "Wind Vectors (Cartesian Input)",
+  labs(title = "Wind Vectors",
        x = "Longitude", y = "Latitude") 
 ```
 
@@ -116,7 +116,9 @@ Two important options in `geom_vector_field()` are **normalize** and **center** 
 
 - **center**: By default, **center** is also set to `TRUE`, meaning the midpoint of each vector is placed at the corresponding `(x, y)` coordinate, effectively "centering" the vector on the point. When `center` is `FALSE`, the base of the vector is anchored at the `(x, y)` point, and the vector extends outward from there. This is useful when the vector field is meant to represent flow starting *from* a point, rather than centered around it.
 
-By using these two options, you can control whether vector lengths are uniform or reflect their actual magnitudes and how the vectors are positioned relative to their base coordinates.
+Additionally, **`geom_vector_field()` defaults to `length = after_stat(norm)`**, which maps the computed vector norms to the `length` aesthetic. This means that unless specified otherwise, the vectors' lengths will automatically be proportional to their calculated magnitudes. 
+
+By using these options, you can control whether vector lengths are uniform or reflect their actual magnitudes, how the vectors are positioned relative to their base coordinates, and how the `length` aesthetic is used in your plot.
 
 #### Example: Basic Vector Field Plot
 
@@ -128,7 +130,7 @@ f <- function(v) {
 
 ggplot() +
   geom_vector_field(
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), normalize = TRUE, center = TRUE
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), normalize = FALSE, center = TRUE
     ) 
 ```
 
