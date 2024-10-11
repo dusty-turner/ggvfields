@@ -87,11 +87,11 @@
 #'
 NULL
 
-calculate_bounds <- function(fit, se, level) {
+calculate_bounds <- function(fit, se, probs) {
   if (!se) return(NULL)
 
   # Calculate critical t-value for the confidence level
-  t_critical <- qt(1 - (1 - level) / 2, df = fit$df)
+  t_critical <- qt(1 - (1 - probs) / 2, df = fit$df)
 
   # Calculate upper and lower bounds
   lower_bound <- fit$fit - t_critical * fit$se.fit
@@ -108,7 +108,12 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                             required_aes = c("x", "y", "dx", "dy"),
                             default_aes = aes(color = "#3366FF", linewidth = 0.5, linetype = 1, alpha = 1),
 
-                            compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_length, se = TRUE, level = .95, ...) {
+                            compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_length, se = TRUE, probs, ...) {
+
+                              # Ensure probs is a vector, even if a single value is provided
+                              if (length(probs) == 1) {
+                                probs <- c(probs, NA)  # Add NA to represent the missing inner interval
+                              }
 
                               # Ensure that n has the correct length
                               n <- ensure_length_two(n)
@@ -143,42 +148,51 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                 pred_cos <- predict(fit_cos, newdata = grid, se.fit = se)
                                 pred_distance <- predict(fit_distance, newdata = grid, se.fit = se)
 
-                                # Calculate confidence bounds using the helper function
-                                sin_bounds <- calculate_bounds(pred_sin, se, level)
-                                cos_bounds <- calculate_bounds(pred_cos, se, level)
-                                distance_bounds <- calculate_bounds(pred_distance, se, level)
-
                                 if (se) {
+
+                                  # Calculate confidence bounds for outer interval
+                                  sin_bounds_outer <- calculate_bounds(fit = pred_sin, se = se, probs = probs[1])
+                                  cos_bounds_outer <- calculate_bounds(pred_cos, se, probs[1])
+                                  distance_bounds <- calculate_bounds(pred_distance, se, probs[1])
+
                                   # Reconstruct the angle and distance predictions
                                   grid$angle_pred <- atan2(pred_sin$fit, pred_cos$fit)
                                   grid$distance_pred <- pred_distance$fit
 
-                                  # Calculate the angle prediction intervals
-                                  grid$angle_lower <- atan2(sin_bounds$lower, cos_bounds$upper)
-                                  grid$angle_upper <- atan2(sin_bounds$upper, cos_bounds$lower)
+                                  # Calculate the angle prediction intervals for outer bounds
+                                  grid$angle_lower_outer <- atan2(sin_bounds_outer$lower, cos_bounds_outer$upper)
+                                  grid$angle_upper_outer <- atan2(sin_bounds_outer$upper, cos_bounds_outer$lower)
 
                                   # Calculate xend and yend for lower, upper, and main predictions
                                   grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
                                   grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
-                                  grid$xend_lower <- grid$x + grid$distance_pred * cos(grid$angle_lower)
-                                  grid$yend_lower <- grid$y + grid$distance_pred * sin(grid$angle_lower)
-                                  grid$xend_upper <- grid$x + grid$distance_pred * cos(grid$angle_upper)
-                                  grid$yend_upper <- grid$y + grid$distance_pred * sin(grid$angle_upper)
+                                  grid$xend_lower_outer <- grid$x + grid$distance_pred * cos(grid$angle_lower_outer)
+                                  grid$yend_lower_outer <- grid$y + grid$distance_pred * sin(grid$angle_lower_outer)
+                                  grid$xend_upper_outer <- grid$x + grid$distance_pred * cos(grid$angle_upper_outer)
+                                  grid$yend_upper_outer <- grid$y + grid$distance_pred * sin(grid$angle_upper_outer)
+
+                                  # Handle inner interval only if probs[2] is not NA
+                                  if (!is.na(probs[2])) {
+                                    sin_bounds_inner <- calculate_bounds(fit = pred_sin, se = se, probs = probs[2])
+                                    cos_bounds_inner <- calculate_bounds(pred_cos, se, probs[2])
+                                    distance_bounds <- calculate_bounds(pred_distance, se, probs[2])
+
+                                    # Calculate the angle prediction intervals for inner bounds
+                                    grid$angle_lower_inner <- atan2(sin_bounds_inner$lower, cos_bounds_inner$upper)
+                                    grid$angle_upper_inner <- atan2(sin_bounds_inner$upper, cos_bounds_inner$lower)
+
+                                    # Calculate xend and yend for lower, upper, and main predictions
+                                    grid$xend_lower_inner <- grid$x + grid$distance_pred * cos(grid$angle_lower_inner)
+                                    grid$yend_lower_inner <- grid$y + grid$distance_pred * sin(grid$angle_lower_inner)
+                                    grid$xend_upper_inner <- grid$x + grid$distance_pred * cos(grid$angle_upper_inner)
+                                    grid$yend_upper_inner <- grid$y + grid$distance_pred * sin(grid$angle_upper_inner)
+                                  }
                                 } else {
-                                  grid$angle_pred <- atan2(pred_sin$fit, pred_cos$fit)
-                                  grid$distance_pred <- pred_distance$fit
+                                  grid$angle_pred <- atan2(pred_sin, pred_cos)
+                                  grid$distance_pred <- pred_distance
                                   grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
                                   grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
                                 }
-                              } else if (method == "loess") {
-                                fit_angle <- loess(angle ~ x + y, data = data)
-                                fit_distance <- loess(distance ~ x + y, data = data)
-                                grid$angle_pred <- predict(fit_angle, newdata = grid)
-                                grid$distance_pred <- predict(fit_distance, newdata = grid)
-                                grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
-                                grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
-                              } else {
-                                stop("Unsupported method. Please use 'lm' or 'loess'.")
                               }
 
                               if (normalize) {
@@ -208,16 +222,25 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                 dy = grid$yend_pred - grid$y  # Include dy
                               )
 
+                              # Append inner bounds only if they exist
                               if (se) {
-                                result$xend_upper <- grid$xend_upper
-                                result$yend_upper <- grid$yend_upper
-                                result$xend_lower <- grid$xend_lower
-                                result$yend_lower <- grid$yend_lower
+                                result$xend_upper_outer <- grid$xend_upper_outer
+                                result$yend_upper_outer <- grid$yend_upper_outer
+                                result$xend_lower_outer <- grid$xend_lower_outer
+                                result$yend_lower_outer <- grid$yend_lower_outer
+
+                                if (!is.na(probs[2])) {
+                                  result$xend_upper_inner <- grid$xend_upper_inner
+                                  result$yend_upper_inner <- grid$yend_upper_inner
+                                  result$xend_lower_inner <- grid$xend_lower_inner
+                                  result$yend_lower_inner <- grid$yend_lower_inner
+                                }
                               }
 
                               return(result)
                             }
 )
+
 
 
 #' @rdname geom_vector_smooth
@@ -229,50 +252,41 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                             default_aes = aes(linewidth = 0.5, linetype = 1, alpha = 1, fill = "grey80", color = "#3366FF"),
 
                             setup_data = function(data, params) {
-
                               data$id <- seq_len(nrow(data))
 
-                              if(params$se){
-
+                              if (params$se) {
                                 original_length <- sqrt((data$xend - data$x)^2 + (data$yend - data$y)^2)
-
                                 scaling_factor <- data$radius / original_length
 
                                 data$xend <- data$x + (data$xend - data$x) * scaling_factor
                                 data$yend <- data$y + (data$yend - data$y) * scaling_factor
                               }
 
-
                               return(data)
                             },
 
-                            draw_panel = function(data, panel_params, coord, arrow = NULL, se = TRUE, se.circle) {
-
-
+                            draw_panel = function(data, panel_params, coord, arrow = NULL, se = TRUE, se.circle = TRUE) {
                               circle_grob <- NULL
-                              wedge_grob <- NULL
+                              wedge_grob_outer <- NULL
+                              wedge_grob_inner <- NULL
                               all_circle_data <- NULL
-                              wedge_data <- NULL
+                              wedge_data_outer <- NULL
+                              wedge_data_inner <- NULL
 
                               if (se) {
-                                if(se.circle){
-
+                                if (se.circle) {
+                                  # Create confidence interval circles if se.circle is TRUE
                                   all_circle_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
-
                                     circle_data <- create_circle_data(
                                       x = data$x[i], y = data$y[i], radius = data$radius[i]
                                     )
-
                                     circle_data$group <- i
-
                                     circle_data$linewidth <- data$linewidth[i]
                                     circle_data$alpha <- 0.4
                                     circle_data$fill <- NA
                                     circle_data$colour <- "grey60"
-
                                     return(circle_data)
                                   }))
-
 
                                   circle_grob <- GeomPolygon$draw_panel(
                                     data = all_circle_data,
@@ -281,13 +295,12 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                                   )
                                 }
 
-
-                                wedge_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
-
+                                # Outer wedge data
+                                wedge_data_outer <- do.call(rbind, lapply(1:nrow(data), function(i) {
                                   wedge <- create_wedge_data(
                                     x = data$x[i], y = data$y[i],
-                                    xend_upper = data$xend_upper[i], yend_upper = data$yend_upper[i],
-                                    xend_lower = data$xend_lower[i], yend_lower = data$yend_lower[i],
+                                    xend_upper = data$xend_upper_outer[i], yend_upper = data$yend_upper_outer[i],
+                                    xend_lower = data$xend_lower_outer[i], yend_lower = data$yend_lower_outer[i],
                                     radius = data$radius[i],
                                     id = data$id[i],
                                     n_points = 50
@@ -300,15 +313,40 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                                   return(wedge)
                                 }))
 
-
-                                wedge_grob <- GeomPolygon$draw_panel(
-                                  data = wedge_data,
+                                wedge_grob_outer <- GeomPolygon$draw_panel(
+                                  data = wedge_data_outer,
                                   panel_params = panel_params,
                                   coord = coord
                                 )
+
+                                # Draw inner wedge only if inner bounds exist (probs[2] was not NA)
+                                if (!is.null(data$xend_lower_inner)) {
+                                  wedge_data_inner <- do.call(rbind, lapply(1:nrow(data), function(i) {
+                                    wedge <- create_wedge_data(
+                                      x = data$x[i], y = data$y[i],
+                                      xend_upper = data$xend_upper_inner[i], yend_upper = data$yend_upper_inner[i],
+                                      xend_lower = data$xend_lower_inner[i], yend_lower = data$yend_lower_inner[i],
+                                      radius = data$radius[i],
+                                      id = data$id[i],
+                                      n_points = 50
+                                    )
+
+                                    wedge$linewidth <- data$linewidth[i]
+                                    wedge$alpha <- 0.4
+                                    wedge$fill <- data$fill[i]
+                                    wedge$colour <- "grey60"
+                                    return(wedge)
+                                  }))
+
+                                  wedge_grob_inner <- GeomPolygon$draw_panel(
+                                    data = wedge_data_inner,
+                                    panel_params = panel_params,
+                                    coord = coord
+                                  )
+                                }
                               }
 
-
+                              # Draw the vectors
                               segments_grob <- GeomSegment$draw_panel(
                                 data = data,
                                 panel_params = panel_params,
@@ -316,8 +354,8 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                                 arrow = arrow
                               )
 
-                              grobs <- list(circle_grob, wedge_grob, segments_grob)
-
+                              # Combine grobs for outer wedge, inner wedge (if any), and segments
+                              grobs <- list(circle_grob, wedge_grob_outer, wedge_grob_inner, segments_grob)
                               grobs <- Filter(Negate(is.null), grobs)
 
                               return(grid::grobTree(do.call(grid::gList, grobs)))
@@ -325,6 +363,7 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
 
                             draw_key = draw_key_smooth
 )
+
 
 
 #' @rdname geom_vector_smooth
@@ -339,6 +378,7 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
                                method = "lm",
                                se = TRUE,
                                se.circle = TRUE,
+                               probs = c(.95, NA),
                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                                ...) {
 
@@ -358,6 +398,7 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
       method = method,
       se = se,
       se.circle = se.circle,
+      probs = probs,
       arrow = arrow,
       na.rm = na.rm,
       ...
@@ -377,6 +418,7 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
                                method = "lm",
                                se = TRUE,
                                se.circle = TRUE,
+                               probs = c(.95, NA),
                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                                ...) {
 
@@ -396,6 +438,7 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
       method = method,
       se = se,
       se.circle = se.circle,
+      probs = probs,
       arrow = arrow,
       na.rm = na.rm,
       ...

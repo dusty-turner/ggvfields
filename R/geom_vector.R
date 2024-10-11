@@ -144,7 +144,7 @@ StatVector <- ggproto("StatVector", Stat,
 
 #' @keywords internal
 draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = NULL,
-                              center = TRUE, normalize = TRUE, tail_point = FALSE, tail_point.size = 2) {
+                              center = TRUE, normalize = TRUE, tail_point = FALSE, tail_point.size = 2, linewidth = .5) {
 
 
   # If length is not mapped, normalize and center using the original data before transformation
@@ -157,7 +157,7 @@ draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = 
     vector_grob <- grid::segmentsGrob(
       x0 = unit(coords$x, "npc"), y0 = unit(coords$y, "npc"),
       x1 = unit(coords$xend, "npc"), y1 = unit(coords$yend, "npc"),
-      gp = grid::gpar(col = coords$colour, fill = coords$fill, lwd = 2),  # Use mapped fill
+      gp = grid::gpar(col = coords$colour, fill = coords$fill, lwd = linewidth),  # Use mapped fill
       arrow = arrow  # Pass the arrow parameter here
     )
 
@@ -230,7 +230,7 @@ draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = 
         y0 = unit(coords$y, "npc") - unit(half_dy, "cm"),
         x1 = unit(coords$x, "npc") + unit(half_dx, "cm"),
         y1 = unit(coords$y, "npc") + unit(half_dy, "cm"),
-        gp = grid::gpar(col = coords$colour, fill = coords$fill, lwd = 2),  # Use mapped fill
+        gp = grid::gpar(col = coords$colour, fill = coords$fill, lwd = linewidth),  # Use mapped fill
         arrow = arrow  # Pass the arrow parameter here
       )
       points_grob <- NULL
@@ -248,7 +248,7 @@ draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = 
         x0 = unit(coords$x, "npc"), y0 = unit(coords$y, "npc"),
         x1 = unit(coords$x, "npc") + unit(coords$length * coords$dx, "cm"),
         y1 = unit(coords$y, "npc") + unit(coords$length * coords$dy, "cm"),
-        gp = grid::gpar(col = coords$colour, fill = coords$fill, lwd = 2),  # Use mapped fill
+        gp = grid::gpar(col = coords$colour, fill = coords$fill, lwd = linewidth),  # Use mapped fill
         arrow = arrow  # Pass the arrow parameter here
       )
       points_grob <- NULL
@@ -271,7 +271,7 @@ draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = 
 }
 
 #' @keywords internal
-draw_key_vector <- function(data, params, size) {
+draw_key_vector <- function(data, params, size, linewidth) {
   x0 <- unit(0.1, "npc")
   y0 <- unit(0.5, "npc")
 
@@ -282,7 +282,7 @@ draw_key_vector <- function(data, params, size) {
   grid::segmentsGrob(
     x0 = x0, y0 = y0,
     x1 = x1, y1 = y1,
-    gp = grid::gpar(col = data$colour, lwd = 2)
+    gp = grid::gpar(col = data$colour, lwd = linewidth)
   )
 }
 
