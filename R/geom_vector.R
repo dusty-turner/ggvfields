@@ -108,7 +108,7 @@ stat_vector <- function(mapping = NULL, data = NULL, geom = GeomVector,
 StatVector <- ggproto("StatVector", Stat,
                       required_aes = c("x", "y"),
                       default_aes = aes(dx = NA, dy = NA, distance = NA, angle = NA, length = NA,
-                                        color = "black", fill = "black", linewidth = 0.5, linetype = 1, alpha = 1),
+                                        color = "black", fill = "black", linewidth = 2, linetype = 1, alpha = 1),
                       compute_group = function(data, scales, center = FALSE, fun = NULL, ...) {
 
                         # If a function is provided, calculate curl and divergence
@@ -144,7 +144,7 @@ StatVector <- ggproto("StatVector", Stat,
 
 #' @keywords internal
 draw_panel_vector <- function(data, panel_params, coord, na.rm = FALSE, arrow = NULL,
-                              center = TRUE, normalize = TRUE, tail_point = FALSE, tail_point.size = 2, linewidth = .5) {
+                              center = TRUE, normalize = TRUE, tail_point = FALSE, tail_point.size = 2, linewidth = 2) {
 
 
   # If length is not mapped, normalize and center using the original data before transformation
@@ -282,7 +282,7 @@ draw_key_vector <- function(data, params, size, linewidth) {
   grid::segmentsGrob(
     x0 = x0, y0 = y0,
     x1 = x1, y1 = y1,
-    gp = grid::gpar(col = data$colour, lwd = linewidth)
+    gp = grid::gpar(col = data$colour, lwd = data$linewidth)
   )
 }
 
@@ -355,7 +355,7 @@ GeomVector <- ggproto(
   },
 
   required_aes = c("x", "y"),
-  default_aes = aes(colour = "black", fill = "black", size = 0.5, length = NA, linewidth = 0.5, linetype = 1, alpha = 1),
+  default_aes = aes(colour = "black", fill = "black", size = 0.5, length = NA, linewidth = 2, linetype = 1, alpha = 1),
   draw_group = draw_panel_vector,
   draw_key = draw_key_vector
 )

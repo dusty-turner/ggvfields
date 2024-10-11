@@ -102,34 +102,47 @@ create_circle_data <- function(x, y, radius, n = 100) {
   )
 }
 
-# create wedges in geom_vector_smooth
-create_wedge_data <- function(x, y, xend_upper, yend_upper, xend_lower, yend_lower, radius, id, n_points = 100) {
+create_wedge_data <- function(x, y, xend_upper, yend_upper, xend_lower, yend_lower, xend, yend, radius, id, n_points = 100) {
 
-
-  if (any(is.na(c(x, y, xend_upper, yend_upper, xend_lower, yend_lower)))) {
+  # Check for missing values in the coordinates
+  if (any(is.na(c(x, y, xend_upper, yend_upper, xend_lower, yend_lower, xend, yend)))) {
     warning(paste("Skipping wedge for id =", id, "due to missing values in coordinates"))
     return(data.frame(x = numeric(0), y = numeric(0), group = numeric(0), id = numeric(0)))
   }
 
+  # Calculate angles for the wedge bounds using atan2
   angle_upper <- atan2(yend_upper - y, xend_upper - x)
   angle_lower <- atan2(yend_lower - y, xend_lower - x)
 
+  # Ensure that the arc angles cover the correct range
   if (angle_upper < angle_lower) {
+    angle_upper <- angle_upper + 2 * pi  # Adjust to ensure continuous arc
+  }
+
+  # Check the midpoint to ensure the arc follows the direction towards xend, yend
+  midpoint_angle <- atan2(yend - y, xend - x)
+
+  # If midpoint is outside the arc range, adjust the arc range accordingly
+  if (midpoint_angle < angle_lower || midpoint_angle > angle_upper) {
     angle_upper <- angle_upper + 2 * pi
   }
 
+  # Create arc between the two angles
   arc_angles <- seq(angle_lower, angle_upper, length.out = n_points)
 
+  # Calculate the coordinates for the arc based on the radius
   arc_x <- x + radius * cos(arc_angles)
   arc_y <- y + radius * sin(arc_angles)
 
+  # Create a data frame for the wedge
   wedge_data <- data.frame(
-    x = c(x, arc_x, x),
+    x = c(x, arc_x, x),  # Start at center, move along arc, return to center
     y = c(y, arc_y, y),
-    group = rep(id, length.out = n_points + 2),
+    group = rep(id, length.out = n_points + 2),  # Grouping for each wedge
     id = rep(id, length.out = n_points + 2)
   )
 
   return(wedge_data)
 }
+
 

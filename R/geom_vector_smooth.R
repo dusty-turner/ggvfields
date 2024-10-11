@@ -25,11 +25,17 @@
 #' @param se.circle Logical; if `TRUE`, draws circles around the origin of the vectors to represent
 #'   the radius of the confidence interval. This is useful for visualizing the spread and variability
 #'   of the confidence intervals when `se = TRUE`.
+#' @param probs Numeric vector; specifies the prediction interval level(s) to be plotted when `se = TRUE`.
+#'   For example, `probs = c(0.95, 0.68)` will plot 95% and 68% prediction intervals. If only one value
+#'   is provided (e.g., `probs = 0.95`), a single prediction interval is drawn. If multiple values
+#'   are provided, the function will plot multiple intervals (with smaller intervals nested inside larger ones).
+
 #' @param arrow Arrow specification, as created by `grid::arrow()`. This
 #'   controls the appearance of the arrowheads at the end of the vectors,
 #'   including properties like angle, length, and type.
 #' @return A `ggplot2` layer that can be added to a ggplot object to produce a
 #'   smooth vector field plot.
+#' @importFrom stats qt
 #' @name geom_vector_smooth
 #' @rdname geom_vector_smooth
 #'
@@ -220,6 +226,7 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
                                 radius = rep(radius, nrow(grid)),
                                 dx = grid$xend_pred - grid$x,  # Include dx
                                 dy = grid$yend_pred - grid$y  # Include dy
+                                # distance = grid$distance_pred / max(grid$distance_pred)
                               )
 
                               # Append inner bounds only if they exist
@@ -278,7 +285,9 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                                   # Create confidence interval circles if se.circle is TRUE
                                   all_circle_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
                                     circle_data <- create_circle_data(
-                                      x = data$x[i], y = data$y[i], radius = data$radius[i]
+                                      x = data$x[i], y = data$y[i],
+                                      # radius = data$distance[i]
+                                      radius = data$radius[i]
                                     )
                                     circle_data$group <- i
                                     circle_data$linewidth <- data$linewidth[i]
@@ -301,6 +310,8 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                                     x = data$x[i], y = data$y[i],
                                     xend_upper = data$xend_upper_outer[i], yend_upper = data$yend_upper_outer[i],
                                     xend_lower = data$xend_lower_outer[i], yend_lower = data$yend_lower_outer[i],
+                                    xend = data$xend[i], yend = data$yend[i],
+                                    # radius = data$distance[i],
                                     radius = data$radius[i],
                                     id = data$id[i],
                                     n_points = 50
@@ -326,6 +337,8 @@ GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
                                       x = data$x[i], y = data$y[i],
                                       xend_upper = data$xend_upper_inner[i], yend_upper = data$yend_upper_inner[i],
                                       xend_lower = data$xend_lower_inner[i], yend_lower = data$yend_lower_inner[i],
+                                      xend = data$xend[i], yend = data$yend[i],
+                                      # radius = data$distance[i],
                                       radius = data$radius[i],
                                       id = data$id[i],
                                       n_points = 50

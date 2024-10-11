@@ -154,7 +154,4 @@ stat_vector_field <- function(mapping = NULL, data = NULL, geom = GeomVector,
   )
 }
 
-
-utils::globalVariables(c("x", "y", "dx", "dy"))#' Create a Vector Field Plot Layer
-
-
+utils::globalVariables(c("x", "y", "dx", "dy"))

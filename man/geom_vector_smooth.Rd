@@ -32,6 +32,7 @@ stat_vector_smooth(
   method = "lm",
   se = TRUE,
   se.circle = TRUE,
+  probs = c(0.95, NA),
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
@@ -51,6 +52,7 @@ geom_vector_smooth(
   method = "lm",
   se = TRUE,
   se.circle = TRUE,
+  probs = c(0.95, NA),
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   ...
 )
@@ -139,6 +141,11 @@ scatterplot smoothing.}
 \item{se.circle}{Logical; if \code{TRUE}, draws circles around the origin of the vectors to represent
 the radius of the confidence interval. This is useful for visualizing the spread and variability
 of the confidence intervals when \code{se = TRUE}.}
+
+\item{probs}{Numeric vector; specifies the prediction interval level(s) to be plotted when \code{se = TRUE}.
+For example, \code{probs = c(0.95, 0.68)} will plot 95\% and 68\% prediction intervals. If only one value
+is provided (e.g., \code{probs = 0.95}), a single prediction interval is drawn. If multiple values
+are provided, the function will plot multiple intervals (with smaller intervals nested inside larger ones).}
 
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}. This
 controls the appearance of the arrowheads at the end of the vectors,

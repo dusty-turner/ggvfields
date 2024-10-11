@@ -79,6 +79,7 @@ instead of scalar data.</p>
 <span>  method <span class="op">=</span> <span class="st">"lm"</span>,</span>
 <span>  se <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  se.circle <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
@@ -98,6 +99,7 @@ instead of scalar data.</p>
 <span>  method <span class="op">=</span> <span class="st">"lm"</span>,</span>
 <span>  se <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  se.circle <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -213,6 +215,13 @@ scatterplot smoothing.</p></dd>
 <dd><p>Logical; if <code>TRUE</code>, draws circles around the origin of the vectors to represent
 the radius of the confidence interval. This is useful for visualizing the spread and variability
 of the confidence intervals when <code>se = TRUE</code>.</p></dd>
+
+
+<dt>probs</dt>
+<dd><p>Numeric vector; specifies the prediction interval level(s) to be plotted when <code>se = TRUE</code>.
+For example, <code>probs = c(0.95, 0.68)</code> will plot 95% and 68% prediction intervals. If only one value
+is provided (e.g., <code>probs = 0.95</code>), a single prediction interval is drawn. If multiple values
+are provided, the function will plot multiple intervals (with smaller intervals nested inside larger ones).</p></dd>
 
 
 <dt>arrow</dt>

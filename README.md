@@ -115,7 +115,7 @@ In this example, the norm of the wind vectors is mapped to their length:
 wind_data_cartesian |> 
   ggplot() +
   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)), 
-              tail_point = TRUE, center = TRUE) +
+              tail_point = TRUE, center = TRUE, arrow = NULL) +
   labs(title = "Wind Vectors",
        x = "Longitude", y = "Latitude") 
 #> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
@@ -536,7 +536,7 @@ sample_points$dy <- sample_points$yend - sample_points$y
 # Visualize the original and smoothed vectors using `ggplot2` from ggvfields
 ggplot(sample_points, aes(x = x, y = y)) +
   geom_vector(aes(dx = dx, dy = dy)) +  
-  geom_vector_smooth(aes(dx = dx, dy = dy), n = 6, center = FALSE) + 
+  geom_vector_smooth(aes(dx = dx, dy = dy), n = 6, center = FALSE, probs = c(.95, .7)) + 
   coord_equal()
 ```
 
