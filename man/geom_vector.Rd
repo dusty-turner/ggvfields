@@ -21,7 +21,7 @@ geom_vector(
   ...,
   na.rm = FALSE,
   show.legend = NA,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
   inherit.aes = TRUE,
   center = TRUE,
   normalize = TRUE,
@@ -38,7 +38,7 @@ stat_vector(
   ...,
   na.rm = FALSE,
   show.legend = NA,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
   inherit.aes = TRUE,
   center = TRUE,
   normalize = TRUE,
@@ -134,25 +134,29 @@ a warning. If \code{TRUE}, missing values are silently removed.}
 It can also be a named logical vector to finely select the aesthetics to
 display.}
 
-\item{arrow}{Arrow specification for vector arrowheads, created by \code{grid::arrow()}.
-This controls the appearance of the arrowheads at the end of the vectors, including properties like angle, length, and type.}
+\item{arrow}{Arrow specification for vector arrowheads, created by
+\code{grid::arrow()}. This controls the appearance of the arrowheads at the end
+of the vectors, including properties like angle, length, and type.}
 
 \item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
-\item{center}{Logical; if \code{TRUE}, centers the vector on the specified (\code{x}, \code{y}) location.
-If \code{FALSE}, the vector origin is at the specified (\code{x}, \code{y}) location.
-When centering is enabled, the vector's midpoint aligns with the original (\code{x}, \code{y}) location.}
+\item{center}{Logical; if \code{TRUE}, centers the vector on the specified (\code{x},
+\code{y}) location. If \code{FALSE}, the vector origin is at the specified (\code{x}, \code{y})
+location. When centering is enabled, the vector's midpoint aligns with the
+original (\code{x}, \code{y}) location.}
 
-\item{normalize}{Logical; if \code{TRUE}, normalizes each vector to a unit length before
-applying any scaling. Normalization is useful for avoiding overplotting and ensuring
-visual consistency, especially in dense plots.}
+\item{normalize}{Logical; if \code{TRUE}, normalizes each vector to a unit length
+before applying any scaling. Normalization is useful for avoiding
+overplotting and ensuring visual consistency, especially in dense plots.}
 
-\item{tail_point}{Logical; if \code{TRUE}, adds a point at the start of each vector.}
+\item{tail_point}{Logical; if \code{TRUE}, adds a point at the start of each
+vector.}
 
-\item{tail_point.size}{Integer; controls the size of points on the tail if \code{tail_point = TRUE}.}
+\item{tail_point.size}{Integer; controls the size of points on the tail if
+\code{tail_point = TRUE}.}
 
 \item{fun}{A function used to calculate vector fields (curl/divergence).}
 
@@ -170,17 +174,18 @@ give the geom as \code{"point"}.
 }}
 }
 \value{
-A \code{ggplot2} layer that can be added to a ggplot object to produce a vector plot.
+A \code{ggplot2} layer that can be added to a ggplot object to produce a
+vector plot.
 }
 \description{
 \code{geom_vector} generates a ggplot layer that visualizes vectors as line
-segments with optional arrowheads. The vectors are defined by start (\code{x}, \code{y})
-and end (\code{xend}, \code{yend}) coordinates, which can be directly provided or derived
-from angular (\code{angle}) and distance (\code{distance}) information.
+segments with optional arrowheads. The vectors are defined by start (\code{x},
+\code{y}) and end (\code{xend}, \code{yend}) coordinates, which can be directly provided or
+derived from angular (\code{angle}) and distance (\code{distance}) information.
 }
 \section{Aesthetics}{
-
-\code{geom_vector} understands the following aesthetics (required aesthetics are in \strong{bold}):
+ \code{geom_vector} understands the following aesthetics
+(required aesthetics are in bold):
 \itemize{
 \item \strong{\code{x}}: x-coordinate of the start point of the vector.
 \item \strong{\code{y}}: y-coordinate of the start point of the vector.
@@ -251,15 +256,11 @@ wind_data_cartesian <- within(wind_data_polar, {
 
 
 ggplot(wind_data_cartesian) +
-  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy)) +
-  labs(title = "Wind Vectors (Cartesian Input)",
-       x = "Longitude", y = "Latitude")
+  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy))
 
 # Example using Polar input: angle (wind_dir) and distance (wind_spd)
 ggplot(wind_data_polar) +
-  geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd)) +
-  labs(title = "Wind Vectors (Polar Input)",
-       x = "Longitude", y = "Latitude")
+  geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd))
 
 # By default, length = after_stat(norm).
 # To allow vectors to be the exact length of the data you can disable this option

@@ -22,11 +22,6 @@ knitr::opts_chunk$set(
 
 **ggvfields** provides tools for visualizing vector fields, stream plots, and soon complex numbers and more.
 
-```{r eval = FALSE}
-remotes::install_github("dusty-turner/ggvfields")
-```
-
-
 ```{r}
 library("ggvfields")
 options(ggplot2.continuous.colour="viridis")
@@ -57,11 +52,8 @@ wind_data_cartesian <- within(wind_data_polar, {
   dy <- wind_lat_comp
 })
 
-wind_data_cartesian |> 
-  ggplot() +
-  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy)) +
-  labs(title = "Wind Vectors (Cartesian Input)",
-       x = "Longitude", y = "Latitude")  
+ggplot(wind_data_cartesian) +
+  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy))
 ```
 
 #### Polar Example
@@ -69,11 +61,8 @@ wind_data_cartesian |>
 For polar coordinates, the vector is defined by an angle and distance:
 
 ```{r}
-wind_data_polar |> 
-  ggplot() +
-  geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd)) +
-  labs(title = "Wind Vectors (Polar Input)",
-       x = "Longitude", y = "Latitude") 
+ggplot(wind_data_cartesian) +
+  geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd))
 ```
 
 ### New Feature: Mapping Norm to the Length Aesthetic
@@ -98,12 +87,11 @@ By mapping the norm of a vector to the length aesthetic, users can directly obse
 In this example, the norm of the wind vectors is mapped to their length:
 
 ```{r}
-wind_data_cartesian |> 
-  ggplot() +
-  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)), 
-              tail_point = TRUE, center = TRUE, arrow = NULL) +
-  labs(title = "Wind Vectors",
-       x = "Longitude", y = "Latitude") 
+ggplot(wind_data_cartesian) +
+  geom_vector(
+    aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)),
+    arrow = NULL, tail_point = TRUE
+  )
 ```
 
 ### `geom_vector_field()`{.R}: Visualizing Vector Fields
@@ -129,9 +117,7 @@ f <- function(v) {
 }
 
 ggplot() +
-  geom_vector_field(
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), normalize = FALSE, center = TRUE
-    ) 
+  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) 
 ```
 
 This function allows the user to map several characteristics of the vector field to different aesthetic mappings.
@@ -147,9 +133,9 @@ We can visualize the norm by mapping it to the length aesthetic:
 ```{r}
 ggplot() +
   geom_vector_field(
-    aes(length = after_stat(norm)),
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
-    ) 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
+    aes(length = after_stat(norm))
+  ) 
 ```
 
 ### Divergence
@@ -204,9 +190,7 @@ f <- function(v) {
 }
 
 ggplot() +
-  geom_streamplot(
-    fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
-    ) 
+  geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3)) 
 ```
 
 The `chop` parameter (defaulted to TRUE) allows you to chop the trajectories into segments. This can be useful for better visualization of the streamlines when they are long and complex. 
@@ -215,10 +199,7 @@ It may be useful to not break up the streamlines.
 
 ```{r}
 ggplot() +
-  geom_streamplot(
-    fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
-    chop = FALSE
-    ) 
+  geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3), chop = FALSE) 
 ```
 
 It may also be useful to break up the streamlines into more segments. The `scale_stream` parameter (defaults to 1) adjusts the segmentation of streamlines by specifying the proportion of the streamline length used to divide it into smaller segments.
@@ -228,7 +209,7 @@ ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
     chop = TRUE, scale_stream = .9,
-    ) 
+  ) 
 ```
 
 ### Map Calculus Measures to Aesthetics
@@ -238,7 +219,7 @@ ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
     aes(color = after_stat(log(divergence + abs(min(divergence)))))
-    ) +
+  ) +
   labs(color = "adjusted\ndivergence")
 ```
 
@@ -278,9 +259,7 @@ Flows are computed using the `deSolve` package's ODE solver, with the `rk4` meth
 
 ```{r}
 ggplot() +
-  geom_flow(
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
-    )
+  geom_flow(fun = f, xlim = c(-10, 10), ylim = c(-10, 10))
 ```
 
 In this example, flow lines evolve according to the vector field defined by `f`. The color along each line will show how the particle moves over time (`t`) within the vector field.
@@ -306,7 +285,7 @@ ggplot() +
   geom_flow(
     fun = f, n = c(21, 21), xlim = c(-10, 10), ylim = c(-10, 10),
     iterations = 1000, threshold_distance = 0.5, T = 5
-    ) 
+  ) 
 ```
 
 
@@ -374,6 +353,8 @@ ggplot() +
 <!--   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3) -->
 <!-- ``` -->
 
+
+
 ## In Development
 
 ### `geom_vector_smooth()`
@@ -419,14 +400,32 @@ ggplot(sample_points, aes(x = x, y = y)) +
 
 This example demonstrates how `geom_vector_smooth()` can be used to fit a vector field to vector data. 
 
+
+
+## Installation
+
+**ggvfields** is not yet on CRAN. You can install it with
+
+```{r eval = FALSE}
+remotes::install_github("dusty-turner/ggvfields")
+```
+
+
+
 ## License
 
 This package is licensed under the MIT License.
+
+
 
 ## Contact
 
 For any questions or issues, please [open an issue](https://github.com/dusty-turner/ggvfields/issues/new) on GitHub or contact the maintainer.
 
+
+
 ## Related projects
 
 For creating vector fields, the [**ggquiver**](http://pkg.mitchelloharawild.com/ggquiver/) package provides quiver plots to visualize vector fields, while the [**ggarchery**](https://github.com/mdhall272/ggarchery) package can handling of segments with arrowheads.
+
+

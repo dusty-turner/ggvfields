@@ -12,6 +12,7 @@
 #'
 #' @import ggplot2
 #' @importFrom farver encode_colour
+#' @importFrom utils modifyList
 #' @name ggvfields
 #' @aliases ggvfields ggvfields-package
 NULL
