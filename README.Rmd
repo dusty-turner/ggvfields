@@ -57,14 +57,8 @@ wind_data_cartesian <- within(wind_data_polar, {
   dy <- wind_lat_comp
 })
 
-wind_data_cartesian |> 
-  ggplot() +
-  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy), 
-              add_points = TRUE, normalize = TRUE, center = TRUE) +
-  labs(title = "Wind Vectors (Cartesian Input)",
-       x = "Longitude", y = "Latitude")  +
-  lims(x = c(-3,2), y = c(-2,3))
-
+ggplot(wind_data_cartesian) +
+  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy))
 ```
 
 #### Polar Example
@@ -72,13 +66,8 @@ wind_data_cartesian |>
 For polar coordinates, the vector is defined by an angle and distance:
 
 ```{r}
-wind_data_polar |> 
-  ggplot() +
-  geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd),
-              add_points = TRUE, normalize = TRUE, center = TRUE) +
-  labs(title = "Wind Vectors (Polar Input)",
-       x = "Longitude", y = "Latitude") +
-  lims(x = c(-3,2), y = c(-2,3))
+ggplot(wind_data_cartesian) +
+  geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd))
 ```
 
 ### New Feature: Mapping Norm to the Length Aesthetic
@@ -103,14 +92,11 @@ By mapping the norm of a vector to the length aesthetic, users can directly obse
 In this example, the norm of the wind vectors is mapped to their length:
 
 ```{r}
-wind_data_cartesian |> 
-  ggplot() +
-  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)), 
-              add_points = TRUE, center = TRUE) +
-  labs(title = "Wind Vectors (Cartesian Input)",
-       x = "Longitude", y = "Latitude")  +
-  lims(x = c(-3,2), y = c(-2,3)) +
-  scale_length_continuous()
+ggplot(wind_data_cartesian) +
+  geom_vector(
+    aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)),
+    arrow = NULL, add_points = TRUE
+    )
 ```
 
 ### `geom_vector_field()`{.R}
@@ -134,9 +120,7 @@ f <- function(v) {
 }
 
 ggplot() +
-  geom_vector_field(
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), normalize = TRUE, center = TRUE
-    ) 
+  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) 
 ```
 
 This function allows the user to map several characteristics of the vector field to different aesthetic mappings.
@@ -152,9 +136,9 @@ We can visualize the norm by mapping it to the length aesthetic:
 ```{r}
 ggplot() +
   geom_vector_field(
-    aes(length = after_stat(norm)),
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
-    ) 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
+    aes(length = after_stat(norm))
+  ) 
 ```
 
 ### Divergence
@@ -417,7 +401,8 @@ sample_points$dy <- sample_points$yend - sample_points$y
 # Visualize the original and smoothed vectors using `ggplot2` from ggvfields
 ggplot(sample_points, aes(x = x, y = y)) +
   geom_vector(aes(dx = dx, dy = dy), color = "red") +  # Plot original vectors in red
-  geom_vector_smooth(aes(dx = dx, dy = dy))            # Overlay with smoothed vectors
+  geom_vector_smooth(aes(dx = dx, dy = dy)) +          # Overlay with smoothed vectors
+  coord_equal()
 ```
 
 This example demonstrates how `geom_vector_smooth()` can be used to fit a vector field to vector data. 

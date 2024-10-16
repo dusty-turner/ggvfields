@@ -75,7 +75,7 @@
 #' @export
 geom_vector <- function(mapping = NULL, data = NULL, stat = StatVector,
                         position = "identity", ..., na.rm = FALSE, show.legend = NA,
-                        arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+                        arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
                         inherit.aes = TRUE, center = TRUE, normalize = TRUE, add_points = FALSE,
                         fun = NULL) {
   layer(
@@ -90,7 +90,7 @@ geom_vector <- function(mapping = NULL, data = NULL, stat = StatVector,
 #' @export
 stat_vector <- function(mapping = NULL, data = NULL, geom = GeomVector,
                         position = "identity", ..., na.rm = FALSE, show.legend = NA,
-                        arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+                        arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
                         inherit.aes = TRUE, center = TRUE, normalize = TRUE, add_points = FALSE) {
   layer(
     stat = StatVector, geom = geom, mapping = mapping, data = data,

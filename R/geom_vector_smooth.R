@@ -86,145 +86,145 @@ NULL
 #' @rdname geom_vector_smooth
 #' @export
 StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
-                            required_aes = c("x", "y", "dx", "dy"),
-                            default_aes = aes(color = "black", linewidth = 0.5, linetype = 1, alpha = 1),
+  required_aes = c("x", "y", "dx", "dy"),
+  default_aes = aes(color = "black", linewidth = 0.5, linetype = 1, alpha = 1),
 
-                            compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_length, se = TRUE, level = .95, ...) {
+  compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_length, se = TRUE, level = .95, ...) {
 
-                              # Ensure that n has the correct length
-                              n <- ensure_length_two(n)
+    # Ensure that n has the correct length
+    n <- ensure_length_two(n)
 
-                              # Calculate xend and yend using dx and dy
-                              data$xend <- data$x + data$dx
-                              data$yend <- data$y + data$dy
+    # Calculate xend and yend using dx and dy
+    data$xend <- data$x + data$dx
+    data$yend <- data$y + data$dy
 
-                              # Calculate angle and distance using dx and dy
-                              data$distance <- sqrt(data$dx^2 + data$dy^2)
-                              data$angle <- atan2(data$dy, data$dx)
+    # Calculate angle and distance using dx and dy
+    data$distance <- sqrt(data$dx^2 + data$dy^2)
+    data$angle <- atan2(data$dy, data$dx)
 
-                              # Generate the grid for predictions
-                              x_seq <- seq(min(data$x), max(data$x), length.out = n[1])
-                              y_seq <- seq(min(data$y), max(data$y), length.out = n[2])
-                              grid <- expand.grid(x = x_seq, y = y_seq)
-                              grid$id <- seq_len(nrow(grid))
+    # Generate the grid for predictions
+    x_seq <- seq(min(data$x), max(data$x), length.out = n[1])
+    y_seq <- seq(min(data$y), max(data$y), length.out = n[2])
+    grid <- expand.grid(x = x_seq, y = y_seq)
+    grid$id <- seq_len(nrow(grid))
 
 
-                              # Fit models using regression on sin and cos for angle, and linear regression for distance
-                              if (method == "lm") {
-                                fit_sin <- lm(sin(angle) ~ x + y, data = data)
-                                fit_cos <- lm(cos(angle) ~ x + y, data = data)
-                                fit_distance <- lm(distance ~ x + y, data = data)
+    # Fit models using regression on sin and cos for angle, and linear regression for distance
+    if (method == "lm") {
+      fit_sin <- lm(sin(angle) ~ x + y, data = data)
+      fit_cos <- lm(cos(angle) ~ x + y, data = data)
+      fit_distance <- lm(distance ~ x + y, data = data)
 
-                                # Predict sine and cosine values with standard errors if `se = TRUE`
-                                pred_sin <- predict(fit_sin, newdata = grid, se.fit = se)
-                                pred_cos <- predict(fit_cos, newdata = grid, se.fit = se)
-                                pred_distance <- predict(fit_distance, newdata = grid)
+      # Predict sine and cosine values with standard errors if `se = TRUE`
+      pred_sin <- predict(fit_sin, newdata = grid, se.fit = se)
+      pred_cos <- predict(fit_cos, newdata = grid, se.fit = se)
+      pred_distance <- predict(fit_distance, newdata = grid)
 
-                                # Reconstruct the angle from sine and cosine predictions
-                                grid$angle_pred <- atan2(pred_sin$fit, pred_cos$fit)
-                                grid$distance_pred <- pred_distance
+      # Reconstruct the angle from sine and cosine predictions
+      grid$angle_pred <- atan2(pred_sin$fit, pred_cos$fit)
+      grid$distance_pred <- pred_distance
 
-                                if (se) {
-                                  # Calculate critical value for confidence intervals
-                                  t_critical <- qt(1 - (1 - level) / 2, df = fit_sin$df.residual)
+      if (se) {
+        # Calculate critical value for confidence intervals
+        t_critical <- qt(1 - (1 - level) / 2, df = fit_sin$df.residual)
 
-                                  # Calculate lower and upper bounds for sin and cos predictions using standard errors
-                                  sin_lower <- pred_sin$fit - t_critical * pred_sin$se.fit
-                                  sin_upper <- pred_sin$fit + t_critical * pred_sin$se.fit
-                                  cos_lower <- pred_cos$fit - t_critical * pred_cos$se.fit
-                                  cos_upper <- pred_cos$fit + t_critical * pred_cos$se.fit
+        # Calculate lower and upper bounds for sin and cos predictions using standard errors
+        sin_lower <- pred_sin$fit - t_critical * pred_sin$se.fit
+        sin_upper <- pred_sin$fit + t_critical * pred_sin$se.fit
+        cos_lower <- pred_cos$fit - t_critical * pred_cos$se.fit
+        cos_upper <- pred_cos$fit + t_critical * pred_cos$se.fit
 
-                                  # Construct angle prediction intervals
-                                  grid$angle_lower <- atan2(sin_lower, cos_lower)
-                                  grid$angle_upper <- atan2(sin_upper, cos_upper)
+        # Construct angle prediction intervals
+        grid$angle_lower <- atan2(sin_lower, cos_lower)
+        grid$angle_upper <- atan2(sin_upper, cos_upper)
 
-                                  # Calculate xend and yend for lower, upper, and main predictions
-                                  grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
-                                  grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
-                                  grid$xend_lower <- grid$x + grid$distance_pred * cos(grid$angle_lower)
-                                  grid$yend_lower <- grid$y + grid$distance_pred * sin(grid$angle_lower)
-                                  grid$xend_upper <- grid$x + grid$distance_pred * cos(grid$angle_upper)
-                                  grid$yend_upper <- grid$y + grid$distance_pred * sin(grid$angle_upper)
-                                } else {
-                                  grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
-                                  grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
-                                }
-                              } else if (method == "loess") {
-                                # Use loess as an alternative smoothing method
-                                fit_angle <- loess(angle ~ x + y, data = data)
-                                fit_distance <- loess(distance ~ x + y, data = data)
-                                grid$angle_pred <- predict(fit_angle, newdata = grid)
-                                grid$distance_pred <- predict(fit_distance, newdata = grid)
-                                grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
-                                grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
-                              } else {
-                                stop("Unsupported method. Please use 'lm' or 'loess'.")
-                              }
+        # Calculate xend and yend for lower, upper, and main predictions
+        grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
+        grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
+        grid$xend_lower <- grid$x + grid$distance_pred * cos(grid$angle_lower)
+        grid$yend_lower <- grid$y + grid$distance_pred * sin(grid$angle_lower)
+        grid$xend_upper <- grid$x + grid$distance_pred * cos(grid$angle_upper)
+        grid$yend_upper <- grid$y + grid$distance_pred * sin(grid$angle_upper)
+      } else {
+        grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
+        grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
+      }
+    } else if (method == "loess") {
+      # Use loess as an alternative smoothing method
+      fit_angle <- loess(angle ~ x + y, data = data)
+      fit_distance <- loess(distance ~ x + y, data = data)
+      grid$angle_pred <- predict(fit_angle, newdata = grid)
+      grid$distance_pred <- predict(fit_distance, newdata = grid)
+      grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
+      grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
+    } else {
+      stop("Unsupported method. Please use 'lm' or 'loess'.")
+    }
 
-                              # Normalize vector lengths if required
-                              if (normalize) {
-                                grid$norm_pred <- sqrt((grid$xend_pred - grid$x)^2 + (grid$yend_pred - grid$y)^2)
-                                grid$xend_pred <- grid$x + (grid$xend_pred - grid$x) / grid$norm_pred * scale_length
-                                grid$yend_pred <- grid$y + (grid$yend_pred - grid$y) / grid$norm_pred * scale_length
+    # Normalize vector lengths if required
+    if (normalize) {
+      grid$norm_pred <- sqrt((grid$xend_pred - grid$x)^2 + (grid$yend_pred - grid$y)^2)
+      grid$xend_pred <- grid$x + (grid$xend_pred - grid$x) / grid$norm_pred * scale_length
+      grid$yend_pred <- grid$y + (grid$yend_pred - grid$y) / grid$norm_pred * scale_length
 
-                                if (se) {
-                                  grid$norm_lower <- sqrt((grid$xend_lower - grid$x)^2 + (grid$yend_lower - grid$y)^2)
-                                  grid$norm_upper <- sqrt((grid$xend_upper - grid$x)^2 + (grid$yend_upper - grid$y)^2)
+      if (se) {
+        grid$norm_lower <- sqrt((grid$xend_lower - grid$x)^2 + (grid$yend_lower - grid$y)^2)
+        grid$norm_upper <- sqrt((grid$xend_upper - grid$x)^2 + (grid$yend_upper - grid$y)^2)
 
-                                  grid$xend_lower <- grid$x + (grid$xend_lower - grid$x) / grid$norm_lower * scale_length
-                                  grid$yend_lower <- grid$y + (grid$yend_lower - grid$y) / grid$norm_lower * scale_length
-                                  grid$xend_upper <- grid$x + (grid$xend_upper - grid$x) / grid$norm_upper * scale_length
-                                  grid$yend_upper <- grid$y + (grid$yend_upper - grid$y) / grid$norm_upper * scale_length
-                                }
-                              }
+        grid$xend_lower <- grid$x + (grid$xend_lower - grid$x) / grid$norm_lower * scale_length
+        grid$yend_lower <- grid$y + (grid$yend_lower - grid$y) / grid$norm_lower * scale_length
+        grid$xend_upper <- grid$x + (grid$xend_upper - grid$x) / grid$norm_upper * scale_length
+        grid$yend_upper <- grid$y + (grid$yend_upper - grid$y) / grid$norm_upper * scale_length
+      }
+    }
 
-                              # Center the vectors if required
-                              if (center) {
-                                half_u <- (grid$xend_pred - grid$x) / 2
-                                half_v <- (grid$yend_pred - grid$y) / 2
+    # Center the vectors if required
+    if (center) {
+      half_u <- (grid$xend_pred - grid$x) / 2
+      half_v <- (grid$yend_pred - grid$y) / 2
 
-                                grid$x <- grid$x - half_u
-                                grid$y <- grid$y - half_v
-                                grid$xend_pred <- grid$xend_pred - half_u
-                                grid$yend_pred <- grid$yend_pred - half_v
+      grid$x <- grid$x - half_u
+      grid$y <- grid$y - half_v
+      grid$xend_pred <- grid$xend_pred - half_u
+      grid$yend_pred <- grid$yend_pred - half_v
 
-                                if (se) {
-                                  grid$xend_lower <- grid$xend_lower - half_u
-                                  grid$xend_upper <- grid$xend_upper - half_u
-                                  grid$yend_lower <- grid$yend_lower - half_v
-                                  grid$yend_upper <- grid$yend_upper - half_v
-                                }
-                              }
+      if (se) {
+        grid$xend_lower <- grid$xend_lower - half_u
+        grid$xend_upper <- grid$xend_upper - half_u
+        grid$yend_lower <- grid$yend_lower - half_v
+        grid$yend_upper <- grid$yend_upper - half_v
+      }
+    }
 
-                              # Prepare the final data to be returned based on se
-                              if (se) {
-                                result <- data.frame(
-                                  x = grid$x,
-                                  y = grid$y,
-                                  xend = grid$xend_pred,
-                                  yend = grid$yend_pred,
-                                  norm = grid$distance_pred,
-                                  xend_upper = grid$xend_upper,
-                                  yend_upper = grid$yend_upper,
-                                  xend_lower = grid$xend_lower,
-                                  yend_lower = grid$yend_lower,
-                                  dx = grid$xend_pred - grid$x,
-                                  dy = grid$yend_pred - grid$y
-                                )
-                              } else {
-                                result <- data.frame(
-                                  x = grid$x,
-                                  y = grid$y,
-                                  xend = grid$xend_pred,
-                                  yend = grid$yend_pred,
-                                  norm = grid$distance_pred,
-                                  dx = grid$xend_pred - grid$x,
-                                  dy = grid$yend_pred - grid$y
-                                )
-                              }
+    # Prepare the final data to be returned based on se
+    if (se) {
+      result <- data.frame(
+        x = grid$x,
+        y = grid$y,
+        xend = grid$xend_pred,
+        yend = grid$yend_pred,
+        norm = grid$distance_pred,
+        xend_upper = grid$xend_upper,
+        yend_upper = grid$yend_upper,
+        xend_lower = grid$xend_lower,
+        yend_lower = grid$yend_lower,
+        dx = grid$xend_pred - grid$x,
+        dy = grid$yend_pred - grid$y
+      )
+    } else {
+      result <- data.frame(
+        x = grid$x,
+        y = grid$y,
+        xend = grid$xend_pred,
+        yend = grid$yend_pred,
+        norm = grid$distance_pred,
+        dx = grid$xend_pred - grid$x,
+        dy = grid$yend_pred - grid$y
+      )
+    }
 
-                              return(result)
-                            }
+    return(result)
+  }
 )
 
 
@@ -232,76 +232,84 @@ StatVectorSmooth <- ggproto("StatVectorSmooth", Stat,
 #' @export
 GeomVectorSmooth <- ggproto("GeomVectorSmooth", GeomSegment,
 
-                            required_aes = c("x", "y", "xend", "yend"),
+  required_aes = c("x", "y", "xend", "yend"),
 
-                            default_aes = aes(linewidth = 0.5, linetype = 1, alpha = 1, fill = "grey80", color = "black"),
+  default_aes = aes(linewidth = 0.5, linetype = 1, alpha = 1, fill = "grey80", color = "black"),
 
-                            draw_panel = function(data, panel_params, coord, arrow = NULL) {
+  draw_panel = function(data, panel_params, coord, arrow = NULL) {
 
-                              # Reshape the data for polygons
-                              data$id <- seq_len(nrow(data))
+    # Reshape the data for polygons
+    data$id <- seq_len(nrow(data))
 
-                              if(!is.null(data$xend_upper)){
+    if(!is.null(data$xend_upper)){
 
-                                polygon_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
+      polygon_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
 
-                                  data.frame(
-                                    id = rep(data$id[i], 4),  # Repeat the ID to match the length of the other vectors
-                                    x = c(data$x[i], data$xend_upper[i], data$xend[i], data$xend_lower[i]),  # Define the x-coordinates
-                                    y = c(data$y[i], data$yend_upper[i], data$yend[i], data$yend_lower[i]),  # Define the y-coordinates
-                                    group = rep(data$id[i], 4),  # Repeat group ID to match the length of the other vectors
-                                    linewidth = rep(data$linewidth[i], 4),  # Inherit or repeat linewidth
-                                    fill = rep(data$fill[i], 4),  # Inherit or repeat fill
-                                    linetype = rep(data$linetype[i], 4),  # Inherit or repeat linetype
-                                    alpha = rep(data$alpha[i], 4)  # Inherit or repeat alpha
-                                  )
-                                }))
+        data.frame(
+          id = rep(data$id[i], 4),  # Repeat the ID to match the length of the other vectors
+          x = c(data$x[i], data$xend_upper[i], data$xend[i], data$xend_lower[i]),  # Define the x-coordinates
+          y = c(data$y[i], data$yend_upper[i], data$yend[i], data$yend_lower[i]),  # Define the y-coordinates
+          group = rep(data$id[i], 4),  # Repeat group ID to match the length of the other vectors
+          linewidth = rep(data$linewidth[i], 4),  # Inherit or repeat linewidth
+          # fill = rep(data$fill[i], 4),  # Inherit or repeat fill
+          fill = "gray60",  # Inherit or repeat fill
+          linetype = rep(data$linetype[i], 4),  # Inherit or repeat linetype
+          # alpha = rep(data$alpha[i], 4)  # Inherit or repeat alpha
+          alpha = .4  # Inherit or repeat alpha
+        )
+      }))
 
 
-                              } else{
-                                polygon_data <- NULL
-                              }
+    } else{
+      polygon_data <- NULL
+    }
 
-                              # Draw the polygon if polygon data exists
-                              polygon_grob <- if (!is.null(polygon_data)) {
+    # Draw the polygon if polygon data exists
+    polygon_grob <- if (!is.null(polygon_data)) {
 
-                                GeomPolygon$draw_panel(
-                                  data = polygon_data,
-                                  panel_params = panel_params,
-                                  coord = coord
-                                )
-                              } else {
-                                NULL
-                              }
+      GeomPolygon$draw_panel(
+        data = polygon_data,
+        panel_params = panel_params,
+        coord = coord
+      )
+    } else {
+      NULL
+    }
 
-                              # Draw the vector lines
-                              segments_grob <- GeomSegment$draw_panel(
-                                data = data,
-                                panel_params = panel_params,
-                                coord = coord,
-                                arrow = arrow
-                              )
+    # Draw the vector lines
+    segments_grob <- GeomSegment$draw_panel(
+      data = data,
+      panel_params = panel_params,
+      coord = coord,
+      arrow = arrow
+    )
 
-                              grid::gList(polygon_grob, segments_grob)
+    grid::gList(polygon_grob, segments_grob)
 
-                            },
+  },
 
-                            draw_key = draw_key_smooth
+  draw_key = draw_key_smooth
 )
 
 #' @rdname geom_vector_smooth
 #' @export
-stat_vector_smooth <- function(mapping = NULL, data = NULL,
-                               geom = "vector_smooth",
-                               position = "identity",
-                               na.rm = FALSE, show.legend = NA,
-                               inherit.aes = TRUE,
-                               n = c(11, 11), scale_length = 1,
-                               center = TRUE, normalize = TRUE,
-                               method = "lm",
-                               se = TRUE,
-                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                               ...) {
+stat_vector_smooth <- function(
+  mapping = NULL,
+  data = NULL,
+  geom = "vector_smooth",
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  n = c(11, 11),
+  scale_length = 1,
+  center = TRUE,
+  normalize = TRUE,
+  method = "lm",
+  se = TRUE,
+  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  ...
+) {
 
   layer(
     stat = StatVectorSmooth,
@@ -327,17 +335,23 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
 
 #' @rdname geom_vector_smooth
 #' @export
-geom_vector_smooth <- function(mapping = NULL, data = NULL,
-                               stat = "vector_smooth",
-                               position = "identity",
-                               na.rm = FALSE, show.legend = NA,
-                               inherit.aes = TRUE,
-                               n = c(11, 11), scale_length = 1,
-                               center = TRUE, normalize = TRUE,
-                               method = "lm",
-                               se = TRUE,
-                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                               ...) {
+geom_vector_smooth <- function(
+  mapping = NULL,
+  data = NULL,
+  stat = "vector_smooth",
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  n = c(11, 11),
+  scale_length = 1,
+  center = TRUE,
+  normalize = TRUE,
+  method = "lm",
+  se = TRUE,
+  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  ...
+) {
 
   layer(
     stat = StatVectorSmooth,
