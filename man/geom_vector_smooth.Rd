@@ -118,10 +118,11 @@ rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
-\item{n}{An integer vector specifying the number of grid points along each axis.}
+\item{n}{An integer vector specifying the number of grid points along each
+axis.}
 
-\item{scale_length}{Numeric; scales the length of the vectors to a given value.
-Useful for ensuring consistent lengths for visualization.}
+\item{scale_length}{Numeric; scales the length of the vectors to a given
+value. Useful for ensuring consistent lengths for visualization.}
 
 \item{center}{Logical; if \code{TRUE}, centers the vector on the evaluated x/y
 location. If \code{FALSE}, the vector origin is at the evaluated x/y location.
@@ -132,20 +133,24 @@ x/y location.}
 length before applying other transformations like centering. If \code{FALSE},
 vectors retain their original lengths.}
 
-\item{method}{Character; specifies the smoothing method to be used.
-Accepts \code{"lm"} for linear modeling or \code{"loess"} for locally estimated
-scatterplot smoothing.}
+\item{method}{Character; specifies the smoothing method to be used. Accepts
+\code{"lm"} for linear modeling or \code{"loess"} for locally estimated scatterplot
+smoothing.}
 
-\item{se}{Logical; if \code{TRUE}, plots the confidence intervals around the smoothed vectors.}
+\item{se}{Logical; if \code{TRUE}, plots the confidence intervals around the
+smoothed vectors.}
 
-\item{se.circle}{Logical; if \code{TRUE}, draws circles around the origin of the vectors to represent
-the radius of the confidence interval. This is useful for visualizing the spread and variability
-of the confidence intervals when \code{se = TRUE}.}
+\item{se.circle}{Logical; if \code{TRUE}, draws circles around the origin of the
+vectors to represent the radius of the confidence interval. This is useful
+for visualizing the spread and variability of the confidence intervals when
+\code{se = TRUE}.}
 
-\item{probs}{Numeric vector; specifies the prediction interval level(s) to be plotted when \code{se = TRUE}.
-For example, \code{probs = c(0.95, 0.68)} will plot 95\% and 68\% prediction intervals. If only one value
-is provided (e.g., \code{probs = 0.95}), a single prediction interval is drawn. If multiple values
-are provided, the function will plot multiple intervals (with smaller intervals nested inside larger ones).}
+\item{probs}{Numeric vector; specifies the prediction interval level(s) to be
+plotted when \code{se = TRUE}. For example, \code{probs = c(0.95, 0.68)} will plot
+95\% and 68\% prediction intervals. If only one value is provided (e.g.,
+\code{probs = 0.95}), a single prediction interval is drawn. If multiple values
+are provided, the function will plot multiple intervals (with smaller
+intervals nested inside larger ones).}
 
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}. This
 controls the appearance of the arrowheads at the end of the vectors,
@@ -204,8 +209,8 @@ estimate the underlying vector field. This is similar in concept to how
 instead of scalar data.
 }
 \section{Aesthetics}{
-
-\code{geom_vector_smooth} understands the following aesthetics (required aesthetics are in bold):
+ \code{geom_vector_smooth} understands the following
+aesthetics (required aesthetics are in bold):
 \itemize{
 \item \strong{\code{x}}: x-coordinate of the start point of the vector.
 \item \strong{\code{y}}: y-coordinate of the start point of the vector.
@@ -218,10 +223,8 @@ instead of scalar data.
 \item \code{linetype}: The type of the vector line (solid, dashed, etc.).
 \item \code{alpha}: The transparency level of the vector.
 \item \code{arrow}: Specification for arrowheads at the end of the vector.
-}
 
 Additionally, when using smoothing:
-\itemize{
 \item \code{norm}: A computed variable representing the magnitude of each smoothed vector.
 }
 }

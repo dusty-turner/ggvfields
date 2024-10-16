@@ -46,11 +46,8 @@ wind_data_cartesian <- within(wind_data_polar, {
   dy <- wind_lat_comp
 })
 
-wind_data_cartesian |> 
-  ggplot() +
-  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy)) +
-  labs(title = "Wind Vectors (Cartesian Input)",
-       x = "Longitude", y = "Latitude")  
+ggplot(wind_data_cartesian) +
+  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy))
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
@@ -60,11 +57,8 @@ wind_data_cartesian |>
 For polar coordinates, the vector is defined by an angle and distance:
 
 ``` r
-wind_data_polar |> 
-  ggplot() +
-  geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd)) +
-  labs(title = "Wind Vectors (Polar Input)",
-       x = "Longitude", y = "Latitude") 
+ggplot(wind_data_cartesian) +
+  geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd))
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
@@ -112,12 +106,11 @@ actual size.
 In this example, the norm of the wind vectors is mapped to their length:
 
 ``` r
-wind_data_cartesian |> 
-  ggplot() +
-  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)), 
-              tail_point = TRUE, center = TRUE, arrow = NULL) +
-  labs(title = "Wind Vectors",
-       x = "Longitude", y = "Latitude") 
+ggplot(wind_data_cartesian) +
+  geom_vector(
+    aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)),
+    arrow = NULL, tail_point = TRUE
+  )
 #> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
 #> Ensure your `length` values reflect the intended scaling.
 ```
@@ -174,9 +167,9 @@ f <- function(v) {
 }
 
 ggplot() +
-  geom_vector_field(
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10), normalize = FALSE, center = TRUE
-    ) 
+  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) 
+#> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
+#> Ensure your `length` values reflect the intended scaling.
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
@@ -195,9 +188,9 @@ We can visualize the norm by mapping it to the length aesthetic:
 ``` r
 ggplot() +
   geom_vector_field(
-    aes(length = after_stat(norm)),
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
-    ) 
+    fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
+    aes(length = after_stat(norm))
+  ) 
 #> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
 #> Ensure your `length` values reflect the intended scaling.
 ```
@@ -281,9 +274,7 @@ f <- function(v) {
 }
 
 ggplot() +
-  geom_streamplot(
-    fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
-    ) 
+  geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3)) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
@@ -296,10 +287,7 @@ It may be useful to not break up the streamlines.
 
 ``` r
 ggplot() +
-  geom_streamplot(
-    fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
-    chop = FALSE
-    ) 
+  geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3), chop = FALSE) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
@@ -314,7 +302,7 @@ ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
     chop = TRUE, scale_stream = .9,
-    ) 
+  ) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
@@ -326,7 +314,7 @@ ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
     aes(color = after_stat(log(divergence + abs(min(divergence)))))
-    ) +
+  ) +
   labs(color = "adjusted\ndivergence")
 ```
 
@@ -379,9 +367,7 @@ flow lines, abstracting away complex calculations for the user.
 
 ``` r
 ggplot() +
-  geom_flow(
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
-    )
+  geom_flow(fun = f, xlim = c(-10, 10), ylim = c(-10, 10))
 ```
 
 <img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
@@ -434,7 +420,9 @@ ggplot() +
   geom_flow(
     fun = f, n = c(21, 21), xlim = c(-10, 10), ylim = c(-10, 10),
     iterations = 1000, threshold_distance = 0.5, T = 5
-    ) 
+  ) 
+#> Warning in geom_flow(fun = f, n = c(21, 21), xlim = c(-10, 10), ylim = c(-10, :
+#> Ignoring unknown parameters: `T`
 ```
 
 <img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
