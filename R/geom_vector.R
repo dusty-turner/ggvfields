@@ -24,20 +24,23 @@
 #' @export
 #'
 #' @section Aesthetics:
-#' `geom_vector` understands the following aesthetics (required aesthetics are in bold):
+#' `geom_vector` understands the following aesthetics (required aesthetics are in **bold**):
 #' - **`x`**: x-coordinate of the start point of the vector.
 #' - **`y`**: y-coordinate of the start point of the vector.
 #' - `xend`: x-coordinate of the end point of the vector (optional if `angle` and `distance` are provided).
 #' - `yend`: y-coordinate of the end point of the vector (optional if `angle` and `distance` are provided).
 #' - `angle`: The angle of the vector in degrees (optional, used with `distance`).
 #' - `distance`: The distance/magnitude of the vector (optional, used with `angle`).
-#' - `length`: The length of the vector (optional, overrides `distance` when mapped as an aesthetic).
+#' - `length`: The length of the vector.
+#'   - **By default**, `length = after_stat(norm)` automatically maps vector length to the calculated magnitude of `(xend - x)` and `(yend - y)`.
+#'   - **To turn off automatic length mapping**, set `length = after_stat(NA)`. This allows you to plot vectors without the length scaling.
 #' - `color`: The color of the vector line.
 #' - `fill`: The fill color of vector arrowheads and points.
 #' - `linewidth`: The thickness of the vector line.
 #' - `linetype`: The type of the vector line (solid, dashed, etc.).
 #' - `alpha`: The transparency level of the vector.
 #' - `arrow`: Specification for arrowheads at the end of the vector.
+
 #'
 #' @examples
 #'
@@ -58,6 +61,7 @@
 #'   dy <- wind_lat_comp  # dy represents the change in y (latitude component)
 #' })
 #'
+#'
 #' ggplot(wind_data_cartesian) +
 #'   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy)) +
 #'   labs(title = "Wind Vectors (Cartesian Input)",
@@ -68,6 +72,26 @@
 #'   geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd)) +
 #'   labs(title = "Wind Vectors (Polar Input)",
 #'        x = "Longitude", y = "Latitude")
+#'
+#' # By default, length = after_stat(norm).
+#' # To allow vectors to be the exact length of the data you can disable this option
+#' # with length = after_stat(NA)
+#' ggplot(wind_data_cartesian) +
+#'   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(NA)))
+#'
+#' @section Key Notes:
+#' - **Default Length Mapping**:
+#'   - By default, `length` is mapped as `length = after_stat(norm)`, where `norm` is the magnitude of each vector.
+#'   - This ensures that the length of each vector visually reflects its magnitude.
+#'
+#' - **Disabling Length Mapping**:
+#'   - To plot vectors without length scaling, set `length = after_stat(NA)`.
+#'   - This is useful when vector directions are important, but their relative magnitudes should not influence the visualization.
+#'
+#' - **Custom Length Mapping**:
+#'   - You can still manually specify `length` by mapping it to a specific column or using a function.
+#'   - Example: `aes(length = 0.5)` or `aes(length = sqrt(dx^2 + dy^2))`.
+
 #'
 #' @section Computed variables:
 #' \describe{
@@ -107,7 +131,7 @@ stat_vector <- function(mapping = NULL, data = NULL, geom = GeomVector,
 #' @export
 StatVector <- ggproto("StatVector", Stat,
                       required_aes = c("x", "y"),
-                      default_aes = aes(dx = NA, dy = NA, distance = NA, angle = NA, length = NA,
+                      default_aes = aes(dx = NA, dy = NA, distance = NA, angle = NA, length = after_stat(norm),
                                         color = "black", fill = "black", linewidth = 2, linetype = 1, alpha = 1),
                       compute_group = function(data, scales, center = FALSE, fun = NULL, ...) {
 
@@ -293,8 +317,8 @@ GeomVector <- ggproto(
 
   setup_data = function(data, params){
 
-  # if (is.na(data$length[1])) {
-  if (is.null(data$length[1])) {
+  if (is.na(data$length[1])) {
+  # if (is.null(data$length[1])) {
     # Normalize dx and dy to unit vectors if normalize is TRUE
 
     if (params$normalize) {
@@ -355,7 +379,7 @@ GeomVector <- ggproto(
   },
 
   required_aes = c("x", "y"),
-  default_aes = aes(colour = "black", fill = "black", size = 0.5, length = NA, linewidth = 2, linetype = 1, alpha = 1),
+  default_aes = aes(colour = "black", fill = "black", size = 0.5, length = after_stat(norm), linewidth = 2, linetype = 1, alpha = 1),
   draw_group = draw_panel_vector,
   draw_key = draw_key_vector
 )

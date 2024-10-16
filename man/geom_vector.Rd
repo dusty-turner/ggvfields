@@ -180,7 +180,7 @@ from angular (\code{angle}) and distance (\code{distance}) information.
 }
 \section{Aesthetics}{
 
-\code{geom_vector} understands the following aesthetics (required aesthetics are in bold):
+\code{geom_vector} understands the following aesthetics (required aesthetics are in \strong{bold}):
 \itemize{
 \item \strong{\code{x}}: x-coordinate of the start point of the vector.
 \item \strong{\code{y}}: y-coordinate of the start point of the vector.
@@ -188,13 +188,38 @@ from angular (\code{angle}) and distance (\code{distance}) information.
 \item \code{yend}: y-coordinate of the end point of the vector (optional if \code{angle} and \code{distance} are provided).
 \item \code{angle}: The angle of the vector in degrees (optional, used with \code{distance}).
 \item \code{distance}: The distance/magnitude of the vector (optional, used with \code{angle}).
-\item \code{length}: The length of the vector (optional, overrides \code{distance} when mapped as an aesthetic).
+\item \code{length}: The length of the vector.
+\itemize{
+\item \strong{By default}, \code{length = after_stat(norm)} automatically maps vector length to the calculated magnitude of \code{(xend - x)} and \code{(yend - y)}.
+\item \strong{To turn off automatic length mapping}, set \code{length = after_stat(NA)}. This allows you to plot vectors without the length scaling.
+}
 \item \code{color}: The color of the vector line.
 \item \code{fill}: The fill color of vector arrowheads and points.
 \item \code{linewidth}: The thickness of the vector line.
 \item \code{linetype}: The type of the vector line (solid, dashed, etc.).
 \item \code{alpha}: The transparency level of the vector.
 \item \code{arrow}: Specification for arrowheads at the end of the vector.
+}
+}
+
+\section{Key Notes}{
+
+\itemize{
+\item \strong{Default Length Mapping}:
+\itemize{
+\item By default, \code{length} is mapped as \code{length = after_stat(norm)}, where \code{norm} is the magnitude of each vector.
+\item This ensures that the length of each vector visually reflects its magnitude.
+}
+\item \strong{Disabling Length Mapping}:
+\itemize{
+\item To plot vectors without length scaling, set \code{length = after_stat(NA)}.
+\item This is useful when vector directions are important, but their relative magnitudes should not influence the visualization.
+}
+\item \strong{Custom Length Mapping}:
+\itemize{
+\item You can still manually specify \code{length} by mapping it to a specific column or using a function.
+\item Example: \code{aes(length = 0.5)} or \code{aes(length = sqrt(dx^2 + dy^2))}.
+}
 }
 }
 
@@ -224,6 +249,7 @@ wind_data_cartesian <- within(wind_data_polar, {
   dy <- wind_lat_comp  # dy represents the change in y (latitude component)
 })
 
+
 ggplot(wind_data_cartesian) +
   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy)) +
   labs(title = "Wind Vectors (Cartesian Input)",
@@ -234,6 +260,12 @@ ggplot(wind_data_polar) +
   geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd)) +
   labs(title = "Wind Vectors (Polar Input)",
        x = "Longitude", y = "Latitude")
+
+# By default, length = after_stat(norm).
+# To allow vectors to be the exact length of the data you can disable this option
+# with length = after_stat(NA)
+ggplot(wind_data_cartesian) +
+  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(NA)))
 
 }
 \keyword{datasets}
