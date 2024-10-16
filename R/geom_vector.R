@@ -244,9 +244,9 @@ draw_panel_vector <- function(
   } else {
     # When length is mapped, proceed as usual
     # Display a message and ignore normalization if normalize = TRUE
-    if (normalize) {
-      message("Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.\nEnsure your `length` values reflect the intended scaling.")
-    }
+    # if (normalize) {
+    #   message("Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.\nEnsure your `length` values reflect the intended scaling.")
+    # }
 
     #### Untransform the data here ####
     # Reverse the transformation done in setup_data to get the original data back
@@ -361,6 +361,16 @@ GeomVector <- ggproto(
   default_aes = aes(colour = "black", fill = "black", size = 0.5, length = NA, linewidth = 2, linetype = 1, alpha = 1),
 
   setup_data = function(data, params){
+
+    # print(params)
+    #
+    # inherits(params$length, "after_stat")
+    #
+    # if (!is.na(data$length[1]) && params$normalize) {
+    #   message("Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.\nEnsure your `length` values reflect the intended scaling.")
+    # }
+
+
 
   if (is.na(data$length[1])) {
 

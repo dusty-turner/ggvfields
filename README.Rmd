@@ -33,6 +33,8 @@ options(ggplot2.continuous.colour="viridis")
 
 `geom_vector()` is designed to visualize individual vectors, specified by either Cartesian (`dx`, `dy`) or polar (`angle`, `distance`) components. It’s especially useful for directional data like wind patterns or flow fields.
 
+By default, the **`length` aesthetic** is mapped to `after_stat(norm)`, meaning the vector length reflects its magnitude. More details in this section: [**New Feature: Mapping Norm to the Length Aesthetic**](#new-feature-mapping-norm-to-the-length-aesthetic).
+
 #### Cartesian Example
 
 ```{r}
@@ -91,6 +93,15 @@ ggplot(wind_data_cartesian) +
   geom_vector(
     aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)),
     arrow = NULL, tail_point = TRUE
+  )
+```
+
+To disable this feature, you can map `length = after_stat(NA)`.
+
+```{r}
+ggplot(wind_data_cartesian) +
+  geom_vector(
+    aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(NA))
   )
 ```
 
@@ -393,8 +404,8 @@ sample_points$dy <- sample_points$yend - sample_points$y
 
 # Visualize the original and smoothed vectors using `ggplot2` from ggvfields
 ggplot(sample_points, aes(x = x, y = y)) +
-  geom_vector(aes(dx = dx, dy = dy)) +  
   geom_vector_smooth(aes(dx = dx, dy = dy), n = 6, center = FALSE, probs = c(.95, .7)) + 
+  geom_vector(aes(dx = dx, dy = dy)) +  
   coord_equal()
 ```
 
