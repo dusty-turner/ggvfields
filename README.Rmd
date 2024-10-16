@@ -22,11 +22,6 @@ knitr::opts_chunk$set(
 
 **ggvfields** provides tools for visualizing vector fields, stream plots, and soon complex numbers and more.
 
-```{r eval = FALSE}
-remotes::install_github("dusty-turner/ggvfields")
-```
-
-
 ```{r}
 library("ggvfields")
 options(ggplot2.continuous.colour="viridis")
@@ -358,6 +353,8 @@ ggplot() +
 <!--   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3) -->
 <!-- ``` -->
 
+
+
 ## In Development
 
 ### `geom_vector_smooth()`
@@ -403,14 +400,32 @@ ggplot(sample_points, aes(x = x, y = y)) +
 
 This example demonstrates how `geom_vector_smooth()` can be used to fit a vector field to vector data. 
 
+
+
+## Installation
+
+**ggvfields** is not yet on CRAN. You can install it with
+
+```{r eval = FALSE}
+remotes::install_github("dusty-turner/ggvfields")
+```
+
+
+
 ## License
 
 This package is licensed under the MIT License.
+
+
 
 ## Contact
 
 For any questions or issues, please [open an issue](https://github.com/dusty-turner/ggvfields/issues/new) on GitHub or contact the maintainer.
 
+
+
 ## Related projects
 
 For creating vector fields, the [**ggquiver**](http://pkg.mitchelloharawild.com/ggquiver/) package provides quiver plots to visualize vector fields, while the [**ggarchery**](https://github.com/mdhall272/ggarchery) package can handling of segments with arrowheads.
+
+
