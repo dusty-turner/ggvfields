@@ -175,18 +175,18 @@ StatVectorSmooth <- ggproto(
         upr <- preds + t_value * se_values
 
         # Store the intervals with custom naming convention
-        interval_data[[interval_type]] <- bind_cols(
-          as_tibble(lwr) %>% rename_with(~paste0(c("xend", "yend"), "_lower_", interval_type)),
-          as_tibble(upr) %>% rename_with(~paste0(c("xend", "yend"), "_upper_", interval_type))
+        interval_data[[interval_type]] <- cbind(
+          setNames(data.frame(lwr), paste0(c("xend", "yend"), "_lower_", interval_type)),
+          setNames(data.frame(upr), paste0(c("xend", "yend"), "_upper_", interval_type))
         )
 
       }
 
       # Combine all interval data with the main grid and predictions
-      grid <- bind_cols(
+      grid <- cbind(
         grid,
-        as_tibble(preds) %>% rename_with(~paste0("fit_", .)),
-        bind_cols(interval_data)  # Flatten the list of intervals into columns
+        setNames(data.frame(preds), paste0("fit_", c("dx", "dy"))),
+        do.call(cbind, unname(interval_data))
       )
     }
 
@@ -221,10 +221,8 @@ StatVectorSmooth <- ggproto(
 
     # If confidence intervals are enabled, include them in the result
     if (se) {
-      result <- bind_cols(
-        result,
-        grid %>% select(contains("end_"))
-      )
+      ci_cols <- grep("end_", colnames(grid), value = TRUE)
+      result <- cbind(result, grid[, ci_cols])
     }
 
     return(result)
@@ -318,6 +316,7 @@ GeomVectorSmooth <- ggproto(
         panel_params = panel_params,
         coord = coord
       )
+
 
       # Draw inner wedge only if inner bounds exist (probs[2] was not NA)
       if (!is.na(data$xend_lower_inner[1])) {
