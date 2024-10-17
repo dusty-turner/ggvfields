@@ -26,7 +26,7 @@ stat_vector_smooth(
   show.legend = NA,
   inherit.aes = TRUE,
   n = c(11, 11),
-  scale_length = 1,
+  scale_factor = 1,
   center = TRUE,
   normalize = TRUE,
   method = "lm",
@@ -46,7 +46,7 @@ geom_vector_smooth(
   show.legend = NA,
   inherit.aes = TRUE,
   n = c(11, 11),
-  scale_length = 1,
+  scale_factor = 1,
   center = TRUE,
   normalize = TRUE,
   method = "lm",
@@ -121,7 +121,7 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 \item{n}{An integer vector specifying the number of grid points along each
 axis.}
 
-\item{scale_length}{Numeric; scales the length of the vectors to a given
+\item{scale_factor}{Numeric; scales the length of the vectors to a given
 value. Useful for ensuring consistent lengths for visualization.}
 
 \item{center}{Logical; if \code{TRUE}, centers the vector on the evaluated x/y
@@ -133,9 +133,8 @@ x/y location.}
 length before applying other transformations like centering. If \code{FALSE},
 vectors retain their original lengths.}
 
-\item{method}{Character; specifies the smoothing method to be used. Accepts
-\code{"lm"} for linear modeling or \code{"loess"} for locally estimated scatterplot
-smoothing.}
+\item{method}{Character; specifies the smoothing method to be used.
+Currently, only \code{"lm"} (linear modeling) is supported.}
 
 \item{se}{Logical; if \code{TRUE}, plots the confidence intervals around the
 smoothed vectors.}
@@ -146,11 +145,10 @@ for visualizing the spread and variability of the confidence intervals when
 \code{se = TRUE}.}
 
 \item{probs}{Numeric vector; specifies the prediction interval level(s) to be
-plotted when \code{se = TRUE}. For example, \code{probs = c(0.95, 0.68)} will plot
-95\% and 68\% prediction intervals. If only one value is provided (e.g.,
-\code{probs = 0.95}), a single prediction interval is drawn. If multiple values
-are provided, the function will plot multiple intervals (with smaller
-intervals nested inside larger ones).}
+plotted when \code{se = TRUE}. \strong{Default is \code{probs = c(0.95, NA)}}. If only one
+value is provided (e.g., \code{probs = 0.95}), a single prediction interval is
+drawn. If multiple values are provided, the function will plot multiple
+intervals (with smaller intervals nested inside larger ones).}
 
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}. This
 controls the appearance of the arrowheads at the end of the vectors,

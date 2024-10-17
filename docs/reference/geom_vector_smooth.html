@@ -73,7 +73,7 @@ instead of scalar data.</p>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">11</span>, <span class="fl">11</span><span class="op">)</span>,</span>
-<span>  scale_length <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  scale_factor <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"lm"</span>,</span>
@@ -93,7 +93,7 @@ instead of scalar data.</p>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">11</span>, <span class="fl">11</span><span class="op">)</span>,</span>
-<span>  scale_length <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  scale_factor <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"lm"</span>,</span>
@@ -180,12 +180,13 @@ the default plot specification, e.g. <code><a href="https://ggplot2.tidyverse.or
 
 
 <dt>n</dt>
-<dd><p>An integer vector specifying the number of grid points along each axis.</p></dd>
+<dd><p>An integer vector specifying the number of grid points along each
+axis.</p></dd>
 
 
-<dt>scale_length</dt>
-<dd><p>Numeric; scales the length of the vectors to a given value.
-Useful for ensuring consistent lengths for visualization.</p></dd>
+<dt>scale_factor</dt>
+<dd><p>Numeric; scales the length of the vectors to a given
+value. Useful for ensuring consistent lengths for visualization.</p></dd>
 
 
 <dt>center</dt>
@@ -203,25 +204,27 @@ vectors retain their original lengths.</p></dd>
 
 <dt>method</dt>
 <dd><p>Character; specifies the smoothing method to be used.
-Accepts <code>"lm"</code> for linear modeling or <code>"loess"</code> for locally estimated
-scatterplot smoothing.</p></dd>
+Currently, only <code>"lm"</code> (linear modeling) is supported.</p></dd>
 
 
 <dt>se</dt>
-<dd><p>Logical; if <code>TRUE</code>, plots the confidence intervals around the smoothed vectors.</p></dd>
+<dd><p>Logical; if <code>TRUE</code>, plots the confidence intervals around the
+smoothed vectors.</p></dd>
 
 
 <dt>se.circle</dt>
-<dd><p>Logical; if <code>TRUE</code>, draws circles around the origin of the vectors to represent
-the radius of the confidence interval. This is useful for visualizing the spread and variability
-of the confidence intervals when <code>se = TRUE</code>.</p></dd>
+<dd><p>Logical; if <code>TRUE</code>, draws circles around the origin of the
+vectors to represent the radius of the confidence interval. This is useful
+for visualizing the spread and variability of the confidence intervals when
+<code>se = TRUE</code>.</p></dd>
 
 
 <dt>probs</dt>
-<dd><p>Numeric vector; specifies the prediction interval level(s) to be plotted when <code>se = TRUE</code>.
-For example, <code>probs = c(0.95, 0.68)</code> will plot 95% and 68% prediction intervals. If only one value
-is provided (e.g., <code>probs = 0.95</code>), a single prediction interval is drawn. If multiple values
-are provided, the function will plot multiple intervals (with smaller intervals nested inside larger ones).</p></dd>
+<dd><p>Numeric vector; specifies the prediction interval level(s) to be
+plotted when <code>se = TRUE</code>. <strong>Default is <code>probs = c(0.95, NA)</code></strong>. If only one
+value is provided (e.g., <code>probs = 0.95</code>), a single prediction interval is
+drawn. If multiple values are provided, the function will plot multiple
+intervals (with smaller intervals nested inside larger ones).</p></dd>
 
 
 <dt>arrow</dt>
@@ -280,9 +283,8 @@ smooth vector field plot.</p>
     </div>
     <div class="section level2">
     <h2 id="aesthetics">Aesthetics<a class="anchor" aria-label="anchor" href="#aesthetics"></a></h2>
-    
-
-<p><code>geom_vector_smooth</code> understands the following aesthetics (required aesthetics are in bold):</p><ul><li><p><strong><code>x</code></strong>: x-coordinate of the start point of the vector.</p></li>
+    <p><code>geom_vector_smooth</code> understands the following
+aesthetics (required aesthetics are in bold):</p><ul><li><p><strong><code>x</code></strong>: x-coordinate of the start point of the vector.</p></li>
 <li><p><strong><code>y</code></strong>: y-coordinate of the start point of the vector.</p></li>
 <li><p><code>xend</code>: x-coordinate of the end point of the vector (optional if <code>angle</code> and <code>distance</code> are provided).</p></li>
 <li><p><code>yend</code>: y-coordinate of the end point of the vector (optional if <code>angle</code> and <code>distance</code> are provided).</p></li>
@@ -292,8 +294,9 @@ smooth vector field plot.</p>
 <li><p><code>linewidth</code>: The thickness of the vector line.</p></li>
 <li><p><code>linetype</code>: The type of the vector line (solid, dashed, etc.).</p></li>
 <li><p><code>alpha</code>: The transparency level of the vector.</p></li>
-<li><p><code>arrow</code>: Specification for arrowheads at the end of the vector.</p></li>
-</ul><p>Additionally, when using smoothing:</p><ul><li><p><code>norm</code>: A computed variable representing the magnitude of each smoothed vector.</p></li>
+<li><p><code>arrow</code>: Specification for arrowheads at the end of the vector.</p>
+<p>Additionally, when using smoothing:</p></li>
+<li><p><code>norm</code>: A computed variable representing the magnitude of each smoothed vector.</p></li>
 </ul></div>
 
     <div class="section level2">
@@ -330,6 +333,9 @@ smooth vector field plot.</p>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">sample_points</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span>  <span class="co"># Original vectors in red</span></span></span>
 <span class="r-in"><span>  <span class="fu">geom_vector_smooth</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span>, se <span class="op">=</span> <span class="cn">TRUE</span>, se.circle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>  <span class="co"># Smoothed vectors</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Computation failed in `stat_vector_smooth()`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Caused by error in `bind_cols()`:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> could not find function "bind_cols"</span>
 <span class="r-plt img"><img src="geom_vector_smooth-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

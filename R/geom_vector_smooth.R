@@ -10,7 +10,7 @@
 #' @inheritParams ggplot2::stat_identity
 #' @param n An integer vector specifying the number of grid points along each
 #'   axis.
-#' @param scale_length Numeric; scales the length of the vectors to a given
+#' @param scale_factor Numeric; scales the length of the vectors to a given
 #'   value. Useful for ensuring consistent lengths for visualization.
 #' @param center Logical; if `TRUE`, centers the vector on the evaluated x/y
 #'   location. If `FALSE`, the vector origin is at the evaluated x/y location.
@@ -19,9 +19,8 @@
 #' @param normalize Logical; if `TRUE`, normalizes the vector's length to a unit
 #'   length before applying other transformations like centering. If `FALSE`,
 #'   vectors retain their original lengths.
-#' @param method Character; specifies the smoothing method to be used. Accepts
-#'   `"lm"` for linear modeling or `"loess"` for locally estimated scatterplot
-#'   smoothing.
+#' @param method Character; specifies the smoothing method to be used.
+#'   Currently, only `"lm"` (linear modeling) is supported.
 #' @param se Logical; if `TRUE`, plots the confidence intervals around the
 #'   smoothed vectors.
 #' @param se.circle Logical; if `TRUE`, draws circles around the origin of the
@@ -29,11 +28,10 @@
 #'   for visualizing the spread and variability of the confidence intervals when
 #'   `se = TRUE`.
 #' @param probs Numeric vector; specifies the prediction interval level(s) to be
-#'   plotted when `se = TRUE`. For example, `probs = c(0.95, 0.68)` will plot
-#'   95% and 68% prediction intervals. If only one value is provided (e.g.,
-#'   `probs = 0.95`), a single prediction interval is drawn. If multiple values
-#'   are provided, the function will plot multiple intervals (with smaller
-#'   intervals nested inside larger ones).
+#'   plotted when `se = TRUE`. **Default is `probs = c(0.95, NA)`**. If only one
+#'   value is provided (e.g., `probs = 0.95`), a single prediction interval is
+#'   drawn. If multiple values are provided, the function will plot multiple
+#'   intervals (with smaller intervals nested inside larger ones).
 #' @param arrow Arrow specification, as created by `grid::arrow()`. This
 #'   controls the appearance of the arrowheads at the end of the vectors,
 #'   including properties like angle, length, and type.
@@ -97,22 +95,6 @@
 #'
 NULL
 
-
-calculate_bounds <- function(fit, se, probs) {
-  if (!se) return(NULL)
-
-  # Calculate critical t-value for the confidence level
-  t_critical <- qt(1 - (1 - probs) / 2, df = fit$df)
-
-  # Calculate upper and lower bounds
-  lower_bound <- fit$fit - t_critical * fit$se.fit
-  upper_bound <- fit$fit + t_critical * fit$se.fit
-
-  # Return a list of bounds
-  return(list(lower = lower_bound, upper = upper_bound))
-}
-
-
 #' @rdname geom_vector_smooth
 #' @export
 StatVectorSmooth <- ggproto(
@@ -121,7 +103,7 @@ StatVectorSmooth <- ggproto(
   required_aes = c("x", "y", "dx", "dy"),
   default_aes = aes(color = "#3366FF", linewidth = 0.5, linetype = 1, alpha = 1),
 
-  compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_length, se = TRUE, probs, ...) {
+  compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_factor, se = TRUE, probs, ...) {
 
     # Ensure probs is a vector, even if a single value is provided
     if (length(probs) == 1) {
@@ -145,114 +127,105 @@ StatVectorSmooth <- ggproto(
     grid <- expand.grid(x = x_seq, y = y_seq)
     grid$id <- 1:nrow(grid)
 
-
     x_spacing <- diff(sort(unique(grid$x)))[1]  # Spacing between adjacent x-values
     y_spacing <- diff(sort(unique(grid$y)))[1]  # Spacing between adjacent y-values
 
     # Choose the radius as a fraction of the smaller spacing
     radius <- min(x_spacing, y_spacing) / 2.5
 
-
     if (method == "lm") {
-      fit_sin <- lm(sin(angle) ~ x + y, data = data)
-      fit_cos <- lm(cos(angle) ~ x + y, data = data)
-      fit_distance <- lm(distance ~ x + y, data = data)
+      model <- lm(cbind(dx, dy) ~ x * y, data = data)
 
-      # Predictions and confidence intervals using helper function
-      pred_sin <- predict(fit_sin, newdata = grid, se.fit = se)
-      pred_cos <- predict(fit_cos, newdata = grid, se.fit = se)
-      pred_distance <- predict(fit_distance, newdata = grid, se.fit = se)
+      # Extract the covariance matrix of the coefficients
+      V <- vcov(model)
 
-      if (se) {
+      # Compute the model matrix for the new data named grid
+      X <- model.matrix(~ x * y, grid)
 
-        # Calculate confidence bounds for outer interval
-        sin_bounds_outer <- calculate_bounds(fit = pred_sin, se = se, probs = probs[1])
-        cos_bounds_outer <- calculate_bounds(pred_cos, se, probs[1])
-        distance_bounds <- calculate_bounds(pred_distance, se, probs[1])
+      # Initialize matrices to store prediction variances for each response
+      n_preds <- ncol(model$coefficients)  # Number of responses (dx, dy)
+      pred_var <- matrix(NA, nrow = nrow(X), ncol = n_preds)
 
-        # Reconstruct the angle and distance predictions
-        grid$angle_pred <- atan2(pred_sin$fit, pred_cos$fit)
-        grid$distance_pred <- pred_distance$fit
-
-        # Calculate the angle prediction intervals for outer bounds
-        grid$angle_lower_outer <- atan2(sin_bounds_outer$lower, cos_bounds_outer$upper)
-        grid$angle_upper_outer <- atan2(sin_bounds_outer$upper, cos_bounds_outer$lower)
-
-        # Calculate xend and yend for lower, upper, and main predictions
-        grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
-        grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
-        grid$xend_lower_outer <- grid$x + grid$distance_pred * cos(grid$angle_lower_outer)
-        grid$yend_lower_outer <- grid$y + grid$distance_pred * sin(grid$angle_lower_outer)
-        grid$xend_upper_outer <- grid$x + grid$distance_pred * cos(grid$angle_upper_outer)
-        grid$yend_upper_outer <- grid$y + grid$distance_pred * sin(grid$angle_upper_outer)
-
-        # Handle inner interval only if probs[2] is not NA
-        if (!is.na(probs[2])) {
-          sin_bounds_inner <- calculate_bounds(fit = pred_sin, se = se, probs = probs[2])
-          cos_bounds_inner <- calculate_bounds(pred_cos, se, probs[2])
-          distance_bounds <- calculate_bounds(pred_distance, se, probs[2])
-
-          # Calculate the angle prediction intervals for inner bounds
-          grid$angle_lower_inner <- atan2(sin_bounds_inner$lower, cos_bounds_inner$upper)
-          grid$angle_upper_inner <- atan2(sin_bounds_inner$upper, cos_bounds_inner$lower)
-
-          # Calculate xend and yend for lower, upper, and main predictions
-          grid$xend_lower_inner <- grid$x + grid$distance_pred * cos(grid$angle_lower_inner)
-          grid$yend_lower_inner <- grid$y + grid$distance_pred * sin(grid$angle_lower_inner)
-          grid$xend_upper_inner <- grid$x + grid$distance_pred * cos(grid$angle_upper_inner)
-          grid$yend_upper_inner <- grid$y + grid$distance_pred * sin(grid$angle_upper_inner)
-        }
-      } else {
-        grid$angle_pred <- atan2(pred_sin, pred_cos)
-        grid$distance_pred <- pred_distance
-        grid$xend_pred <- grid$x + grid$distance_pred * cos(grid$angle_pred)
-        grid$yend_pred <- grid$y + grid$distance_pred * sin(grid$angle_pred)
+      # Compute prediction variances for each response
+      for (i in 1:n_preds) {
+        idx <- ((i - 1) * ncol(X) + 1):(i * ncol(X))  # Extract block for response i
+        V_i <- V[idx, idx]
+        pred_var[, i] <- diag(X %*% V_i %*% t(X))  # Compute variances
       }
+
+      # Compute standard errors for each response
+      se_values <- sqrt(pred_var)
+
+      # Get point predictions for all responses
+      preds <- predict(model, grid)
+
+      # Initialize a list to store interval data
+      interval_data <- list()
+
+      # Iterate over the probabilities and store appropriately named intervals
+      for (i in seq_along(probs)) {
+        # Determine the interval type (outer or inner)
+        interval_type <- ifelse(i == 1, "outer", "inner")
+
+        # Compute the critical value for the current probability
+        t_value <- qt(1 - (1 - probs[i]) / 2, df = model$df.residual)
+
+        # Compute the lower and upper prediction intervals
+        lwr <- preds - t_value * se_values
+        upr <- preds + t_value * se_values
+
+        # Store the intervals with custom naming convention
+        interval_data[[interval_type]] <- bind_cols(
+          as_tibble(lwr) %>% rename_with(~paste0(c("xend", "yend"), "_lower_", interval_type)),
+          as_tibble(upr) %>% rename_with(~paste0(c("xend", "yend"), "_upper_", interval_type))
+        )
+
+      }
+
+      # Combine all interval data with the main grid and predictions
+      grid <- bind_cols(
+        grid,
+        as_tibble(preds) %>% rename_with(~paste0("fit_", .)),
+        bind_cols(interval_data)  # Flatten the list of intervals into columns
+      )
     }
 
+    # Optionally normalize vector lengths to a fixed scale
     if (normalize) {
-      grid$norm_pred <- sqrt((grid$xend_pred - grid$x)^2 + (grid$yend_pred - grid$y)^2)
-      grid$xend_pred <- grid$x + (grid$xend_pred - grid$x) / grid$norm_pred * scale_length
-      grid$yend_pred <- grid$y + (grid$yend_pred - grid$y) / grid$norm_pred * scale_length
+      grid$norm_pred <- sqrt((grid$fit_dx - grid$x)^2 + (grid$fit_dy - grid$y)^2)
+      grid$fit_dx <- grid$x + (grid$fit_dx - grid$x) / grid$norm_pred * scale_factor
+      grid$fit_dy <- grid$y + (grid$fit_dy - grid$y) / grid$norm_pred * scale_factor
     }
 
+    # Optionally center vectors around their midpoint
     if (center) {
-      half_u <- (grid$xend_pred - grid$x) / 2
-      half_v <- (grid$yend_pred - grid$y) / 2
+      half_u <- (grid$fit_dx - grid$x) / 2
+      half_v <- (grid$fit_dy - grid$y) / 2
 
       grid$x <- grid$x - half_u
       grid$y <- grid$y - half_v
-      grid$xend_pred <- grid$xend_pred - half_u
-      grid$yend_pred <- grid$yend_pred - half_v
+      grid$fit_dx <- grid$fit_dx - half_u
+      grid$fit_dy <- grid$fit_dy - half_v
     }
 
-    # Include radius and original dx, dy in the result
+    # Prepare the result with relevant columns
     result <- data.frame(
       x = grid$x,
       y = grid$y,
-      xend = grid$xend_pred,
-      yend = grid$yend_pred,
+      xend = grid$fit_dx,
+      yend = grid$fit_dy,
       radius = rep(radius, nrow(grid)),
-      dx = grid$xend_pred - grid$x,  # Include dx
-      dy = grid$yend_pred - grid$y  # Include dy
-      # distance = grid$distance_pred / max(grid$distance_pred)
+      dx = grid$fit_dx - grid$x,
+      dy = grid$fit_dy - grid$y
     )
 
-    # Append inner bounds only if they exist
+    # If confidence intervals are enabled, include them in the result
     if (se) {
-      result$xend_upper_outer <- grid$xend_upper_outer
-      result$yend_upper_outer <- grid$yend_upper_outer
-      result$xend_lower_outer <- grid$xend_lower_outer
-      result$yend_lower_outer <- grid$yend_lower_outer
-
-      if (!is.na(probs[2])) {
-        result$xend_upper_inner <- grid$xend_upper_inner
-        result$yend_upper_inner <- grid$yend_upper_inner
-        result$xend_lower_inner <- grid$xend_lower_inner
-        result$yend_lower_inner <- grid$yend_lower_inner
-      }
+      result <- bind_cols(
+        result,
+        grid %>% select(contains("end_"))
+      )
     }
-
 
     return(result)
   }
@@ -269,20 +242,22 @@ GeomVectorSmooth <- ggproto(
   default_aes = aes(linewidth = 0.5, linetype = 1, alpha = 1, fill = "grey80", color = "#3366FF"),
 
   setup_data = function(data, params) {
+
     data$id <- seq_len(nrow(data))
 
     if (params$se) {
       original_length <- sqrt((data$xend - data$x)^2 + (data$yend - data$y)^2)
       scaling_factor <- data$radius / original_length
 
-      data$xend <- data$x + (data$xend - data$x) * scaling_factor
-      data$yend <- data$y + (data$yend - data$y) * scaling_factor
+      data$xend <- data$x + (data$xend - data$x) * params$scale_factor
+      data$yend <- data$y + (data$yend - data$y) * params$scale_factor
+
     }
 
     return(data)
   },
 
-  draw_panel = function(data, panel_params, coord, arrow = NULL, se = TRUE, se.circle = TRUE) {
+  draw_panel = function(data, panel_params, coord, arrow = NULL, se = TRUE, se.circle = TRUE, scale_factor) {
     circle_grob <- NULL
     wedge_grob_outer <- NULL
     wedge_grob_inner <- NULL
@@ -294,14 +269,16 @@ GeomVectorSmooth <- ggproto(
       if (se.circle) {
         # Create confidence interval circles if se.circle is TRUE
         all_circle_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
+
           circle_data <- create_circle_data(
             x = data$x[i], y = data$y[i],
             # radius = data$distance[i]
             radius = data$radius[i]
           )
+
           circle_data$group <- i
           circle_data$linewidth <- data$linewidth[i]
-          circle_data$alpha <- 0.4
+          circle_data$alpha <- 0.6
           circle_data$fill <- NA
           circle_data$colour <- "grey60"
           return(circle_data)
@@ -316,6 +293,7 @@ GeomVectorSmooth <- ggproto(
 
       # Outer wedge data
       wedge_data_outer <- do.call(rbind, lapply(1:nrow(data), function(i) {
+
         wedge <- create_wedge_data(
           x = data$x[i], y = data$y[i],
           xend_upper = data$xend_upper_outer[i], yend_upper = data$yend_upper_outer[i],
@@ -328,8 +306,9 @@ GeomVectorSmooth <- ggproto(
         )
 
         wedge$linewidth <- data$linewidth[i]
-        wedge$alpha <- 0.4
-        wedge$fill <- data$fill[i]
+        wedge$alpha <- 0.6
+        wedge$fill <- "grey60"
+        # wedge$fill <- data$fill[i]
         wedge$colour <- "grey60"
         return(wedge)
       }))
@@ -341,7 +320,8 @@ GeomVectorSmooth <- ggproto(
       )
 
       # Draw inner wedge only if inner bounds exist (probs[2] was not NA)
-      if (!is.null(data$xend_lower_inner)) {
+      if (!is.na(data$xend_lower_inner[1])) {
+
         wedge_data_inner <- do.call(rbind, lapply(1:nrow(data), function(i) {
           wedge <- create_wedge_data(
             x = data$x[i], y = data$y[i],
@@ -355,11 +335,14 @@ GeomVectorSmooth <- ggproto(
           )
 
           wedge$linewidth <- data$linewidth[i]
-          wedge$alpha <- 0.4
-          wedge$fill <- data$fill[i]
+          wedge$alpha <- 0.6
+          wedge$fill <- "grey60"
+          # wedge$fill <- data$fill[i]
           wedge$colour <- "grey60"
           return(wedge)
         }))
+
+        print("here")
 
         wedge_grob_inner <- GeomPolygon$draw_panel(
           data = wedge_data_inner,
@@ -401,7 +384,7 @@ stat_vector_smooth <- function(
   show.legend = NA,
   inherit.aes = TRUE,
   n = c(11, 11),
-  scale_length = 1,
+  scale_factor = 1,
   center = TRUE,
   normalize = TRUE,
   method = "lm",
@@ -424,7 +407,7 @@ stat_vector_smooth <- function(
       n = n,
       center = center,
       normalize = normalize,
-      scale_length = scale_length,
+      scale_factor = scale_factor,
       method = method,
       se = se,
       se.circle = se.circle,
@@ -446,7 +429,7 @@ geom_vector_smooth <- function(
   position = "identity",
   na.rm = FALSE, show.legend = NA,
   inherit.aes = TRUE,
-  n = c(11, 11), scale_length = 1,
+  n = c(11, 11), scale_factor = 1,
   center = TRUE, normalize = TRUE,
   method = "lm",
   se = TRUE,
@@ -468,7 +451,7 @@ geom_vector_smooth <- function(
       n = n,
       center = center,
       normalize = normalize,
-      scale_length = scale_length,
+      scale_factor = scale_factor,
       method = method,
       se = se,
       se.circle = se.circle,

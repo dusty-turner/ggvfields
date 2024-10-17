@@ -75,22 +75,21 @@ draw_key_length <- function(data, params, size) {
 # Utility function to replace %||%
 `%||%` <- function(a, b) if (!is.null(a)) a else b
 
-# Helper function to extract expression inside after_stat
-extract_after_stat <- function(mapping, aes_name) {
-  if (!is.null(mapping[[aes_name]])) {
-    aes_expr <- as_label(mapping[[aes_name]])
-    # aes_expr <- as.character(mapping[[aes_name]])
-
-    pattern <- "after_stat\\(([^)]+)\\)"
-    match <- regexec(pattern, aes_expr)
-
-    if (length(match[[1]]) > 1) {
-      extracted <- regmatches(aes_expr, match)[[1]][2]
-      return(extracted)
-    }
-  }
-  return(NULL)
-}
+# # Helper function to extract expression inside after_stat
+# extract_after_stat <- function(mapping, aes_name) {
+#   if (!is.null(mapping[[aes_name]])) {
+#     aes_expr <- as_label(mapping[[aes_name]])
+#
+#     pattern <- "after_stat\\(([^)]+)\\)"
+#     match <- regexec(pattern, aes_expr)
+#
+#     if (length(match[[1]]) > 1) {
+#       extracted <- regmatches(aes_expr, match)[[1]][2]
+#       return(extracted)
+#     }
+#   }
+#   return(NULL)
+# }
 
 # create circles in geom_vector_smooth
 create_circle_data <- function(x, y, radius, n = 100) {
@@ -104,11 +103,11 @@ create_circle_data <- function(x, y, radius, n = 100) {
 
 create_wedge_data <- function(x, y, xend_upper, yend_upper, xend_lower, yend_lower, xend, yend, radius, id, n_points = 100) {
 
-  # Check for missing values in the coordinates
-  if (any(is.na(c(x, y, xend_upper, yend_upper, xend_lower, yend_lower, xend, yend)))) {
-    warning(paste("Skipping wedge for id =", id, "due to missing values in coordinates"))
-    return(data.frame(x = numeric(0), y = numeric(0), group = numeric(0), id = numeric(0)))
-  }
+  # # Check for missing values in the coordinates
+  # if (any(is.na(c(x, y, xend_upper, yend_upper, xend_lower, yend_lower, xend, yend)))) {
+  #   warning(paste("Skipping wedge for id =", id, "due to missing values in coordinates"))
+  #   return(data.frame(x = numeric(0), y = numeric(0), group = numeric(0), id = numeric(0)))
+  # }
 
   # Calculate angles for the wedge bounds using atan2
   angle_upper <- atan2(yend_upper - y, xend_upper - x)
@@ -145,4 +144,16 @@ create_wedge_data <- function(x, y, xend_upper, yend_upper, xend_lower, yend_low
   return(wedge_data)
 }
 
+calculate_bounds <- function(fit, se, probs) {
+  if (!se) return(NULL)
 
+  # Calculate critical t-value for the confidence level
+  t_critical <- qt(1 - (1 - probs) / 2, df = fit$df)
+
+  # Calculate upper and lower bounds
+  lower_bound <- fit$fit - t_critical * fit$se.fit
+  upper_bound <- fit$fit + t_critical * fit$se.fit
+
+  # Return a list of bounds
+  return(list(lower = lower_bound, upper = upper_bound))
+}
