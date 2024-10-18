@@ -49,8 +49,6 @@ wind_data_cartesian <- within(wind_data_polar, {
 
 ggplot(wind_data_cartesian) +
   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy))
-#> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
-#> Ensure your `length` values reflect the intended scaling.
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
@@ -62,8 +60,6 @@ For polar coordinates, the vector is defined by an angle and distance:
 ``` r
 ggplot(wind_data_cartesian) +
   geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd))
-#> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
-#> Ensure your `length` values reflect the intended scaling.
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
@@ -116,8 +112,6 @@ ggplot(wind_data_cartesian) +
     aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)),
     arrow = NULL, tail_point = TRUE
   )
-#> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
-#> Ensure your `length` values reflect the intended scaling.
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
@@ -184,8 +178,6 @@ f <- function(v) {
 
 ggplot() +
   geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) 
-#> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
-#> Ensure your `length` values reflect the intended scaling.
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
@@ -207,8 +199,6 @@ ggplot() +
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10),
     aes(length = after_stat(norm))
   ) 
-#> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
-#> Ensure your `length` values reflect the intended scaling.
 ```
 
 <img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
@@ -239,8 +229,6 @@ ggplot() +
     aes(length = after_stat(norm), color = after_stat(divergence)), 
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
   ) 
-#> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
-#> Ensure your `length` values reflect the intended scaling.
 ```
 
 <img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
@@ -270,8 +258,6 @@ ggplot() +
     aes(color = after_stat(curl)), 
     fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
   ) 
-#> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
-#> Ensure your `length` values reflect the intended scaling.
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
@@ -539,14 +525,32 @@ sample_points$dy <- sample_points$yend - sample_points$y
 
 # Visualize the original and smoothed vectors using `ggplot2` from ggvfields
 ggplot(sample_points, aes(x = x, y = y)) +
-  geom_vector_smooth(aes(dx = dx, dy = dy), n = 6, center = FALSE, probs = c(.95, .7)) + 
+  geom_vector_smooth(aes(dx = dx, dy = dy), 
+                     n = 6, center = FALSE, probs = c(.95, .68), method = "lm"
+                     ) + 
   geom_vector(aes(dx = dx, dy = dy)) +  
   coord_equal()
-#> Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.
-#> Ensure your `length` values reflect the intended scaling.
 ```
 
 <img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
+
+This function also works with polar coordinates and `method = "boot"`.
+
+``` r
+# Calculate polar coordinates: angle and distance
+sample_points$distance <- sqrt(sample_points$dx^2 + sample_points$dy^2)
+sample_points$angle <- atan2(sample_points$dy, sample_points$dx)
+
+# Visualize the vector field with smoothing in polar coordinates
+ggplot(sample_points, aes(x = x, y = y)) +
+  geom_vector_smooth(aes(angle = angle, distance = distance),
+                     n = 6, center = FALSE, probs = c(.95), method = "boot"
+                     ) +
+  geom_vector(aes(dx = dx, dy = dy)) +  
+  coord_fixed() 
+```
+
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
 
 This example demonstrates how `geom_vector_smooth()` can be used to fit
 a vector field to vector data.

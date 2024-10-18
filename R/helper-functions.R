@@ -101,48 +101,51 @@ create_circle_data <- function(x, y, radius, n = 100) {
   )
 }
 
-create_wedge_data <- function(x, y, xend_upper, yend_upper, xend_lower, yend_lower, xend, yend, radius, id, n_points = 100) {
+create_wedge_data <- function(
+    x, y, xend_upper, yend_upper, xend_lower, yend_lower,
+    xend, yend, radius, id, n_points = 100
+) {
+  # Calculate angles using atan2 for upper, lower, and midpoint
+  angle_upper <- atan2(yend_upper - y, xend_upper - x) %% (2 * pi)
+  angle_lower <- atan2(yend_lower - y, xend_lower - x) %% (2 * pi)
+  midpoint_angle <- atan2(yend - y, xend - x) %% (2 * pi)
 
-  # # Check for missing values in the coordinates
-  # if (any(is.na(c(x, y, xend_upper, yend_upper, xend_lower, yend_lower, xend, yend)))) {
-  #   warning(paste("Skipping wedge for id =", id, "due to missing values in coordinates"))
-  #   return(data.frame(x = numeric(0), y = numeric(0), group = numeric(0), id = numeric(0)))
-  # }
+  # Calculate the shift to bring the midpoint to 0 radians
+  shift <- -midpoint_angle
 
-  # Calculate angles for the wedge bounds using atan2
-  angle_upper <- atan2(yend_upper - y, xend_upper - x)
-  angle_lower <- atan2(yend_lower - y, xend_lower - x)
+  # Shift all angles by the same amount
+  shifted_upper <- (angle_upper + shift) %% (2 * pi)
+  shifted_lower <- (angle_lower + shift) %% (2 * pi)
 
-  # Ensure that the arc angles cover the correct range
-  if (angle_upper < angle_lower) {
-    angle_upper <- angle_upper + 2 * pi  # Adjust to ensure continuous arc
-  }
+  # Adjust shifted angles to ensure they are relative to the midpoint:
+  # Upper should be positive, lower should be negative
+  if (shifted_upper > pi) shifted_upper <- shifted_upper - 2 * pi
+  if (shifted_lower > pi) shifted_lower <- shifted_lower - 2 * pi
 
-  # Check the midpoint to ensure the arc follows the direction towards xend, yend
-  midpoint_angle <- atan2(yend - y, xend - x)
+  # Generate arc points from upper (positive) to lower (negative)
+  arc_angles <- seq(shifted_upper, shifted_lower, length.out = n_points)
 
-  # If midpoint is outside the arc range, adjust the arc range accordingly
-  if (midpoint_angle < angle_lower || midpoint_angle > angle_upper) {
-    angle_upper <- angle_upper + 2 * pi
-  }
+  # Calculate the coordinates of the arc in the transformed space
+  arc_x <- radius * cos(arc_angles)
+  arc_y <- radius * sin(arc_angles)
 
-  # Create arc between the two angles
-  arc_angles <- seq(angle_lower, angle_upper, length.out = n_points)
-
-  # Calculate the coordinates for the arc based on the radius
-  arc_x <- x + radius * cos(arc_angles)
-  arc_y <- y + radius * sin(arc_angles)
+  # Rotate the arc points back to the original coordinate system
+  final_x <- x + arc_x * cos(-shift) - arc_y * sin(-shift)
+  final_y <- y + arc_x * sin(-shift) + arc_y * cos(-shift)
 
   # Create a data frame for the wedge
   wedge_data <- data.frame(
-    x = c(x, arc_x, x),  # Start at center, move along arc, return to center
-    y = c(y, arc_y, y),
-    group = rep(id, length.out = n_points + 2),  # Grouping for each wedge
+    x = c(x, final_x, x),  # Start at the center, follow the arc, return to center
+    y = c(y, final_y, y),
+    group = rep(id, length.out = n_points + 2),
     id = rep(id, length.out = n_points + 2)
   )
 
   return(wedge_data)
 }
+
+
+
 
 calculate_bounds <- function(fit, se, probs) {
   if (!se) return(NULL)

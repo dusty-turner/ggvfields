@@ -34,7 +34,8 @@ Imports:
     deSolve,
     grid,
     utils,
-    scales
+    scales,
+    boot
 URL: https://github.com/dusty-turner/ggvfields
 BugReports: https://github.com/dusty-turner/ggvfields/issues
 Suggests: 

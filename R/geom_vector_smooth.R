@@ -20,18 +20,17 @@
 #'   length before applying other transformations like centering. If `FALSE`,
 #'   vectors retain their original lengths.
 #' @param method Character; specifies the smoothing method to be used.
-#'   Currently, only `"lm"` (linear modeling) is supported.
+#'   Supported methods are `"lm"` (linear modeling) and `"boot"` (bootstrapping).
+#'   `"boot"` generates smoother results by calculating angles with bootstrapping,
+#'   and the prediction intervals are determined using quantiles.
 #' @param se Logical; if `TRUE`, plots the confidence intervals around the
 #'   smoothed vectors.
 #' @param se.circle Logical; if `TRUE`, draws circles around the origin of the
 #'   vectors to represent the radius of the confidence interval. This is useful
-#'   for visualizing the spread and variability of the confidence intervals when
-#'   `se = TRUE`.
-#' @param probs Numeric vector; specifies the prediction interval level(s) to be
-#'   plotted when `se = TRUE`. **Default is `probs = c(0.95, NA)`**. If only one
-#'   value is provided (e.g., `probs = 0.95`), a single prediction interval is
-#'   drawn. If multiple values are provided, the function will plot multiple
-#'   intervals (with smaller intervals nested inside larger ones).
+#'   for visualizing variability when `se = TRUE`.
+#' @param probs Numeric vector; specifies the prediction interval levels to be
+#'   plotted when `se = TRUE`. **Default is `probs = 0.95`**, but users can specify
+#'   multiple levels (e.g., `probs = c(0.95, 0.68)`).
 #' @param arrow Arrow specification, as created by `grid::arrow()`. This
 #'   controls the appearance of the arrowheads at the end of the vectors,
 #'   including properties like angle, length, and type.
@@ -41,15 +40,15 @@
 #' @name geom_vector_smooth
 #' @rdname geom_vector_smooth
 #'
-#' @section Aesthetics: `geom_vector_smooth` understands the following
-#'   aesthetics (required aesthetics are in bold):
+#' @section Aesthetics:
+#' `geom_vector_smooth` understands the following aesthetics (required aesthetics are in bold):
 #'
-#' - **`x`**: x-coordinate of the start point of the vector.
-#' - **`y`**: y-coordinate of the start point of the vector.
-#' - `xend`: x-coordinate of the end point of the vector (optional if `angle` and `distance` are provided).
-#' - `yend`: y-coordinate of the end point of the vector (optional if `angle` and `distance` are provided).
-#' - `angle`: The angle of the vector in degrees (optional, used with `distance`).
-#' - `distance`: The distance/magnitude of the vector (optional, used with `angle`).
+#' - **`x`**: x-coordinate of the starting point of the vector.
+#' - **`y`**: y-coordinate of the starting point of the vector.
+#' - **`dx`**: x-displacement of the vector.
+#' - **`dy`**: y-displacement of the vector.
+#' - `angle`: The angle of the vector in radians (optional, used with `distance`).
+#' - `distance`: The magnitude of the vector (optional, used with `angle`).
 #' - `color`: The color of the vector line.
 #' - `linewidth`: The thickness of the vector line.
 #' - `linetype`: The type of the vector line (solid, dashed, etc.).
@@ -57,57 +56,173 @@
 #' - `arrow`: Specification for arrowheads at the end of the vector.
 #'
 #'   Additionally, when using smoothing:
-#' - `norm`: A computed variable representing the magnitude of each smoothed vector.
+#' - `norm`: A computed variable representing the magnitude of the smoothed vector,
+#'   available via `after_stat()`.
+#'
+#' @details
+#' **Mathematics of Prediction and Prediction Intervals**:
+#'
+#'
+#' This section explains the methods for computing predictions and prediction
+#' intervals using the **x** and **y** coordinates.
+#'
+#' #### Linear Model (lm) Method
+#'
+#' The `"lm"` method fits a multivariate linear regression to predict the vector
+#' displacements *dx* and *dy* based on **x** and **y**.
+#'
+#' **Model:**
+#' ```
+#' dx, dy = b_0 + b_1 * x + b_2 * y + b_3 * (x * y) + e
+#' ```
+#' - *b_0*, *b_1*, *b_2*, and *b_3* are the model coefficients.
+#' - *e* is the residual error.
+#'
+#' **Prediction:**
+#' For a new grid point, the predicted displacements are:
+#' ```
+#' Z_i = X_i * beta
+#' ```
+#' - *X_i* is the design matrix for the new grid point.
+#' - *beta* is the vector of estimated coefficients.
+#'
+#' **Prediction Intervals:**
+#' The standard error of the prediction is:
+#' ```
+#' SE(Z_i) = sqrt(diag(X_i * V * t(X_i)))
+#' ```
+#' - *V* is the covariance matrix of the coefficients.
+#'
+#' The prediction interval at confidence level (1 - alpha) is:
+#' ```
+#' Z_i ± t_(alpha / 2) * SE(Z_i)
+#' ```
+#'
+#' #### Bootstrapping (boot) Method
+#'
+#' The `"boot"` method uses resampling to estimate angles and displacements.
+#'
+#' **Process:**
+#' - Resample the original data with replacement.
+#' - Fit models for the sine and cosine of the vector angle:
+#'   ```
+#'   sin(theta) = b_0 + b_1 * x + b_2 * y + e
+#'   ```
+#'   ```
+#'   cos(theta) = b_0 + b_1 * x + b_2 * y + e
+#'   ```
+#' - Use the predicted sine and cosine to compute:
+#'   ```
+#'   theta = atan2(sin(theta), cos(theta))
+#'   ```
+#'
+#' **Prediction Intervals:**
+#' Based on quantiles from bootstrapped angles:
+#' ```
+#' Lower Bound = Q_(alpha / 2)(theta)
+#' Upper Bound = Q_(1 - alpha / 2)(theta)
+#' ```
+#'
+#' **Displacements:**
+#' Using predicted angle *theta* and distance *d*:
+#' ```
+#' dx = d * cos(theta), dy = d * sin(theta)
+#' ```
 #'
 #' @examples
-#' # Generate a function to create random vectors based on input (x, y) values
+#' library(ggplot2)
+#' library(ggvfields)
+#'
+#' # Function to generate random vectors based on (x, y) inputs
 #' generate_vectors <- function(v) {
 #'   x <- v[1]
 #'   y <- v[2]
-#'   # Return new x and y values with added random noise
-#'   c(x + rnorm(1, 1, 1), y + rnorm(1, 1, 1))
+#'   c(sin(x) + sin(y) + rnorm(1, 5, 3), sin(x) - sin(y) + rnorm(1, 5, 3))
 #' }
 #'
 #' # Set seed for reproducibility
 #' set.seed(123)
 #'
-#' # Generate sample points for the vector field
+#' # Generate sample data
 #' sample_points <- data.frame(
-#'   x = runif(10, min = -10, max = 10),
-#'   y = runif(10, min = -10, max = 10)
+#'   x = runif(50, min = -10, max = 10),
+#'   y = runif(50, min = -10, max = 10)
 #' )
 #'
 #' # Apply the generate_vectors function to each row
 #' result <- t(apply(sample_points, 1, generate_vectors))
 #'
-#' # Create new columns for xend and yend coordinates
+#' # Create new columns for displacements (dx, dy) and polar coordinates
 #' sample_points$xend <- result[, 1]
 #' sample_points$yend <- result[, 2]
-#'
-#' # Calculate dx and dy (displacements)
 #' sample_points$dx <- sample_points$xend - sample_points$x
 #' sample_points$dy <- sample_points$yend - sample_points$y
+#' sample_points$distance <- sqrt(sample_points$dx^2 + sample_points$dy^2)
+#' sample_points$angle <- atan2(sample_points$dy, sample_points$dx)
 #'
-#' # Plot the original vectors and smoothed vectors using `ggplot2` from ggvfields
+#' # Example 1: Cartesian Coordinates with Linear Model (lm)
 #' ggplot(sample_points, aes(x = x, y = y)) +
-#'   geom_vector(aes(dx = dx, dy = dy), color = "red") +  # Original vectors in red
-#'   geom_vector_smooth(aes(dx = dx, dy = dy), se = TRUE, se.circle = TRUE)  # Smoothed vectors
+#'   geom_vector_smooth(aes(dx = dx, dy = dy), method = "lm", se = TRUE) +
+#'   geom_vector(aes(dx = dx, dy = dy)) +
+#'   ggtitle("Vector Smoothing with Linear Model (lm)")
+#'
+#' # Example 2: Polar Coordinates with Bootstrapping (boot)
+#' ggplot(sample_points, aes(x = x, y = y, angle = angle, distance = distance)) +
+#'   geom_vector_smooth(method = "boot", se = TRUE, probs = c(0.95, 0.68)) +
+#'   geom_vector(aes(dx = dx, dy = dy)) +
+#'   ggtitle("Vector Smoothing with Bootstrapping (boot)")
 #'
 NULL
+
 
 #' @rdname geom_vector_smooth
 #' @export
 StatVectorSmooth <- ggproto(
   "StatVectorSmooth",
   Stat,
-  required_aes = c("x", "y", "dx", "dy"),
-  default_aes = aes(color = "#3366FF", linewidth = 0.5, linetype = 1, alpha = 1),
+  # required_aes = c("x", "y"),
+  required_aes = c("x", "y"),  # Add angle/distance support
+  dropped_aes = c("distance", "angle"),
+  default_aes = aes(color = "#3366FF", linewidth = 0.5, linetype = 1, alpha = 1,
+                    angle = NA, distance = NA, dx = NA, dy = NA),
+
+  setup_data = function(data, params) {
+
+    # Ensure angle and distance are retained in the transformed data
+    if (!("dx" %in% names(data) && "dy" %in% names(data))) {
+      if ("angle" %in% names(data) && "distance" %in% names(data)) {
+        data$dx <- data$distance * cos(data$angle)
+        data$dy <- data$distance * sin(data$angle)
+      } else {
+        stop("Either 'dx' and 'dy' or 'angle' and 'distance' must be provided.")
+      }
+
+    }
+
+    # Retain all original aesthetics to prevent warnings
+    required_aes <- c("x", "y", "angle", "distance", "dx", "dy")
+    extra_aes <- setdiff(names(data), required_aes)
+    data[extra_aes] <- lapply(extra_aes, function(a) data[[a]])
+
+    return(data)
+  },
 
   compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_factor, se = TRUE, probs, ...) {
 
+    # Check if dx/dy or angle/distance are provided and calculate dx/dy if needed
+    if (!("dx" %in% names(data) && "dy" %in% names(data))) {
+      if ("angle" %in% names(data) && "distance" %in% names(data)) {
+        # Compute dx and dy from angle and distance
+        data$dx <- data$distance * cos(data$angle)
+        data$dy <- data$distance * sin(data$angle)
+      } else {
+        stop("Either 'dx' and 'dy' or 'angle' and 'distance' must be provided.")
+      }
+    }
+
     # Ensure probs is a vector, even if a single value is provided
     if (length(probs) == 1) {
-      probs <- c(probs, NA)  # Add NA to represent the missing inner interval
+      probs <- c(probs, NA)
     }
 
     # Ensure that n has the correct length
@@ -127,8 +242,8 @@ StatVectorSmooth <- ggproto(
     grid <- expand.grid(x = x_seq, y = y_seq)
     grid$id <- 1:nrow(grid)
 
-    x_spacing <- diff(sort(unique(grid$x)))[1]  # Spacing between adjacent x-values
-    y_spacing <- diff(sort(unique(grid$y)))[1]  # Spacing between adjacent y-values
+    x_spacing <- diff(sort(unique(grid$x)))[1]
+    y_spacing <- diff(sort(unique(grid$y)))[1]
 
     # Choose the radius as a fraction of the smaller spacing
     radius <- min(x_spacing, y_spacing) / 2.5
@@ -148,9 +263,9 @@ StatVectorSmooth <- ggproto(
 
       # Compute prediction variances for each response
       for (i in 1:n_preds) {
-        idx <- ((i - 1) * ncol(X) + 1):(i * ncol(X))  # Extract block for response i
+        idx <- ((i - 1) * ncol(X) + 1):(i * ncol(X))
         V_i <- V[idx, idx]
-        pred_var[, i] <- diag(X %*% V_i %*% t(X))  # Compute variances
+        pred_var[, i] <- diag(X %*% V_i %*% t(X))
       }
 
       # Compute standard errors for each response
@@ -188,6 +303,67 @@ StatVectorSmooth <- ggproto(
         setNames(data.frame(preds), paste0("fit_", c("dx", "dy"))),
         do.call(cbind, unname(interval_data))
       )
+    } else if (method == "boot") {
+      # Perform bootstrapping to predict angles
+      boot_results <- boot::boot(data, function(d, i) {
+        fit_sin <- lm(sin(atan2(d$dy, d$dx)) ~ x + y, data = d[i, ])
+        fit_cos <- lm(cos(atan2(d$dy, d$dx)) ~ x + y, data = d[i, ])
+
+        pred_sin <- predict(fit_sin, newdata = grid)
+        pred_cos <- predict(fit_cos, newdata = grid)
+
+        return(atan2(pred_sin, pred_cos))
+      }, R = 500)
+
+      # Extract predictions and use the median as the main angle prediction
+      angle_preds <- boot_results$t
+      grid$angle_pred <- apply(angle_preds, 2, median)
+
+      # If SE enabled, calculate outer and inner bounds for prediction intervals
+      if (se) {
+        grid$angle_lower_outer <- apply(angle_preds, 2, function(x) quantile(x, probs = (1 - probs[1]) / 2))
+        grid$angle_upper_outer <- apply(angle_preds, 2, function(x) quantile(x, probs = 1 - (1 - probs[1]) / 2))
+
+        if (!is.na(probs[2])) {
+          grid$angle_lower_inner <- apply(angle_preds, 2, function(x) quantile(x, probs = (1 - probs[2]) / 2))
+          grid$angle_upper_inner <- apply(angle_preds, 2, function(x) quantile(x, probs = 1 - (1 - probs[2]) / 2))
+        } else {
+          # Fill inner bounds with NA if probs[2] is not provided
+          grid$angle_lower_inner <- rep(NA, nrow(grid))
+          grid$angle_upper_inner <- rep(NA, nrow(grid))
+        }
+      }
+
+      # Predict distances
+      fit_distance <- lm(sqrt(dx^2 + dy^2) ~ x + y, data = data)
+      pred_distance <- predict(fit_distance, newdata = grid, se.fit = se)
+      grid$distance_pred <- pred_distance$fit
+
+      # Calculate xend and yend using the predicted angles and distances
+      grid$fit_dx <- grid$x + grid$distance_pred * cos(grid$angle_pred)
+      grid$fit_dy <- grid$y + grid$distance_pred * sin(grid$angle_pred)
+
+      if (se) {
+        # Calculate outer bounds for xend and yend
+        grid$xend_upper_outer <- grid$x + grid$distance_pred * cos(grid$angle_upper_outer)
+        grid$yend_upper_outer <- grid$y + grid$distance_pred * sin(grid$angle_upper_outer)
+        grid$xend_lower_outer <- grid$x + grid$distance_pred * cos(grid$angle_lower_outer)
+        grid$yend_lower_outer <- grid$y + grid$distance_pred * sin(grid$angle_lower_outer)
+
+        # Calculate inner bounds or fill with NA for xend and yend
+        if (!is.na(probs[2])) {
+          grid[, c("xend_upper_inner", "yend_upper_inner",
+                   "xend_lower_inner", "yend_lower_inner")] <- list(
+                     grid$x + grid$distance_pred * cos(grid$angle_upper_inner),
+                     grid$y + grid$distance_pred * sin(grid$angle_upper_inner),
+                     grid$x + grid$distance_pred * cos(grid$angle_lower_inner),
+                     grid$y + grid$distance_pred * sin(grid$angle_lower_inner)
+                   )
+        } else {
+          grid[, c("xend_upper_inner", "yend_upper_inner",
+                   "xend_lower_inner", "yend_lower_inner")] <- NA
+        }
+      }
     }
 
     # Optionally normalize vector lengths to a fixed scale
@@ -236,7 +412,9 @@ StatVectorSmooth <- ggproto(
 GeomVectorSmooth <- ggproto(
   "GeomVectorSmooth",
   GeomSegment,
-  required_aes = c("x", "y", "xend", "yend"),
+  required_aes = c("x", "y"),  # Add angle/distance support
+  dropped_aes = c("distance", "angle"),
+  optional_aes = c("x", "y", "dx", "dy"),
   default_aes = aes(linewidth = 0.5, linetype = 1, alpha = 1, fill = "grey80", color = "#3366FF"),
 
   setup_data = function(data, params) {
@@ -256,6 +434,7 @@ GeomVectorSmooth <- ggproto(
   },
 
   draw_panel = function(data, panel_params, coord, arrow = NULL, se = TRUE, se.circle = TRUE, scale_factor) {
+
     circle_grob <- NULL
     wedge_grob_outer <- NULL
     wedge_grob_inner <- NULL
@@ -317,7 +496,6 @@ GeomVectorSmooth <- ggproto(
         coord = coord
       )
 
-
       # Draw inner wedge only if inner bounds exist (probs[2] was not NA)
       if (!is.na(data$xend_lower_inner[1])) {
 
@@ -338,10 +516,9 @@ GeomVectorSmooth <- ggproto(
           wedge$fill <- "grey60"
           # wedge$fill <- data$fill[i]
           wedge$colour <- "grey60"
+
           return(wedge)
         }))
-
-        print("here")
 
         wedge_grob_inner <- GeomPolygon$draw_panel(
           data = wedge_data_inner,

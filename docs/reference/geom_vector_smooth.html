@@ -107,8 +107,8 @@ instead of scalar data.</p>
 
     <div class="section level2">
     <h2 id="format">Format<a class="anchor" aria-label="anchor" href="#format"></a></h2>
-    <p>An object of class <code>StatVectorSmooth</code> (inherits from <code>Stat</code>, <code>ggproto</code>, <code>gg</code>) of length 4.</p>
-<p>An object of class <code>GeomVectorSmooth</code> (inherits from <code>GeomSegment</code>, <code>Geom</code>, <code>ggproto</code>, <code>gg</code>) of length 6.</p>
+    <p>An object of class <code>StatVectorSmooth</code> (inherits from <code>Stat</code>, <code>ggproto</code>, <code>gg</code>) of length 6.</p>
+<p>An object of class <code>GeomVectorSmooth</code> (inherits from <code>GeomSegment</code>, <code>Geom</code>, <code>ggproto</code>, <code>gg</code>) of length 8.</p>
     </div>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
@@ -204,7 +204,9 @@ vectors retain their original lengths.</p></dd>
 
 <dt>method</dt>
 <dd><p>Character; specifies the smoothing method to be used.
-Currently, only <code>"lm"</code> (linear modeling) is supported.</p></dd>
+Supported methods are <code>"lm"</code> (linear modeling) and <code>"boot"</code> (bootstrapping).
+<code>"boot"</code> generates smoother results by calculating angles with bootstrapping,
+and the prediction intervals are determined using quantiles.</p></dd>
 
 
 <dt>se</dt>
@@ -215,16 +217,13 @@ smoothed vectors.</p></dd>
 <dt>se.circle</dt>
 <dd><p>Logical; if <code>TRUE</code>, draws circles around the origin of the
 vectors to represent the radius of the confidence interval. This is useful
-for visualizing the spread and variability of the confidence intervals when
-<code>se = TRUE</code>.</p></dd>
+for visualizing variability when <code>se = TRUE</code>.</p></dd>
 
 
 <dt>probs</dt>
-<dd><p>Numeric vector; specifies the prediction interval level(s) to be
-plotted when <code>se = TRUE</code>. <strong>Default is <code>probs = c(0.95, NA)</code></strong>. If only one
-value is provided (e.g., <code>probs = 0.95</code>), a single prediction interval is
-drawn. If multiple values are provided, the function will plot multiple
-intervals (with smaller intervals nested inside larger ones).</p></dd>
+<dd><p>Numeric vector; specifies the prediction interval levels to be
+plotted when <code>se = TRUE</code>. <strong>Default is <code>probs = 0.95</code></strong>, but users can specify
+multiple levels (e.g., <code>probs = c(0.95, 0.68)</code>).</p></dd>
 
 
 <dt>arrow</dt>
@@ -282,61 +281,115 @@ give the stat as <code>"count"</code>.</p></li>
 smooth vector field plot.</p>
     </div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p><strong>Mathematics of Prediction and Prediction Intervals</strong>:</p>
+<p>This section explains the methods for computing predictions and prediction
+intervals using the <strong>x</strong> and <strong>y</strong> coordinates.</p><div class="section">
+<h3 id="linear-model-lm-method">Linear Model (lm) Method<a class="anchor" aria-label="anchor" href="#linear-model-lm-method"></a></h3>
+
+
+<p>The <code>"lm"</code> method fits a multivariate linear regression to predict the vector
+displacements <em>dx</em> and <em>dy</em> based on <strong>x</strong> and <strong>y</strong>.</p>
+<p><strong>Model:</strong></p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>dx, dy <span class="ot">=</span> b_0 <span class="sc">+</span> b_1 <span class="sc">*</span> x <span class="sc">+</span> b_2 <span class="sc">*</span> y <span class="sc">+</span> b_3 <span class="sc">*</span> (x <span class="sc">*</span> y) <span class="sc">+</span> e</span></code></pre><p></p></div><ul><li><p><em>b_0</em>, <em>b_1</em>, <em>b_2</em>, and <em>b_3</em> are the model coefficients.</p></li>
+<li><p><em>e</em> is the residual error.</p></li>
+</ul><p><strong>Prediction:</strong>
+For a new grid point, the predicted displacements are:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>Z_i <span class="ot">=</span> X_i <span class="sc">*</span> beta</span></code></pre><p></p></div><ul><li><p><em>X_i</em> is the design matrix for the new grid point.</p></li>
+<li><p><em>beta</em> is the vector of estimated coefficients.</p></li>
+</ul><p><strong>Prediction Intervals:</strong>
+The standard error of the prediction is:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">SE</span>(Z_i) <span class="ot">=</span> <span class="fu">sqrt</span>(<span class="fu">diag</span>(X_i <span class="sc">*</span> V <span class="sc">*</span> <span class="fu">t</span>(X_i)))</span></code></pre><p></p></div><ul><li><p><em>V</em> is the covariance matrix of the coefficients.</p></li>
+</ul><p>The prediction interval at confidence level (1 - alpha) is:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>Z_i ± <span class="fu">t_</span>(alpha <span class="sc">/</span> <span class="dv">2</span>) <span class="sc">*</span> <span class="fu">SE</span>(Z_i)</span></code></pre><p></p></div>
+</div>
+
+<div class="section">
+<h3 id="bootstrapping-boot-method">Bootstrapping (boot) Method<a class="anchor" aria-label="anchor" href="#bootstrapping-boot-method"></a></h3>
+
+
+<p>The <code>"boot"</code> method uses resampling to estimate angles and displacements.</p>
+<p><strong>Process:</strong></p><ul><li><p>Resample the original data with replacement.</p></li>
+<li><p>Fit models for the sine and cosine of the vector angle:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">sin</span>(theta) <span class="ot">=</span> b_0 <span class="sc">+</span> b_1 <span class="sc">*</span> x <span class="sc">+</span> b_2 <span class="sc">*</span> y <span class="sc">+</span> e</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">cos</span>(theta) <span class="ot">=</span> b_0 <span class="sc">+</span> b_1 <span class="sc">*</span> x <span class="sc">+</span> b_2 <span class="sc">*</span> y <span class="sc">+</span> e</span></code></pre><p></p></div></li>
+<li><p>Use the predicted sine and cosine to compute:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>theta <span class="ot">=</span> <span class="fu">atan2</span>(<span class="fu">sin</span>(theta), <span class="fu">cos</span>(theta))</span></code></pre><p></p></div></li>
+</ul><p><strong>Prediction Intervals:</strong>
+Based on quantiles from bootstrapped angles:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>Lower Bound <span class="ot">=</span> <span class="fu">Q_</span>(alpha <span class="sc">/</span> <span class="dv">2</span>)(theta)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>Upper Bound <span class="ot">=</span> <span class="fu">Q_</span>(<span class="dv">1</span> <span class="sc">-</span> alpha <span class="sc">/</span> <span class="dv">2</span>)(theta)</span></code></pre><p></p></div>
+<p><strong>Displacements:</strong>
+Using predicted angle <em>theta</em> and distance <em>d</em>:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>dx <span class="ot">=</span> d <span class="sc">*</span> <span class="fu">cos</span>(theta), dy <span class="ot">=</span> d <span class="sc">*</span> <span class="fu">sin</span>(theta)</span></code></pre><p></p></div>
+</div>
+
+    </div>
+    <div class="section level2">
     <h2 id="aesthetics">Aesthetics<a class="anchor" aria-label="anchor" href="#aesthetics"></a></h2>
-    <p><code>geom_vector_smooth</code> understands the following
-aesthetics (required aesthetics are in bold):</p><ul><li><p><strong><code>x</code></strong>: x-coordinate of the start point of the vector.</p></li>
-<li><p><strong><code>y</code></strong>: y-coordinate of the start point of the vector.</p></li>
-<li><p><code>xend</code>: x-coordinate of the end point of the vector (optional if <code>angle</code> and <code>distance</code> are provided).</p></li>
-<li><p><code>yend</code>: y-coordinate of the end point of the vector (optional if <code>angle</code> and <code>distance</code> are provided).</p></li>
-<li><p><code>angle</code>: The angle of the vector in degrees (optional, used with <code>distance</code>).</p></li>
-<li><p><code>distance</code>: The distance/magnitude of the vector (optional, used with <code>angle</code>).</p></li>
+    
+
+<p><code>geom_vector_smooth</code> understands the following aesthetics (required aesthetics are in bold):</p><ul><li><p><strong><code>x</code></strong>: x-coordinate of the starting point of the vector.</p></li>
+<li><p><strong><code>y</code></strong>: y-coordinate of the starting point of the vector.</p></li>
+<li><p><strong><code>dx</code></strong>: x-displacement of the vector.</p></li>
+<li><p><strong><code>dy</code></strong>: y-displacement of the vector.</p></li>
+<li><p><code>angle</code>: The angle of the vector in radians (optional, used with <code>distance</code>).</p></li>
+<li><p><code>distance</code>: The magnitude of the vector (optional, used with <code>angle</code>).</p></li>
 <li><p><code>color</code>: The color of the vector line.</p></li>
 <li><p><code>linewidth</code>: The thickness of the vector line.</p></li>
 <li><p><code>linetype</code>: The type of the vector line (solid, dashed, etc.).</p></li>
 <li><p><code>alpha</code>: The transparency level of the vector.</p></li>
 <li><p><code>arrow</code>: Specification for arrowheads at the end of the vector.</p>
 <p>Additionally, when using smoothing:</p></li>
-<li><p><code>norm</code>: A computed variable representing the magnitude of each smoothed vector.</p></li>
+<li><p><code>norm</code>: A computed variable representing the magnitude of the smoothed vector,
+available via <code><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat()</a></code>.</p></li>
 </ul></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Generate a function to create random vectors based on input (x, y) values</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dusty-turner/ggvfields">ggvfields</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Function to generate random vectors based on (x, y) inputs</span></span></span>
 <span class="r-in"><span><span class="va">generate_vectors</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></span>
 <span class="r-in"><span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span></span>
-<span class="r-in"><span>  <span class="co"># Return new x and y values with added random noise</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>, <span class="va">y</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Set seed for reproducibility</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Generate sample points for the vector field</span></span></span>
+<span class="r-in"><span><span class="co"># Generate sample data</span></span></span>
 <span class="r-in"><span><span class="va">sample_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">10</span>, min <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>, max <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">10</span>, min <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>, max <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">50</span>, min <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>, max <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">50</span>, min <span class="op">=</span> <span class="op">-</span><span class="fl">10</span>, max <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Apply the generate_vectors function to each row</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="va">sample_points</span>, <span class="fl">1</span>, <span class="va">generate_vectors</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Create new columns for xend and yend coordinates</span></span></span>
+<span class="r-in"><span><span class="co"># Create new columns for displacements (dx, dy) and polar coordinates</span></span></span>
 <span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">xend</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">yend</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Calculate dx and dy (displacements)</span></span></span>
 <span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">dx</span> <span class="op">&lt;-</span> <span class="va">sample_points</span><span class="op">$</span><span class="va">xend</span> <span class="op">-</span> <span class="va">sample_points</span><span class="op">$</span><span class="va">x</span></span></span>
 <span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">dy</span> <span class="op">&lt;-</span> <span class="va">sample_points</span><span class="op">$</span><span class="va">yend</span> <span class="op">-</span> <span class="va">sample_points</span><span class="op">$</span><span class="va">y</span></span></span>
+<span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">distance</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">sample_points</span><span class="op">$</span><span class="va">dx</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">sample_points</span><span class="op">$</span><span class="va">dy</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">angle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">atan2</a></span><span class="op">(</span><span class="va">sample_points</span><span class="op">$</span><span class="va">dy</span>, <span class="va">sample_points</span><span class="op">$</span><span class="va">dx</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Plot the original vectors and smoothed vectors using `ggplot2` from ggvfields</span></span></span>
+<span class="r-in"><span><span class="co"># Example 1: Cartesian Coordinates with Linear Model (lm)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">sample_points</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span>  <span class="co"># Original vectors in red</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_vector_smooth</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span>, se <span class="op">=</span> <span class="cn">TRUE</span>, se.circle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>  <span class="co"># Smoothed vectors</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Computation failed in `stat_vector_smooth()`.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> Caused by error in `bind_cols()`:</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> could not find function "bind_cols"</span>
+<span class="r-in"><span>  <span class="fu">geom_vector_smooth</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"lm"</span>, se <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"Vector Smoothing with Linear Model (lm)"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="geom_vector_smooth-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Example 2: Polar Coordinates with Bootstrapping (boot)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">sample_points</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, angle <span class="op">=</span> <span class="va">angle</span>, distance <span class="op">=</span> <span class="va">distance</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">geom_vector_smooth</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"boot"</span>, se <span class="op">=</span> <span class="cn">TRUE</span>, probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="fl">0.68</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"Vector Smoothing with Bootstrapping (boot)"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_vector_smooth-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

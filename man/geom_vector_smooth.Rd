@@ -8,9 +8,9 @@
 \alias{stat_vector_smooth}
 \title{Create a Smooth Vector Plot Layer}
 \format{
-An object of class \code{StatVectorSmooth} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
+An object of class \code{StatVectorSmooth} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 6.
 
-An object of class \code{GeomVectorSmooth} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 6.
+An object of class \code{GeomVectorSmooth} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 8.
 }
 \usage{
 StatVectorSmooth
@@ -134,21 +134,20 @@ length before applying other transformations like centering. If \code{FALSE},
 vectors retain their original lengths.}
 
 \item{method}{Character; specifies the smoothing method to be used.
-Currently, only \code{"lm"} (linear modeling) is supported.}
+Supported methods are \code{"lm"} (linear modeling) and \code{"boot"} (bootstrapping).
+\code{"boot"} generates smoother results by calculating angles with bootstrapping,
+and the prediction intervals are determined using quantiles.}
 
 \item{se}{Logical; if \code{TRUE}, plots the confidence intervals around the
 smoothed vectors.}
 
 \item{se.circle}{Logical; if \code{TRUE}, draws circles around the origin of the
 vectors to represent the radius of the confidence interval. This is useful
-for visualizing the spread and variability of the confidence intervals when
-\code{se = TRUE}.}
+for visualizing variability when \code{se = TRUE}.}
 
-\item{probs}{Numeric vector; specifies the prediction interval level(s) to be
-plotted when \code{se = TRUE}. \strong{Default is \code{probs = c(0.95, NA)}}. If only one
-value is provided (e.g., \code{probs = 0.95}), a single prediction interval is
-drawn. If multiple values are provided, the function will plot multiple
-intervals (with smaller intervals nested inside larger ones).}
+\item{probs}{Numeric vector; specifies the prediction interval levels to be
+plotted when \code{se = TRUE}. \strong{Default is \code{probs = 0.95}}, but users can specify
+multiple levels (e.g., \code{probs = c(0.95, 0.68)}).}
 
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}. This
 controls the appearance of the arrowheads at the end of the vectors,
@@ -206,16 +205,94 @@ estimate the underlying vector field. This is similar in concept to how
 \code{geom_smooth()} in ggplot2 estimates a smooth line, but for vector data
 instead of scalar data.
 }
-\section{Aesthetics}{
- \code{geom_vector_smooth} understands the following
-aesthetics (required aesthetics are in bold):
+\details{
+\strong{Mathematics of Prediction and Prediction Intervals}:
+
+This section explains the methods for computing predictions and prediction
+intervals using the \strong{x} and \strong{y} coordinates.
+\subsection{Linear Model (lm) Method}{
+
+The \code{"lm"} method fits a multivariate linear regression to predict the vector
+displacements \emph{dx} and \emph{dy} based on \strong{x} and \strong{y}.
+
+\strong{Model:}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{dx, dy = b_0 + b_1 * x + b_2 * y + b_3 * (x * y) + e
+}\if{html}{\out{</div>}}
 \itemize{
-\item \strong{\code{x}}: x-coordinate of the start point of the vector.
-\item \strong{\code{y}}: y-coordinate of the start point of the vector.
-\item \code{xend}: x-coordinate of the end point of the vector (optional if \code{angle} and \code{distance} are provided).
-\item \code{yend}: y-coordinate of the end point of the vector (optional if \code{angle} and \code{distance} are provided).
-\item \code{angle}: The angle of the vector in degrees (optional, used with \code{distance}).
-\item \code{distance}: The distance/magnitude of the vector (optional, used with \code{angle}).
+\item \emph{b_0}, \emph{b_1}, \emph{b_2}, and \emph{b_3} are the model coefficients.
+\item \emph{e} is the residual error.
+}
+
+\strong{Prediction:}
+For a new grid point, the predicted displacements are:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Z_i = X_i * beta
+}\if{html}{\out{</div>}}
+\itemize{
+\item \emph{X_i} is the design matrix for the new grid point.
+\item \emph{beta} is the vector of estimated coefficients.
+}
+
+\strong{Prediction Intervals:}
+The standard error of the prediction is:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{SE(Z_i) = sqrt(diag(X_i * V * t(X_i)))
+}\if{html}{\out{</div>}}
+\itemize{
+\item \emph{V} is the covariance matrix of the coefficients.
+}
+
+The prediction interval at confidence level (1 - alpha) is:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Z_i ± t_(alpha / 2) * SE(Z_i)
+}\if{html}{\out{</div>}}
+}
+
+\subsection{Bootstrapping (boot) Method}{
+
+The \code{"boot"} method uses resampling to estimate angles and displacements.
+
+\strong{Process:}
+\itemize{
+\item Resample the original data with replacement.
+\item Fit models for the sine and cosine of the vector angle:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{sin(theta) = b_0 + b_1 * x + b_2 * y + e
+}\if{html}{\out{</div>}}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{cos(theta) = b_0 + b_1 * x + b_2 * y + e
+}\if{html}{\out{</div>}}
+\item Use the predicted sine and cosine to compute:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{theta = atan2(sin(theta), cos(theta))
+}\if{html}{\out{</div>}}
+}
+
+\strong{Prediction Intervals:}
+Based on quantiles from bootstrapped angles:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Lower Bound = Q_(alpha / 2)(theta)
+Upper Bound = Q_(1 - alpha / 2)(theta)
+}\if{html}{\out{</div>}}
+
+\strong{Displacements:}
+Using predicted angle \emph{theta} and distance \emph{d}:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{dx = d * cos(theta), dy = d * sin(theta)
+}\if{html}{\out{</div>}}
+}
+}
+\section{Aesthetics}{
+
+\code{geom_vector_smooth} understands the following aesthetics (required aesthetics are in bold):
+\itemize{
+\item \strong{\code{x}}: x-coordinate of the starting point of the vector.
+\item \strong{\code{y}}: y-coordinate of the starting point of the vector.
+\item \strong{\code{dx}}: x-displacement of the vector.
+\item \strong{\code{dy}}: y-displacement of the vector.
+\item \code{angle}: The angle of the vector in radians (optional, used with \code{distance}).
+\item \code{distance}: The magnitude of the vector (optional, used with \code{angle}).
 \item \code{color}: The color of the vector line.
 \item \code{linewidth}: The thickness of the vector line.
 \item \code{linetype}: The type of the vector line (solid, dashed, etc.).
@@ -223,43 +300,53 @@ aesthetics (required aesthetics are in bold):
 \item \code{arrow}: Specification for arrowheads at the end of the vector.
 
 Additionally, when using smoothing:
-\item \code{norm}: A computed variable representing the magnitude of each smoothed vector.
+\item \code{norm}: A computed variable representing the magnitude of the smoothed vector,
+available via \code{after_stat()}.
 }
 }
 
 \examples{
-# Generate a function to create random vectors based on input (x, y) values
+library(ggplot2)
+library(ggvfields)
+
+# Function to generate random vectors based on (x, y) inputs
 generate_vectors <- function(v) {
   x <- v[1]
   y <- v[2]
-  # Return new x and y values with added random noise
-  c(x + rnorm(1, 1, 1), y + rnorm(1, 1, 1))
+  c(sin(x) + sin(y) + rnorm(1, 5, 3), sin(x) - sin(y) + rnorm(1, 5, 3))
 }
 
 # Set seed for reproducibility
 set.seed(123)
 
-# Generate sample points for the vector field
+# Generate sample data
 sample_points <- data.frame(
-  x = runif(10, min = -10, max = 10),
-  y = runif(10, min = -10, max = 10)
+  x = runif(50, min = -10, max = 10),
+  y = runif(50, min = -10, max = 10)
 )
 
 # Apply the generate_vectors function to each row
 result <- t(apply(sample_points, 1, generate_vectors))
 
-# Create new columns for xend and yend coordinates
+# Create new columns for displacements (dx, dy) and polar coordinates
 sample_points$xend <- result[, 1]
 sample_points$yend <- result[, 2]
-
-# Calculate dx and dy (displacements)
 sample_points$dx <- sample_points$xend - sample_points$x
 sample_points$dy <- sample_points$yend - sample_points$y
+sample_points$distance <- sqrt(sample_points$dx^2 + sample_points$dy^2)
+sample_points$angle <- atan2(sample_points$dy, sample_points$dx)
 
-# Plot the original vectors and smoothed vectors using `ggplot2` from ggvfields
+# Example 1: Cartesian Coordinates with Linear Model (lm)
 ggplot(sample_points, aes(x = x, y = y)) +
-  geom_vector(aes(dx = dx, dy = dy), color = "red") +  # Original vectors in red
-  geom_vector_smooth(aes(dx = dx, dy = dy), se = TRUE, se.circle = TRUE)  # Smoothed vectors
+  geom_vector_smooth(aes(dx = dx, dy = dy), method = "lm", se = TRUE) +
+  geom_vector(aes(dx = dx, dy = dy)) +
+  ggtitle("Vector Smoothing with Linear Model (lm)")
+
+# Example 2: Polar Coordinates with Bootstrapping (boot)
+ggplot(sample_points, aes(x = x, y = y, angle = angle, distance = distance)) +
+  geom_vector_smooth(method = "boot", se = TRUE, probs = c(0.95, 0.68)) +
+  geom_vector(aes(dx = dx, dy = dy)) +
+  ggtitle("Vector Smoothing with Bootstrapping (boot)")
 
 }
 \keyword{datasets}

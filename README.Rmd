@@ -238,7 +238,7 @@ ggplot() +
 
 ### Animate `geom_streamplot()`{.R}
 
-```{r animation}
+```{r animation, cache = TRUE}
 #| cache: true
 # Create stream plot with rownum aesthetic
 p <- ggplot() +
@@ -404,10 +404,30 @@ sample_points$dy <- sample_points$yend - sample_points$y
 
 # Visualize the original and smoothed vectors using `ggplot2` from ggvfields
 ggplot(sample_points, aes(x = x, y = y)) +
-  geom_vector_smooth(aes(dx = dx, dy = dy), n = 6, center = FALSE, probs = c(.95, .7)) + 
+  geom_vector_smooth(aes(dx = dx, dy = dy), 
+                     n = 6, center = FALSE, probs = c(.95, .68), method = "lm"
+                     ) + 
   geom_vector(aes(dx = dx, dy = dy)) +  
   coord_equal()
 ```
+
+This function also works with polar coordinates and `method = "boot"`.
+
+```{r}
+# Calculate polar coordinates: angle and distance
+sample_points$distance <- sqrt(sample_points$dx^2 + sample_points$dy^2)
+sample_points$angle <- atan2(sample_points$dy, sample_points$dx)
+
+# Visualize the vector field with smoothing in polar coordinates
+ggplot(sample_points, aes(x = x, y = y)) +
+  geom_vector_smooth(aes(angle = angle, distance = distance),
+                     n = 6, center = FALSE, probs = c(.95), method = "boot"
+                     ) +
+  geom_vector(aes(dx = dx, dy = dy)) +  
+  coord_fixed() 
+```
+
+
 
 This example demonstrates how `geom_vector_smooth()` can be used to fit a vector field to vector data. 
 

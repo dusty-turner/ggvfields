@@ -13,6 +13,7 @@
 #'
 #' @inheritParams ggplot2::geom_raster
 #' @inheritParams ggplot2::stat_identity
+#' @importFrom boot boot
 #' @param fun A user-defined function that takes a vector (x, y) and returns a
 #'   vector (dx, dy), representing the displacements at that point in the vector
 #'   field.
