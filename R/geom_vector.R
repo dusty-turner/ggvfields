@@ -111,7 +111,7 @@ geom_vector <- function(
   ...,
   na.rm = FALSE,
   show.legend = NA,
-  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
+  arrow = grid::arrow(angle = 25, length = unit(0.015, "npc"), type = "closed"),
   inherit.aes = TRUE,
   center = TRUE,
   normalize = TRUE,

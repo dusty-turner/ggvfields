@@ -528,6 +528,8 @@ GeomVectorSmooth <- ggproto(
       }
     }
 
+    print(data)
+
     # Draw the vectors
     segments_grob <- GeomSegment$draw_panel(
       data = data,
