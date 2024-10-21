@@ -111,7 +111,7 @@ geom_vector <- function(
   ...,
   na.rm = FALSE,
   show.legend = NA,
-  arrow = grid::arrow(angle = 25, length = unit(0.015, "npc"), type = "closed"),
+  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
   inherit.aes = TRUE,
   center = TRUE,
   normalize = TRUE,
@@ -221,8 +221,8 @@ draw_panel_vector <- function(
     vector_grob <- grid::segmentsGrob(
       x0 = unit(coords$x, "npc"), y0 = unit(coords$y, "npc"),
       x1 = unit(coords$xend, "npc"), y1 = unit(coords$yend, "npc"),
-      gp = grid::gpar(col = coords$colour, fill = coords$fill, lwd = linewidth),  # Use mapped fill
-      arrow = arrow  # Pass the arrow parameter here
+      gp = grid::gpar(col = coords$colour, fill = coords$fill, lwd = linewidth),
+      arrow = arrow
     )
 
     points_grob <- NULL
@@ -232,7 +232,7 @@ draw_panel_vector <- function(
         y = unit(coords$y, "npc"),
         pch = 16,  # Solid circle
         size = unit(tail_point.size, "mm"),
-        gp = grid::gpar(col = coords$colour, fill = coords$fill)  # Use mapped fill
+        gp = grid::gpar(col = coords$colour, fill = coords$fill)
       )
     }
 
@@ -295,7 +295,7 @@ draw_panel_vector <- function(
         x1 = unit(coords$x, "npc") + unit(half_dx, "cm"),
         y1 = unit(coords$y, "npc") + unit(half_dy, "cm"),
         gp = grid::gpar(col = coords$colour, fill = coords$fill, lwd = linewidth),  # Use mapped fill
-        arrow = arrow  # Pass the arrow parameter here
+        arrow = grid::arrow(angle = 25, length = unit(0.015, "npc"), type = "closed")  # Pass the arrow parameter here
       )
       points_grob <- NULL
       if (tail_point) {
@@ -313,7 +313,7 @@ draw_panel_vector <- function(
         x1 = unit(coords$x, "npc") + unit(coords$length * coords$dx, "cm"),
         y1 = unit(coords$y, "npc") + unit(coords$length * coords$dy, "cm"),
         gp = grid::gpar(col = coords$colour, fill = coords$fill, lwd = linewidth),  # Use mapped fill
-        arrow = arrow  # Pass the arrow parameter here
+        arrow = grid::arrow(angle = 25, length = unit(0.015, "npc"), type = "closed")  # Pass the arrow parameter here
       )
       points_grob <- NULL
       if (tail_point) {
