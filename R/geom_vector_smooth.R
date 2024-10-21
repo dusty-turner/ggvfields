@@ -188,6 +188,10 @@ StatVectorSmooth <- ggproto(
 
   setup_data = function(data, params) {
 
+    if (!all(is.na(data$dx)) && !all(is.na(data$angle))) {
+      warning("Both Cartesian and Polar inputs provided. Using Cartesian by default.")
+    }
+
     # Ensure angle and distance are retained in the transformed data
     if (!("dx" %in% names(data) && "dy" %in% names(data))) {
       if ("angle" %in% names(data) && "distance" %in% names(data)) {
@@ -528,7 +532,19 @@ GeomVectorSmooth <- ggproto(
       }
     }
 
-    print(data)
+    data$distance <- sqrt(data$dx^2 + data$dy^2)  # Calculate vector magnitudes
+
+    # Normalize dx and dy to unit length
+    data$dx_norm <- data$dx / data$distance
+    data$dy_norm <- data$dy / data$distance
+
+    # Scale dx and dy to match the desired radius
+    data$dx <- data$dx_norm * data$radius
+    data$dy <- data$dy_norm * data$radius
+
+    # Calculate new xend and yend based on the scaled dx and dy
+    data$xend <- data$x + data$dx
+    data$yend <- data$y + data$dy
 
     # Draw the vectors
     segments_grob <- GeomSegment$draw_panel(
