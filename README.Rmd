@@ -1,6 +1,6 @@
 ---
 output: github_document
-cache: true
+cache: refresh
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file --> 
