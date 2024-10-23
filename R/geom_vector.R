@@ -289,13 +289,18 @@ draw_panel_vector <- function(
 
     # Handle centering
     if (center) {
+
+      ## this determins if the user has adjusted the length of the arrow away from the default and makes it smaller
+      ## if the user has altered the default then leave it alone
+      if (round(grid::convertUnit(arrow$length, "npc", valueOnly = TRUE),3) == 0.025) arrow$length <- unit(0.015, "npc")
+
       vector_grob <- grid::segmentsGrob(
         x0 = unit(coords$x, "npc") - unit(half_dx, "cm"),
         y0 = unit(coords$y, "npc") - unit(half_dy, "cm"),
         x1 = unit(coords$x, "npc") + unit(half_dx, "cm"),
         y1 = unit(coords$y, "npc") + unit(half_dy, "cm"),
         gp = grid::gpar(col = coords$colour, fill = coords$fill, lwd = linewidth),  # Use mapped fill
-        arrow = grid::arrow(angle = 25, length = unit(0.015, "npc"), type = "closed")  # Pass the arrow parameter here
+        arrow = arrow  # Pass the arrow parameter here
       )
       points_grob <- NULL
       if (tail_point) {
@@ -308,12 +313,17 @@ draw_panel_vector <- function(
         )
       }
     } else {
+
+      ## this determins if the user has adjusted the length of the arrow away from the default and makes it smaller
+      ## if the user has altered the default then leave it alone
+      if (round(grid::convertUnit(arrow$length, "npc", valueOnly = TRUE),3) == 0.025) arrow$length <- unit(0.015, "npc")
+
       vector_grob <- grid::segmentsGrob(
         x0 = unit(coords$x, "npc"), y0 = unit(coords$y, "npc"),
         x1 = unit(coords$x, "npc") + unit(coords$length * coords$dx, "cm"),
         y1 = unit(coords$y, "npc") + unit(coords$length * coords$dy, "cm"),
         gp = grid::gpar(col = coords$colour, fill = coords$fill, lwd = linewidth),  # Use mapped fill
-        arrow = grid::arrow(angle = 25, length = unit(0.015, "npc"), type = "closed")  # Pass the arrow parameter here
+        arrow = arrow
       )
       points_grob <- NULL
       if (tail_point) {
