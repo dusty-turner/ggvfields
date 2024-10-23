@@ -130,7 +130,6 @@
 #' ```
 #'
 #' @examples
-#' library(ggplot2)
 #' library(ggvfields)
 #'
 #' # Function to generate random vectors based on (x, y) inputs
@@ -490,7 +489,7 @@ GeomVectorSmooth <- ggproto(
         wedge$alpha <- 0.6
         wedge$fill <- "grey60"
         # wedge$fill <- data$fill[i]
-        wedge$colour <- "grey60"
+        wedge$colour <- NA
         return(wedge)
       }))
 
@@ -517,9 +516,9 @@ GeomVectorSmooth <- ggproto(
 
           wedge$linewidth <- data$linewidth[i]
           wedge$alpha <- 0.6
-          wedge$fill <- "grey60"
+          wedge$fill <- "grey40"
           # wedge$fill <- data$fill[i]
-          wedge$colour <- "grey60"
+          wedge$colour <- NA
 
           return(wedge)
         }))
