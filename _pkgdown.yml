@@ -13,6 +13,8 @@ reference:
     contents:
       - geom_vector
       - stat_vector
+      - geom_vector2
+      - stat_vector2
       - geom_vector_field
       - stat_vector_field
       - scale_length_continuous
