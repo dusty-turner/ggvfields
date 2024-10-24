@@ -18,52 +18,73 @@ knitr::opts_chunk$set(
 
 # ggvfields <img src="man/figures/ggvfields_hex.png"  align="right"  width="120" style="padding-left:10px;background-color:white;" />
 
+
+
+
 ## Overview
 
-**ggvfields** provides tools for visualizing vector fields, stream plots, and soon complex numbers and more.
+**ggvfields** provides tools for visualizing vector fields, stream plots, and soon complex numbers and more. Let's start by creating some synthetic data that we can use to see its features.
 
 ```{r}
 library("ggvfields")
 options(ggplot2.continuous.colour="viridis")
+
+set.seed(1234)
+n <- 10
+
+(wind_data <- data.frame(
+  "lon" = rnorm(n), 
+  "lat" = rnorm(n), 
+  "dir" = runif(n, -pi, pi),
+  "spd" = rchisq(n, df = 2)
+) |> 
+  within({
+    dx <- spd * cos(dir)
+    dy <- spd * sin(dir)
+  }))
+  
+round(wind_data, digits = 2)
 ```
+
+
+
 
 ## Usage
 
+
+
+
+
 ### `geom_vector()`{.R}: Visualizing Individual Vectors
 
-`geom_vector()` is designed to visualize individual vectors, specified by either Cartesian (`dx`, `dy`) or polar (`angle`, `distance`) components. It’s especially useful for directional data like wind patterns or flow fields.
+`geom_vector()`{.R} is designed to visualize individual vectors, which are essentially just line segments with (typically ) arrow heads to signify their direction. As line segments, they are naturally represented as 2 points-2 $(x,y)$ pairs-signifying the start point and the end point, where the end point signifies the direction of the vector. This already possible using `geom_segment()`{.R}; however, **ggvfields**'s `geom_vector()`{.R} provides a bit more support. 
+
+
+
+
+, specified by either Cartesian (`dx`{.R}, `dy`{.R}) or polar (`angle`{.R}, `distance`{.R}) components. It’s especially useful for directional data like wind patterns or flow fields.
 
 By default, the **`length` aesthetic** is mapped to `after_stat(norm)`, meaning the vector length reflects its magnitude. More details in this section: [**New Feature: Mapping Norm to the Length Aesthetic**](#new-feature-mapping-norm-to-the-length-aesthetic).
 
-#### Cartesian Example
-
 ```{r}
-set.seed(1234)
-n <- 10
-wind_data_polar <- data.frame(
-  lon = rnorm(n), 
-  lat = rnorm(n), 
-  wind_dir = runif(n, -pi, pi),
-  wind_spd = rchisq(n, df = 2)
-)
-
-wind_data_cartesian <- within(wind_data_polar, {
-  wind_lon_comp <- wind_spd * cos(wind_dir)
-  wind_lat_comp <- wind_spd * sin(wind_dir)
-  dx <- wind_lon_comp
-  dy <- wind_lat_comp
-})
-
-ggplot(wind_data_cartesian) +
+ggplot(wind_data) +
   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy))
 ```
 
-#### Polar Example
-
-For polar coordinates, the vector is defined by an angle and distance:
+If you'd prefer to use dots on the tails instead of arrow heads, those are available, too:
 
 ```{r}
-ggplot(wind_data_cartesian) +
+ggplot(wind_data) +
+  geom_vector(
+    aes(x = lon, y = lat, dx = dx, dy = dy), 
+    tail_point = TRUE, arrow = NULL
+  )
+```
+
+For polar coordinates, the vector is defined by an `angle` and `distance`:
+
+```{r}
+ggplot(wind_data) +
   geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd))
 ```
 
@@ -89,7 +110,7 @@ By mapping the norm of a vector to the length aesthetic, users can directly obse
 In this example, the norm of the wind vectors is mapped to their length:
 
 ```{r}
-ggplot(wind_data_cartesian) +
+ggplot(wind_data) +
   geom_vector(
     aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)),
     arrow = NULL, tail_point = TRUE
@@ -99,7 +120,7 @@ ggplot(wind_data_cartesian) +
 To disable this feature, you can map `length = after_stat(NA)`.
 
 ```{r}
-ggplot(wind_data_cartesian) +
+ggplot(wind_data) +
   geom_vector(
     aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(NA))
   )
