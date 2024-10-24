@@ -210,18 +210,31 @@ StatVectorSmooth <- ggproto(
     return(data)
   },
 
-  compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_factor, se = TRUE, probs, ...) {
+  compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_factor, se = TRUE, probs, eval_points = NULL, ...) {
 
-    # Check if dx/dy or angle/distance are provided and calculate dx/dy if needed
-    if (!("dx" %in% names(data) && "dy" %in% names(data))) {
-      if ("angle" %in% names(data) && "distance" %in% names(data)) {
-        # Compute dx and dy from angle and distance
-        data$dx <- data$distance * cos(data$angle)
-        data$dy <- data$distance * sin(data$angle)
-      } else {
-        stop("Either 'dx' and 'dy' or 'angle' and 'distance' must be provided.")
+    ## if eval points exist, then create the grid this way
+    if (!is.null(eval_points)) {
+      if (!all(c("x", "y") %in% names(eval_points))) {
+        stop("The 'eval_points' argument must contain 'x' and 'y' columns.")
       }
+
+      grid <- eval_points
+      # Find the minimum Euclidean distance
+      min_distance <- euclidean_distances(grid)
+      # Choose radius as a fraction of the minimum distance
+      radius <- min_distance / 2.5
+
+    } else { # Generate a regular grid if eval_points is not provided
+      x_seq <- seq(min(data$x), max(data$x), length.out = n[1])
+      y_seq <- seq(min(data$y), max(data$y), length.out = n[2])
+      grid <- expand.grid(x = x_seq, y = y_seq)
+      x_spacing <- diff(sort(unique(grid$x)))[1]
+      y_spacing <- diff(sort(unique(grid$y)))[1]
+      # Choose the radius as a fraction of the smaller spacing
+      radius <- min(x_spacing, y_spacing) / 2.5
     }
+
+    grid$id <- 1:nrow(grid)
 
     # Ensure probs is a vector, even if a single value is provided
     if (length(probs) == 1) {
@@ -238,18 +251,6 @@ StatVectorSmooth <- ggproto(
     # Calculate angle and distance using dx and dy
     data$distance <- sqrt(data$dx^2 + data$dy^2)
     data$angle <- atan2(data$dy, data$dx)
-
-    # Generate the grid for predictions
-    x_seq <- seq(min(data$x), max(data$x), length.out = n[1])
-    y_seq <- seq(min(data$y), max(data$y), length.out = n[2])
-    grid <- expand.grid(x = x_seq, y = y_seq)
-    grid$id <- 1:nrow(grid)
-
-    x_spacing <- diff(sort(unique(grid$x)))[1]
-    y_spacing <- diff(sort(unique(grid$y)))[1]
-
-    # Choose the radius as a fraction of the smaller spacing
-    radius <- min(x_spacing, y_spacing) / 2.5
 
     if (method == "lm") {
       model <- lm(cbind(dx, dy) ~ x * y, data = data)
@@ -585,6 +586,7 @@ stat_vector_smooth <- function(
   se.circle = TRUE,
   probs = c(.95, NA),
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  eval_points = NULL,
   ...
 ) {
 
@@ -606,6 +608,7 @@ stat_vector_smooth <- function(
       se.circle = se.circle,
       probs = probs,
       arrow = arrow,
+      eval_points = eval_points,
       na.rm = na.rm,
       ...
     )
@@ -629,6 +632,7 @@ geom_vector_smooth <- function(
   se.circle = TRUE,
   probs = c(.95, NA),
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  eval_points = NULL,
   ...
 ) {
 
@@ -650,6 +654,7 @@ geom_vector_smooth <- function(
       se.circle = se.circle,
       probs = probs,
       arrow = arrow,
+      eval_points = eval_points,
       na.rm = na.rm,
       ...
     )

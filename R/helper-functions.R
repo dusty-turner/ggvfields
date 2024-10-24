@@ -160,3 +160,22 @@ calculate_bounds <- function(fit, se, probs) {
   # Return a list of bounds
   return(list(lower = lower_bound, upper = upper_bound))
 }
+
+
+# Compute Euclidean distances only between nearest neighbors
+euclidean_distances <- function(points) {
+  n <- nrow(points)
+  min_distance <- Inf
+
+  for (i in 1:(n - 1)) {
+    for (j in (i + 1):n) {
+      # Only consider direct neighbors (1-step difference in x or y)
+      if (abs(points$x[i] - points$x[j]) <= min(diff(sort(unique(points$x)))) &&
+          abs(points$y[i] - points$y[j]) <= min(diff(sort(unique(points$y))))) {
+        dist <- sqrt((points$x[i] - points$x[j])^2 + (points$y[i] - points$y[j])^2)
+        min_distance <- min(min_distance, dist)
+      }
+    }
+  }
+  return(min_distance)
+}
