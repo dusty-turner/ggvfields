@@ -42,7 +42,6 @@
 #' - `linetype`: The type of the vector line (solid, dashed, etc.).
 #' - `alpha`: The transparency level of the vector.
 #' - `arrow`: Specification for arrowheads at the end of the vector.
-
 #'
 #' @examples
 #'

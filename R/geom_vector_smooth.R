@@ -31,6 +31,7 @@
 #' @param probs Numeric vector; specifies the prediction interval levels to be
 #'   plotted when `se = TRUE`. **Default is `probs = 0.95`**, but users can specify
 #'   multiple levels (e.g., `probs = c(0.95, 0.68)`).
+#' @param eval_points Number of points at which the function is evaluated for smoothing.
 #' @param arrow Arrow specification, as created by `grid::arrow()`. This
 #'   controls the appearance of the arrowheads at the end of the vectors,
 #'   including properties like angle, length, and type.

@@ -34,6 +34,7 @@ stat_vector_smooth(
   se.circle = TRUE,
   probs = c(0.95, NA),
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  eval_points = NULL,
   ...
 )
 
@@ -54,6 +55,7 @@ geom_vector_smooth(
   se.circle = TRUE,
   probs = c(0.95, NA),
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  eval_points = NULL,
   ...
 )
 }
@@ -152,6 +154,8 @@ multiple levels (e.g., \code{probs = c(0.95, 0.68)}).}
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}. This
 controls the appearance of the arrowheads at the end of the vectors,
 including properties like angle, length, and type.}
+
+\item{eval_points}{Number of points at which the function is evaluated for smoothing.}
 
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}'s \code{params} argument. These
 arguments broadly fall into one of 4 categories below. Notably, further
@@ -306,7 +310,6 @@ available via \code{after_stat()}.
 }
 
 \examples{
-library(ggplot2)
 library(ggvfields)
 
 # Function to generate random vectors based on (x, y) inputs
