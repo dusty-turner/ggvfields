@@ -291,7 +291,9 @@ draw_panel_vector <- function(
 
       ## this determins if the user has adjusted the length of the arrow away from the default and makes it smaller
       ## if the user has altered the default then leave it alone
-      if (round(grid::convertUnit(arrow$length, "npc", valueOnly = TRUE),3) == 0.025) arrow$length <- unit(0.015, "npc")
+      if (!is.null(arrow) && round(grid::convertUnit(arrow$length, "npc", valueOnly = TRUE), 3) == 0.025) {
+        arrow$length <- unit(0.015, "npc")
+      }
 
       vector_grob <- grid::segmentsGrob(
         x0 = unit(coords$x, "npc") - unit(half_dx, "cm"),
@@ -315,8 +317,9 @@ draw_panel_vector <- function(
 
       ## this determins if the user has adjusted the length of the arrow away from the default and makes it smaller
       ## if the user has altered the default then leave it alone
-      if (round(grid::convertUnit(arrow$length, "npc", valueOnly = TRUE),3) == 0.025) arrow$length <- unit(0.015, "npc")
-
+      if (!is.null(arrow) && round(grid::convertUnit(arrow$length, "npc", valueOnly = TRUE), 3) == 0.025) {
+        arrow$length <- unit(0.015, "npc")
+      }
       vector_grob <- grid::segmentsGrob(
         x0 = unit(coords$x, "npc"), y0 = unit(coords$y, "npc"),
         x1 = unit(coords$x, "npc") + unit(coords$length * coords$dx, "cm"),

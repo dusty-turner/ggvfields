@@ -2,6 +2,7 @@
 % Please edit documentation in R/geom_vector2.R
 \name{geom_vector2}
 \alias{geom_vector2}
+\alias{stat_vector2}
 \title{Create a Vector Plot Layer with Norm Mapped to Color}
 \usage{
 geom_vector2(
@@ -14,10 +15,21 @@ geom_vector2(
   show.legend = NA,
   inherit.aes = TRUE
 )
+
+stat_vector2(
+  mapping = NULL,
+  data = NULL,
+  geom = GeomVector,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE
+)
 }
 \arguments{
-\item{mapping}{Set of aesthetic mappings created by \code{aes()} or \code{aes_()}.
-This function ensures that \code{color = after_stat(norm)} is mapped by default.}
+\item{mapping}{Aesthetic mappings created by \code{aes()} or \code{aes_()}.
+These functions ensure that \code{color = after_stat(norm)} is mapped by default.}
 
 \item{data}{The data to be displayed in this layer. There are three
 options:
@@ -60,7 +72,7 @@ to use \code{position_jitter()}, give the position as \code{"jitter"}.
 \link[ggplot2:layer_positions]{layer position} documentation.
 }}
 
-\item{...}{Other arguments passed on to \code{geom_vector()}.}
+\item{...}{Other arguments passed on to \code{geom_vector()} or \code{stat_vector()}.}
 
 \item{na.rm}{If \code{FALSE}, the default, missing values are removed with
 a warning. If \code{TRUE}, missing values are silently removed.}
@@ -75,65 +87,56 @@ display.}
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
+
+\item{geom}{The geometric object to use to display the data for this layer.
+When using a \verb{stat_*()} function to construct a layer, the \code{geom} argument
+can be used to override the default coupling between stats and geoms. The
+\code{geom} argument accepts the following:
+\itemize{
+\item A \code{Geom} ggproto subclass, for example \code{GeomPoint}.
+\item A string naming the geom. To give the geom as a string, strip the
+function name of the \code{geom_} prefix. For example, to use \code{geom_point()},
+give the geom as \code{"point"}.
+\item For more information and other ways to specify the geom, see the
+\link[ggplot2:layer_geoms]{layer geom} documentation.
+}}
 }
 \value{
-A \code{ggplot2} layer that can be added to a ggplot object to produce a vector plot
-with \code{norm} mapped to \code{color}.
+A ggplot2 layer that can be added to a ggplot object.
 }
 \description{
-\code{geom_vector2} creates a ggplot2 layer that visualizes vectors as line segments with
-optional arrowheads. By default, it maps the vector norm (magnitude) to the \code{color} aesthetic.
+\code{geom_vector2} and \code{stat_vector2} are extensions of \code{geom_vector} and \code{stat_vector}.
+They provide identical functionality but map the \strong{vector norm (magnitude)} to
+the \code{color} aesthetic by default. This is useful when you want vector magnitude to
+be emphasized visually through color.
 }
 \details{
-This function is a wrapper around \code{geom_vector()} and behaves identically, except for
-the default aesthetic mapping of \code{color = after_stat(norm)}.
+These functions are wrappers around \code{geom_vector()} and \code{stat_vector()}, ensuring
+that \code{color = after_stat(norm)} and \code{length = after_stat(NA)} are applied by default.
 }
 \examples{
 
-# Example 1: Basic Cartesian Vector Plot with Magnitude Mapped to Color
+# Example with Cartesian Data
 set.seed(1234)
 n <- 10
 wind_data <- data.frame(
-  lon = rnorm(n),                     # Longitude coordinates
-  lat = rnorm(n),                     # Latitude coordinates
-  wind_dir = runif(n, -pi, pi),       # Wind direction in radians
-  wind_spd = rchisq(n, df = 2)        # Wind speed (magnitude)
+  lon = rnorm(n),
+  lat = rnorm(n),
+  wind_dir = runif(n, -pi, pi),
+  wind_spd = rchisq(n, df = 2)
 )
+wind_data$dx <- wind_data$wind_spd * cos(wind_data$wind_dir)
+wind_data$dy <- wind_data$wind_spd * sin(wind_data$wind_dir)
 
-# Add Cartesian components (dx, dy)
-wind_data$dx <- wind_data$wind_spd * cos(wind_data$wind_dir)  # x-component
-wind_data$dy <- wind_data$wind_spd * sin(wind_data$wind_dir)  # y-component
-
-# Plot with geom_vector2 (color mapped to vector norm by default)
 ggplot(wind_data) +
   geom_vector2(aes(x = lon, y = lat, dx = dx, dy = dy)) +
   scale_color_viridis_c() +
   theme_minimal() +
   labs(color = "Vector Magnitude")
 
-# Example 2: Polar Coordinates with Angle and Distance
+# Example with Polar Coordinates
 ggplot(wind_data) +
   geom_vector2(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd)) +
-  scale_color_viridis_c() +
-  theme_minimal() +
-  labs(color = "Vector Magnitude")
-
-# Example 3: Customizing Arrow Appearance
-ggplot(wind_data) +
-  geom_vector2(
-    aes(x = lon, y = lat, dx = dx, dy = dy),
-    arrow = grid::arrow(angle = 15, length = unit(0.02, "npc"), type = "closed")
-  ) +
-  scale_color_viridis_c() +
-  theme_minimal() +
-  labs(color = "Vector Magnitude")
-
-# Example 4: Disabling Length Mapping and Using Custom Lengths
-wind_data$length_custom <- runif(n, 0.5, 1.5)  # Custom lengths for each vector
-ggplot(wind_data) +
-  geom_vector2(
-    aes(x = lon, y = lat, dx = dx, dy = dy, length = length_custom)
-  ) +
   scale_color_viridis_c() +
   theme_minimal() +
   labs(color = "Vector Magnitude")

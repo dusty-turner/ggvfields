@@ -1,70 +1,46 @@
 #' Create a Vector Plot Layer with Norm Mapped to Color
 #'
-#' `geom_vector2` creates a ggplot2 layer that visualizes vectors as line segments with
-#' optional arrowheads. By default, it maps the vector norm (magnitude) to the `color` aesthetic.
+#' `geom_vector2` and `stat_vector2` are extensions of `geom_vector` and `stat_vector`.
+#' They provide identical functionality but map the **vector norm (magnitude)** to
+#' the `color` aesthetic by default. This is useful when you want vector magnitude to
+#' be emphasized visually through color.
 #'
-#' This function is a wrapper around `geom_vector()` and behaves identically, except for
-#' the default aesthetic mapping of `color = after_stat(norm)`.
+#' These functions are wrappers around `geom_vector()` and `stat_vector()`, ensuring
+#' that `color = after_stat(norm)` and `length = after_stat(NA)` are applied by default.
 #'
 #' @inheritParams geom_vector
-#' @param mapping Set of aesthetic mappings created by `aes()` or `aes_()`.
-#'   This function ensures that `color = after_stat(norm)` is mapped by default.
-#' @param ... Other arguments passed on to `geom_vector()`.
-#' @return A `ggplot2` layer that can be added to a ggplot object to produce a vector plot
-#'   with `norm` mapped to `color`.
+#' @param mapping Aesthetic mappings created by `aes()` or `aes_()`.
+#'   These functions ensure that `color = after_stat(norm)` is mapped by default.
+#' @param ... Other arguments passed on to `geom_vector()` or `stat_vector()`.
+#' @return A ggplot2 layer that can be added to a ggplot object.
 #' @examples
 #'
-#' # Example 1: Basic Cartesian Vector Plot with Magnitude Mapped to Color
+#' # Example with Cartesian Data
 #' set.seed(1234)
 #' n <- 10
 #' wind_data <- data.frame(
-#'   lon = rnorm(n),                     # Longitude coordinates
-#'   lat = rnorm(n),                     # Latitude coordinates
-#'   wind_dir = runif(n, -pi, pi),       # Wind direction in radians
-#'   wind_spd = rchisq(n, df = 2)        # Wind speed (magnitude)
+#'   lon = rnorm(n),
+#'   lat = rnorm(n),
+#'   wind_dir = runif(n, -pi, pi),
+#'   wind_spd = rchisq(n, df = 2)
 #' )
+#' wind_data$dx <- wind_data$wind_spd * cos(wind_data$wind_dir)
+#' wind_data$dy <- wind_data$wind_spd * sin(wind_data$wind_dir)
 #'
-#' # Add Cartesian components (dx, dy)
-#' wind_data$dx <- wind_data$wind_spd * cos(wind_data$wind_dir)  # x-component
-#' wind_data$dy <- wind_data$wind_spd * sin(wind_data$wind_dir)  # y-component
-#'
-#' # Plot with geom_vector2 (color mapped to vector norm by default)
 #' ggplot(wind_data) +
 #'   geom_vector2(aes(x = lon, y = lat, dx = dx, dy = dy)) +
 #'   scale_color_viridis_c() +
 #'   theme_minimal() +
 #'   labs(color = "Vector Magnitude")
 #'
-#' # Example 2: Polar Coordinates with Angle and Distance
+#' # Example with Polar Coordinates
 #' ggplot(wind_data) +
 #'   geom_vector2(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd)) +
 #'   scale_color_viridis_c() +
 #'   theme_minimal() +
 #'   labs(color = "Vector Magnitude")
 #'
-#' # Example 3: Customizing Arrow Appearance
-#' ggplot(wind_data) +
-#'   geom_vector2(
-#'     aes(x = lon, y = lat, dx = dx, dy = dy),
-#'     arrow = grid::arrow(angle = 15, length = unit(0.02, "npc"), type = "closed")
-#'   ) +
-#'   scale_color_viridis_c() +
-#'   theme_minimal() +
-#'   labs(color = "Vector Magnitude")
-#'
-#' # Example 4: Disabling Length Mapping and Using Custom Lengths
-#' wind_data$length_custom <- runif(n, 0.5, 1.5)  # Custom lengths for each vector
-#' ggplot(wind_data) +
-#'   geom_vector2(
-#'     aes(x = lon, y = lat, dx = dx, dy = dy, length = length_custom)
-#'   ) +
-#'   scale_color_viridis_c() +
-#'   theme_minimal() +
-#'   labs(color = "Vector Magnitude")
-#'
 #' @export
-
-# Wrapper around geom_vector to change the default mapping
 geom_vector2 <- function(
     mapping = NULL,
     data = NULL,
@@ -75,10 +51,7 @@ geom_vector2 <- function(
     show.legend = NA,
     inherit.aes = TRUE
 ) {
-  # Ensure norm is mapped to color by default
   mapping <- modifyList(aes(color = after_stat(norm), length = after_stat(NA)), mapping)
-
-  # Call the original geom_vector with modified mapping
   geom_vector(
     mapping = mapping,
     data = data,
@@ -91,7 +64,8 @@ geom_vector2 <- function(
   )
 }
 
-# Wrapper around stat_vector to change the default mapping
+#' @rdname geom_vector2
+#' @export
 stat_vector2 <- function(
     mapping = NULL,
     data = NULL,
@@ -102,10 +76,7 @@ stat_vector2 <- function(
     show.legend = NA,
     inherit.aes = TRUE
 ) {
-  # Ensure norm is mapped to color by default
   mapping <- modifyList(aes(color = after_stat(norm), length = after_stat(NA)), mapping)
-
-  # Call the original stat_vector with modified mapping
   stat_vector(
     mapping = mapping,
     data = data,
