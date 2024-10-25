@@ -188,6 +188,8 @@ StatVectorSmooth <- ggproto(
 
   setup_data = function(data, params) {
 
+    print(data |> head())
+
     if (!all(is.na(data$dx)) && !all(is.na(data$angle))) {
       warning("Both Cartesian and Polar inputs provided. Using Cartesian by default.")
     }
@@ -208,10 +210,13 @@ StatVectorSmooth <- ggproto(
     extra_aes <- setdiff(names(data), required_aes)
     data[extra_aes] <- lapply(extra_aes, function(a) data[[a]])
 
+    print(data |> head())
+
     return(data)
   },
 
-  compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_factor, se = TRUE, probs, eval_points = NULL, ...) {
+  compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_factor, se = TRUE, probs,
+                           eval_points = NULL, formula, ...) {
 
     ## if eval points exist, then create the grid this way
     if (!is.null(eval_points)) {
@@ -237,6 +242,8 @@ StatVectorSmooth <- ggproto(
 
     grid$id <- 1:nrow(grid)
 
+    print(grid)
+
     # Ensure probs is a vector, even if a single value is provided
     if (length(probs) == 1) {
       probs <- c(probs, NA)
@@ -254,17 +261,26 @@ StatVectorSmooth <- ggproto(
     data$angle <- atan2(data$dy, data$dx)
 
     if (method == "lm") {
-      model <- lm(cbind(dx, dy) ~ x * y, data = data)
+
+      print(as.character(formula))
+
+      model <- lm(formula = formula, data = data)
+
+      print(model)
 
       # Extract the covariance matrix of the coefficients
       V <- vcov(model)
 
-      # Compute the model matrix for the new data named grid
-      X <- model.matrix(~ x * y, grid)
+      rhs_formula <- as.formula(paste("~", paste(all.vars(formula[[3]]), collapse = "+")))
+
+      # Create the model matrix using only the independent variables
+
+      X <- model.matrix(rhs_formula, grid)
 
       # Initialize matrices to store prediction variances for each response
       n_preds <- ncol(model$coefficients)  # Number of responses (dx, dy)
       pred_var <- matrix(NA, nrow = nrow(X), ncol = n_preds)
+
 
       # Compute prediction variances for each response
       for (i in 1:n_preds) {
@@ -586,6 +602,7 @@ stat_vector_smooth <- function(
   se = TRUE,
   se.circle = TRUE,
   probs = c(.95, NA),
+  default_formula = cbind(dx, dy) ~ x * y,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   eval_points = NULL,
   ...
@@ -632,6 +649,7 @@ geom_vector_smooth <- function(
   se = TRUE,
   se.circle = TRUE,
   probs = c(.95, NA),
+  default_formula = cbind(dx, dy) ~ x * y,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   eval_points = NULL,
   ...
@@ -656,6 +674,7 @@ geom_vector_smooth <- function(
       probs = probs,
       arrow = arrow,
       eval_points = eval_points,
+      formula = default_formula,
       na.rm = na.rm,
       ...
     )
