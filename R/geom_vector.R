@@ -82,7 +82,7 @@
 #' \describe{
 #'   \item{norm}{The magnitude of each vector, calculated as \eqn{\|\mathbf{v}\| = \sqrt{dx^2 + dy^2}}.}
 #' }
-
+#'
 #' @rdname geom_vector
 #' @export
 geom_vector <- function(

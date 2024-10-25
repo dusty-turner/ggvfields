@@ -3,78 +3,65 @@
 #' `geom_vector_field` generates a vector field plot layer using a user-defined
 #' function to compute the vector displacements (`dx`, `dy`) at each grid point.
 #' The function automatically generates a grid of points (specified by `xlim`
-#' and `ylim`) and evaluates the vector field displacements at those points.
+#' and `ylim`) and evaluates the vector displacements at those points.
 #'
-#' The user provides a function that takes a vector `(x, y)` and returns the
-#' vector
-#' **displacements** `(dx, dy)` at that point in the vector field. The layer automatically
-#' computes calculus measures such as divergence, curl, and vector norm that can
-#' be mapped to aesthetics using `after_stat()`.
+#' The user must provide a function that takes a vector `(x, y)` and returns the
+#' **displacements** `(dx, dy)` at that point in the vector field. Optionally, the
+#' layer can compute **divergence**, **curl**, and **vector norm**, which can be
+#' mapped to aesthetics using `after_stat()`.
+#'
+#' **Default Behavior**:
+#' - The **magnitude of each vector (`norm`) is mapped to the `color` aesthetic** by default.
+#' - **Vector lengths** are scaled to **90% of the grid spacing**.
+#' - **Vectors are normalized to unit length** before scaling by grid spacing.
+#'   - **To see the original lengths of the vectors, set `normalize = FALSE`.**
+#' - **Arrowheads** are included by default to indicate direction.
 #'
 #' @inheritParams ggplot2::geom_raster
 #' @inheritParams ggplot2::stat_identity
 #' @importFrom boot boot
-#' @param fun A user-defined function that takes a vector (x, y) and returns a
-#'   vector (dx, dy), representing the displacements at that point in the vector
+#' @param fun A user-defined function that takes a vector `(x, y)` and returns a
+#'   vector `(dx, dy)`, representing the displacements at that point in the vector
 #'   field.
-#' @param xlim,ylim Numeric vectors of length 2 giving the x/y-axis limits for
+#' @param xlim,ylim Numeric vectors of length 2 specifying the x/y-axis limits for
 #'   the grid.
 #' @param n Integer specifying the number of grid points along each axis
 #'   (resolution of the grid).
 #' @param center Logical; if `TRUE`, centers the vectors on their respective
 #'   grid points.
 #' @param normalize Logical; if `TRUE`, normalizes the vectors to unit length.
-#' @param arrow Arrow specification, as created by `grid::arrow()`, to add
+#'   Set to `FALSE` to view the original lengths of the vectors.
+#' @param arrow Arrow specification, created by `grid::arrow()`, to add
 #'   arrowheads to vectors.
 #' @param ... Other arguments passed to `layer()`, such as aesthetic mappings.
 #'
-#' @return A `ggplot2` layer that can be added to a ggplot object to produce a
-#'   vector field plot. The layer includes optional calculations of:
+#' @return A `ggplot2` layer that can be added to a ggplot object to create a
+#'   vector field plot. The following mathematical measures are available:
 #'
-#'   ### Curl The curl of a vector field represents the rotation or "twisting"
-#'   of the vectors around a point.
+#' ### Curl
+#' The curl represents the rotation or "twisting" of vectors around a point:
+#' \deqn{\text{curl}(\mathbf{f})(x, y) = \frac{\partial f_2}{\partial x} - \frac{\partial f_1}{\partial y}}
 #'
-#'   The formula for the curl is given by:
+#' ### Divergence
+#' The divergence measures the rate at which vectors "spread out" from a point:
+#' \deqn{\text{div}(\mathbf{f})(x, y) = \frac{\partial f_1}{\partial x} + \frac{\partial f_2}{\partial y}}
 #'
-#'   \deqn{\text{curl}(\mathbf{f})(x, y) = \frac{\partial f_2}{\partial x}(x, y)
-#'   - \frac{\partial f_1}{\partial y}(x, y)}
+#' ### Norm
+#' The norm (magnitude) of a vector:
+#' \deqn{\|\mathbf{f}(x, y)\| = \sqrt{dx^2 + dy^2}}
 #'
-#'   where \eqn{\frac{\partial f_1}{\partial y}(x, y)} is the partial derivative
-#'   of the first component with respect to \eqn{y}, and \eqn{\frac{\partial
-#'   f_2}{\partial x}(x, y)} is the partial derivative of the second component
-#'   with respect to \eqn{x}.
+#' @section Aesthetic mappings:
+#' You can map the following measures using `after_stat()`:
+#' - **`norm`**: Magnitude (norm) of the vector at each point.
+#' - **`divergence`**: Divergence of the vector field at each point.
+#' - **`curl`**: Curl of the vector field at each point.
 #'
-#'   ### Divergence The divergence of a vector field measures the rate at which
-#'   vectors are "spreading out" from a point.
-#'
-#'   \deqn{\text{div}(\mathbf{f})(x, y) = \frac{\partial f_1}{\partial x}(x, y)
-#'   + \frac{\partial f_2}{\partial y}(x, y)}
-#'
-#'   where \eqn{\frac{\partial f_1}{\partial x}(x, y)} is the partial derivative
-#'   of the first component with respect to \eqn{x}, and \eqn{\frac{\partial
-#'   f_2}{\partial y}(x, y)} is the partial derivative of the second component
-#'   with respect to \eqn{y}.
-#'
-#'   ### Norm The norm of a vector represents its magnitude (or length):
-#'
-#'   \deqn{\|\mathbf{f}(x, y)\| = \sqrt{dx^2 + dy^2}}
-#'
-#'   where \eqn{dx} and \eqn{dy} are the displacements in the x and y
-#'   directions, respectively.
-#' @section Aesthetic mappings: The following aesthetics can be mapped using
-#'   `after_stat()`:
-#' - `divergence`: Divergence of the vector field at each point.
-#' - `curl`: Curl of the vector field at each point.
-#' - `norm`: Norm (magnitude) of the vector at each point.
-#'
-#'   For example, to map `norm` to color, you can use:
-#'
-#' ```
-#' aes(color = after_stat(norm))
+#' For example, to map `curl` to color:
+#' ```r
+#' aes(color = after_stat(curl))
 #' ```
 #'
 #' @examples
-#'
 #' # Example user-defined vector field function
 #' f <- function(v) {
 #'   x <- v[1]; y <- v[2]
@@ -88,10 +75,11 @@
 #' # Example of mapping norm to length
 #' ggplot() +
 #'   geom_vector_field(
-#'     fun = f, xlim = c(-5, 5), ylim = c(-5, 5), n = 20, normalize = FALSE
+#'     aes(length = after_stat(norm)),
+#'     fun = f, xlim = c(-5, 5), ylim = c(-5, 5), n = 20,
 #'   )
 #'
-#'
+#' # Example with both length and curl mapped
 #' ggplot() +
 #'   geom_vector_field(
 #'     fun = f, xlim = c(-5, 5), ylim = c(-5, 5), n = 20, normalize = FALSE,
@@ -128,8 +116,6 @@ geom_vector_field <- function(
   # Split the vectors into dx and dy components
   grid$dx <- vectors[, 1]
   grid$dy <- vectors[, 2]
-
-  grid$field <- "field"
 
   # Ensure default mappings for x, y, dx, dy, length, if not provided
   if (is.null(mapping)) {

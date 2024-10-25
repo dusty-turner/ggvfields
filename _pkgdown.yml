@@ -17,6 +17,8 @@ reference:
       - stat_vector2
       - geom_vector_field
       - stat_vector_field
+      - geom_vector_field2
+      - stat_vector_field2
       - scale_length_continuous
       - geom_flow
       - geom_streamplot
