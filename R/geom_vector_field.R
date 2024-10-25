@@ -129,12 +129,14 @@ geom_vector_field <- function(
   grid$dx <- vectors[, 1]
   grid$dy <- vectors[, 2]
 
+  grid$field <- "field"
+
   # Ensure default mappings for x, y, dx, dy, length, if not provided
   if (is.null(mapping)) {
-    mapping <- aes(x = x, y = y, dx = dx, dy = dy, length = after_stat(norm))
+    mapping <- aes(x = x, y = y, dx = dx, dy = dy)
   } else {
     # Add dx and dy to the mapping if not already present
-    mapping <- modifyList(mapping, aes(x = x, y = y, dx = dx, dy = dy, length = after_stat(norm)))
+    mapping <- modifyList(mapping, aes(x = x, y = y, dx = dx, dy = dy))
   }
 
   # Pass the grid and function along to geom_vector for further processing

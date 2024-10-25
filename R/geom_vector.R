@@ -380,14 +380,38 @@ GeomVector <- ggproto(
     # Normalize dx and dy to unit vectors if normalize is TRUE
 
     if (params$normalize) {
+
+      # norms <- sqrt(data$dx^2 + data$dy^2)
+      # norms[norms == 0] <- 1  # Avoid division by zero
+      # data$dx <- data$dx / norms
+      # data$dy <- data$dy / norms
+      #
+      # # Recalculate xend and yend after normalization
+      # data$xend <- data$x + data$dx
+      # data$yend <- data$y + data$dy
+
+      # Detect if the data forms a regular grid by checking unique x and y spacings
+      x_spacing <- unique(diff(sort(unique(data$x))))
+      y_spacing <- unique(diff(sort(unique(data$y))))
+
+      # Calculate the minimum spacing or default to 1 if not a grid
+      min_spacing <- if (all(abs(x_spacing - mean(x_spacing)) < 1e-6) &&
+                         all(abs(y_spacing - mean(y_spacing)) < 1e-6)) {
+        min(x_spacing, y_spacing) * .9
+      } else {
+        1  # No scaling for non-grid data
+      }
+
+      # Normalize the vectors to unit length and scale by the minimum spacing
       norms <- sqrt(data$dx^2 + data$dy^2)
       norms[norms == 0] <- 1  # Avoid division by zero
-      data$dx <- data$dx / norms
-      data$dy <- data$dy / norms
+      data$dx <- (data$dx / norms) * min_spacing
+      data$dy <- (data$dy / norms) * min_spacing
 
-      # Recalculate xend and yend after normalization
+      # Recalculate xend and yend after normalization/scaling
       data$xend <- data$x + data$dx
       data$yend <- data$y + data$dy
+
     }
 
     # Handle centering if requested (using the original data)
