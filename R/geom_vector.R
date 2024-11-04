@@ -1,106 +1,88 @@
 #' Create a Vector Plot Layer
 #'
 #' `geom_vector` generates a ggplot layer that visualizes vectors as line
-#' segments with optional arrowheads. The vectors are defined by start (`x`,
-#' `y`) and end (`xend`, `yend`) coordinates, which can be directly provided or
-#' derived from angular (`angle`) and distance (`distance`) information.
+#' segments with optional arrowheads. Vectors are defined by their start (`x`, `y`)
+#' and directional components (`dx`, `dy`), which indicate the change in position.
+#' Alternatively, vectors can be defined by angular (`angle`) and distance (`distance`) information.
 #'
 #' @inheritParams ggplot2::geom_segment
 #' @inheritParams ggplot2::stat_identity
-#' @param fun A function used to calculate vector fields (curl/divergence).
-#' @param center Logical; if `TRUE`, centers the vector on the specified (`x`,
-#'   `y`) location. If `FALSE`, the vector origin is at the specified (`x`, `y`)
-#'   location. When centering is enabled, the vector's midpoint aligns with the
-#'   original (`x`, `y`) location.
-#' @param normalize Logical; if `TRUE`, normalizes each vector to a unit length
-#'   before applying any scaling. Normalization is useful for avoiding
-#'   overplotting and ensuring visual consistency, especially in dense plots.
-#' @param tail_point Logical; if `TRUE`, adds a point at the start of each
-#'   vector.
-#' @param tail_point.size Integer; controls the size of points on the tail if
-#'   `tail_point = TRUE`.
-#' @param arrow Arrow specification for vector arrowheads, created by
-#'   `grid::arrow()`. This controls the appearance of the arrowheads at the end
-#'   of the vectors, including properties like angle, length, and type.
-#' @return A `ggplot2` layer that can be added to a ggplot object to produce a
-#'   vector plot.
+#' @param fun A function applied to vector data if additional transformations are needed.
+#' @param center Logical; if `TRUE`, centers the vector on the specified (`x`, `y`) location.
+#'   If `FALSE`, the vector starts at the specified (`x`, `y`) point. When centering is enabled,
+#'   the vector's midpoint aligns with the original (`x`, `y`) location.
+#' @param normalize Logical; if `TRUE`, normalizes each vector to a unit length before applying any scaling.
+#'   This prevents overplotting and ensures consistent visual presentation in dense plots.
+#' @param tail_point Logical; if `TRUE`, adds a point to mark the tail of each vector.
+#' @param tail_point.size Integer; sets the size of the tail point if `tail_point = TRUE`.
+#' @param arrow Arrow specification for vector arrowheads, created with `grid::arrow()`.
+#'   Controls the appearance of arrowheads, including angle, length, and type.
+#' @return A `ggplot2` layer that can be added to a ggplot object to produce a vector plot.
 #' @name geom_vector
-#' @section Aesthetics: `geom_vector` understands the following aesthetics
-#'   (required aesthetics are in bold):
+#' @section Aesthetics:
+#' `geom_vector` understands the following aesthetics (required aesthetics are in **bold**):
 #' - **`x`**: x-coordinate of the start point of the vector.
 #' - **`y`**: y-coordinate of the start point of the vector.
-#' - `xend`: x-coordinate of the end point of the vector (optional if `angle` and `distance` are provided).
-#' - `yend`: y-coordinate of the end point of the vector (optional if `angle` and `distance` are provided).
+#' - **`dx`**: Change in the x-direction (length component along the x-axis).
+#' - **`dy`**: Change in the y-direction (length component along the y-axis).
 #' - `angle`: The angle of the vector in degrees (optional, used with `distance`).
-#' - `distance`: The distance/magnitude of the vector (optional, used with `angle`).
-#' - `length`: The length of the vector.
-#'   - **By default**, `length = after_stat(norm)` automatically maps vector length to the calculated magnitude of `(xend - x)` and `(yend - y)`.
-#'   - **To turn off automatic length mapping**, set `length = after_stat(NA)`. This allows you to plot vectors without the length scaling.
-#' - `color`: The color of the vector line.
-#' - `fill`: The fill color of vector arrowheads and points.
-#' - `linewidth`: The thickness of the vector line.
-#' - `linetype`: The type of the vector line (solid, dashed, etc.).
-#' - `alpha`: The transparency level of the vector.
-#' - `arrow`: Specification for arrowheads at the end of the vector.
-
+#' - `distance`: The magnitude of the vector (optional, used with `angle`).
+#' - `length`: Length of the vector (default: `after_stat(NA)`).
+#'   - You can also manually scale vector length by using `aes(length = after_stat(norm))`.
+#'   - Alternatively, use `geom_vector2()` to map vector magnitude (`norm`) to length automatically.
+#' - `color`: **By default, `color = after_stat(norm)`** to reflect vector magnitude.
+#' - `fill`: Fill color for arrowheads and points.
+#' - `linewidth`: Thickness of the vector line.
+#' - `linetype`: Type of line (solid, dashed, etc.).
+#' - `alpha`: Transparency level of the vector.
+#' - `arrow`: Arrowhead specification for the vector.
+#'
+#' @seealso
+#' Use [geom_vector2()] for automatically mapping the vector's magnitude (`norm`) to length.
 #'
 #' @examples
-#'
-#' # Example using Cartesian input: precomputed dx and dy
 #' set.seed(1234)
 #' n <- 10
-#' wind_data_polar <- data.frame(
+#' wind_data <- data.frame(
 #'   lon = rnorm(n),
 #'   lat = rnorm(n),
 #'   wind_dir = runif(n, -pi, pi),
-#'   wind_spd = rchisq(n, df = 2)
+#'   wind_spd = rchisq(n, df = 2),
+#'   dx = rchisq(n, df = 2) * cos(runif(n, -pi, pi)),
+#'   dy = rchisq(n, df = 2) * sin(runif(n, -pi, pi))
 #' )
 #'
-#' wind_data_cartesian <- within(wind_data_polar, {
-#'   wind_lon_comp <- wind_spd * cos(wind_dir)
-#'   wind_lat_comp <- wind_spd * sin(wind_dir)
-#'   dx <- wind_lon_comp  # dx represents the change in x (longitude component)
-#'   dy <- wind_lat_comp  # dy represents the change in y (latitude component)
-#' })
-#'
-#'
-#' ggplot(wind_data_cartesian) +
+#' ggplot(wind_data) +
 #'   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy))
 #'
-#' # Example using Polar input: angle (wind_dir) and distance (wind_spd)
-#' ggplot(wind_data_polar) +
+#' # Example using Polar coordinates: angle and distance
+#' ggplot(wind_data) +
 #'   geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd))
 #'
-#' # By default, length = after_stat(norm).
-#' # To allow vectors to be the exact length of the data you can disable this option
-#' # with length = after_stat(NA)
-#' ggplot(wind_data_cartesian) +
-#'   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(NA)))
+#' # To scale vector length by magnitude, use geom_vector2():
+#' ggplot(wind_data) +
+#'   geom_vector2(aes(x = lon, y = lat, dx = dx, dy = dy))
+#'
+#' # Or manually set length mapping with after_stat():
+#' ggplot(wind_data) +
+#'   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)))
 #'
 #' @section Key Notes:
-#' - **Default Length Mapping**:
-#'   - By default, `length` is mapped as `length = after_stat(norm)`, where `norm` is the magnitude of each vector.
-#'   - This ensures that the length of each vector visually reflects its magnitude.
+#' - **Default Color Mapping**:
+#'   - The default behavior maps the vector's magnitude (`norm`) to the `color` aesthetic.
+#'   - This ensures that vector strength is visually emphasized through color.
+#'   - To override this behavior, you can set `aes(color = "black")` or another fixed color.
 #'
-#' - **Disabling Length Mapping**:
-#'   - To plot vectors without length scaling, set `length = after_stat(NA)`.
-#'   - This is useful when vector directions are important, but their relative magnitudes should not influence the visualization.
+#' - **Scaling by Length**:
+#'   - By default, vector length is not scaled (`length = after_stat(NA)`).
+#'   - You can manually enable length scaling by using `aes(length = after_stat(norm))`.
+#'   - Alternatively, use the `geom_vector2()` function for automatic length scaling based on magnitude.
 #'
-#' - **Custom Length Mapping**:
-#'   - You can still manually specify `length` by mapping it to a specific column or using a function.
-#'   - Example: `aes(length = 0.5)` or `aes(length = sqrt(dx^2 + dy^2))`.
-
-#'
-#' @section Computed variables:
+#' @section Computed Variables:
 #' \describe{
-#'   \item{norm}{The magnitude of each vector, calculated as \eqn{\|\mathbf{v}\| = \sqrt{(xend - x)^2 + (yend - y)^2}}.}
+#'   \item{norm}{The magnitude of each vector, calculated as \eqn{\|\mathbf{v}\| = \sqrt{dx^2 + dy^2}}.}
 #' }
-
-
-
-
-
-
+#'
 #' @rdname geom_vector
 #' @export
 geom_vector <- function(
@@ -119,6 +101,10 @@ geom_vector <- function(
   tail_point.size = 2,
   fun = NULL
 ) {
+
+  mapping <- modifyList(aes(color = after_stat(norm), length = after_stat(NA)), mapping)
+
+
   layer(
     stat = StatVector, geom = GeomVector, mapping = mapping, data = data,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
@@ -145,6 +131,10 @@ stat_vector <- function(
   tail_point = FALSE,
   tail_point.size = 2
 ) {
+
+  mapping <- modifyList(aes(color = after_stat(norm), length = after_stat(NA)), mapping)
+
+
   layer(
     stat = StatVector, geom = geom, mapping = mapping, data = data,
     position = position, show.legend = show.legend, inherit.aes = inherit.aes,
@@ -160,7 +150,7 @@ StatVector <- ggproto(
   "StatVector",
   Stat,
   required_aes = c("x", "y"),
-  default_aes = aes(dx = NA, dy = NA, distance = NA, angle = NA, length = after_stat(norm),
+  default_aes = aes(dx = NA, dy = NA, distance = NA, angle = NA, length = 1,
                     color = "black", fill = "black", linewidth = 2, linetype = 1, alpha = 1),
 
   compute_group = function(data, scales, center = FALSE, fun = NULL, ...) {
@@ -292,7 +282,9 @@ draw_panel_vector <- function(
 
       ## this determins if the user has adjusted the length of the arrow away from the default and makes it smaller
       ## if the user has altered the default then leave it alone
-      if (round(grid::convertUnit(arrow$length, "npc", valueOnly = TRUE),3) == 0.025) arrow$length <- unit(0.015, "npc")
+      if (!is.null(arrow) && round(grid::convertUnit(arrow$length, "npc", valueOnly = TRUE), 3) == 0.025) {
+        arrow$length <- unit(0.015, "npc")
+      }
 
       vector_grob <- grid::segmentsGrob(
         x0 = unit(coords$x, "npc") - unit(half_dx, "cm"),
@@ -316,8 +308,9 @@ draw_panel_vector <- function(
 
       ## this determins if the user has adjusted the length of the arrow away from the default and makes it smaller
       ## if the user has altered the default then leave it alone
-      if (round(grid::convertUnit(arrow$length, "npc", valueOnly = TRUE),3) == 0.025) arrow$length <- unit(0.015, "npc")
-
+      if (!is.null(arrow) && round(grid::convertUnit(arrow$length, "npc", valueOnly = TRUE), 3) == 0.025) {
+        arrow$length <- unit(0.015, "npc")
+      }
       vector_grob <- grid::segmentsGrob(
         x0 = unit(coords$x, "npc"), y0 = unit(coords$y, "npc"),
         x1 = unit(coords$x, "npc") + unit(coords$length * coords$dx, "cm"),
@@ -368,7 +361,7 @@ GeomVector <- ggproto(
   "GeomVector",
   Geom,
   required_aes = c("x", "y"),
-  default_aes = aes(colour = "black", fill = "black", size = 0.5, length = NA, linewidth = 2, linetype = 1, alpha = 1),
+  default_aes = aes(color = "black", fill = "black", size = 0.5, length = 1, linewidth = 2, linetype = 1, alpha = 1),
 
   setup_data = function(data, params){
 
@@ -387,14 +380,38 @@ GeomVector <- ggproto(
     # Normalize dx and dy to unit vectors if normalize is TRUE
 
     if (params$normalize) {
+
+      # norms <- sqrt(data$dx^2 + data$dy^2)
+      # norms[norms == 0] <- 1  # Avoid division by zero
+      # data$dx <- data$dx / norms
+      # data$dy <- data$dy / norms
+      #
+      # # Recalculate xend and yend after normalization
+      # data$xend <- data$x + data$dx
+      # data$yend <- data$y + data$dy
+
+      # Detect if the data forms a regular grid by checking unique x and y spacings
+      x_spacing <- unique(diff(sort(unique(data$x))))
+      y_spacing <- unique(diff(sort(unique(data$y))))
+
+      # Calculate the minimum spacing or default to 1 if not a grid
+      min_spacing <- if (all(abs(x_spacing - mean(x_spacing)) < 1e-6) &&
+                         all(abs(y_spacing - mean(y_spacing)) < 1e-6)) {
+        min(x_spacing, y_spacing) * .9
+      } else {
+        1  # No scaling for non-grid data
+      }
+
+      # Normalize the vectors to unit length and scale by the minimum spacing
       norms <- sqrt(data$dx^2 + data$dy^2)
       norms[norms == 0] <- 1  # Avoid division by zero
-      data$dx <- data$dx / norms
-      data$dy <- data$dy / norms
+      data$dx <- (data$dx / norms) * min_spacing
+      data$dy <- (data$dy / norms) * min_spacing
 
-      # Recalculate xend and yend after normalization
+      # Recalculate xend and yend after normalization/scaling
       data$xend <- data$x + data$dx
       data$yend <- data$y + data$dy
+
     }
 
     # Handle centering if requested (using the original data)
@@ -445,7 +462,6 @@ GeomVector <- ggproto(
   },
 
   required_aes = c("x", "y"),
-  default_aes = aes(colour = "black", fill = "black", size = 0.5, length = after_stat(norm), linewidth = 2, linetype = 1, alpha = 1),
   draw_group = draw_panel_vector,
   draw_key = draw_key_vector
 )

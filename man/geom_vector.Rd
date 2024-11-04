@@ -134,31 +134,26 @@ a warning. If \code{TRUE}, missing values are silently removed.}
 It can also be a named logical vector to finely select the aesthetics to
 display.}
 
-\item{arrow}{Arrow specification for vector arrowheads, created by
-\code{grid::arrow()}. This controls the appearance of the arrowheads at the end
-of the vectors, including properties like angle, length, and type.}
+\item{arrow}{Arrow specification for vector arrowheads, created with \code{grid::arrow()}.
+Controls the appearance of arrowheads, including angle, length, and type.}
 
 \item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
-\item{center}{Logical; if \code{TRUE}, centers the vector on the specified (\code{x},
-\code{y}) location. If \code{FALSE}, the vector origin is at the specified (\code{x}, \code{y})
-location. When centering is enabled, the vector's midpoint aligns with the
-original (\code{x}, \code{y}) location.}
+\item{center}{Logical; if \code{TRUE}, centers the vector on the specified (\code{x}, \code{y}) location.
+If \code{FALSE}, the vector starts at the specified (\code{x}, \code{y}) point. When centering is enabled,
+the vector's midpoint aligns with the original (\code{x}, \code{y}) location.}
 
-\item{normalize}{Logical; if \code{TRUE}, normalizes each vector to a unit length
-before applying any scaling. Normalization is useful for avoiding
-overplotting and ensuring visual consistency, especially in dense plots.}
+\item{normalize}{Logical; if \code{TRUE}, normalizes each vector to a unit length before applying any scaling.
+This prevents overplotting and ensures consistent visual presentation in dense plots.}
 
-\item{tail_point}{Logical; if \code{TRUE}, adds a point at the start of each
-vector.}
+\item{tail_point}{Logical; if \code{TRUE}, adds a point to mark the tail of each vector.}
 
-\item{tail_point.size}{Integer; controls the size of points on the tail if
-\code{tail_point = TRUE}.}
+\item{tail_point.size}{Integer; sets the size of the tail point if \code{tail_point = TRUE}.}
 
-\item{fun}{A function used to calculate vector fields (curl/divergence).}
+\item{fun}{A function applied to vector data if additional transformations are needed.}
 
 \item{geom}{The geometric object to use to display the data for this layer.
 When using a \verb{stat_*()} function to construct a layer, the \code{geom} argument
@@ -174,99 +169,92 @@ give the geom as \code{"point"}.
 }}
 }
 \value{
-A \code{ggplot2} layer that can be added to a ggplot object to produce a
-vector plot.
+A \code{ggplot2} layer that can be added to a ggplot object to produce a vector plot.
 }
 \description{
 \code{geom_vector} generates a ggplot layer that visualizes vectors as line
-segments with optional arrowheads. The vectors are defined by start (\code{x},
-\code{y}) and end (\code{xend}, \code{yend}) coordinates, which can be directly provided or
-derived from angular (\code{angle}) and distance (\code{distance}) information.
+segments with optional arrowheads. Vectors are defined by their start (\code{x}, \code{y})
+and directional components (\code{dx}, \code{dy}), which indicate the change in position.
+Alternatively, vectors can be defined by angular (\code{angle}) and distance (\code{distance}) information.
 }
 \section{Aesthetics}{
- \code{geom_vector} understands the following aesthetics
-(required aesthetics are in bold):
+
+\code{geom_vector} understands the following aesthetics (required aesthetics are in \strong{bold}):
 \itemize{
 \item \strong{\code{x}}: x-coordinate of the start point of the vector.
 \item \strong{\code{y}}: y-coordinate of the start point of the vector.
-\item \code{xend}: x-coordinate of the end point of the vector (optional if \code{angle} and \code{distance} are provided).
-\item \code{yend}: y-coordinate of the end point of the vector (optional if \code{angle} and \code{distance} are provided).
+\item \strong{\code{dx}}: Change in the x-direction (length component along the x-axis).
+\item \strong{\code{dy}}: Change in the y-direction (length component along the y-axis).
 \item \code{angle}: The angle of the vector in degrees (optional, used with \code{distance}).
-\item \code{distance}: The distance/magnitude of the vector (optional, used with \code{angle}).
-\item \code{length}: The length of the vector.
+\item \code{distance}: The magnitude of the vector (optional, used with \code{angle}).
+\item \code{length}: Length of the vector (default: \code{after_stat(NA)}).
 \itemize{
-\item \strong{By default}, \code{length = after_stat(norm)} automatically maps vector length to the calculated magnitude of \code{(xend - x)} and \code{(yend - y)}.
-\item \strong{To turn off automatic length mapping}, set \code{length = after_stat(NA)}. This allows you to plot vectors without the length scaling.
+\item You can also manually scale vector length by using \code{aes(length = after_stat(norm))}.
+\item Alternatively, use \code{geom_vector2()} to map vector magnitude (\code{norm}) to length automatically.
 }
-\item \code{color}: The color of the vector line.
-\item \code{fill}: The fill color of vector arrowheads and points.
-\item \code{linewidth}: The thickness of the vector line.
-\item \code{linetype}: The type of the vector line (solid, dashed, etc.).
-\item \code{alpha}: The transparency level of the vector.
-\item \code{arrow}: Specification for arrowheads at the end of the vector.
+\item \code{color}: \strong{By default, \code{color = after_stat(norm)}} to reflect vector magnitude.
+\item \code{fill}: Fill color for arrowheads and points.
+\item \code{linewidth}: Thickness of the vector line.
+\item \code{linetype}: Type of line (solid, dashed, etc.).
+\item \code{alpha}: Transparency level of the vector.
+\item \code{arrow}: Arrowhead specification for the vector.
 }
 }
 
 \section{Key Notes}{
 
 \itemize{
-\item \strong{Default Length Mapping}:
+\item \strong{Default Color Mapping}:
 \itemize{
-\item By default, \code{length} is mapped as \code{length = after_stat(norm)}, where \code{norm} is the magnitude of each vector.
-\item This ensures that the length of each vector visually reflects its magnitude.
+\item The default behavior maps the vector's magnitude (\code{norm}) to the \code{color} aesthetic.
+\item This ensures that vector strength is visually emphasized through color.
+\item To override this behavior, you can set \code{aes(color = "black")} or another fixed color.
 }
-\item \strong{Disabling Length Mapping}:
+\item \strong{Scaling by Length}:
 \itemize{
-\item To plot vectors without length scaling, set \code{length = after_stat(NA)}.
-\item This is useful when vector directions are important, but their relative magnitudes should not influence the visualization.
-}
-\item \strong{Custom Length Mapping}:
-\itemize{
-\item You can still manually specify \code{length} by mapping it to a specific column or using a function.
-\item Example: \code{aes(length = 0.5)} or \code{aes(length = sqrt(dx^2 + dy^2))}.
+\item By default, vector length is not scaled (\code{length = after_stat(NA)}).
+\item You can manually enable length scaling by using \code{aes(length = after_stat(norm))}.
+\item Alternatively, use the \code{geom_vector2()} function for automatic length scaling based on magnitude.
 }
 }
 }
 
-\section{Computed variables}{
+\section{Computed Variables}{
 
 \describe{
-\item{norm}{The magnitude of each vector, calculated as \eqn{\|\mathbf{v}\| = \sqrt{(xend - x)^2 + (yend - y)^2}}.}
+\item{norm}{The magnitude of each vector, calculated as \eqn{\|\mathbf{v}\| = \sqrt{dx^2 + dy^2}}.}
 }
 }
 
 \examples{
-
-# Example using Cartesian input: precomputed dx and dy
 set.seed(1234)
 n <- 10
-wind_data_polar <- data.frame(
+wind_data <- data.frame(
   lon = rnorm(n),
   lat = rnorm(n),
   wind_dir = runif(n, -pi, pi),
-  wind_spd = rchisq(n, df = 2)
+  wind_spd = rchisq(n, df = 2),
+  dx = rchisq(n, df = 2) * cos(runif(n, -pi, pi)),
+  dy = rchisq(n, df = 2) * sin(runif(n, -pi, pi))
 )
 
-wind_data_cartesian <- within(wind_data_polar, {
-  wind_lon_comp <- wind_spd * cos(wind_dir)
-  wind_lat_comp <- wind_spd * sin(wind_dir)
-  dx <- wind_lon_comp  # dx represents the change in x (longitude component)
-  dy <- wind_lat_comp  # dy represents the change in y (latitude component)
-})
-
-
-ggplot(wind_data_cartesian) +
+ggplot(wind_data) +
   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy))
 
-# Example using Polar input: angle (wind_dir) and distance (wind_spd)
-ggplot(wind_data_polar) +
+# Example using Polar coordinates: angle and distance
+ggplot(wind_data) +
   geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd))
 
-# By default, length = after_stat(norm).
-# To allow vectors to be the exact length of the data you can disable this option
-# with length = after_stat(NA)
-ggplot(wind_data_cartesian) +
-  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(NA)))
+# To scale vector length by magnitude, use geom_vector2():
+ggplot(wind_data) +
+  geom_vector2(aes(x = lon, y = lat, dx = dx, dy = dy))
 
+# Or manually set length mapping with after_stat():
+ggplot(wind_data) +
+  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)))
+
+}
+\seealso{
+Use \code{\link[=geom_vector2]{geom_vector2()}} for automatically mapping the vector's magnitude (\code{norm}) to length.
 }
 \keyword{datasets}

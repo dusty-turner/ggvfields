@@ -31,6 +31,7 @@
 #' @param probs Numeric vector; specifies the prediction interval levels to be
 #'   plotted when `se = TRUE`. **Default is `probs = 0.95`**, but users can specify
 #'   multiple levels (e.g., `probs = c(0.95, 0.68)`).
+#' @param eval_points Number of points at which the function is evaluated for smoothing.
 #' @param arrow Arrow specification, as created by `grid::arrow()`. This
 #'   controls the appearance of the arrowheads at the end of the vectors,
 #'   including properties like angle, length, and type.
@@ -187,6 +188,8 @@ StatVectorSmooth <- ggproto(
 
   setup_data = function(data, params) {
 
+    print(data |> head())
+
     if (!all(is.na(data$dx)) && !all(is.na(data$angle))) {
       warning("Both Cartesian and Polar inputs provided. Using Cartesian by default.")
     }
@@ -207,21 +210,39 @@ StatVectorSmooth <- ggproto(
     extra_aes <- setdiff(names(data), required_aes)
     data[extra_aes] <- lapply(extra_aes, function(a) data[[a]])
 
+    print(data |> head())
+
     return(data)
   },
 
-  compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_factor, se = TRUE, probs, ...) {
+  compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_factor, se = TRUE, probs,
+                           eval_points = NULL, formula, ...) {
 
-    # Check if dx/dy or angle/distance are provided and calculate dx/dy if needed
-    if (!("dx" %in% names(data) && "dy" %in% names(data))) {
-      if ("angle" %in% names(data) && "distance" %in% names(data)) {
-        # Compute dx and dy from angle and distance
-        data$dx <- data$distance * cos(data$angle)
-        data$dy <- data$distance * sin(data$angle)
-      } else {
-        stop("Either 'dx' and 'dy' or 'angle' and 'distance' must be provided.")
+    ## if eval points exist, then create the grid this way
+    if (!is.null(eval_points)) {
+      if (!all(c("x", "y") %in% names(eval_points))) {
+        stop("The 'eval_points' argument must contain 'x' and 'y' columns.")
       }
+
+      grid <- eval_points
+      # Find the minimum Euclidean distance
+      min_distance <- euclidean_distances(grid)
+      # Choose radius as a fraction of the minimum distance
+      radius <- min_distance / 2.5
+
+    } else { # Generate a regular grid if eval_points is not provided
+      x_seq <- seq(min(data$x), max(data$x), length.out = n[1])
+      y_seq <- seq(min(data$y), max(data$y), length.out = n[2])
+      grid <- expand.grid(x = x_seq, y = y_seq)
+      x_spacing <- diff(sort(unique(grid$x)))[1]
+      y_spacing <- diff(sort(unique(grid$y)))[1]
+      # Choose the radius as a fraction of the smaller spacing
+      radius <- min(x_spacing, y_spacing) / 2.5
     }
+
+    grid$id <- 1:nrow(grid)
+
+    print(grid)
 
     # Ensure probs is a vector, even if a single value is provided
     if (length(probs) == 1) {
@@ -239,30 +260,27 @@ StatVectorSmooth <- ggproto(
     data$distance <- sqrt(data$dx^2 + data$dy^2)
     data$angle <- atan2(data$dy, data$dx)
 
-    # Generate the grid for predictions
-    x_seq <- seq(min(data$x), max(data$x), length.out = n[1])
-    y_seq <- seq(min(data$y), max(data$y), length.out = n[2])
-    grid <- expand.grid(x = x_seq, y = y_seq)
-    grid$id <- 1:nrow(grid)
-
-    x_spacing <- diff(sort(unique(grid$x)))[1]
-    y_spacing <- diff(sort(unique(grid$y)))[1]
-
-    # Choose the radius as a fraction of the smaller spacing
-    radius <- min(x_spacing, y_spacing) / 2.5
-
     if (method == "lm") {
-      model <- lm(cbind(dx, dy) ~ x * y, data = data)
+
+      print(as.character(formula))
+
+      model <- lm(formula = formula, data = data)
+
+      print(model)
 
       # Extract the covariance matrix of the coefficients
       V <- vcov(model)
 
-      # Compute the model matrix for the new data named grid
-      X <- model.matrix(~ x * y, grid)
+      rhs_formula <- as.formula(paste("~", paste(all.vars(formula[[3]]), collapse = "+")))
+
+      # Create the model matrix using only the independent variables
+
+      X <- model.matrix(rhs_formula, grid)
 
       # Initialize matrices to store prediction variances for each response
       n_preds <- ncol(model$coefficients)  # Number of responses (dx, dy)
       pred_var <- matrix(NA, nrow = nrow(X), ncol = n_preds)
+
 
       # Compute prediction variances for each response
       for (i in 1:n_preds) {
@@ -584,7 +602,9 @@ stat_vector_smooth <- function(
   se = TRUE,
   se.circle = TRUE,
   probs = c(.95, NA),
+  default_formula = cbind(dx, dy) ~ x * y,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  eval_points = NULL,
   ...
 ) {
 
@@ -606,6 +626,7 @@ stat_vector_smooth <- function(
       se.circle = se.circle,
       probs = probs,
       arrow = arrow,
+      eval_points = eval_points,
       na.rm = na.rm,
       ...
     )
@@ -628,7 +649,9 @@ geom_vector_smooth <- function(
   se = TRUE,
   se.circle = TRUE,
   probs = c(.95, NA),
+  default_formula = cbind(dx, dy) ~ x * y,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+  eval_points = NULL,
   ...
 ) {
 
@@ -650,6 +673,8 @@ geom_vector_smooth <- function(
       se.circle = se.circle,
       probs = probs,
       arrow = arrow,
+      eval_points = eval_points,
+      formula = default_formula,
       na.rm = na.rm,
       ...
     )
