@@ -232,13 +232,13 @@ StatVectorSmooth <- ggproto(
         # Find the minimum Euclidean distance between points
         min_distance <- euclidean_distances(grid)
         # Choose radius as a fraction of the minimum distance
-        radius <- min_distance / 2.5
+        base_radius <- min_distance / 2.5
       } else {
         # Use a fallback radius derived from the data range or ggplot's scales
         data_range_x <- diff(range(data$x))
         data_range_y <- diff(range(data$y))
         data_range <- min(data_range_x, data_range_y)
-        radius <- data_range / 2.5  # A heuristic to derive a meaningful radius
+        base_radius <- data_range / 2.5  # A heuristic to derive a meaningful radius
       }
 
     } else { # Generate a regular grid if eval_points is not provided
@@ -248,7 +248,7 @@ StatVectorSmooth <- ggproto(
       x_spacing <- diff(sort(unique(grid$x)))[1]
       y_spacing <- diff(sort(unique(grid$y)))[1]
       # Choose the radius as a fraction of the smaller spacing
-      radius <- min(x_spacing, y_spacing) / 2.5
+      base_radius <- min(x_spacing, y_spacing) / 2.5
 
     }
 
@@ -274,6 +274,7 @@ StatVectorSmooth <- ggproto(
 
     if (method == "lm") {
 
+      ## for angle
       message(as.character(formula))
 
       model <- lm(formula = formula, data = data)
@@ -327,6 +328,28 @@ StatVectorSmooth <- ggproto(
           setNames(data.frame(lwr), paste0(c("xend", "yend"), "_lower_", interval_type)),
           setNames(data.frame(upr), paste0(c("xend", "yend"), "_upper_", interval_type))
         )
+
+        ## for distance
+        # Distance prediction model
+        fit_distance <- lm(sqrt(dx^2 + dy^2) ~ x + y, data = data)
+        distance_pred <- predict(fit_distance, newdata = grid, interval = "prediction", level = 0.75)
+
+        # Extract the 25% and 75% prediction intervals
+        grid$distance_pred <- distance_pred[, "fit"]
+        grid$distance_lower_25 <- distance_pred[, "lwr"]
+        grid$distance_upper_75 <- distance_pred[, "upr"]
+
+        # Use predicted distance and angle to calculate fit_dx and fit_dy
+        grid$est_dx <- grid$x + grid$distance_pred * cos(preds[, 1])
+        grid$est_dy <- grid$y + grid$distance_pred * sin(preds[, 1])
+
+        grid$radius <- sqrt((grid$est_dx)^2 + (grid$est_dy)^2)
+
+        # Optionally include the lower and upper bounds for plotting
+        grid$est_dx_lower_25 <- grid$x + grid$distance_lower_25 * cos(preds[, 1])
+        grid$est_dy_lower_25 <- grid$y + grid$distance_lower_25 * sin(preds[, 1])
+        grid$est_dx_upper_75 <- grid$x + grid$distance_upper_75 * cos(preds[, 1])
+        grid$est_dy_upper_75 <- grid$y + grid$distance_upper_75 * sin(preds[, 1])
 
       }
 
@@ -423,7 +446,6 @@ StatVectorSmooth <- ggproto(
       y = grid$y,
       xend = grid$fit_dx,
       yend = grid$fit_dy,
-      radius = rep(radius, nrow(grid)),
       dx = grid$fit_dx - grid$x,
       dy = grid$fit_dy - grid$y
     )
@@ -433,6 +455,14 @@ StatVectorSmooth <- ggproto(
       ci_cols <- grep("end_", colnames(grid), value = TRUE)
       result <- cbind(result, grid[, ci_cols])
     }
+
+    if(is.null(eval_points)) {
+      result$radius <- rep(base_radius, nrow(result))
+    } else {
+      result$radius <- grid$radius
+    }
+
+    # print(result)
 
     return(result)
   }
