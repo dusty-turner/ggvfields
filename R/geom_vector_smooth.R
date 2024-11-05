@@ -163,13 +163,13 @@
 #' # Example 1: Cartesian Coordinates with Linear Model (lm)
 #' ggplot(sample_points, aes(x = x, y = y)) +
 #'   geom_vector_smooth(aes(dx = dx, dy = dy), method = "lm", se = TRUE) +
-#'   geom_vector(aes(dx = dx, dy = dy)) +
+#'   geom_vector(aes(dx = dx, dy = dy), color = "black") +
 #'   ggtitle("Vector Smoothing with Linear Model (lm)")
 #'
 #' # Example 2: Polar Coordinates with Bootstrapping (boot)
 #' ggplot(sample_points, aes(x = x, y = y, angle = angle, distance = distance)) +
 #'   geom_vector_smooth(method = "boot", se = TRUE, probs = c(0.95, 0.68)) +
-#'   geom_vector(aes(dx = dx, dy = dy)) +
+#'   geom_vector(aes(dx = dx, dy = dy), color = "black") +
 #'   ggtitle("Vector Smoothing with Bootstrapping (boot)")
 #'
 NULL
@@ -188,7 +188,7 @@ StatVectorSmooth <- ggproto(
 
   setup_data = function(data, params) {
 
-    print(data |> head())
+    # print(data |> head())
 
     if (!all(is.na(data$dx)) && !all(is.na(data$angle))) {
       warning("Both Cartesian and Polar inputs provided. Using Cartesian by default.")
@@ -210,7 +210,7 @@ StatVectorSmooth <- ggproto(
     extra_aes <- setdiff(names(data), required_aes)
     data[extra_aes] <- lapply(extra_aes, function(a) data[[a]])
 
-    print(data |> head())
+    # print(data |> head())
 
     return(data)
   },
@@ -242,7 +242,7 @@ StatVectorSmooth <- ggproto(
 
     grid$id <- 1:nrow(grid)
 
-    print(grid)
+    # print(grid)
 
     # Ensure probs is a vector, even if a single value is provided
     if (length(probs) == 1) {
@@ -266,7 +266,7 @@ StatVectorSmooth <- ggproto(
 
       model <- lm(formula = formula, data = data)
 
-      print(model)
+      # print(model)
 
       # Extract the covariance matrix of the coefficients
       V <- vcov(model)
