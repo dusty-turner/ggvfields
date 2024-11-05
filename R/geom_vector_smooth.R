@@ -218,6 +218,8 @@ StatVectorSmooth <- ggproto(
   compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_factor, se = TRUE, probs,
                            eval_points = NULL, formula, ...) {
 
+    # print(eval_points)
+
     ## if eval points exist, then create the grid this way
     if (!is.null(eval_points)) {
       if (!all(c("x", "y") %in% names(eval_points))) {
@@ -225,10 +227,19 @@ StatVectorSmooth <- ggproto(
       }
 
       grid <- eval_points
-      # Find the minimum Euclidean distance
-      min_distance <- euclidean_distances(grid)
-      # Choose radius as a fraction of the minimum distance
-      radius <- min_distance / 2.5
+
+      if (nrow(grid) > 1) {
+        # Find the minimum Euclidean distance between points
+        min_distance <- euclidean_distances(grid)
+        # Choose radius as a fraction of the minimum distance
+        radius <- min_distance / 2.5
+      } else {
+        # Use a fallback radius derived from the data range or ggplot's scales
+        data_range_x <- diff(range(data$x))
+        data_range_y <- diff(range(data$y))
+        data_range <- min(data_range_x, data_range_y)
+        radius <- data_range / 2.5  # A heuristic to derive a meaningful radius
+      }
 
     } else { # Generate a regular grid if eval_points is not provided
       x_seq <- seq(min(data$x), max(data$x), length.out = n[1])
@@ -238,6 +249,7 @@ StatVectorSmooth <- ggproto(
       y_spacing <- diff(sort(unique(grid$y)))[1]
       # Choose the radius as a fraction of the smaller spacing
       radius <- min(x_spacing, y_spacing) / 2.5
+
     }
 
     grid$id <- 1:nrow(grid)
@@ -262,7 +274,7 @@ StatVectorSmooth <- ggproto(
 
     if (method == "lm") {
 
-      print(as.character(formula))
+      message(as.character(formula))
 
       model <- lm(formula = formula, data = data)
 
