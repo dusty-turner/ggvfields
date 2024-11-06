@@ -546,7 +546,7 @@ GeomVectorSmooth <- ggproto(
         )
 
         wedge$linewidth <- data$linewidth[i]
-        wedge$alpha <- 0.6
+        wedge$alpha <- 0.9
         wedge$fill <- "grey60"
         # wedge$fill <- data$fill[i]
         wedge$colour <- NA
@@ -575,7 +575,7 @@ GeomVectorSmooth <- ggproto(
           )
 
           wedge$linewidth <- data$linewidth[i]
-          wedge$alpha <- 0.6
+          wedge$alpha <- 0.4
           wedge$fill <- "grey40"
           # wedge$fill <- data$fill[i]
           wedge$colour <- NA
