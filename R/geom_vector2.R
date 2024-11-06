@@ -65,6 +65,13 @@ geom_vector2 <- function(
     tail_point = TRUE,
     arrow = NULL
 ) {
+
+  if (is.null(mapping)) {
+    mapping <- aes()
+  } else if (!is.list(mapping)) {
+    stop("mapping must be a list or NULL")
+  }
+
   mapping <- modifyList(aes(length = after_stat(norm), color = NULL), mapping)
   geom_vector(
     mapping = mapping,

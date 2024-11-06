@@ -102,8 +102,12 @@ geom_vector <- function(
   fun = NULL
 ) {
 
+  if (is.null(mapping)) {
+    mapping <- aes()
+  } else if (!is.list(mapping)) {
+    stop("mapping must be a list or NULL")
+  }
   mapping <- modifyList(aes(color = after_stat(norm), length = after_stat(NA)), mapping)
-
 
   layer(
     stat = StatVector, geom = GeomVector, mapping = mapping, data = data,
