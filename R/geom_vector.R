@@ -215,7 +215,7 @@ draw_panel_vector <- function(
     vector_grob <- grid::segmentsGrob(
       x0 = unit(coords$x, "npc"), y0 = unit(coords$y, "npc"),
       x1 = unit(coords$xend, "npc"), y1 = unit(coords$yend, "npc"),
-      gp = grid::gpar(col = coords$colour, fill = coords$colour, lwd = linewidth),
+      gp = grid::gpar(col = coords$colour, fill = coords$colour, lwd = linewidth, alpha = coords$alpha),
       arrow = arrow
     )
 
@@ -226,7 +226,7 @@ draw_panel_vector <- function(
         y = unit(coords$y, "npc"),
         pch = 16,  # Solid circle
         size = unit(tail_point.size, "mm"),
-        gp = grid::gpar(col = coords$colour, fill = coords$fill)
+        gp = grid::gpar(col = coords$colour, fill = coords$fill, alpha = coords$alpha)
       )
     }
 
@@ -376,8 +376,6 @@ GeomVector <- ggproto(
     # if (!is.na(data$length[1]) && params$normalize) {
     #   message("Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.\nEnsure your `length` values reflect the intended scaling.")
     # }
-
-
 
   if (is.na(data$length[1])) {
 
