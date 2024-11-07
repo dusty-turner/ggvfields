@@ -188,8 +188,6 @@ StatVectorSmooth <- ggproto(
 
   setup_data = function(data, params) {
 
-    # print(data |> head())
-
     if (!all(is.na(data$dx)) && !all(is.na(data$angle))) {
       warning("Both Cartesian and Polar inputs provided. Using Cartesian by default.")
     }
@@ -210,17 +208,13 @@ StatVectorSmooth <- ggproto(
     extra_aes <- setdiff(names(data), required_aes)
     data[extra_aes] <- lapply(extra_aes, function(a) data[[a]])
 
-    # print(data |> head())
-
     return(data)
   },
 
   compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_factor, se = TRUE, probs,
                            eval_points = NULL, formula, ...) {
 
-    # print(eval_points)
-
-    ## if eval points exist, then create the grid this way
+    # Check if eval_points exist and create grid accordingly
     if (!is.null(eval_points)) {
       if (!all(c("x", "y") %in% names(eval_points))) {
         stop("The 'eval_points' argument must contain 'x' and 'y' columns.")
@@ -229,16 +223,13 @@ StatVectorSmooth <- ggproto(
       grid <- eval_points
 
       if (nrow(grid) > 1) {
-        # Find the minimum Euclidean distance between points
         min_distance <- euclidean_distances(grid)
-        # Choose radius as a fraction of the minimum distance
         base_radius <- min_distance / 2.5
       } else {
-        # Use a fallback radius derived from the data range or ggplot's scales
         data_range_x <- diff(range(data$x))
         data_range_y <- diff(range(data$y))
         data_range <- min(data_range_x, data_range_y)
-        base_radius <- data_range / 2.5  # A heuristic to derive a meaningful radius
+        base_radius <- data_range / 2.5
       }
 
     } else { # Generate a regular grid if eval_points is not provided
@@ -247,14 +238,10 @@ StatVectorSmooth <- ggproto(
       grid <- expand.grid(x = x_seq, y = y_seq)
       x_spacing <- diff(sort(unique(grid$x)))[1]
       y_spacing <- diff(sort(unique(grid$y)))[1]
-      # Choose the radius as a fraction of the smaller spacing
       base_radius <- min(x_spacing, y_spacing) / 2.5
-
     }
 
     grid$id <- 1:nrow(grid)
-
-    # print(grid)
 
     # Ensure probs is a vector, even if a single value is provided
     if (length(probs) == 1) {
@@ -276,24 +263,12 @@ StatVectorSmooth <- ggproto(
 
       ## for angle
       message(as.character(formula))
-
-      model <- lm(formula = formula, data = data)
-
-      # print(model)
-
-      # Extract the covariance matrix of the coefficients
-      V <- vcov(model)
-
+      angle_model <- lm(formula = formula, data = data)
+      V <- vcov(angle_model)
       rhs_formula <- as.formula(paste("~", paste(all.vars(formula[[3]]), collapse = "+")))
-
-      # Create the model matrix using only the independent variables
-
       X <- model.matrix(rhs_formula, grid)
-
-      # Initialize matrices to store prediction variances for each response
-      n_preds <- ncol(model$coefficients)  # Number of responses (dx, dy)
+      n_preds <- ncol(angle_model$coefficients)
       pred_var <- matrix(NA, nrow = nrow(X), ncol = n_preds)
-
 
       # Compute prediction variances for each response
       for (i in 1:n_preds) {
@@ -302,65 +277,79 @@ StatVectorSmooth <- ggproto(
         pred_var[, i] <- diag(X %*% V_i %*% t(X))
       }
 
-      # Compute standard errors for each response
-      se_values <- sqrt(pred_var)
+      se_values <- sqrt(pred_var)       # Compute standard errors for each response
+      preds <- predict(angle_model, grid)       # Get dx/dy point predictions for all responses
 
-      # Get point predictions for all responses
-      preds <- predict(model, grid)
 
-      # Initialize a list to store interval data
-      interval_data <- list()
+      interval_data <- list()      # Initialize a list to store interval data
 
       # Iterate over the probabilities and store appropriately named intervals
       for (i in seq_along(probs)) {
+
+        ## for angle
         # Determine the interval type (outer or inner)
         interval_type <- ifelse(i == 1, "outer", "inner")
 
         # Compute the critical value for the current probability
-        t_value <- qt(1 - (1 - probs[i]) / 2, df = model$df.residual)
+        # t_value <- qt(1 - (1 - probs[i]) / 2, df = angle_model$df.residual)
 
-        # Compute the lower and upper prediction intervals
-        lwr <- preds - t_value * se_values
-        upr <- preds + t_value * se_values
+        # Number of responses
+        p <- 2  # for dx and dy
 
-        # Store the intervals with custom naming convention
+        # Residual degrees of freedom from the model (already adjusted for predictors)
+        df_residual <- angle_model$df.residual
+
+        # Sample size based on residuals and predictors
+        n <- df_residual + length(angle_model$coefficients)
+
+        # Critical value for Hotelling's T-squared
+        T2_crit <- (df_residual) * p / (df_residual - p + 1) * qf(probs[i], p, df_residual - p + 1)
+
+        # Use this critical value for interval scaling
+        scale_factor <- sqrt(T2_crit)
+
+        # Apply scale_factor to get prediction intervals
+        lwr <- preds - scale_factor * se_values
+        upr <- preds + scale_factor * se_values
+
+        # Store the intervals with custom naming convention for dx and dy
         interval_data[[interval_type]] <- cbind(
-          setNames(data.frame(lwr), paste0(c("xend", "yend"), "_lower_", interval_type)),
-          setNames(data.frame(upr), paste0(c("xend", "yend"), "_upper_", interval_type))
+          setNames(data.frame(lwr), paste0(c("fit_dx", "fit_dy"), "_lower_", interval_type)),
+          setNames(data.frame(upr), paste0(c("fit_dx", "fit_dy"), "_upper_", interval_type))
         )
-
-        ## for distance
-        # Distance prediction model
-        fit_distance <- lm(sqrt(dx^2 + dy^2) ~ x + y, data = data)
-        distance_pred <- predict(fit_distance, newdata = grid, interval = "prediction", level = 0.75)
-
-        # Extract the 25% and 75% prediction intervals
-        grid$distance_pred <- distance_pred[, "fit"]
-        grid$distance_lower_25 <- distance_pred[, "lwr"]
-        grid$distance_upper_75 <- distance_pred[, "upr"]
-
-        # Use predicted distance and angle to calculate fit_dx and fit_dy
-        grid$est_dx <- grid$x + grid$distance_pred * cos(preds[, 1])
-        grid$est_dy <- grid$y + grid$distance_pred * sin(preds[, 1])
-
-        grid$radius <- sqrt((grid$est_dx)^2 + (grid$est_dy)^2)
-
-        # Optionally include the lower and upper bounds for plotting
-        grid$est_dx_lower_25 <- grid$x + grid$distance_lower_25 * cos(preds[, 1])
-        grid$est_dy_lower_25 <- grid$y + grid$distance_lower_25 * sin(preds[, 1])
-        grid$est_dx_upper_75 <- grid$x + grid$distance_upper_75 * cos(preds[, 1])
-        grid$est_dy_upper_75 <- grid$y + grid$distance_upper_75 * sin(preds[, 1])
-
       }
 
+
+      ## for distance
+      # Distance prediction model
+      fit_distance <- lm(sqrt(dx^2 + dy^2) ~ x + y, data = data)
+      distance_pred <- predict(fit_distance, newdata = grid, interval = "prediction", level = 0.75)
+      # print(distance_pred)
+
+      # Extract the 25% and 75% prediction intervals
+      grid$distance_pred <- distance_pred[, "fit"]
+      grid$distance_lower_25 <- distance_pred[, "lwr"]
+      grid$distance_upper_75 <- distance_pred[, "upr"]
+
+      # Use predicted distance and angle to calculate fit_dx and fit_dy
+      # grid$fit_dx <- grid$x + grid$distance_pred * cos(preds[, 1])
+      # grid$fit_dy <- grid$y + grid$distance_pred * sin(preds[, 1])
+
+      # grid$radius <- sqrt((grid$fit_dx)^2 + (grid$fit_dy)^2)
+
+      # Optionally include the lower and upper bounds for plotting
+      # grid$fit_dx_lower_25 <- grid$x + grid$distance_lower_25 * cos(preds[, 1])
+      # grid$fit_dy_lower_25 <- grid$y + grid$distance_lower_25 * sin(preds[, 1])
+      # grid$fit_dx_upper_75 <- grid$x + grid$distance_upper_75 * cos(preds[, 1])
+      # grid$fit_dy_upper_75 <- grid$y + grid$distance_upper_75 * sin(preds[, 1])
+
       # Combine all interval data with the main grid and predictions
+
       grid <- cbind(
         grid,
         setNames(data.frame(preds), paste0("fit_", c("dx", "dy"))),
         do.call(cbind, unname(interval_data))
       )
-
-      print(grid)
 
     } else if (method == "boot") {
 
@@ -390,28 +379,50 @@ StatVectorSmooth <- ggproto(
     result <- data.frame(
       x = grid$x,
       y = grid$y,
-      xend = grid$fit_dx,
-      yend = grid$fit_dy,
-      dx = grid$fit_dx - grid$x,
-      dy = grid$fit_dy - grid$y
+      dx = grid$fit_dx,
+      dy = grid$fit_dy,
+      xend = grid$fit_dx + grid$x,
+      yend = grid$fit_dy + grid$y,
+      est_magnitude = sqrt(grid$fit_dx^2 + grid$fit_dy^2)
     )
 
-    # If confidence intervals are enabled, include them in the result
+    # If confidence intervals are enabled, calculate and include upper/lower xend and yend in the result
     if (se) {
-      ci_cols <- grep("end_", colnames(grid), value = TRUE)
+      # Get all column names with "fit_" prefix but exclude "fit_dx" and "fit_dy"
+      ci_cols <- grep("fit_", colnames(grid), value = TRUE)
+      ci_cols <- setdiff(ci_cols, c("fit_dx", "fit_dy"))
+
+      # Add xend and yend bounds using dx and dy bounds
+      result$xend_lower_outer <- grid$x + grid$fit_dx_lower_outer
+      result$yend_lower_outer <- grid$y + grid$fit_dy_lower_outer
+      result$xend_upper_outer <- grid$x + grid$fit_dx_upper_outer
+      result$yend_upper_outer <- grid$y + grid$fit_dy_upper_outer
+
+      result$distance_pred <- grid$distance_pred
+      result$distance_lower_25 <- grid$distance_lower_25
+      result$distance_upper_75 <- grid$distance_upper_75
+
+      # Add inner bounds if they exist in the grid data
+      if ("fit_dx_lower_inner" %in% colnames(grid) && "fit_dy_lower_inner" %in% colnames(grid)) {
+        result$xend_lower_inner <- grid$x + grid$fit_dx_lower_inner
+        result$yend_lower_inner <- grid$y + grid$fit_dy_lower_inner
+        result$xend_upper_inner <- grid$x + grid$fit_dx_upper_inner
+        result$yend_upper_inner <- grid$y + grid$fit_dy_upper_inner
+      }
+
+      # Combine all other columns from ci_cols (excluding fit_dx, fit_dy)
       result <- cbind(result, grid[, ci_cols])
     }
 
+    ## uses radius calculated or one determined that's best for grid
     if(is.null(eval_points)) {
-      result$radius <- rep(base_radius, nrow(result))
-    } else {
-      result$radius <- grid$radius
+      result$est_magnitude <- rep(base_radius, nrow(result))
     }
-
-    # print(result)
 
     return(result)
   }
+
+
 )
 
 
@@ -442,7 +453,7 @@ GeomVectorSmooth <- ggproto(
     return(data)
   },
 
-  draw_panel = function(data, panel_params, coord, arrow = NULL, se = TRUE, se.circle = TRUE, scale_factor) {
+  draw_panel = function(data, panel_params, coord, arrow = NULL, se = TRUE, se.circle = TRUE, scale_factor, eval_points) {
 
     circle_grob <- NULL
     wedge_grob_outer <- NULL
@@ -459,7 +470,8 @@ GeomVectorSmooth <- ggproto(
           circle_data <- create_circle_data(
             x = data$x[i], y = data$y[i],
             # radius = data$distance[i]
-            radius = data$radius[i]
+            # radius = data$radius[i]
+            radius = data$est_magnitude[i]
           )
 
           circle_data$group <- i
@@ -467,6 +479,7 @@ GeomVectorSmooth <- ggproto(
           circle_data$alpha <- 0.6
           circle_data$fill <- NA
           circle_data$colour <- "grey60"
+
           return(circle_data)
         }))
 
@@ -480,22 +493,57 @@ GeomVectorSmooth <- ggproto(
       # Outer wedge data
       wedge_data_outer <- do.call(rbind, lapply(1:nrow(data), function(i) {
 
+        # Determine if we need an annular wedge based on your logic
+        annular_wedge <- !is.null(eval_points)
+        # Call create_wedge_data with appropriate parameters
         wedge <- create_wedge_data(
           x = data$x[i], y = data$y[i],
           xend_upper = data$xend_upper_outer[i], yend_upper = data$yend_upper_outer[i],
           xend_lower = data$xend_lower_outer[i], yend_lower = data$yend_lower_outer[i],
           xend = data$xend[i], yend = data$yend[i],
-          # radius = data$distance[i],
-          radius = data$radius[i],
+          radius = if (!annular_wedge) data$est_magnitude[i] else NULL,
+          distance_lower = if (annular_wedge) data$distance_lower_25[i] else NULL,
+          distance_upper = if (annular_wedge) data$distance_upper_75[i] else NULL,
           id = data$id[i],
-          n_points = 50
+          n_points = 50,
+          annular_wedge = annular_wedge  # Explicitly specify wedge type
         )
+
+
+
+        # wedge <- create_wedge_data(
+        #   x = data$x[i], y = data$y[i],
+        #   xend_upper = data$xend_upper_outer[i], yend_upper = data$yend_upper_outer[i],
+        #   xend_lower = data$xend_lower_outer[i], yend_lower = data$yend_lower_outer[i],
+        #   xend = data$xend[i], yend = data$yend[i],
+        #   # radius = data$distance[i],
+        #   radius = data$est_magnitude[i],
+        #   id = data$id[i],
+        #   n_points = 50
+        # )
+
+        # wedge <- create_wedge_data(
+        #   x = data$x[i],
+        #   y = data$y[i],
+        #   xend_upper = data$xend_upper_outer[i],
+        #   yend_upper = data$yend_upper_outer[i],
+        #   xend_lower = data$xend_lower_outer[i],
+        #   yend_lower = data$yend_lower_outer[i],
+        #   xend = data$xend[i],
+        #   yend = data$yend[i],
+        #   distance_lower = data$distance_lower_25[i],  # inner arc radius
+        #   distance_upper = data$distance_upper_75[i],  # outer arc radius
+        #   id = data$id[i],
+        #   n_points = 50
+        # )
+
 
         wedge$linewidth <- data$linewidth[i]
         wedge$alpha <- 0.9
         wedge$fill <- "grey60"
         # wedge$fill <- data$fill[i]
         wedge$colour <- NA
+
         return(wedge)
       }))
 
@@ -515,7 +563,7 @@ GeomVectorSmooth <- ggproto(
             xend_lower = data$xend_lower_inner[i], yend_lower = data$yend_lower_inner[i],
             xend = data$xend[i], yend = data$yend[i],
             # radius = data$distance[i],
-            radius = data$radius[i],
+            radius = data$est_magnitude[i],
             id = data$id[i],
             n_points = 50
           )
@@ -544,8 +592,10 @@ GeomVectorSmooth <- ggproto(
     data$dy_norm <- data$dy / data$distance
 
     # Scale dx and dy to match the desired radius
-    data$dx <- data$dx_norm * data$radius
-    data$dy <- data$dy_norm * data$radius
+    data$dx <- data$dx_norm * data$est_magnitude
+    data$dy <- data$dy_norm * data$est_magnitude
+    # data$dx <- data$dx_norm * data$radius
+    # data$dy <- data$dy_norm * data$radius
 
     # Calculate new xend and yend based on the scaled dx and dy
     data$xend <- data$x + data$dx

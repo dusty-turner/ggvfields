@@ -103,7 +103,8 @@ create_circle_data <- function(x, y, radius, n = 100) {
 
 create_wedge_data <- function(
     x, y, xend_upper, yend_upper, xend_lower, yend_lower,
-    xend, yend, radius, id, n_points = 100
+    xend, yend, id, n_points = 100, radius = NULL,
+    distance_lower = NULL, distance_upper = NULL, annular_wedge = FALSE
 ) {
   # Calculate angles using atan2 for upper, lower, and midpoint
   angle_upper <- atan2(yend_upper - y, xend_upper - x) %% (2 * pi)
@@ -125,26 +126,46 @@ create_wedge_data <- function(
   # Generate arc points from upper (positive) to lower (negative)
   arc_angles <- seq(shifted_upper, shifted_lower, length.out = n_points)
 
-  # Calculate the coordinates of the arc in the transformed space
-  arc_x <- radius * cos(arc_angles)
-  arc_y <- radius * sin(arc_angles)
+  if (annular_wedge) {
+    # Create an annular wedge when annular_wedge is TRUE
+    outer_arc_x <- distance_upper * cos(arc_angles)
+    outer_arc_y <- distance_upper * sin(arc_angles)
+    inner_arc_x <- distance_lower * cos(arc_angles)
+    inner_arc_y <- distance_lower * sin(arc_angles)
 
-  # Rotate the arc points back to the original coordinate system
-  final_x <- x + arc_x * cos(-shift) - arc_y * sin(-shift)
-  final_y <- y + arc_x * sin(-shift) + arc_y * cos(-shift)
+    # Rotate arc points back to the original orientation
+    outer_x_final <- x + outer_arc_x * cos(-shift) - outer_arc_y * sin(-shift)
+    outer_y_final <- y + outer_arc_x * sin(-shift) + outer_arc_y * cos(-shift)
+    inner_x_final <- x + inner_arc_x * cos(-shift) - inner_arc_y * sin(-shift)
+    inner_y_final <- y + inner_arc_x * sin(-shift) + inner_arc_y * cos(-shift)
 
-  # Create a data frame for the wedge
-  wedge_data <- data.frame(
-    x = c(x, final_x, x),  # Start at the center, follow the arc, return to center
-    y = c(y, final_y, y),
-    group = rep(id, length.out = n_points + 2),
-    id = rep(id, length.out = n_points + 2)
-  )
+    # Create the data frame for the annular wedge
+    wedge_data <- data.frame(
+      x = c(inner_x_final, rev(outer_x_final)),
+      y = c(inner_y_final, rev(outer_y_final)),
+      group = rep(id, length.out = 2 * n_points),
+      id = rep(id, length.out = 2 * n_points)
+    )
+  } else {
+    # Create a solid wedge if annular_wedge is FALSE
+    arc_x <- radius * cos(arc_angles)
+    arc_y <- radius * sin(arc_angles)
+
+    # Rotate the arc points back to the original coordinate system
+    final_x <- x + arc_x * cos(-shift) - arc_y * sin(-shift)
+    final_y <- y + arc_x * sin(-shift) + arc_y * cos(-shift)
+
+    # Create a data frame for the solid wedge
+    wedge_data <- data.frame(
+      x = c(x, final_x, x),
+      y = c(y, final_y, y),
+      group = rep(id, length.out = n_points + 2),
+      id = rep(id, length.out = n_points + 2)
+    )
+  }
 
   return(wedge_data)
 }
-
-
 
 
 calculate_bounds <- function(fit, se, probs) {
