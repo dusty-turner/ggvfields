@@ -1,10 +1,24 @@
 #' Create a Vector Field Plot Layer with Length Mapped to Norm
 #'
-#' `geom_vector_field2` behaves the same as `geom_vector_field` but has different default aesthetics.
-#' - **Length** is automatically mapped to `norm`.
-#' - **Color** is set to `"black"` by default.
+#' `geom_vector_field2` and `stat_vector_field2` are extensions of `geom_vector_field` and `stat_vector_field`,
+#' providing identical functionality but with different default aesthetics. These functions are particularly useful
+#' for vector field visualizations where vector length is mapped to the vector's magnitude.
+#'
+#' **Default Behavior:**
+#' - **Length** is automatically mapped to the vector norm (`length = after_stat(norm)`), meaning that vector
+#'   magnitude is emphasized through the length of each vector in the plot.
+#' - **Color** is set to `"black"` by default, ensuring a uniform appearance across vectors. Users can override
+#'   this if they wish to map another variable to `color`.
+#'
+#' **Additional Parameters:**
+#' - **center** is set to `FALSE` by default, so vectors start from the specified (`x`, `y`) coordinates.
+#' - **tail_point** is set to `TRUE`, adding a small point at the tail of each vector to help indicate the starting point.
+#' - **arrow** is set to `NULL`, but users can specify an arrow using `grid::arrow()` to add custom arrowheads.
 #'
 #' @inheritParams geom_vector_field
+#' @param mapping Aesthetic mappings created by `aes()` or `aes_()`.
+#'   These functions ensure that `length = after_stat(norm)` is mapped by default, and `color` is set to `"black"` unless otherwise specified.
+#' @param ... Other arguments passed on to `geom_vector_field()` or `stat_vector_field()`.
 #' @return A `ggplot2` layer that can be added to a ggplot object to create a vector field plot.
 #'
 #' @examples
@@ -18,6 +32,9 @@
 #' ggplot() +
 #'   geom_vector_field2(fun = f, xlim = c(-5, 5), ylim = c(-5, 5))
 #'
+#' @seealso
+#' Use [geom_vector_field()] if you prefer to map vector magnitude using a different aesthetic such as `color`.
+#'
 #' @export
 geom_vector_field2 <- function(
     mapping = NULL,
@@ -25,16 +42,9 @@ geom_vector_field2 <- function(
     stat = StatVector,
     geom = GeomVector,
     position = "identity",
-    na.rm = FALSE,
-    show.legend = NA,
-    inherit.aes = TRUE,
-    fun,
-    xlim = c(-10, 10),
-    ylim = c(-10, 10),
-    n = 16,
-    center = TRUE,
-    normalize = TRUE,
-    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+    center = FALSE,
+    tail_point = TRUE,
+    arrow = NULL,
     ...
 ) {
 
@@ -52,15 +62,8 @@ geom_vector_field2 <- function(
     stat = stat,
     geom = geom,
     position = position,
-    na.rm = na.rm,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    fun = fun,
-    xlim = xlim,
-    ylim = ylim,
-    n = n,
     center = center,
-    normalize = normalize,
+    tail_point = tail_point,
     arrow = arrow,
     ...
   )
@@ -74,16 +77,6 @@ stat_vector_field2 <- function(
     data = NULL,
     geom = GeomVector,
     position = "identity",
-    na.rm = FALSE,
-    show.legend = NA,
-    inherit.aes = TRUE,
-    fun,
-    xlim = c(-10, 10),
-    ylim = c(-10, 10),
-    n = 16,
-    center = TRUE,
-    normalize = TRUE,
-    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
     ...
 ) {
 
@@ -100,15 +93,8 @@ stat_vector_field2 <- function(
     data = data,
     geom = geom,
     position = position,
-    na.rm = na.rm,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    fun = fun,
-    xlim = xlim,
-    ylim = ylim,
-    n = n,
     center = center,
-    normalize = normalize,
+    tail_point = tail_point,
     arrow = arrow,
     ...
   )
