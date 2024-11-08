@@ -238,7 +238,8 @@ StatVectorSmooth <- ggproto(
       grid <- expand.grid(x = x_seq, y = y_seq)
       x_spacing <- diff(sort(unique(grid$x)))[1]
       y_spacing <- diff(sort(unique(grid$y)))[1]
-      base_radius <- min(x_spacing, y_spacing) / 2.5
+      base_radius <- min(x_spacing, y_spacing) *.9
+      # print(base_radius)
     }
 
     grid$id <- 1:nrow(grid)
@@ -279,7 +280,7 @@ StatVectorSmooth <- ggproto(
 
       se_values <- sqrt(pred_var)       # Compute standard errors for each response
       preds <- predict(angle_model, grid)       # Get dx/dy point predictions for all responses
-
+      # print(preds)
 
       interval_data <- list()      # Initialize a list to store interval data
 
@@ -318,6 +319,7 @@ StatVectorSmooth <- ggproto(
           setNames(data.frame(upr), paste0(c("fit_dx", "fit_dy"), "_upper_", interval_type))
         )
       }
+      # print(interval_data)
 
 
       ## for distance
@@ -454,6 +456,8 @@ GeomVectorSmooth <- ggproto(
   },
 
   draw_panel = function(data, panel_params, coord, arrow = NULL, se = TRUE, se.circle = TRUE, scale_factor, eval_points) {
+
+    print(data)
 
     circle_grob <- NULL
     wedge_grob_outer <- NULL
