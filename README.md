@@ -102,30 +102,20 @@ use in visualizing other information about the vector field.
 
 By mapping the norm of a vector to the length aesthetic, users can
 directly observe differences in vector magnitude based on the vector’s
-actual size.
+actual size. You can do this by `length = after_stat(norm)` or
+`geom_vector2()` can do this by default.
 
 In this example, the norm of the wind vectors is mapped to their length:
 
 ``` r
 ggplot(wind_data_cartesian) +
-  geom_vector(
-    aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)),
+  geom_vector2(
+    aes(x = lon, y = lat, dx = dx, dy = dy),
     arrow = NULL, tail_point = TRUE
   )
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
-
-To disable this feature, you can map `length = after_stat(NA)`.
-
-``` r
-ggplot(wind_data_cartesian) +
-  geom_vector(
-    aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(NA))
-  )
-```
-
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
 ### `geom_vector_field()`: Visualizing Vector Fields
 
@@ -180,7 +170,7 @@ ggplot() +
   geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
 This function allows the user to map several characteristics of the
 vector field to different aesthetic mappings.
@@ -201,7 +191,7 @@ ggplot() +
   ) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
 
 ### Divergence
 
@@ -231,7 +221,7 @@ ggplot() +
   ) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
 
 ### Curl
 
@@ -260,7 +250,7 @@ ggplot() +
   ) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
 
 ### `geom_streamplot()`
 
@@ -279,7 +269,7 @@ ggplot() +
   geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3)) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
 
 The `chop` parameter (defaulted to TRUE) allows you to chop the
 trajectories into segments. This can be useful for better visualization
@@ -292,7 +282,7 @@ ggplot() +
   geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3), chop = FALSE) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
 It may also be useful to break up the streamlines into more segments.
 The `scale_stream` parameter (defaults to 1) adjusts the segmentation of
@@ -307,7 +297,7 @@ ggplot() +
   ) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
 
 ### Map Calculus Measures to Aesthetics
 
@@ -320,7 +310,7 @@ ggplot() +
   labs(color = "adjusted\ndivergence")
 ```
 
-<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
 
 ### Animate `geom_streamplot()`
 
@@ -372,7 +362,7 @@ ggplot() +
   geom_flow(fun = f, xlim = c(-10, 10), ylim = c(-10, 10))
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
 
 In this example, flow lines evolve according to the vector field defined
 by `f`. The color along each line will show how the particle moves over
@@ -427,7 +417,7 @@ ggplot() +
 #> Ignoring unknown parameters: `T`
 ```
 
-<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
 
 <!-- The `mask_shape_type` parameter allows you to specify the mask shape used for streamline generation which influences how the streamlines are placed and how closely they can approach each other. The default mask shape is `"square"`, but you can also use `"diamond"`, `"inset_square"`, or `"circle"`.  During streamline generation, when a streamline enters the specified shape, no other streamlines will enter that region.  -->
 <!-- - **Square Mask (default)**: Streamlines are restricted to a grid where each cell is a square. This generally results in evenly spaced streamlines. -->
@@ -526,31 +516,28 @@ sample_points$dy <- sample_points$yend - sample_points$y
 # Visualize the original and smoothed vectors using `ggplot2` from ggvfields
 ggplot(sample_points, aes(x = x, y = y)) +
   geom_vector_smooth(aes(dx = dx, dy = dy), 
-                     n = 6, center = FALSE, probs = c(.95, .68), method = "lm"
+                     n = c(6,6), probs = c(.95, .68), method = "lm"
                      ) + 
   geom_vector(aes(dx = dx, dy = dy)) +  
-  coord_equal()
+  coord_equal(xlim = c(-11,11), y = c(-11,11))
+#> ~cbind(dx, dy)x * y
 ```
 
-<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
 
-This function also works with polar coordinates and `method = "boot"`.
-
-``` r
-# Calculate polar coordinates: angle and distance
-sample_points$distance <- sqrt(sample_points$dx^2 + sample_points$dy^2)
-sample_points$angle <- atan2(sample_points$dy, sample_points$dx)
-
-# Visualize the vector field with smoothing in polar coordinates
-ggplot(sample_points, aes(x = x, y = y)) +
-  geom_vector_smooth(aes(angle = angle, distance = distance),
-                     n = 6, center = FALSE, probs = c(.95), method = "boot"
-                     ) +
-  geom_vector(aes(dx = dx, dy = dy)) +  
-  coord_fixed() 
-```
-
-<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
+<!-- This function also works with polar coordinates and `method = "boot"`. -->
+<!-- **In Development** -->
+<!-- ```{r} -->
+<!-- # Calculate polar coordinates: angle and distance -->
+<!-- sample_points$distance <- sqrt(sample_points$dx^2 + sample_points$dy^2) -->
+<!-- sample_points$angle <- atan2(sample_points$dy, sample_points$dx) -->
+<!-- # Visualize the vector field with smoothing in polar coordinates -->
+<!-- ggplot(sample_points, aes(x = x, y = y)) + -->
+<!--   geom_vector_smooth(aes(angle = angle, distance = distance), -->
+<!--                      n = c(6,6), probs = c(.95), method = "boot" -->
+<!--                      ) + -->
+<!--   geom_vector(aes(dx = dx, dy = dy)) -->
+<!-- ``` -->
 
 This example demonstrates how `geom_vector_smooth()` can be used to fit
 a vector field to vector data.
