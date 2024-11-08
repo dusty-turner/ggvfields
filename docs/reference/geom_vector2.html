@@ -62,7 +62,10 @@ to map the <strong>vector norm (magnitude)</strong> to the <code>length</code> a
 <span>  <span class="va">...</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  tail_point <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  arrow <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">stat_vector2</span><span class="op">(</span></span>
@@ -73,7 +76,10 @@ to map the <strong>vector norm (magnitude)</strong> to the <code>length</code> a
 <span>  <span class="va">...</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  tail_point <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  arrow <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -149,6 +155,21 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. <code><a href="https://ggplot2.tidyverse.org/reference/borders.html">borders()</a></code>.</p></dd>
 
 
+<dt>center</dt>
+<dd><p>Logical; if <code>TRUE</code>, centers the vector on the specified (<code>x</code>, <code>y</code>) location.
+Default is <code>FALSE</code>, meaning the vector starts at the specified (<code>x</code>, <code>y</code>) point.</p></dd>
+
+
+<dt>tail_point</dt>
+<dd><p>Logical; if <code>TRUE</code>, adds a point to mark the tail of each vector.
+Default is <code>TRUE</code> in <code>geom_vector2</code>, providing a small marker at the tail.</p></dd>
+
+
+<dt>arrow</dt>
+<dd><p>Arrow specification for vector arrowheads, created with <code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code>.
+Controls the appearance of arrowheads, including angle, length, and type. Default is <code>NULL</code>.</p></dd>
+
+
 <dt>geom</dt>
 <dd><p>The geometric object to use to display the data for this layer.
 When using a <code>stat_*()</code> function to construct a layer, the <code>geom</code> argument
@@ -173,9 +194,12 @@ give the geom as <code>"point"</code>.</p></li>
     <p>This is useful when you want the vector's magnitude to be visually emphasized by
 its length rather than its color. These functions also disable the default
 color mapping, setting all vectors to black unless otherwise specified.</p>
-<p>These functions ensure that <code>length = after_stat(norm)</code> is applied by default,
-while the <code>color</code> aesthetic is set to <code>NULL</code>. This gives users the ability to
-scale vector length by magnitude without visual interference from color mapping.</p>
+<p>By default, <code>geom_vector2</code> and <code>stat_vector2</code> have <code>length = after_stat(norm)</code> mapped,
+<code>color</code> set to <code>NULL</code>, and <code>tail_point</code> set to <code>TRUE</code>, which adds a small marker at
+the tail of each vector. Additionally, <code>center</code> is set to <code>FALSE</code>, meaning that vectors
+start from the specified (<code>x</code>, <code>y</code>) coordinates rather than centering on them.
+The <code>arrow</code> parameter is set to <code>NULL</code> by default, allowing users to specify custom
+arrow types if desired.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

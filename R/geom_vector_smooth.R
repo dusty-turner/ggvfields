@@ -12,13 +12,6 @@
 #'   axis.
 #' @param scale_factor Numeric; scales the length of the vectors to a given
 #'   value. Useful for ensuring consistent lengths for visualization.
-#' @param center Logical; if `TRUE`, centers the vector on the evaluated x/y
-#'   location. If `FALSE`, the vector origin is at the evaluated x/y location.
-#'   When centering is enabled, the vector's midpoint aligns with the original
-#'   x/y location.
-#' @param normalize Logical; if `TRUE`, normalizes the vector's length to a unit
-#'   length before applying other transformations like centering. If `FALSE`,
-#'   vectors retain their original lengths.
 #' @param method Character; specifies the smoothing method to be used.
 #'   Supported methods are `"lm"` (linear modeling) and `"boot"` (bootstrapping).
 #'   `"boot"` generates smoother results by calculating angles with bootstrapping,
@@ -35,6 +28,8 @@
 #' @param arrow Arrow specification, as created by `grid::arrow()`. This
 #'   controls the appearance of the arrowheads at the end of the vectors,
 #'   including properties like angle, length, and type.
+#' @param default_formula A formula specifying the model to fit for smoothing.
+#' Defaults to `cbind(dx, dy) ~ x * y`.
 #' @return A `ggplot2` layer that can be added to a ggplot object to produce a
 #'   smooth vector field plot.
 #' @importFrom stats qt
@@ -211,7 +206,9 @@ StatVectorSmooth <- ggproto(
     return(data)
   },
 
-  compute_group = function(data, scales, n, center, method, normalize = TRUE, scale_factor, se = TRUE, probs,
+  compute_group = function(data, scales, n,
+                           # center, normalize = TRUE,
+                           method, scale_factor, se = TRUE, probs,
                            eval_points = NULL, formula, ...) {
 
     # Check if eval_points exist and create grid accordingly
@@ -238,7 +235,7 @@ StatVectorSmooth <- ggproto(
       grid <- expand.grid(x = x_seq, y = y_seq)
       x_spacing <- diff(sort(unique(grid$x)))[1]
       y_spacing <- diff(sort(unique(grid$y)))[1]
-      base_radius <- min(x_spacing, y_spacing) *.9
+      base_radius <- min(x_spacing, y_spacing) / 2.5
       # print(base_radius)
     }
 
@@ -360,22 +357,24 @@ StatVectorSmooth <- ggproto(
     }
 
     # Optionally normalize vector lengths to a fixed scale
-    if (normalize) {
-      grid$norm_pred <- sqrt((grid$fit_dx - grid$x)^2 + (grid$fit_dy - grid$y)^2)
-      grid$fit_dx <- grid$x + (grid$fit_dx - grid$x) / grid$norm_pred * scale_factor
-      grid$fit_dy <- grid$y + (grid$fit_dy - grid$y) / grid$norm_pred * scale_factor
-    }
+    # if (normalize) {
+    #   grid$norm_pred <- sqrt((grid$fit_dx - grid$x)^2 + (grid$fit_dy - grid$y)^2)
+    #   grid$fit_dx <- grid$x + (grid$fit_dx - grid$x) / grid$norm_pred * scale_factor
+    #   grid$fit_dy <- grid$y + (grid$fit_dy - grid$y) / grid$norm_pred * scale_factor
+    # }
 
-    # Optionally center vectors around their midpoint
-    if (center) {
-      half_u <- (grid$fit_dx - grid$x) / 2
-      half_v <- (grid$fit_dy - grid$y) / 2
-
-      grid$x <- grid$x - half_u
-      grid$y <- grid$y - half_v
-      grid$fit_dx <- grid$fit_dx - half_u
-      grid$fit_dy <- grid$fit_dy - half_v
-    }
+    # Optionally center vectors around their midpoint but not when points are given
+    # print(center)
+    # print(eval_points)
+    # if (center & !is.null(eval_points)) {
+    #   half_u <- (grid$fit_dx - grid$x) / 2
+    #   half_v <- (grid$fit_dy - grid$y) / 2
+    #
+    #   grid$x <- grid$x - half_u
+    #   grid$y <- grid$y - half_v
+    #   grid$fit_dx <- grid$fit_dx - half_u
+    #   grid$fit_dy <- grid$fit_dy - half_v
+    # }
 
     # Prepare the result with relevant columns
     result <- data.frame(
@@ -457,7 +456,7 @@ GeomVectorSmooth <- ggproto(
 
   draw_panel = function(data, panel_params, coord, arrow = NULL, se = TRUE, se.circle = TRUE, scale_factor, eval_points) {
 
-    print(data)
+    # print(data)
 
     circle_grob <- NULL
     wedge_grob_outer <- NULL
@@ -638,8 +637,8 @@ stat_vector_smooth <- function(
   inherit.aes = TRUE,
   n = c(11, 11),
   scale_factor = 1,
-  center = TRUE,
-  normalize = TRUE,
+  # center = TRUE,
+  # normalize = TRUE,
   method = "lm",
   se = TRUE,
   se.circle = TRUE,
@@ -660,8 +659,8 @@ stat_vector_smooth <- function(
     inherit.aes = inherit.aes,
     params = list(
       n = n,
-      center = center,
-      normalize = normalize,
+      # center = center,
+      # normalize = normalize,
       scale_factor = scale_factor,
       method = method,
       se = se,
@@ -686,7 +685,7 @@ geom_vector_smooth <- function(
   na.rm = FALSE, show.legend = NA,
   inherit.aes = TRUE,
   n = c(11, 11), scale_factor = 1,
-  center = TRUE, normalize = TRUE,
+  # center = TRUE, normalize = TRUE,
   method = "lm",
   se = TRUE,
   se.circle = TRUE,
@@ -707,8 +706,8 @@ geom_vector_smooth <- function(
     inherit.aes = inherit.aes,
     params = list(
       n = n,
-      center = center,
-      normalize = normalize,
+      # center = center,
+      # normalize = normalize,
       scale_factor = scale_factor,
       method = method,
       se = se,

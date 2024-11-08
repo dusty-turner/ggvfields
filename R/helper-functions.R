@@ -1,3 +1,4 @@
+#' @importFrom stats lm median predict quantile
 # List of non-expored and non-documented functions
 
 ensure_nonempty_data <- function(data) {

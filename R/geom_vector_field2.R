@@ -18,6 +18,7 @@
 #' @inheritParams geom_vector_field
 #' @param mapping Aesthetic mappings created by `aes()` or `aes_()`.
 #'   These functions ensure that `length = after_stat(norm)` is mapped by default, and `color` is set to `"black"` unless otherwise specified.
+#' @param tail_point Logical; if `TRUE`, adds a small point at the tail of each vector to help indicate the starting point.
 #' @param ... Other arguments passed on to `geom_vector_field()` or `stat_vector_field()`.
 #' @return A `ggplot2` layer that can be added to a ggplot object to create a vector field plot.
 #'
@@ -76,6 +77,8 @@ stat_vector_field2 <- function(
     mapping = NULL,
     data = NULL,
     geom = GeomVector,
+    center = center,
+    tail_point = tail_point,
     position = "identity",
     ...
 ) {
