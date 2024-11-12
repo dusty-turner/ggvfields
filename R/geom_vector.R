@@ -396,13 +396,16 @@ GeomVector <- ggproto(
       x_spacing <- unique(diff(sort(unique(data$x))))
       y_spacing <- unique(diff(sort(unique(data$y))))
 
+
       # Calculate the minimum spacing or default to 1 if not a grid
-      min_spacing <- if (all(abs(x_spacing - mean(x_spacing)) < 1e-6) &&
-                         all(abs(y_spacing - mean(y_spacing)) < 1e-6)) {
-        min(x_spacing, y_spacing) * .9
-      } else {
-        1  # No scaling for non-grid data
-      }
+        min_spacing <- if (length(x_spacing) == 0 || length(y_spacing) == 0) {
+          1
+        } else if (all(abs(x_spacing - mean(x_spacing)) < 1e-6) &&
+                   all(abs(y_spacing - mean(y_spacing)) < 1e-6)) {
+          min(x_spacing, y_spacing) * .9
+        } else {
+          1  # No scaling for non-grid data
+        }
 
       # Normalize the vectors to unit length and scale by the minimum spacing
       norms <- sqrt(data$dx^2 + data$dy^2)
