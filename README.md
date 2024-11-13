@@ -3,11 +3,12 @@
 
 # ggvfields <img src="man/figures/ggvfields_hex.png"  align="right"  width="120" style="padding-left:10px;background-color:white;" />
 
-## Overview
+[![Project Status: Active - The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 
 **ggvfields** provides tools for visualizing vector fields, stream
-plots, and soon complex numbers and more. Let’s start by creating some
-synthetic data that we can use to see its features.
+plots, and smoothed vector fields.
 
 ``` r
 library("ggvfields")

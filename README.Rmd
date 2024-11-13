@@ -16,14 +16,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-# ggvfields <img src="man/figures/ggvfields_hex.png"  align="right"  width="120" style="padding-left:10px;background-color:white;" />
+# ggvfields  <img src="man/figures/ggvfields_hex.png"  align="right"  width="120" style="padding-left:10px;background-color:white;" />
 
+`r badger::badge_repostatus("Active")`
 
+**ggvfields** provides tools for visualizing vector fields, stream plots, and smoothed vector fields.
 
-
-## Overview
-
-**ggvfields** provides tools for visualizing vector fields, stream plots, and soon complex numbers and more. Let's start by creating some synthetic data that we can use to see its features.
 
 ```{r}
 library("ggvfields")
