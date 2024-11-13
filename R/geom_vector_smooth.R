@@ -211,6 +211,8 @@ StatVectorSmooth <- ggproto(
                            method, scale_factor, se = TRUE, probs,
                            eval_points = NULL, formula, ...) {
 
+    n <- ensure_length_two(n)
+
     # Check if eval_points exist and create grid accordingly
     if (!is.null(eval_points)) {
       if (!all(c("x", "y") %in% names(eval_points))) {
@@ -245,9 +247,6 @@ StatVectorSmooth <- ggproto(
     if (length(probs) == 1) {
       probs <- c(probs, NA)
     }
-
-    # Ensure that n has the correct length
-    n <- ensure_length_two(n)
 
     # Calculate xend and yend using dx and dy
     data$xend <- data$x + data$dx
@@ -330,20 +329,6 @@ StatVectorSmooth <- ggproto(
       grid$distance_lower_25 <- distance_pred[, "lwr"]
       grid$distance_upper_75 <- distance_pred[, "upr"]
 
-      # Use predicted distance and angle to calculate fit_dx and fit_dy
-      # grid$fit_dx <- grid$x + grid$distance_pred * cos(preds[, 1])
-      # grid$fit_dy <- grid$y + grid$distance_pred * sin(preds[, 1])
-
-      # grid$radius <- sqrt((grid$fit_dx)^2 + (grid$fit_dy)^2)
-
-      # Optionally include the lower and upper bounds for plotting
-      # grid$fit_dx_lower_25 <- grid$x + grid$distance_lower_25 * cos(preds[, 1])
-      # grid$fit_dy_lower_25 <- grid$y + grid$distance_lower_25 * sin(preds[, 1])
-      # grid$fit_dx_upper_75 <- grid$x + grid$distance_upper_75 * cos(preds[, 1])
-      # grid$fit_dy_upper_75 <- grid$y + grid$distance_upper_75 * sin(preds[, 1])
-
-      # Combine all interval data with the main grid and predictions
-
       grid <- cbind(
         grid,
         setNames(data.frame(preds), paste0("fit_", c("dx", "dy"))),
@@ -355,26 +340,6 @@ StatVectorSmooth <- ggproto(
       grid <- perform_bootstrapping(data, grid, probs, se)
 
     }
-
-    # Optionally normalize vector lengths to a fixed scale
-    # if (normalize) {
-    #   grid$norm_pred <- sqrt((grid$fit_dx - grid$x)^2 + (grid$fit_dy - grid$y)^2)
-    #   grid$fit_dx <- grid$x + (grid$fit_dx - grid$x) / grid$norm_pred * scale_factor
-    #   grid$fit_dy <- grid$y + (grid$fit_dy - grid$y) / grid$norm_pred * scale_factor
-    # }
-
-    # Optionally center vectors around their midpoint but not when points are given
-    # print(center)
-    # print(eval_points)
-    # if (center & !is.null(eval_points)) {
-    #   half_u <- (grid$fit_dx - grid$x) / 2
-    #   half_v <- (grid$fit_dy - grid$y) / 2
-    #
-    #   grid$x <- grid$x - half_u
-    #   grid$y <- grid$y - half_v
-    #   grid$fit_dx <- grid$fit_dx - half_u
-    #   grid$fit_dy <- grid$fit_dy - half_v
-    # }
 
     # Prepare the result with relevant columns
     result <- data.frame(
