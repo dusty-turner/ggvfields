@@ -385,65 +385,76 @@ The `geom_vector_smooth()` function is designed to provide a smoothed estimate o
 
 #### Example Usage
 
+Let's revisit the `wind_data` dataset we used earlier, which contains wind measurements with longitude (`lon`), latitude (`lat`), and wind vector components (`dx`, `dy`).
+
+#### Basic Smoothing of the Vector Field:
+
 ```{r}
-# Create a function to generate random vectors based on (x, y) inputs
-generate_vectors <- function(v) {
-  x <- v[1]
-  y <- v[2]
-  c(-1 - x^2 + y, 1 + x - y^2)  
-}
-
-# Set seed for reproducibility
-set.seed(123)
-
-# Generate sample points for the vector field
-sample_points <- data.frame(
-  x = runif(50, min = -10, max = 10),  
-  y = runif(50, min = -10, max = 10)   
-)
-
-# Apply the generate_vectors function to each row to create displacements
-result <- t(apply(sample_points, 1, generate_vectors))
-
-# Create new columns for the end coordinates (xend, yend)
-sample_points$xend <- result[, 1]
-sample_points$yend <- result[, 2]
-
-# Calculate the displacements (dx, dy)
-sample_points$dx <- sample_points$xend - sample_points$x
-sample_points$dy <- sample_points$yend - sample_points$y
-
-# Visualize the original and smoothed vectors using `ggplot2` from ggvfields
-ggplot(sample_points, aes(x = x, y = y)) +
-  geom_vector_smooth(aes(dx = dx, dy = dy), 
-                     n = c(6,6), probs = c(.95, .68), method = "lm"
-                     ) + 
-  geom_vector(aes(dx = dx, dy = dy)) +  
-  coord_equal(xlim = c(-11,11), y = c(-11,11))
+ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
+  geom_vector_smooth() +
+  geom_vector(aes(color = after_stat(NULL)))
 ```
 
-<!-- This function also works with polar coordinates and `method = "boot"`. -->
+In this example:
 
-<!-- **In Development** -->
+- We use `geom_vector_smooth()` to create a smoothed estimate of the vector field based on the observed vectors.  
+- The smoothed vectors are overlaid on the plot.  
+- We add the original vectors using geom_vector() and set aes(color = after_stat(NULL)) to allow the vectors to be colored black.
 
-<!-- ```{r} -->
-<!-- # Calculate polar coordinates: angle and distance -->
-<!-- sample_points$distance <- sqrt(sample_points$dx^2 + sample_points$dy^2) -->
-<!-- sample_points$angle <- atan2(sample_points$dy, sample_points$dx) -->
+#### Adjusting the Grid Resolution with `n`:
 
-<!-- # Visualize the vector field with smoothing in polar coordinates -->
-<!-- ggplot(sample_points, aes(x = x, y = y)) + -->
-<!--   geom_vector_smooth(aes(angle = angle, distance = distance), -->
-<!--                      n = c(6,6), probs = c(.95), method = "boot" -->
-<!--                      ) + -->
-<!--   geom_vector(aes(dx = dx, dy = dy)) -->
-<!-- ``` -->
+```{r}
+ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
+  geom_vector_smooth(n = 4) +
+  geom_vector(aes(color = after_stat(NULL)))
+```
 
+In this example:
 
+- We specify `n = 4` to adjust the grid resolution of the smoothed vector field. This means the smoothing is evaluated over a 4x4 grid across the data range.
+- A lower `n` results in fewer vectors which can help in identifying broader trends in the vector field.
+- The original vectors are added for comparison.
 
-This example demonstrates how `geom_vector_smooth()` can be used to fit a vector field to vector data. 
+#### Evalutating at Specific Points with `eval_points`:
 
+```{r}
+eval_point <- data.frame(x = -1, y = 1)
 
+ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
+  geom_vector_smooth(eval_points = eval_point) +
+  geom_vector(aes(color = after_stat(NULL)), normalize = FALSE)
+```
+
+In this example:
+
+- We create a tibble `eval_point` containing the specific point (x = -1, y = 1) where we want to evaluate the smoothed vector field.  
+- By passing `eval_points = eval_point` to geom_vector_smooth(), we compute the smoothed vector only at this location.
+- We set `normalize = FALSE` in geom_vector() to display the original vectors without normalization. This preservs their true magnitudes for comparison.
+
+#### Additional Details
+
+- Smoothing Methods: `geom_vector_smooth()` uses linear modeling (`method = "lm"`) by default to smooth the vector components. Future work will allow you to declare other techniques.  
+- Confidence Intervals: By specifying `probs = c(0.95, 0.68)`, you can add prediction intervals to the smoothed vectors. This representing the uncertainty in the estimates.  
+- Grid Resolution: The `n` parameter controls the number of grid points in the x and y directions over which the smoothing is evaluated. Adjusting `n` allows you to balance detail and clarity in your visualization.  
+- Evaluating at Custom Points: The `eval_points` parameter accepts a data frame of points at which you want to evaluate the smoothed vector field. This is useful when you are interested in specific locations rather than a regular grid.
+
+#### Comprehensive Example with Prediction Intervals
+
+```{r}
+ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
+  geom_vector_smooth(
+    n = c(6, 6),
+    probs = c(0.95, 0.68),
+    method = "lm"
+  ) +
+  geom_vector(aes(color = after_stat(NULL))) 
+```
+
+In this example:
+
+- We set `n = c(6, 6)` to specify a 6x6 grid for smoothing.  
+- The `probs` parameter adds 95% and 68% prediction intervals around the smoothed vectors.  
+- We specify `method = "lm"` for linear smoothing.
 
 ## Installation
 
