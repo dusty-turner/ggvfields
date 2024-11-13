@@ -13,7 +13,10 @@ geom_vector2(
   ...,
   na.rm = FALSE,
   show.legend = NA,
-  inherit.aes = TRUE
+  inherit.aes = TRUE,
+  center = FALSE,
+  tail_point = TRUE,
+  arrow = NULL
 )
 
 stat_vector2(
@@ -24,7 +27,10 @@ stat_vector2(
   ...,
   na.rm = FALSE,
   show.legend = NA,
-  inherit.aes = TRUE
+  inherit.aes = TRUE,
+  center = FALSE,
+  tail_point = TRUE,
+  arrow = NULL
 )
 }
 \arguments{
@@ -89,6 +95,15 @@ rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
+\item{center}{Logical; if \code{TRUE}, centers the vector on the specified (\code{x}, \code{y}) location.
+Default is \code{FALSE}, meaning the vector starts at the specified (\code{x}, \code{y}) point.}
+
+\item{tail_point}{Logical; if \code{TRUE}, adds a point to mark the tail of each vector.
+Default is \code{TRUE} in \code{geom_vector2}, providing a small marker at the tail.}
+
+\item{arrow}{Arrow specification for vector arrowheads, created with \code{grid::arrow()}.
+Controls the appearance of arrowheads, including angle, length, and type. Default is \code{NULL}.}
+
 \item{geom}{The geometric object to use to display the data for this layer.
 When using a \verb{stat_*()} function to construct a layer, the \code{geom} argument
 can be used to override the default coupling between stats and geoms. The
@@ -115,9 +130,12 @@ This is useful when you want the vector's magnitude to be visually emphasized by
 its length rather than its color. These functions also disable the default
 color mapping, setting all vectors to black unless otherwise specified.
 
-These functions ensure that \code{length = after_stat(norm)} is applied by default,
-while the \code{color} aesthetic is set to \code{NULL}. This gives users the ability to
-scale vector length by magnitude without visual interference from color mapping.
+By default, \code{geom_vector2} and \code{stat_vector2} have \code{length = after_stat(norm)} mapped,
+\code{color} set to \code{NULL}, and \code{tail_point} set to \code{TRUE}, which adds a small marker at
+the tail of each vector. Additionally, \code{center} is set to \code{FALSE}, meaning that vectors
+start from the specified (\code{x}, \code{y}) coordinates rather than centering on them.
+The \code{arrow} parameter is set to \code{NULL} by default, allowing users to specify custom
+arrow types if desired.
 }
 \examples{
 set.seed(1234)

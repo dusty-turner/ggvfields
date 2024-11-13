@@ -27,12 +27,11 @@ stat_vector_smooth(
   inherit.aes = TRUE,
   n = c(11, 11),
   scale_factor = 1,
-  center = TRUE,
-  normalize = TRUE,
   method = "lm",
   se = TRUE,
   se.circle = TRUE,
   probs = c(0.95, NA),
+  default_formula = cbind(dx, dy) ~ x * y,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   eval_points = NULL,
   ...
@@ -48,12 +47,11 @@ geom_vector_smooth(
   inherit.aes = TRUE,
   n = c(11, 11),
   scale_factor = 1,
-  center = TRUE,
-  normalize = TRUE,
   method = "lm",
   se = TRUE,
   se.circle = TRUE,
   probs = c(0.95, NA),
+  default_formula = cbind(dx, dy) ~ x * y,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   eval_points = NULL,
   ...
@@ -126,15 +124,6 @@ axis.}
 \item{scale_factor}{Numeric; scales the length of the vectors to a given
 value. Useful for ensuring consistent lengths for visualization.}
 
-\item{center}{Logical; if \code{TRUE}, centers the vector on the evaluated x/y
-location. If \code{FALSE}, the vector origin is at the evaluated x/y location.
-When centering is enabled, the vector's midpoint aligns with the original
-x/y location.}
-
-\item{normalize}{Logical; if \code{TRUE}, normalizes the vector's length to a unit
-length before applying other transformations like centering. If \code{FALSE},
-vectors retain their original lengths.}
-
 \item{method}{Character; specifies the smoothing method to be used.
 Supported methods are \code{"lm"} (linear modeling) and \code{"boot"} (bootstrapping).
 \code{"boot"} generates smoother results by calculating angles with bootstrapping,
@@ -150,6 +139,9 @@ for visualizing variability when \code{se = TRUE}.}
 \item{probs}{Numeric vector; specifies the prediction interval levels to be
 plotted when \code{se = TRUE}. \strong{Default is \code{probs = 0.95}}, but users can specify
 multiple levels (e.g., \code{probs = c(0.95, 0.68)}).}
+
+\item{default_formula}{A formula specifying the model to fit for smoothing.
+Defaults to \code{cbind(dx, dy) ~ x * y}.}
 
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}. This
 controls the appearance of the arrowheads at the end of the vectors,
@@ -342,13 +334,13 @@ sample_points$angle <- atan2(sample_points$dy, sample_points$dx)
 # Example 1: Cartesian Coordinates with Linear Model (lm)
 ggplot(sample_points, aes(x = x, y = y)) +
   geom_vector_smooth(aes(dx = dx, dy = dy), method = "lm", se = TRUE) +
-  geom_vector(aes(dx = dx, dy = dy)) +
+  geom_vector(aes(dx = dx, dy = dy), color = "black") +
   ggtitle("Vector Smoothing with Linear Model (lm)")
 
 # Example 2: Polar Coordinates with Bootstrapping (boot)
 ggplot(sample_points, aes(x = x, y = y, angle = angle, distance = distance)) +
   geom_vector_smooth(method = "boot", se = TRUE, probs = c(0.95, 0.68)) +
-  geom_vector(aes(dx = dx, dy = dy)) +
+  geom_vector(aes(dx = dx, dy = dy), color = "black") +
   ggtitle("Vector Smoothing with Bootstrapping (boot)")
 
 }
