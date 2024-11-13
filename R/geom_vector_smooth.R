@@ -427,7 +427,7 @@ GeomVectorSmooth <- ggproto(
     scale_factor, eval_points
   ) {
     grobs <- list()
-print(data)
+# print(data)
     if (se) {
       # Draw wedges for outer confidence intervals using GeomPolygon
       if ("xend_upper_outer" %in% names(data) && "xend_lower_outer" %in% names(data)) {
