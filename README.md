@@ -6,63 +6,103 @@
 ## Overview
 
 **ggvfields** provides tools for visualizing vector fields, stream
-plots, and soon complex numbers and more.
+plots, and soon complex numbers and more. Let’s start by creating some
+synthetic data that we can use to see its features.
 
 ``` r
 library("ggvfields")
 #> Loading required package: ggplot2
 options(ggplot2.continuous.colour="viridis")
+
+set.seed(1234)
+n <- 10
+
+(wind_data <- data.frame(
+  "lon" = rnorm(n), 
+  "lat" = rnorm(n), 
+  "dir" = runif(n, -pi, pi),
+  "spd" = rchisq(n, df = 2)
+) |> 
+  within({
+    dx <- spd * cos(dir)
+    dy <- spd * sin(dir)
+  }))
+#>           lon         lat         dir        spd          dy          dx
+#> 1  -1.2070657 -0.47719270  0.33510483  3.5473948  1.16662525  3.35007394
+#> 2   0.2774292 -0.99838644  0.91989662  2.1892467  1.74163111  1.32646984
+#> 3   1.0844412 -0.77625389 -1.18234275  2.9860220 -2.76355109  1.13097871
+#> 4  -2.3456977  0.06445882  0.76541260 10.8072250  7.48761916  7.79305272
+#> 5   0.4291247  0.95949406 -1.06958553  3.4477308 -3.02366484  1.65659245
+#> 6   0.5060559 -0.11028549  0.01255049  3.9071427  0.04903528  3.90683495
+#> 7  -0.5747400 -0.51100951  1.11271773  0.1561561  0.14005697  0.06905621
+#> 8  -0.5466319 -0.91119542 -0.09430283  0.4239639 -0.03992176  0.42208012
+#> 9  -0.5644520 -0.83717168 -1.60894263  0.4160735 -0.41577077 -0.01586782
+#> 10 -0.8900378  2.41583518  1.66793304  4.1721572  4.15248944 -0.40463261
+  
+round(wind_data, digits = 2)
+#>      lon   lat   dir   spd    dy    dx
+#> 1  -1.21 -0.48  0.34  3.55  1.17  3.35
+#> 2   0.28 -1.00  0.92  2.19  1.74  1.33
+#> 3   1.08 -0.78 -1.18  2.99 -2.76  1.13
+#> 4  -2.35  0.06  0.77 10.81  7.49  7.79
+#> 5   0.43  0.96 -1.07  3.45 -3.02  1.66
+#> 6   0.51 -0.11  0.01  3.91  0.05  3.91
+#> 7  -0.57 -0.51  1.11  0.16  0.14  0.07
+#> 8  -0.55 -0.91 -0.09  0.42 -0.04  0.42
+#> 9  -0.56 -0.84 -1.61  0.42 -0.42 -0.02
+#> 10 -0.89  2.42  1.67  4.17  4.15 -0.40
 ```
 
 ## Usage
 
 ### `geom_vector()`: Visualizing Individual Vectors
 
-`geom_vector()` is designed to visualize individual vectors, specified
-by either Cartesian (`dx`, `dy`) or polar (`angle`, `distance`)
-components. It’s especially useful for directional data like wind
-patterns or flow fields.
+`geom_vector()` is designed to visualize individual vectors, which are
+essentially just line segments with (typically ) arrow heads to signify
+their direction. As line segments, they are naturally represented as 2
+points-2 $(x,y)$ pairs-signifying the start point and the end point,
+where the end point signifies the direction of the vector. This already
+possible using `geom_segment()`; however, **ggvfields**’s
+`geom_vector()` provides a bit more support.
+
+, specified by either Cartesian (`dx`, `dy`) or polar (`angle`,
+`distance`) components. It’s especially useful for directional data like
+wind patterns or flow fields.
 
 By default, the **`length` aesthetic** is mapped to `after_stat(norm)`,
 meaning the vector length reflects its magnitude. More details in this
 section: [**New Feature: Mapping Norm to the Length
 Aesthetic**](#new-feature-mapping-norm-to-the-length-aesthetic).
 
-#### Cartesian Example
-
 ``` r
-set.seed(1234)
-n <- 10
-wind_data_polar <- data.frame(
-  lon = rnorm(n), 
-  lat = rnorm(n), 
-  wind_dir = runif(n, -pi, pi),
-  wind_spd = rchisq(n, df = 2)
-)
-
-wind_data_cartesian <- within(wind_data_polar, {
-  wind_lon_comp <- wind_spd * cos(wind_dir)
-  wind_lat_comp <- wind_spd * sin(wind_dir)
-  dx <- wind_lon_comp
-  dy <- wind_lat_comp
-})
-
-ggplot(wind_data_cartesian) +
+ggplot(wind_data) +
   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy))
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
-#### Polar Example
-
-For polar coordinates, the vector is defined by an angle and distance:
+If you’d prefer to use dots on the tails instead of arrow heads, those
+are available, too:
 
 ``` r
-ggplot(wind_data_cartesian) +
-  geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd))
+ggplot(wind_data) +
+  geom_vector(
+    aes(x = lon, y = lat, dx = dx, dy = dy), 
+    tail_point = TRUE, arrow = NULL
+  )
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+
+For polar coordinates, the vector is defined by an `angle` and
+`distance`:
+
+``` r
+ggplot(wind_data) +
+  geom_vector(aes(x = lon, y = lat, angle = dir, distance = spd))
+```
+
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
 ### New Feature: Mapping Norm to the Length Aesthetic
 
@@ -102,26 +142,16 @@ use in visualizing other information about the vector field.
 
 By mapping the norm of a vector to the length aesthetic, users can
 directly observe differences in vector magnitude based on the vector’s
-actual size.
+actual size. You can do this by `length = after_stat(norm)` or
+`geom_vector2()` can do this by default.
 
 In this example, the norm of the wind vectors is mapped to their length:
 
 ``` r
-ggplot(wind_data_cartesian) +
+ggplot(wind_data) +
   geom_vector(
     aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)),
     arrow = NULL, tail_point = TRUE
-  )
-```
-
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
-
-To disable this feature, you can map `length = after_stat(NA)`.
-
-``` r
-ggplot(wind_data_cartesian) +
-  geom_vector(
-    aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(NA))
   )
 ```
 
@@ -526,31 +556,28 @@ sample_points$dy <- sample_points$yend - sample_points$y
 # Visualize the original and smoothed vectors using `ggplot2` from ggvfields
 ggplot(sample_points, aes(x = x, y = y)) +
   geom_vector_smooth(aes(dx = dx, dy = dy), 
-                     n = 6, center = FALSE, probs = c(.95, .68), method = "lm"
+                     n = c(6,6), probs = c(.95, .68), method = "lm"
                      ) + 
   geom_vector(aes(dx = dx, dy = dy)) +  
-  coord_equal()
+  coord_equal(xlim = c(-11,11), y = c(-11,11))
+#> ~cbind(dx, dy)x * y
 ```
 
 <img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
 
-This function also works with polar coordinates and `method = "boot"`.
-
-``` r
-# Calculate polar coordinates: angle and distance
-sample_points$distance <- sqrt(sample_points$dx^2 + sample_points$dy^2)
-sample_points$angle <- atan2(sample_points$dy, sample_points$dx)
-
-# Visualize the vector field with smoothing in polar coordinates
-ggplot(sample_points, aes(x = x, y = y)) +
-  geom_vector_smooth(aes(angle = angle, distance = distance),
-                     n = 6, center = FALSE, probs = c(.95), method = "boot"
-                     ) +
-  geom_vector(aes(dx = dx, dy = dy)) +  
-  coord_fixed() 
-```
-
-<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
+<!-- This function also works with polar coordinates and `method = "boot"`. -->
+<!-- **In Development** -->
+<!-- ```{r} -->
+<!-- # Calculate polar coordinates: angle and distance -->
+<!-- sample_points$distance <- sqrt(sample_points$dx^2 + sample_points$dy^2) -->
+<!-- sample_points$angle <- atan2(sample_points$dy, sample_points$dx) -->
+<!-- # Visualize the vector field with smoothing in polar coordinates -->
+<!-- ggplot(sample_points, aes(x = x, y = y)) + -->
+<!--   geom_vector_smooth(aes(angle = angle, distance = distance), -->
+<!--                      n = c(6,6), probs = c(.95), method = "boot" -->
+<!--                      ) + -->
+<!--   geom_vector(aes(dx = dx, dy = dy)) -->
+<!-- ``` -->
 
 This example demonstrates how `geom_vector_smooth()` can be used to fit
 a vector field to vector data.
