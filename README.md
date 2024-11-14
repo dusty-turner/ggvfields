@@ -59,16 +59,16 @@ round(wind_data, digits = 2)
 ### `geom_vector()`: Visualizing Individual Vectors
 
 `geom_vector()` is designed to visualize individual vectors, which are
-essentially just line segments with (typically ) arrow heads to signify
+essentially just line segments with (typically) arrow heads to signify
 their direction. As line segments, they are naturally represented as 2
 points-2 $(x,y)$ pairs-signifying the start point and the end point,
 where the end point signifies the direction of the vector. This already
 possible using `geom_segment()`; however, **ggvfields**’s
 `geom_vector()` provides a bit more support.
 
-, specified by either Cartesian (`dx`, `dy`) or polar (`angle`,
-`distance`) components. It’s especially useful for directional data like
-wind patterns or flow fields.
+ggvfields can plot vectors specified by either Cartesian (`dx`, `dy`) or
+polar (`angle`, `distance`) components. It’s especially useful for
+directional data like wind patterns or flow fields.
 
 By default, the **`length` aesthetic** is mapped to `after_stat(norm)`,
 meaning the vector length reflects its magnitude. More details in this
