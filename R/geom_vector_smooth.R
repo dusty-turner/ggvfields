@@ -350,7 +350,13 @@ StatVectorSmooth <- ggproto(
     # 6. Data Preparation for Geom
     # ----------------------------
 
-    # Add theta values to grid
+    ## ignore upper and lower bounds and radius if no grid is provided
+    if(is.null(eval_points)){
+      r_mean <- base_radius
+      r_lower <- base_radius
+      r_upper <- base_radius
+    }
+
     # Add theta and distance statistics to grid
     grid <- grid %>%
       mutate(
@@ -362,26 +368,27 @@ StatVectorSmooth <- ggproto(
         r_upper = r_upper
       )
 
-    # Calculate dx and dy for the mean theta and mean distance
     grid <- grid %>%
       mutate(
-        dx = scale_factor * cos(theta) * base_radius,
-        dy = scale_factor * sin(theta) * base_radius,
+        # Calculate dx and dy for the mean theta and mean distance
+        dx = scale_factor * cos(theta) * r_mean,
+        dy = scale_factor * sin(theta) * r_mean,
         xend = x + dx,
         yend = y + dy,
 
         # Calculate dx and dy for theta_lower and r_lower
-        dx_lower = scale_factor * cos(theta_lower) * base_radius,
-        dy_lower = scale_factor * sin(theta_lower) * base_radius,
+        dx_lower = scale_factor * cos(theta_lower) * r_lower,
+        dy_lower = scale_factor * sin(theta_lower) * r_lower,
         xend_lower = x + dx_lower,
         yend_lower = y + dy_lower,
 
         # Calculate dx and dy for theta_upper and r_upper
-        dx_upper = scale_factor * cos(theta_upper) * base_radius,
-        dy_upper = scale_factor * sin(theta_upper) * base_radius,
+        dx_upper = scale_factor * cos(theta_upper) * r_upper,
+        dy_upper = scale_factor * sin(theta_upper) * r_upper,
         xend_upper = x + dx_upper,
         yend_upper = y + dy_upper
       )
+
 
 
     # ----------------------------
@@ -436,12 +443,23 @@ GeomVectorSmooth <- ggproto(
     scale_factor, eval_points
   ) {
     grobs <- list()
-    # print(data)
 
     if (se) {
-      # Draw wedges for confidence intervals using GeomPolygon
+      # Determine if annular wedges should be used
+      use_annular <- !is.null(eval_points)
 
+      # Draw wedges for confidence intervals using GeomPolygon
       wedge_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
+        if (use_annular) {
+          # Use r_lower and r_upper for annular wedges
+          inner_radius <- data$r_lower[i] * scale_factor
+          outer_radius <- data$r_upper[i] * scale_factor
+        } else {
+          # Use r for regular wedges
+          inner_radius <- 0
+          outer_radius <- data$r[i] * scale_factor
+        }
+
         create_wedge_data(
           x = data$x[i], y = data$y[i],
           xend_upper = data$xend_upper[i], yend_upper = data$yend_upper[i],
@@ -449,18 +467,16 @@ GeomVectorSmooth <- ggproto(
           xend = data$xend[i], yend = data$yend[i],
           id = data$id[i],
           n_points = 50,
-          radius = data$r[i]  # Ensure 'r' is equal to base_radius
+          outer_radius = outer_radius,
+          inner_radius = inner_radius
         )
       }))
-
       # Assign aesthetics for the wedge
       wedge_data <- wedge_data %>%
         mutate(
           linewidth = 0.5,          # Adjust as needed
-          alpha = 1,              # Adjust transparency
-          # alpha = 0.3,              # Adjust transparency
-          fill = "green",          # Fill color for the wedge
-          # fill = "grey60",          # Fill color for the wedge
+          alpha = .5,              # Adjust transparency
+          fill = "grey20",           # Fill color for the wedge
           colour = NA               # No border color
         )
 
@@ -479,7 +495,7 @@ GeomVectorSmooth <- ggproto(
       circle_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
         create_circle_data(
           x = data$x[i], y = data$y[i],
-          radius = data$r[i],
+          radius = data$r[i] * scale_factor,
           n = 100,
           group = data$id[i]
         )
@@ -505,7 +521,6 @@ GeomVectorSmooth <- ggproto(
     }
 
     # Draw the main vectors
-    # print(data)
     segments_grob <- GeomSegment$draw_panel(
       data, panel_params, coord, arrow = arrow
     )

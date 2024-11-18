@@ -102,9 +102,12 @@ create_circle_data <- function(x, y, radius, n = 100, group) {
   )
 }
 
+# create circles in geom_vector_smooth
 create_wedge_data <- function(
     x, y, xend_upper, yend_upper, xend_lower, yend_lower,
-    xend, yend, id, n_points = 100, radius = NULL
+    xend, yend, id, n_points = 100,
+    outer_radius = NULL,
+    inner_radius = 0
 ) {
   # Calculate angles using atan2 for upper, lower, and midpoint
   angle_upper <- atan2(yend_upper - y, xend_upper - x) %% (2 * pi)
@@ -126,24 +129,45 @@ create_wedge_data <- function(
   # Generate arc points from upper (positive) to lower (negative)
   arc_angles <- seq(shifted_upper, shifted_lower, length.out = n_points)
 
-  # Create a solid wedge
-  arc_x <- radius * cos(arc_angles)
-  arc_y <- radius * sin(arc_angles)
+  # Create outer arc
+  arc_x_outer <- outer_radius * cos(arc_angles)
+  arc_y_outer <- outer_radius * sin(arc_angles)
 
   # Rotate the arc points back to the original coordinate system
-  final_x <- x + arc_x * cos(-shift) - arc_y * sin(-shift)
-  final_y <- y + arc_x * sin(-shift) + arc_y * cos(-shift)
+  final_x_outer <- x + arc_x_outer * cos(-shift) - arc_y_outer * sin(-shift)
+  final_y_outer <- y + arc_x_outer * sin(-shift) + arc_y_outer * cos(-shift)
 
-  # Create a data frame for the solid wedge
+  if (inner_radius > 0) {
+  # if (inner_radius > 0 && !is.null(inner_radius)) {
+    # Create inner arc
+    arc_x_inner <- inner_radius * cos(arc_angles)
+    arc_y_inner <- inner_radius * sin(arc_angles)
+
+    # Rotate the inner arc points back to the original coordinate system
+    final_x_inner <- x + arc_x_inner * cos(-shift) - arc_y_inner * sin(-shift)
+    final_y_inner <- y + arc_x_inner * sin(-shift) + arc_y_inner * cos(-shift)
+
+    # Combine outer and inner arcs to form an annular wedge
+    wedge_data <- data.frame(
+      x = c(final_x_outer, rev(final_x_inner)),
+      y = c(final_y_outer, rev(final_y_inner)),
+      group = rep(id, each = length(final_x_outer) + length(final_x_inner)),
+      id = rep(id, each = length(final_x_outer) + length(final_x_inner))
+    )
+    out <<- wedge_data
+} else {
+  # Create regular wedge by connecting outer arc to center
   wedge_data <- data.frame(
-    x = c(x, final_x, x),
-    y = c(y, final_y, y),
+    x = c(x, final_x_outer, x),
+    y = c(y, final_y_outer, y),
     group = rep(id, length.out = n_points + 2),
     id = rep(id, length.out = n_points + 2)
   )
+}
 
   return(wedge_data)
-}
+  }
+
 
 
 calculate_bounds <- function(fit, se, probs) {
