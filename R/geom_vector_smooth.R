@@ -293,6 +293,7 @@ StatVectorSmooth <- ggproto(
 
     # Initialize matrix to store theta simulations
     theta_sim_matrix <- matrix(NA, nrow = nrow(grid), ncol = n_sim)
+    r_sim_matrix <- matrix(NA, nrow = nrow(grid), ncol = n_sim)  # Initialize r_sim_matrix
 
     for (i in 1:nrow(grid)) {
       mu <- c(grid$dx[i], grid$dy[i])
@@ -310,14 +311,20 @@ StatVectorSmooth <- ggproto(
       sim_dx <- simulations[, 1]
       sim_dy <- simulations[, 2]
       sim_theta <- atan2(sim_dy, sim_dx)
+      sim_r <- sqrt((sim_dx)^2 + (sim_dy)^2)
 
       # Store simulated theta
       theta_sim_matrix[i, ] <- sim_theta
+      r_sim_matrix[i, ] <- sim_r
     }
 
     # ----------------------------
     # 5. Circular Statistics for Prediction Intervals
     # ----------------------------
+
+    r_mean <- rowMeans(r_sim_matrix, na.rm = TRUE)
+    r_lower <- apply(r_sim_matrix, 1, quantile, probs = .025, na.rm = TRUE)
+    r_upper <- apply(r_sim_matrix, 1, quantile, probs = .975, na.rm = TRUE)
 
     # Compute circular mean for each grid point
     theta_mean <- apply(theta_sim_matrix, 1, function(theta) {
@@ -344,14 +351,18 @@ StatVectorSmooth <- ggproto(
     # ----------------------------
 
     # Add theta values to grid
+    # Add theta and distance statistics to grid
     grid <- grid %>%
       mutate(
         theta = theta_mean,
         theta_lower = theta_lower,
-        theta_upper = theta_upper
+        theta_upper = theta_upper,
+        r_mean = r_mean,
+        r_lower = r_lower,
+        r_upper = r_upper
       )
 
-    # Calculate dx and dy for the mean theta
+    # Calculate dx and dy for the mean theta and mean distance
     grid <- grid %>%
       mutate(
         dx = scale_factor * cos(theta) * base_radius,
@@ -359,18 +370,19 @@ StatVectorSmooth <- ggproto(
         xend = x + dx,
         yend = y + dy,
 
-        # Calculate dx and dy for theta_lower
+        # Calculate dx and dy for theta_lower and r_lower
         dx_lower = scale_factor * cos(theta_lower) * base_radius,
         dy_lower = scale_factor * sin(theta_lower) * base_radius,
         xend_lower = x + dx_lower,
         yend_lower = y + dy_lower,
 
-        # Calculate dx and dy for theta_upper
+        # Calculate dx and dy for theta_upper and r_upper
         dx_upper = scale_factor * cos(theta_upper) * base_radius,
         dy_upper = scale_factor * sin(theta_upper) * base_radius,
         xend_upper = x + dx_upper,
         yend_upper = y + dy_upper
       )
+
 
     # ----------------------------
     # 7. Final Data Selection
