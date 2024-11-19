@@ -29,7 +29,7 @@ stat_vector_smooth(
   method = "lm",
   se = TRUE,
   se.circle = TRUE,
-  probs = c(0.95, NA),
+  conf_level = c(0.95, NA),
   default_formula = cbind(dx, dy) ~ x * y,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   eval_points = NULL,
@@ -48,7 +48,7 @@ geom_vector_smooth(
   method = "lm",
   se = TRUE,
   se.circle = TRUE,
-  probs = c(0.95, NA),
+  conf_level = c(0.95, NA),
   default_formula = cbind(dx, dy) ~ x * y,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   eval_points = NULL,
@@ -131,9 +131,8 @@ smoothed vectors.}
 vectors to represent the radius of the confidence interval. This is useful
 for visualizing variability when \code{se = TRUE}.}
 
-\item{probs}{Numeric vector; specifies the prediction interval levels to be
-plotted when \code{se = TRUE}. \strong{Default is \code{probs = 0.95}}, but users can specify
-multiple levels (e.g., \code{probs = c(0.95, 0.68)}).}
+\item{conf_level}{Numeric vector; specifies the prediction interval levels to be
+plotted when \code{se = TRUE}. \strong{Default is \code{conf_level = 0.95}}.}
 
 \item{default_formula}{A formula specifying the model to fit for smoothing.
 Defaults to \code{cbind(dx, dy) ~ x * y}.}
@@ -329,20 +328,19 @@ sample_points$angle <- atan2(sample_points$dy, sample_points$dx)
 # Example 1: Cartesian Coordinates with Linear Model (lm)
 ggplot(sample_points, aes(x = x, y = y)) +
   geom_vector_smooth(aes(dx = dx, dy = dy), method = "lm", se = TRUE) +
-  geom_vector(aes(dx = dx, dy = dy), color = "black") +
+  geom_vector(aes(dx = dx, dy = dy)) +
   ggtitle("Vector Smoothing with Linear Model (lm)")
 
 # Example 2: Polar Coordinates with Bootstrapping (boot)
 ggplot(sample_points, aes(x = x, y = y, angle = angle, distance = distance)) +
-  geom_vector_smooth(method = "boot", se = TRUE, probs = c(0.95, 0.68)) +
-  geom_vector(aes(dx = dx, dy = dy), color = "black") +
+  geom_vector_smooth(method = "boot", se = TRUE, conf_level = c(0.95, 0.68)) +
+  geom_vector(aes(dx = dx, dy = dy)) +
   ggtitle("Vector Smoothing with Bootstrapping (boot)")
 
 # Example 3: Using Polar Coordinates with coord_polar
 ggplot(sample_points, aes(x = x, y = y, angle = angle, distance = distance)) +
-  geom_vector_smooth(method = "lm", se = TRUE) +
-  geom_vector(aes(dx = dx, dy = dy), color = "black") +
-  coord_polar() +
+  geom_vector_smooth(method = "lm", se = TRUE, n = 4) +
+  geom_vector(aes(dx = dx, dy = dy)) +
   ggtitle("Vector Smoothing in Polar Coordinates")
 
 }

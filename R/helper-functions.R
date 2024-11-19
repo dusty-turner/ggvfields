@@ -213,3 +213,29 @@ compute_circular_quantile <- function(theta, theta_mean, prob) {
   theta_quantile <- (theta_mean + quantile_diff + 2 * pi) %% (2 * pi)
   return(theta_quantile)
 }
+
+validate_aesthetics <- function(data) {
+  # Helper function to check if all specified columns exist and are non-NA
+  columns_valid <- function(df, cols) {
+    all(cols %in% names(df)) && all(!is.na(df[[cols[1]]])) && all(!is.na(df[[cols[2]]]))
+  }
+
+  # Check if both 'angle' and 'distance' are provided and fully populated
+  has_angle_distance <- columns_valid(data, c("angle", "distance"))
+
+  # Check if both 'dx' and 'dy' are provided and fully populated
+  has_dx_dy <- columns_valid(data, c("dx", "dy"))
+
+  # If neither pair is fully provided, throw an error
+  if (!(has_angle_distance || has_dx_dy)) {
+    stop("You must provide either both 'dx' and 'dy' or both 'angle' and 'distance' aesthetics.")
+  }
+
+  # Return a list indicating which pair is present
+  return(list(
+    has_angle_distance = has_angle_distance,
+    has_dx_dy = has_dx_dy
+  ))
+}
+
+

@@ -19,9 +19,8 @@
 #' @param se.circle Logical; if `TRUE`, draws circles around the origin of the
 #'   vectors to represent the radius of the confidence interval. This is useful
 #'   for visualizing variability when `se = TRUE`.
-#' @param probs Numeric vector; specifies the prediction interval levels to be
-#'   plotted when `se = TRUE`. **Default is `probs = 0.95`**, but users can specify
-#'   multiple levels (e.g., `probs = c(0.95, 0.68)`).
+#' @param conf_level Numeric vector; specifies the prediction interval levels to be
+#'   plotted when `se = TRUE`. **Default is `conf_level = 0.95`**.
 #' @param eval_points Number of points at which the function is evaluated for smoothing.
 #' @param arrow Arrow specification, as created by `grid::arrow()`. This
 #'   controls the appearance of the arrowheads at the end of the vectors,
@@ -156,20 +155,19 @@
 #' # Example 1: Cartesian Coordinates with Linear Model (lm)
 #' ggplot(sample_points, aes(x = x, y = y)) +
 #'   geom_vector_smooth(aes(dx = dx, dy = dy), method = "lm", se = TRUE) +
-#'   geom_vector(aes(dx = dx, dy = dy), color = "black") +
+#'   geom_vector(aes(dx = dx, dy = dy)) +
 #'   ggtitle("Vector Smoothing with Linear Model (lm)")
 #'
 #' # Example 2: Polar Coordinates with Bootstrapping (boot)
 #' ggplot(sample_points, aes(x = x, y = y, angle = angle, distance = distance)) +
-#'   geom_vector_smooth(method = "boot", se = TRUE, probs = c(0.95, 0.68)) +
-#'   geom_vector(aes(dx = dx, dy = dy), color = "black") +
+#'   geom_vector_smooth(method = "boot", se = TRUE, conf_level = c(0.95, 0.68)) +
+#'   geom_vector(aes(dx = dx, dy = dy)) +
 #'   ggtitle("Vector Smoothing with Bootstrapping (boot)")
 #'
 #' # Example 3: Using Polar Coordinates with coord_polar
 #' ggplot(sample_points, aes(x = x, y = y, angle = angle, distance = distance)) +
-#'   geom_vector_smooth(method = "lm", se = TRUE) +
-#'   geom_vector(aes(dx = dx, dy = dy), color = "black") +
-#'   coord_polar() +
+#'   geom_vector_smooth(method = "lm", se = TRUE, n = 4) +
+#'   geom_vector(aes(dx = dx, dy = dy)) +
 #'   ggtitle("Vector Smoothing in Polar Coordinates")
 #'
 NULL
@@ -181,7 +179,7 @@ NULL
 StatVectorSmooth <- ggproto(
   "StatVectorSmooth",
   Stat,
-  required_aes = c("x", "y"),  # Supports both Cartesian and Polar coordinates
+  required_aes = c("x", "y"),
   dropped_aes = c("distance", "angle"),
   default_aes = aes(
     color = "#3366FF", linewidth = 0.5, linetype = 1, alpha = 1,
@@ -191,28 +189,35 @@ StatVectorSmooth <- ggproto(
   compute_group = function(
     data, scales, n,
     method,
-    se = TRUE, probs,
+    se = TRUE, conf_level,
     eval_points = NULL, formula, ...
   ) {
 
     # ----------------------------
-    # 1. Initial Data Manipulation
+    # 1. Initial Data Checks and Manipulation
     # ----------------------------
 
+    # use helper function to validate input
+    validation_result <- validate_aesthetics(data)
+
     # If 'angle' and 'distance' are provided, compute 'dx' and 'dy'
-    if (all(!is.na(data$angle), !is.na(data$distance))) {
+    if (!all(is.na(data$angle)) && !all(is.na(data$distance))) {
       data$dx <- data$distance * cos(data$angle)
       data$dy <- data$distance * sin(data$angle)
-    } else if (all(!is.na(data$dx), !is.na(data$dy))) {
+    } else if (all(!is.na(data$dx)) && all(!is.na(data$dy))) {
       # If 'dx' and 'dy' are provided, compute 'angle' and 'distance'
       data$distance <- sqrt(data$dx^2 + data$dy^2)
       data$angle <- atan2(data$dy, data$dx)
-    } else {
-      stop("You must provide either both 'dx' and 'dy' or both 'angle' and 'distance' aesthetics.")
     }
 
     # Ensure 'n' is a numeric vector of length 2
     n <- ensure_length_two(n)
+
+    alpha_levels <- 1 - conf_level
+
+    # For two-tailed intervals, split alpha
+    lower_probs <- alpha_levels / 2
+    upper_probs <- 1 - (alpha_levels / 2)
 
     # Create grid for evaluation
     if (!is.null(eval_points)) {
@@ -239,7 +244,6 @@ StatVectorSmooth <- ggproto(
       y_spacing <- diff(sort(unique(grid$y)))[1]
       base_radius <- min(x_spacing, y_spacing) / 2.5
     }
-
     grid$id <- 1:nrow(grid)
 
     # Calculate xend and yend using dx and dy
@@ -275,7 +279,7 @@ StatVectorSmooth <- ggproto(
 
 
     # Number of response variables (dx and dy)
-    n_resp <- all.vars(formula[[2]]) |> length()
+    n_resp <- length(all.vars(formula[[2]]))
 
     # Number of coefficients per response
     coeffs_per_response <- length(coef(model_mv)[,1])
@@ -284,7 +288,6 @@ StatVectorSmooth <- ggproto(
     total_coeffs <- ncol(cov_coef)
 
     expected_coeffs <- coeffs_per_response * n_resp  # For formula cbind(dx, dy) ~ x * y
-    # expected_coeffs <- 4 * n_resp  # For formula cbind(dx, dy) ~ x * y
     if (total_coeffs != expected_coeffs) {
       stop("Unexpected number of coefficients in the model. Please verify the formula and data.")
     }
@@ -294,9 +297,9 @@ StatVectorSmooth <- ggproto(
     cov_beta_dx_dy <- cov_coef[1:coeffs_per_response, (coeffs_per_response+1):(expected_coeffs)]  # Covariance between dx and dy coefficients
 
     # Compute variance for dx and dy predictions
-    var_dx <- rowSums((design_matrix %*% cov_beta_dx) * design_matrix)
-    var_dy <- rowSums((design_matrix %*% cov_beta_dy) * design_matrix)
-    cov_dx_dy <- rowSums((design_matrix %*% cov_beta_dx_dy) * design_matrix)
+    var_dx <- rowSums(design_matrix * (design_matrix %*% cov_beta_dx))
+    var_dy <- rowSums(design_matrix * (design_matrix %*% cov_beta_dy))
+    cov_dx_dy <- rowSums(design_matrix * (design_matrix %*% cov_beta_dx_dy))
 
     # Assemble the covariance matrix for (dx, dy) predictions
     cov_pred <- data.frame(var_dx, var_dy, cov_dx_dy)
@@ -308,40 +311,14 @@ StatVectorSmooth <- ggproto(
     # Number of simulations per grid point
     n_sim <- 1000  # Adjust as needed for accuracy vs performance
 
-    # Initialize matrix to store theta simulations
-    theta_sim_matrix <- matrix(NA, nrow = nrow(grid), ncol = n_sim)
-    r_sim_matrix <- matrix(NA, nrow = nrow(grid), ncol = n_sim)  # Initialize r_sim_matrix
-
-    # for (i in 1:nrow(grid)) {
-    #   mu <- c(grid$dx[i], grid$dy[i])
-    #   sigma <- matrix(c(cov_pred$var_dx[i], cov_pred$cov_dx_dy[i],
-    #                     cov_pred$cov_dx_dy[i], cov_pred$var_dy[i]), nrow = 2)
-    #
-    #   # Ensure the covariance matrix is positive definite
-    #   if (!all(eigen(sigma)$values > 0)) {
-    #     # Adjust the covariance matrix if necessary
-    #     sigma <- sigma + diag(1e-6, 2)
-    #   }
-    #
-    #   # Simulate dx and dy
-    #   simulations <- MASS::mvrnorm(n = n_sim, mu = mu, Sigma = sigma)
-    #   sim_dx <- simulations[, 1]
-    #   sim_dy <- simulations[, 2]
-    #   sim_theta <- atan2(sim_dy, sim_dx)
-    #   sim_r <- sqrt((sim_dx)^2 + (sim_dy)^2)
-    #
-    #   # Store simulated theta
-    #   theta_sim_matrix[i, ] <- sim_theta
-    #   r_sim_matrix[i, ] <- sim_r
-    # }
-
     # Vectorized simulation using mapply
     simulations_list <- mapply(
       function(mu1, mu2, var_dx, var_dy, cov_dx_dy) {
         sigma <- matrix(c(var_dx, cov_dx_dy, cov_dx_dy, var_dy), nrow = 2)
 
         # Ensure the covariance matrix is positive definite
-        if (!all(eigen(sigma)$values > 0)) {
+        eigen_vals <- eigen(sigma, symmetric = TRUE)$values
+        if (any(eigen_vals <= 0)) {
           sigma <- sigma + diag(1e-6, 2)
         }
 
@@ -365,28 +342,31 @@ StatVectorSmooth <- ggproto(
     # ----------------------------
 
     r_mean <- rowMeans(r_sim_matrix, na.rm = TRUE)
-    r_lower <- apply(r_sim_matrix, 1, quantile, probs = .025, na.rm = TRUE)
-    r_upper <- apply(r_sim_matrix, 1, quantile, probs = .975, na.rm = TRUE)
+    r_lower_list <- lapply(lower_probs, function(p) apply(r_sim_matrix, 1, quantile, probs = p, na.rm = TRUE))
+    r_upper_list <- lapply(upper_probs, function(p) apply(r_sim_matrix, 1, quantile, probs = p, na.rm = TRUE))
 
     # Compute circular mean for each grid point
-    theta_mean <- apply(theta_sim_matrix, 1, function(theta) {
-     circular::mean.circular(circular::circular(theta, units = "radians", modulo = "2pi"))
+    theta_mean <- sapply(1:nrow(theta_sim_matrix), function(i) {
+      circular::mean.circular(circular::circular(theta_sim_matrix[i, ], units = "radians", modulo = "2pi"))
     })
 
     # Compute theta_lower and theta_upper
-    theta_lower <- mapply(
-      compute_circular_quantile,
-      theta = as.data.frame(t(theta_sim_matrix)),
-      theta_mean = theta_mean,
-      prob = 0.025
-    ) |> as.numeric()
+    theta_lower_list <- lapply(lower_probs, function(p) {
+      sapply(1:nrow(theta_sim_matrix), function(i) {
+        compute_circular_quantile(theta = theta_sim_matrix[i, ], theta_mean = theta_mean[i], prob = p)
+      })
+    })
 
-    theta_upper <- mapply(
-      compute_circular_quantile,
-      theta = as.data.frame(t(theta_sim_matrix)),
-      theta_mean = theta_mean,
-      prob = 0.975
-    ) |> as.numeric()
+    theta_upper_list <- lapply(upper_probs, function(p) {
+      sapply(1:nrow(theta_sim_matrix), function(i) {
+        compute_circular_quantile(theta = theta_sim_matrix[i, ], theta_mean = theta_mean[i], prob = p)
+      })
+    })
+
+    r_lower <- r_lower_list[[1]]
+    r_upper <- r_upper_list[[1]]
+    theta_lower <- theta_lower_list[[1]]
+    theta_upper <- theta_upper_list[[1]]
 
     # ----------------------------
     # 6. Data Preparation for Geom
@@ -394,72 +374,68 @@ StatVectorSmooth <- ggproto(
 
     ## ignore upper and lower bounds and radius if no grid is provided
     if(is.null(eval_points)){
-      r_mean <- base_radius
-      r_lower <- base_radius
-      r_upper <- base_radius
+      r_mean <- rep(base_radius, nrow(grid))
+      r_lower <- rep(base_radius, nrow(grid))
+      r_upper <- rep(base_radius, nrow(grid))
     }
 
     # Add theta and distance statistics to grid
-    grid <- grid %>%
-      mutate(
-        theta = theta_mean,
-        theta_lower = theta_lower,
-        theta_upper = theta_upper,
-        r_mean = r_mean,
-        r_lower = r_lower,
-        r_upper = r_upper
-      )
+    grid$theta <- theta_mean
+    grid$theta_lower <- theta_lower
+    grid$theta_upper <- theta_upper
+    grid$r_mean <- r_mean
+    grid$r_lower <- r_lower
+    grid$r_upper <- r_upper
 
-    grid <- grid %>%
-      mutate(
-        # Calculate dx and dy for the mean theta and mean distance
-        dx = cos(theta) * r_mean,
-        dy = sin(theta) * r_mean,
-        xend = x + dx,
-        yend = y + dy,
+    # Calculate dx and dy for the mean theta and mean distance
+    grid$dx <- cos(grid$theta) * grid$r_mean
+    grid$dy <- sin(grid$theta) * grid$r_mean
+    grid$xend <- grid$x + grid$dx
+    grid$yend <- grid$y + grid$dy
 
-        # Calculate dx and dy for theta_lower and r_lower
-        dx_lower = cos(theta_lower) * r_lower,
-        dy_lower = sin(theta_lower) * r_lower,
-        xend_lower = x + dx_lower,
-        yend_lower = y + dy_lower,
+    # Calculate dx and dy for theta_lower and r_lower
+    grid$dx_lower <- cos(grid$theta_lower) * grid$r_lower
+    grid$dy_lower <- sin(grid$theta_lower) * grid$r_lower
+    grid$xend_lower <- grid$x + grid$dx_lower
+    grid$yend_lower <- grid$y + grid$dy_lower
 
-        # Calculate dx and dy for theta_upper and r_upper
-        dx_upper = cos(theta_upper) * r_upper,
-        dy_upper = sin(theta_upper) * r_upper,
-        xend_upper = x + dx_upper,
-        yend_upper = y + dy_upper
-      )
-
-
+    # Calculate dx and dy for theta_upper and r_upper
+    grid$dx_upper <- cos(grid$theta_upper) * grid$r_upper
+    grid$dy_upper <- sin(grid$theta_upper) * grid$r_upper
+    grid$xend_upper <- grid$x + grid$dx_upper
+    grid$yend_upper <- grid$y + grid$dy_upper
 
     # ----------------------------
     # 7. Final Data Selection
     # ----------------------------
 
     # Select relevant columns to return
-    result <- grid %>%
-      select(
-        x, y,
-        dx, dy,
-        xend, yend,
-        dx_lower, dy_lower,
-        xend_lower, yend_lower,
-        dx_upper, dy_upper,
-        xend_upper, yend_upper
-      ) %>%
-      mutate(
-        r = sqrt(dx^2 + dy^2),         # Length of main vectors
-        r_lower = sqrt(dx_lower^2 + dy_lower^2),  # Length of lower vectors
-        r_upper = sqrt(dx_upper^2 + dy_upper^2)   # Length of upper vectors
-      )
+    result <- data.frame(
+      x = grid$x,
+      y = grid$y,
+      dx = grid$dx,
+      dy = grid$dy,
+      xend = grid$xend,
+      yend = grid$yend,
+      dx_lower = grid$dx_lower,
+      dy_lower = grid$dy_lower,
+      xend_lower = grid$xend_lower,
+      yend_lower = grid$yend_lower,
+      dx_upper = grid$dx_upper,
+      dy_upper = grid$dy_upper,
+      xend_upper = grid$xend_upper,
+      yend_upper = grid$yend_upper
+    )
+
+    # Calculate lengths of vectors
+    result$r <- sqrt(result$dx^2 + result$dy^2)
+    result$r_lower <- sqrt(result$dx_lower^2 + result$dy_lower^2)
+    result$r_upper <- sqrt(result$dx_upper^2 + result$dy_upper^2)
 
     return(result)
   }
 
 )
-
-
 
 
 #' @rdname geom_vector_smooth
@@ -490,8 +466,10 @@ GeomVectorSmooth <- ggproto(
       # Determine if annular wedges should be used
       use_annular <- !is.null(eval_points)
 
-      # Draw wedges for confidence intervals using GeomPolygon
-      wedge_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
+      # Initialize a list to store all wedge polygons
+      wedge_polygons <- vector("list", nrow(data))
+
+      for (i in 1:nrow(data)) {
         if (use_annular) {
           # Use r_lower and r_upper for annular wedges
           inner_radius <- data$r_lower[i]
@@ -502,7 +480,7 @@ GeomVectorSmooth <- ggproto(
           outer_radius <- data$r[i]
         }
 
-        create_wedge_data(
+        wedge_polygons[[i]] <- create_wedge_data(
           x = data$x[i], y = data$y[i],
           xend_upper = data$xend_upper[i], yend_upper = data$yend_upper[i],
           xend_lower = data$xend_lower[i], yend_lower = data$yend_lower[i],
@@ -512,17 +490,18 @@ GeomVectorSmooth <- ggproto(
           outer_radius = outer_radius,
           inner_radius = inner_radius
         )
-      }))
-      # Assign aesthetics for the wedge
-      wedge_data <- wedge_data %>%
-        mutate(
-          linewidth = 0.5,          # Adjust as needed
-          alpha = .5,              # Adjust transparency
-          fill = "grey20",           # Fill color for the wedge
-          colour = NA               # No border color
-        )
+      }
 
-      # Draw the wedges
+      # Combine all wedge data into a single data frame
+      wedge_data <- do.call(rbind, wedge_polygons)
+
+      # Assign aesthetics for the wedge
+      wedge_data$linewidth <- 0.5        # Adjust as needed
+      wedge_data$alpha <- 0.5            # Adjust transparency
+      wedge_data$fill <- "grey20"        # Fill color for the wedge
+      wedge_data$colour <- NA            # No border color
+
+      # Draw the wedges using GeomPolygon
       wedge_grob <- GeomPolygon$draw_panel(
         wedge_data,
         panel_params = panel_params,
@@ -533,26 +512,28 @@ GeomVectorSmooth <- ggproto(
     }
 
     if (se.circle) {
-      # Draw circles around each vector using GeomPolygon
-      circle_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
-        create_circle_data(
+      # Initialize a list to store all circle polygons
+      circle_polygons <- vector("list", nrow(data))
+
+      for (i in 1:nrow(data)) {
+        circle_polygons[[i]] <- create_circle_data(
           x = data$x[i], y = data$y[i],
           radius = data$r[i],
           n = 100,
           group = data$id[i]
         )
-      }))
+      }
+
+      # Combine all circle data into a single data frame
+      circle_data <- do.call(rbind, circle_polygons)
 
       # Assign aesthetics for the circles
-      circle_data <- circle_data %>%
-        mutate(
-          linewidth = 0.5,          # Adjust as needed
-          alpha = 0.2,              # Adjust transparency
-          fill = NA,                # No fill for circles
-          colour = "grey40"         # Border color for circles
-        )
+      circle_data$linewidth <- 0.5        # Adjust as needed
+      circle_data$alpha <- 0.2            # Adjust transparency
+      circle_data$fill <- NA              # No fill for circles
+      circle_data$colour <- "grey40"      # Border color for circles
 
-      # Draw the circles
+      # Draw the circles using GeomPolygon
       circle_grob <- GeomPolygon$draw_panel(
         circle_data,
         panel_params = panel_params,
@@ -562,7 +543,7 @@ GeomVectorSmooth <- ggproto(
       grobs <- c(grobs, grid::gList(circle_grob))
     }
 
-    # Draw the main vectors
+    # Draw the main vectors using GeomSegment
     segments_grob <- GeomSegment$draw_panel(
       data, panel_params, coord, arrow = arrow
     )
@@ -578,28 +559,25 @@ GeomVectorSmooth <- ggproto(
 )
 
 
-
-
-
 #' @rdname geom_vector_smooth
 #' @export
 stat_vector_smooth <- function(
-  mapping = NULL,
-  data = NULL,
-  geom = "vector_smooth",
-  position = "identity",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  n = c(11, 11),
-  method = "lm",
-  se = TRUE,
-  se.circle = TRUE,
-  probs = c(.95, NA),
-  default_formula = cbind(dx, dy) ~ x * y,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-  eval_points = NULL,
-  ...
+    mapping = NULL,
+    data = NULL,
+    geom = "vector_smooth",
+    position = "identity",
+    na.rm = FALSE,
+    show.legend = NA,
+    inherit.aes = TRUE,
+    n = c(11, 11),
+    method = "lm",
+    se = TRUE,
+    se.circle = TRUE,
+    conf_level = c(.95, NA),
+    default_formula = cbind(dx, dy) ~ x * y,
+    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+    eval_points = NULL,
+    ...
 ) {
 
   layer(
@@ -615,7 +593,7 @@ stat_vector_smooth <- function(
       method = method,
       se = se,
       se.circle = se.circle,
-      probs = probs,
+      conf_level = conf_level,
       arrow = arrow,
       eval_points = eval_points,
       na.rm = na.rm,
@@ -628,21 +606,21 @@ stat_vector_smooth <- function(
 #' @rdname geom_vector_smooth
 #' @export
 geom_vector_smooth <- function(
-  mapping = NULL,
-  data = NULL,
-  stat = "vector_smooth",
-  position = "identity",
-  na.rm = FALSE, show.legend = NA,
-  inherit.aes = TRUE,
-  n = c(11, 11),
-  method = "lm",
-  se = TRUE,
-  se.circle = TRUE,
-  probs = c(.95, NA),
-  default_formula = cbind(dx, dy) ~ x * y,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-  eval_points = NULL,
-  ...
+    mapping = NULL,
+    data = NULL,
+    stat = "vector_smooth",
+    position = "identity",
+    na.rm = FALSE, show.legend = NA,
+    inherit.aes = TRUE,
+    n = c(11, 11),
+    method = "lm",
+    se = TRUE,
+    se.circle = TRUE,
+    conf_level = c(.95, NA),
+    default_formula = cbind(dx, dy) ~ x * y,
+    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+    eval_points = NULL,
+    ...
 ) {
 
   layer(
@@ -658,7 +636,7 @@ geom_vector_smooth <- function(
       method = method,
       se = se,
       se.circle = se.circle,
-      probs = probs,
+      conf_level = conf_level,
       arrow = arrow,
       eval_points = eval_points,
       formula = default_formula,
