@@ -10,8 +10,6 @@
 #' @inheritParams ggplot2::stat_identity
 #' @param n An integer vector specifying the number of grid points along each
 #'   axis.
-#' @param scale_factor Numeric; scales the length of the vectors to a given
-#'   value. Useful for ensuring consistent lengths for visualization.
 #' @param method Character; specifies the smoothing method to be used.
 #'   Supported methods are `"lm"` (linear modeling) and `"boot"` (bootstrapping).
 #'   `"boot"` generates smoother results by calculating angles with bootstrapping,
@@ -185,7 +183,8 @@ StatVectorSmooth <- ggproto(
 
   compute_group = function(
     data, scales, n,
-    method, scale_factor, se = TRUE, probs,
+    method,
+    se = TRUE, probs,
     eval_points = NULL, formula, ...
   ) {
     # Ensure 'n' is a numeric vector of length 2
@@ -371,20 +370,20 @@ StatVectorSmooth <- ggproto(
     grid <- grid %>%
       mutate(
         # Calculate dx and dy for the mean theta and mean distance
-        dx = scale_factor * cos(theta) * r_mean,
-        dy = scale_factor * sin(theta) * r_mean,
+        dx = cos(theta) * r_mean,
+        dy = sin(theta) * r_mean,
         xend = x + dx,
         yend = y + dy,
 
         # Calculate dx and dy for theta_lower and r_lower
-        dx_lower = scale_factor * cos(theta_lower) * r_lower,
-        dy_lower = scale_factor * sin(theta_lower) * r_lower,
+        dx_lower = cos(theta_lower) * r_lower,
+        dy_lower = sin(theta_lower) * r_lower,
         xend_lower = x + dx_lower,
         yend_lower = y + dy_lower,
 
         # Calculate dx and dy for theta_upper and r_upper
-        dx_upper = scale_factor * cos(theta_upper) * r_upper,
-        dy_upper = scale_factor * sin(theta_upper) * r_upper,
+        dx_upper = cos(theta_upper) * r_upper,
+        dy_upper = sin(theta_upper) * r_upper,
         xend_upper = x + dx_upper,
         yend_upper = y + dy_upper
       )
@@ -440,7 +439,7 @@ GeomVectorSmooth <- ggproto(
   draw_panel = function(
     data, panel_params, coord,
     arrow = NULL, se = TRUE, se.circle = FALSE,
-    scale_factor, eval_points
+    eval_points
   ) {
     grobs <- list()
 
@@ -452,12 +451,12 @@ GeomVectorSmooth <- ggproto(
       wedge_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
         if (use_annular) {
           # Use r_lower and r_upper for annular wedges
-          inner_radius <- data$r_lower[i] * scale_factor
-          outer_radius <- data$r_upper[i] * scale_factor
+          inner_radius <- data$r_lower[i]
+          outer_radius <- data$r_upper[i]
         } else {
           # Use r for regular wedges
           inner_radius <- 0
-          outer_radius <- data$r[i] * scale_factor
+          outer_radius <- data$r[i]
         }
 
         create_wedge_data(
@@ -495,7 +494,7 @@ GeomVectorSmooth <- ggproto(
       circle_data <- do.call(rbind, lapply(1:nrow(data), function(i) {
         create_circle_data(
           x = data$x[i], y = data$y[i],
-          radius = data$r[i] * scale_factor,
+          radius = data$r[i],
           n = 100,
           group = data$id[i]
         )
@@ -550,9 +549,6 @@ stat_vector_smooth <- function(
   show.legend = NA,
   inherit.aes = TRUE,
   n = c(11, 11),
-  scale_factor = 1,
-  # center = TRUE,
-  # normalize = TRUE,
   method = "lm",
   se = TRUE,
   se.circle = TRUE,
@@ -573,9 +569,6 @@ stat_vector_smooth <- function(
     inherit.aes = inherit.aes,
     params = list(
       n = n,
-      # center = center,
-      # normalize = normalize,
-      scale_factor = scale_factor,
       method = method,
       se = se,
       se.circle = se.circle,
@@ -598,8 +591,7 @@ geom_vector_smooth <- function(
   position = "identity",
   na.rm = FALSE, show.legend = NA,
   inherit.aes = TRUE,
-  n = c(11, 11), scale_factor = 1,
-  # center = TRUE, normalize = TRUE,
+  n = c(11, 11),
   method = "lm",
   se = TRUE,
   se.circle = TRUE,
@@ -620,9 +612,6 @@ geom_vector_smooth <- function(
     inherit.aes = inherit.aes,
     params = list(
       n = n,
-      # center = center,
-      # normalize = normalize,
-      scale_factor = scale_factor,
       method = method,
       se = se,
       se.circle = se.circle,
