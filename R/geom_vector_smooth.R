@@ -246,34 +246,28 @@ StatVectorSmooth <- ggproto(
 
     # Extract the covariance matrix of the model coefficients
     cov_coef <- vcov(model_mv)
-
     # Create the design matrix for the grid
     design_matrix <- model.matrix(formula, data = grid)
 
-    # Number of response variables (dx and dy)
-    n_resp <- 2
 
-    # Extract covariance matrices
-    # Assuming the coefficients are ordered as:
-    # (Intercept), x, y, x:y for dx, then same for dy
-    # Adjust the indices if your model has a different order
-    # Here, assuming that for two responses, coefficients are:
-    # dx:(Intercept), dx:x, dx:y, dx:x:y, dy:(Intercept), dy:x, dy:y, dy:x:y
+    # Number of response variables (dx and dy)
+    n_resp <- all.vars(formula[[2]]) |> length()
 
     # Number of coefficients per response
     coeffs_per_response <- length(coef(model_mv)[,1])
 
     # Check the number of coefficients
     total_coeffs <- ncol(cov_coef)
-    expected_coeffs <- 4 * n_resp  # For formula cbind(dx, dy) ~ x * y
+
+    expected_coeffs <- coeffs_per_response * n_resp  # For formula cbind(dx, dy) ~ x * y
+    # expected_coeffs <- 4 * n_resp  # For formula cbind(dx, dy) ~ x * y
     if (total_coeffs != expected_coeffs) {
       stop("Unexpected number of coefficients in the model. Please verify the formula and data.")
     }
-
     # Extract covariance matrices
-    cov_beta_dx <- cov_coef[1:4, 1:4]     # Covariance for dx coefficients
-    cov_beta_dy <- cov_coef[5:8, 5:8]     # Covariance for dy coefficients
-    cov_beta_dx_dy <- cov_coef[1:4, 5:8]  # Covariance between dx and dy coefficients
+    cov_beta_dx <- cov_coef[1:coeffs_per_response, 1:coeffs_per_response]     # Covariance for dx coefficients
+    cov_beta_dy <- cov_coef[(coeffs_per_response+1):(expected_coeffs), (coeffs_per_response+1):(expected_coeffs)]     # Covariance for dy coefficients
+    cov_beta_dx_dy <- cov_coef[1:coeffs_per_response, (coeffs_per_response+1):(expected_coeffs)]  # Covariance between dx and dy coefficients
 
     # Compute variance for dx and dy predictions
     var_dx <- rowSums((design_matrix %*% cov_beta_dx) * design_matrix)
