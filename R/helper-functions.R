@@ -154,7 +154,7 @@ create_wedge_data <- function(
       group = rep(id, each = length(final_x_outer) + length(final_x_inner)),
       id = rep(id, each = length(final_x_outer) + length(final_x_inner))
     )
-    out <<- wedge_data
+
 } else {
   # Create regular wedge by connecting outer arc to center
   wedge_data <- data.frame(

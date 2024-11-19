@@ -165,6 +165,13 @@
 #'   geom_vector(aes(dx = dx, dy = dy), color = "black") +
 #'   ggtitle("Vector Smoothing with Bootstrapping (boot)")
 #'
+#' # Example 3: Using Polar Coordinates with coord_polar
+#' ggplot(sample_points, aes(x = x, y = y, angle = angle, distance = distance)) +
+#'   geom_vector_smooth(method = "lm", se = TRUE) +
+#'   geom_vector(aes(dx = dx, dy = dy), color = "black") +
+#'   coord_polar() +
+#'   ggtitle("Vector Smoothing in Polar Coordinates")
+#'
 NULL
 
 
@@ -187,6 +194,23 @@ StatVectorSmooth <- ggproto(
     se = TRUE, probs,
     eval_points = NULL, formula, ...
   ) {
+
+    # ----------------------------
+    # 1. Initial Data Manipulation
+    # ----------------------------
+
+    # If 'angle' and 'distance' are provided, compute 'dx' and 'dy'
+    if (all(!is.na(data$angle), !is.na(data$distance))) {
+      data$dx <- data$distance * cos(data$angle)
+      data$dy <- data$distance * sin(data$angle)
+    } else if (all(!is.na(data$dx), !is.na(data$dy))) {
+      # If 'dx' and 'dy' are provided, compute 'angle' and 'distance'
+      data$distance <- sqrt(data$dx^2 + data$dy^2)
+      data$angle <- atan2(data$dy, data$dx)
+    } else {
+      stop("You must provide either both 'dx' and 'dy' or both 'angle' and 'distance' aesthetics.")
+    }
+
     # Ensure 'n' is a numeric vector of length 2
     n <- ensure_length_two(n)
 
@@ -288,28 +312,53 @@ StatVectorSmooth <- ggproto(
     theta_sim_matrix <- matrix(NA, nrow = nrow(grid), ncol = n_sim)
     r_sim_matrix <- matrix(NA, nrow = nrow(grid), ncol = n_sim)  # Initialize r_sim_matrix
 
-    for (i in 1:nrow(grid)) {
-      mu <- c(grid$dx[i], grid$dy[i])
-      sigma <- matrix(c(cov_pred$var_dx[i], cov_pred$cov_dx_dy[i],
-                        cov_pred$cov_dx_dy[i], cov_pred$var_dy[i]), nrow = 2)
+    # for (i in 1:nrow(grid)) {
+    #   mu <- c(grid$dx[i], grid$dy[i])
+    #   sigma <- matrix(c(cov_pred$var_dx[i], cov_pred$cov_dx_dy[i],
+    #                     cov_pred$cov_dx_dy[i], cov_pred$var_dy[i]), nrow = 2)
+    #
+    #   # Ensure the covariance matrix is positive definite
+    #   if (!all(eigen(sigma)$values > 0)) {
+    #     # Adjust the covariance matrix if necessary
+    #     sigma <- sigma + diag(1e-6, 2)
+    #   }
+    #
+    #   # Simulate dx and dy
+    #   simulations <- MASS::mvrnorm(n = n_sim, mu = mu, Sigma = sigma)
+    #   sim_dx <- simulations[, 1]
+    #   sim_dy <- simulations[, 2]
+    #   sim_theta <- atan2(sim_dy, sim_dx)
+    #   sim_r <- sqrt((sim_dx)^2 + (sim_dy)^2)
+    #
+    #   # Store simulated theta
+    #   theta_sim_matrix[i, ] <- sim_theta
+    #   r_sim_matrix[i, ] <- sim_r
+    # }
 
-      # Ensure the covariance matrix is positive definite
-      if (!all(eigen(sigma)$values > 0)) {
-        # Adjust the covariance matrix if necessary
-        sigma <- sigma + diag(1e-6, 2)
-      }
+    # Vectorized simulation using mapply
+    simulations_list <- mapply(
+      function(mu1, mu2, var_dx, var_dy, cov_dx_dy) {
+        sigma <- matrix(c(var_dx, cov_dx_dy, cov_dx_dy, var_dy), nrow = 2)
 
-      # Simulate dx and dy
-      simulations <- MASS::mvrnorm(n = n_sim, mu = mu, Sigma = sigma)
-      sim_dx <- simulations[, 1]
-      sim_dy <- simulations[, 2]
-      sim_theta <- atan2(sim_dy, sim_dx)
-      sim_r <- sqrt((sim_dx)^2 + (sim_dy)^2)
+        # Ensure the covariance matrix is positive definite
+        if (!all(eigen(sigma)$values > 0)) {
+          sigma <- sigma + diag(1e-6, 2)
+        }
 
-      # Store simulated theta
-      theta_sim_matrix[i, ] <- sim_theta
-      r_sim_matrix[i, ] <- sim_r
-    }
+        MASS::mvrnorm(n = n_sim, mu = c(mu1, mu2), Sigma = sigma)
+      },
+      mu1 = grid$dx,
+      mu2 = grid$dy,
+      var_dx = cov_pred$var_dx,
+      var_dy = cov_pred$var_dy,
+      cov_dx_dy = cov_pred$cov_dx_dy,
+      SIMPLIFY = FALSE
+    )
+
+    # Extract theta and r from simulations
+    theta_sim_matrix <- do.call(rbind, lapply(simulations_list, function(sim) atan2(sim[, 2], sim[, 1])))
+    r_sim_matrix <- do.call(rbind, lapply(simulations_list, function(sim) sqrt(sim[, 1]^2 + sim[, 2]^2)))
+
 
     # ----------------------------
     # 5. Circular Statistics for Prediction Intervals

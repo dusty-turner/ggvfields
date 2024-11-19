@@ -26,7 +26,6 @@ stat_vector_smooth(
   show.legend = NA,
   inherit.aes = TRUE,
   n = c(11, 11),
-  scale_factor = 1,
   method = "lm",
   se = TRUE,
   se.circle = TRUE,
@@ -46,7 +45,6 @@ geom_vector_smooth(
   show.legend = NA,
   inherit.aes = TRUE,
   n = c(11, 11),
-  scale_factor = 1,
   method = "lm",
   se = TRUE,
   se.circle = TRUE,
@@ -120,9 +118,6 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{n}{An integer vector specifying the number of grid points along each
 axis.}
-
-\item{scale_factor}{Numeric; scales the length of the vectors to a given
-value. Useful for ensuring consistent lengths for visualization.}
 
 \item{method}{Character; specifies the smoothing method to be used.
 Supported methods are \code{"lm"} (linear modeling) and \code{"boot"} (bootstrapping).
@@ -342,6 +337,13 @@ ggplot(sample_points, aes(x = x, y = y, angle = angle, distance = distance)) +
   geom_vector_smooth(method = "boot", se = TRUE, probs = c(0.95, 0.68)) +
   geom_vector(aes(dx = dx, dy = dy), color = "black") +
   ggtitle("Vector Smoothing with Bootstrapping (boot)")
+
+# Example 3: Using Polar Coordinates with coord_polar
+ggplot(sample_points, aes(x = x, y = y, angle = angle, distance = distance)) +
+  geom_vector_smooth(method = "lm", se = TRUE) +
+  geom_vector(aes(dx = dx, dy = dy), color = "black") +
+  coord_polar() +
+  ggtitle("Vector Smoothing in Polar Coordinates")
 
 }
 \keyword{datasets}
