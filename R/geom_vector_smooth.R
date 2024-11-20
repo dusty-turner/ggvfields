@@ -447,7 +447,7 @@ GeomVectorSmooth <- ggproto(
   required_aes = c("x", "y", "xend", "yend"),
   default_aes = aes(
     linewidth = 0.5, linetype = 1, alpha = 1,
-    fill = "grey80", color = "#3366FF"
+    fill = NULL, color = "#3366FF"
   ),
 
   setup_data = function(data, params) {
@@ -497,8 +497,8 @@ GeomVectorSmooth <- ggproto(
 
       # Assign aesthetics for the wedge
       wedge_data$linewidth <- 0.5        # Adjust as needed
-      wedge_data$alpha <- 0.5            # Adjust transparency
-      wedge_data$fill <- "grey20"        # Fill color for the wedge
+      wedge_data$alpha <- .4            # Adjust transparency
+      wedge_data$fill <- "grey60"        # Fill color for the wedge
       wedge_data$colour <- NA            # No border color
 
       # Draw the wedges using GeomPolygon
@@ -531,7 +531,7 @@ GeomVectorSmooth <- ggproto(
       circle_data$linewidth <- 0.5        # Adjust as needed
       circle_data$alpha <- 0.2            # Adjust transparency
       circle_data$fill <- NA              # No fill for circles
-      circle_data$colour <- "grey40"      # Border color for circles
+      circle_data$colour <- "grey60"      # Border color for circles
 
       # Draw the circles using GeomPolygon
       circle_grob <- GeomPolygon$draw_panel(

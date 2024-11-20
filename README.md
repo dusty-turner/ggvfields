@@ -535,7 +535,8 @@ vector components (`dx`, `dy`).
 ``` r
 ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
   geom_vector_smooth() +
-  geom_vector(aes(color = after_stat(NULL)))
+  geom_vector(aes(color = after_stat(NULL))) +
+  coord_equal()
 ```
 
 <img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
@@ -553,7 +554,8 @@ In this example:
 ``` r
 ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
   geom_vector_smooth(n = 4) +
-  geom_vector(aes(color = after_stat(NULL)))
+  geom_vector(aes(color = after_stat(NULL))) +
+  coord_equal()
 ```
 
 <img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
@@ -570,11 +572,12 @@ In this example:
 #### Evalutating at Specific Points with `eval_points`:
 
 ``` r
-eval_point <- data.frame(x = -1, y = 1)
+eval_point <- data.frame(x = -.5, y = -.5)
 
 ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
-  geom_vector_smooth(eval_points = eval_point) +
-  geom_vector(aes(color = after_stat(NULL)), normalize = FALSE)
+  geom_vector_smooth(eval_points = eval_point, conf_level = .75) +
+  geom_vector(aes(color = after_stat(NULL)), normalize = FALSE) +
+  coord_equal()
 ```
 
 <img src="man/figures/README-unnamed-chunk-19-1.png" width="100%" />
@@ -585,9 +588,11 @@ In this example:
   y = 1) where we want to evaluate the smoothed vector field.  
 - By passing `eval_points = eval_point` to geom_vector_smooth(), we
   compute the smoothed vector only at this location.
+- We set the confidence level `conf_level` to .75 for a 75% prediction
+  interval on both the angle and direction.
 - We set `normalize = FALSE` in geom_vector() to display the original
-  vectors without normalization. This preservs their true magnitudes for
-  comparison.
+  vectors without normalization. This preserves their true magnitudes
+  for comparison.
 
 #### Additional Details
 
@@ -612,10 +617,11 @@ In this example:
 ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
   geom_vector_smooth(
     n = c(6, 6),
-    probs = c(0.95, 0.68),
+    conf_level = c(0.95),
     method = "lm"
   ) +
-  geom_vector(aes(color = after_stat(NULL))) 
+  geom_vector(aes(color = after_stat(NULL))) +
+  coord_equal()
 ```
 
 <img src="man/figures/README-unnamed-chunk-20-1.png" width="100%" />
@@ -623,7 +629,7 @@ ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
 In this example:
 
 - We set `n = c(6, 6)` to specify a 6x6 grid for smoothing.  
-- The `probs` parameter adds 95% and 68% prediction intervals around the
+- The `conf_level` parameter adds 95% prediction intervals around the
   smoothed vectors.  
 - We specify `method = "lm"` for linear smoothing.
 
