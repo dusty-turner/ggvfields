@@ -238,4 +238,53 @@ validate_aesthetics <- function(data) {
   ))
 }
 
+# Compute ellipse parameters based on covariance
+compute_ellipse_params <- function(var_dx, var_dy, cov_dx_dy, conf_level = 0.95) {
+  # Construct the covariance matrix
+  cov_matrix <- matrix(c(var_dx, cov_dx_dy, cov_dx_dy, var_dy), nrow = 2)
+
+  # Eigen decomposition
+  eig <- eigen(cov_matrix)
+
+  # Eigenvalues and eigenvectors
+  eigenvalues <- eig$values
+  eigenvectors <- eig$vectors
+
+  # Compute the angle of rotation in degrees
+  angle <- atan2(eigenvectors[2,1], eigenvectors[1,1]) * (180 / pi)
+
+  # Compute the scaling factor based on the desired confidence level
+  # For a 95% confidence ellipse in 2D, the scaling factor is sqrt(5.991)
+  # This comes from the chi-square distribution with 2 degrees of freedom
+  chi_sq_val <- qchisq(conf_level, df = 2)
+  scale_factor <- sqrt(chi_sq_val)
+
+  # Width and height of the ellipse (2 * axis lengths)
+  width <- 2 * scale_factor * sqrt(eigenvalues[1])
+  height <- 2 * scale_factor * sqrt(eigenvalues[2])
+
+  return(list(width = width, height = height, angle = angle))
+}
+
+
+# Helper function to create ellipse polygon data
+create_ellipse_data <- function(x_center, y_center, width, height, angle, n_points = 50) {
+  theta <- seq(0, 2 * pi, length.out = n_points)
+  ellipse <- data.frame(
+    theta = theta,
+    x = width / 2 * cos(theta),
+    y = height / 2 * sin(theta)
+  )
+
+  # Rotation matrix
+  rotation_matrix <- matrix(c(cos(angle * pi / 180), -sin(angle * pi / 180),
+                              sin(angle * pi / 180),  cos(angle * pi / 180)),
+                            nrow = 2)
+
+  rotated <- as.matrix(ellipse[, c("x", "y")]) %*% rotation_matrix
+  ellipse$x <- rotated[,1] + x_center
+  ellipse$y <- rotated[,2] + y_center
+
+  return(ellipse)
+}
 

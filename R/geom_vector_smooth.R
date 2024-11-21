@@ -189,7 +189,7 @@ StatVectorSmooth <- ggproto(
   compute_group = function(
     data, scales, n,
     method,
-    se = TRUE, conf_level,
+    se = TRUE, conf_level, pi_type,
     eval_points = NULL, formula, ...
   ) {
 
@@ -458,7 +458,7 @@ GeomVectorSmooth <- ggproto(
   draw_panel = function(
     data, panel_params, coord,
     arrow = NULL, se = TRUE, se.circle = FALSE,
-    eval_points
+    eval_points, pi_type
   ) {
     grobs <- list()
 
@@ -574,6 +574,7 @@ stat_vector_smooth <- function(
     se = TRUE,
     se.circle = TRUE,
     conf_level = c(.95, NA),
+    pi_type = "wedge",
     default_formula = cbind(dx, dy) ~ x * y,
     arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
     eval_points = NULL,
@@ -593,6 +594,7 @@ stat_vector_smooth <- function(
       method = method,
       se = se,
       se.circle = se.circle,
+      pi_type = pi_type,
       conf_level = conf_level,
       arrow = arrow,
       eval_points = eval_points,
@@ -616,6 +618,7 @@ geom_vector_smooth <- function(
     method = "lm",
     se = TRUE,
     se.circle = TRUE,
+    pi_type = "wedge",
     conf_level = c(.95, NA),
     default_formula = cbind(dx, dy) ~ x * y,
     arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
@@ -636,6 +639,7 @@ geom_vector_smooth <- function(
       method = method,
       se = se,
       se.circle = se.circle,
+      pi_type = pi_type,
       conf_level = conf_level,
       arrow = arrow,
       eval_points = eval_points,
