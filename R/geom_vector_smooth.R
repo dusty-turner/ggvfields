@@ -549,8 +549,8 @@ GeomVectorSmooth <- ggproto(
         # Draw ellipses
         ellipse_data_list <- lapply(1:nrow(data), function(i) {
           ellipse <- create_ellipse_data(
-            x_center = data$x[i],
-            y_center = data$y[i],
+            x_center = data$xend[i],    # Use xend
+            y_center = data$yend[i],    # Use yend
             width = data$ellipse_width[i],
             height = data$ellipse_height[i],
             angle = data$ellipse_angle[i],
