@@ -77,6 +77,7 @@ instead of scalar data.</p>
 <span>  se <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  se.circle <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  conf_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
+<span>  pi_type <span class="op">=</span> <span class="st">"wedge"</span>,</span>
 <span>  default_formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">dx</span>, <span class="va">dy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>  eval_points <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -95,6 +96,7 @@ instead of scalar data.</p>
 <span>  method <span class="op">=</span> <span class="st">"lm"</span>,</span>
 <span>  se <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  se.circle <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  pi_type <span class="op">=</span> <span class="st">"wedge"</span>,</span>
 <span>  conf_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
 <span>  default_formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">dx</span>, <span class="va">dy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
@@ -205,6 +207,22 @@ for visualizing variability when <code>se = TRUE</code>.</p></dd>
 plotted when <code>se = TRUE</code>. <strong>Default is <code>conf_level = 0.95</code></strong>.</p></dd>
 
 
+<dt>pi_type</dt>
+<dd><p>Character; specifies the type of prediction interval to
+display around the smoothed vectors.</p><ul><li><p><code>"wedge"</code>: Represents prediction intervals as angular wedges, illustrating
+uncertainty in both the direction and magnitude of the vectors. This method
+visualizes variability by displaying a sector emanating from the vector's
+origin, capturing the range of possible vector directions and lengths.</p></li>
+<li><p><code>"ellipse"</code>: Depicts prediction intervals as ellipses surrounding the
+vectors, reflecting the covariance between the vector components (<code>dx</code> and
+<code>dy</code>). This approach provides a clear representation of the joint uncertainty
+in both directions, allowing for the visualization of correlated variability.
+<strong>Default is <code>"wedge"</code></strong>. Note that if <code>pi_type</code> is set to <code>"ellipse"</code> but
+<code>eval_points</code> is <code>NULL</code>, the function will automatically switch <code>pi_type</code> to
+<code>"wedge"</code> to ensure appropriate interval representation.</p></li>
+</ul></dd>
+
+
 <dt>default_formula</dt>
 <dd><p>A formula specifying the model to fit for smoothing.
 Defaults to <code>cbind(dx, dy) ~ x * y</code>.</p></dd>
@@ -217,7 +235,8 @@ including properties like angle, length, and type.</p></dd>
 
 
 <dt>eval_points</dt>
-<dd><p>Number of points at which the function is evaluated for smoothing.</p></dd>
+<dd><p>Number of points at which the function is evaluated for
+smoothing.</p></dd>
 
 
 <dt>...</dt>

@@ -550,10 +550,10 @@ GeomVectorSmooth <- ggproto(
         wedge_data <- do.call(rbind, wedge_polygons)
 
         # Assign aesthetics for the wedge
-        wedge_data$linewidth <- 0.5        # Adjust as needed
-        wedge_data$alpha <- .4            # Adjust transparency
-        wedge_data$fill <- "grey60"        # Fill color for the wedge
-        wedge_data$colour <- NA            # No border color
+        wedge_data$linewidth <- 0.5
+        wedge_data$alpha <- .4
+        wedge_data$fill <- "grey60"
+        wedge_data$colour <- NA
 
         # Draw the wedges using GeomPolygon
         wedge_grob <- GeomPolygon$draw_panel(
@@ -568,8 +568,8 @@ GeomVectorSmooth <- ggproto(
         # Draw ellipses
         ellipse_data_list <- lapply(1:nrow(data), function(i) {
           ellipse <- create_ellipse_data(
-            x_center = data$xend[i],    # Use xend
-            y_center = data$yend[i],    # Use yend
+            x_center = data$xend[i],
+            y_center = data$yend[i],
             width = data$ellipse_width[i],
             height = data$ellipse_height[i],
             angle = data$ellipse_angle[i],
@@ -618,10 +618,10 @@ GeomVectorSmooth <- ggproto(
       circle_data <- do.call(rbind, circle_polygons)
 
       # Assign aesthetics for the circles
-      circle_data$linewidth <- 0.5        # Adjust as needed
-      circle_data$alpha <- 0.2            # Adjust transparency
-      circle_data$fill <- NA              # No fill for circles
-      circle_data$colour <- "grey60"      # Border color for circles
+      circle_data$linewidth <- 0.5
+      circle_data$alpha <- 0.2
+      circle_data$fill <- NA
+      circle_data$colour <- "grey60"
 
       # Draw the circles using GeomPolygon
       circle_grob <- GeomPolygon$draw_panel(
