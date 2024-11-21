@@ -30,6 +30,7 @@ stat_vector_smooth(
   se = TRUE,
   se.circle = TRUE,
   conf_level = c(0.95, NA),
+  pi_type = "wedge",
   default_formula = cbind(dx, dy) ~ x * y,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   eval_points = NULL,
@@ -48,6 +49,7 @@ geom_vector_smooth(
   method = "lm",
   se = TRUE,
   se.circle = TRUE,
+  pi_type = "wedge",
   conf_level = c(0.95, NA),
   default_formula = cbind(dx, dy) ~ x * y,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
@@ -134,6 +136,22 @@ for visualizing variability when \code{se = TRUE}.}
 \item{conf_level}{Numeric vector; specifies the prediction interval levels to be
 plotted when \code{se = TRUE}. \strong{Default is \code{conf_level = 0.95}}.}
 
+\item{pi_type}{Character; specifies the type of prediction interval to
+display around the smoothed vectors.
+\itemize{
+\item \code{"wedge"}: Represents prediction intervals as angular wedges, illustrating
+uncertainty in both the direction and magnitude of the vectors. This method
+visualizes variability by displaying a sector emanating from the vector's
+origin, capturing the range of possible vector directions and lengths.
+\item \code{"ellipse"}: Depicts prediction intervals as ellipses surrounding the
+vectors, reflecting the covariance between the vector components (\code{dx} and
+\code{dy}). This approach provides a clear representation of the joint uncertainty
+in both directions, allowing for the visualization of correlated variability.
+\strong{Default is \code{"wedge"}}. Note that if \code{pi_type} is set to \code{"ellipse"} but
+\code{eval_points} is \code{NULL}, the function will automatically switch \code{pi_type} to
+\code{"wedge"} to ensure appropriate interval representation.
+}}
+
 \item{default_formula}{A formula specifying the model to fit for smoothing.
 Defaults to \code{cbind(dx, dy) ~ x * y}.}
 
@@ -141,7 +159,8 @@ Defaults to \code{cbind(dx, dy) ~ x * y}.}
 controls the appearance of the arrowheads at the end of the vectors,
 including properties like angle, length, and type.}
 
-\item{eval_points}{Number of points at which the function is evaluated for smoothing.}
+\item{eval_points}{Number of points at which the function is evaluated for
+smoothing.}
 
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}'s \code{params} argument. These
 arguments broadly fall into one of 4 categories below. Notably, further

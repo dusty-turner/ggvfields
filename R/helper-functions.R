@@ -256,7 +256,7 @@ compute_ellipse_params <- function(var_dx, var_dy, cov_dx_dy, conf_level = 0.95)
   # Compute the scaling factor based on the desired confidence level
   # For a 95% confidence ellipse in 2D, the scaling factor is sqrt(5.991)
   # This comes from the chi-square distribution with 2 degrees of freedom
-  chi_sq_val <- qchisq(conf_level, df = 2)
+  chi_sq_val <- stats::qchisq(conf_level, df = 2)
   scale_factor <- sqrt(chi_sq_val)
 
   # Width and height of the ellipse (2 * axis lengths)

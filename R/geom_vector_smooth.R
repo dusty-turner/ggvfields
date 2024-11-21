@@ -21,7 +21,21 @@
 #'   for visualizing variability when `se = TRUE`.
 #' @param conf_level Numeric vector; specifies the prediction interval levels to be
 #'   plotted when `se = TRUE`. **Default is `conf_level = 0.95`**.
-#' @param eval_points Number of points at which the function is evaluated for smoothing.
+#' @param eval_points Number of points at which the function is evaluated for
+#'   smoothing.
+#' @param pi_type Character; specifies the type of prediction interval to
+#'   display around the smoothed vectors.
+#'   - `"wedge"`: Represents prediction intervals as angular wedges, illustrating
+#'   uncertainty in both the direction and magnitude of the vectors. This method
+#'   visualizes variability by displaying a sector emanating from the vector's
+#'   origin, capturing the range of possible vector directions and lengths.
+#'   - `"ellipse"`: Depicts prediction intervals as ellipses surrounding the
+#'   vectors, reflecting the covariance between the vector components (`dx` and
+#'   `dy`). This approach provides a clear representation of the joint uncertainty
+#'   in both directions, allowing for the visualization of correlated variability.
+#'   **Default is `"wedge"`**. Note that if `pi_type` is set to `"ellipse"` but
+#'   `eval_points` is `NULL`, the function will automatically switch `pi_type` to
+#'   `"wedge"` to ensure appropriate interval representation.
 #' @param arrow Arrow specification, as created by `grid::arrow()`. This
 #'   controls the appearance of the arrowheads at the end of the vectors,
 #'   including properties like angle, length, and type.
@@ -175,7 +189,6 @@ NULL
 
 #' @rdname geom_vector_smooth
 #' @export
-
 StatVectorSmooth <- ggproto(
   "StatVectorSmooth",
   Stat,
@@ -196,7 +209,10 @@ StatVectorSmooth <- ggproto(
     # ----------------------------
     # 1. Initial Data Checks and Manipulation
     # ----------------------------
-
+    if (pi_type == "ellipse" && is.null(eval_points)) {
+      message("eval_points is NULL; changing pi_type from 'ellipse' to 'wedge'.")
+      pi_type <- "wedge"
+    }
     # use helper function to validate input
     validation_result <- validate_aesthetics(data)
 
@@ -468,13 +484,11 @@ StatVectorSmooth <- ggproto(
 
     return(result)
   }
-
 )
 
 
 #' @rdname geom_vector_smooth
 #' @export
-# Define the GeomVectorSmooth ggproto
 GeomVectorSmooth <- ggproto(
   "GeomVectorSmooth",
   GeomSegment,
@@ -495,6 +509,11 @@ GeomVectorSmooth <- ggproto(
     eval_points, pi_type
   ) {
     grobs <- list()
+
+    if (pi_type == "ellipse" && is.null(eval_points)) {
+      # message("eval_points is NULL; changing pi_type from 'ellipse' to 'wedge'.")
+      pi_type <- "wedge"
+    }
 
     if (se) {
       if (pi_type == "wedge") {
@@ -564,10 +583,10 @@ GeomVectorSmooth <- ggproto(
         ellipse_data <- do.call(rbind, ellipse_data_list)
 
         # Assign aesthetics
-        ellipse_data$linewidth <- 0.5         # Adjust as needed
-        ellipse_data$alpha <- 0.4             # Adjust transparency
-        ellipse_data$fill <- "grey60"         # Fill color
-        ellipse_data$colour <- NA             # No border color
+        ellipse_data$linewidth <- 0.5
+        ellipse_data$alpha <- 0.4
+        ellipse_data$fill <- "grey60"
+        ellipse_data$colour <- NA
 
         # Draw the ellipses using GeomPolygon
         ellipse_grob <- GeomPolygon$draw_panel(
