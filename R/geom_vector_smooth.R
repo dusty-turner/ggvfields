@@ -441,6 +441,30 @@ StatVectorSmooth <- ggproto(
 
     }
 
+    if (is.null(eval_points)) {
+      # Rescale outer_radius to base_radius
+      result$r_upper <- base_radius
+
+      # Recompute xend_upper and yend_upper based on base_radius and min_angle
+      min_angle_rad <- result$min_angle * pi / 180
+      result$xend_upper <- result$x + base_radius * cos(min_angle_rad)
+      result$yend_upper <- result$y + base_radius * sin(min_angle_rad)
+
+      # Recompute xend_lower and yend_lower based on base_radius and max_angle
+      max_angle_rad <- result$max_angle * pi / 180
+      result$xend_lower <- result$x + base_radius * cos(max_angle_rad)
+      result$yend_lower <- result$y + base_radius * sin(max_angle_rad)
+
+      # Rescale main vectors dx and dy to have length base_radius
+      result$angle <- atan2(result$dy, result$dx)  # Recompute angle after rescaling
+      result$dx <- base_radius * cos(result$angle)
+      result$dy <- base_radius * sin(result$angle)
+
+      # Recompute xend and yend based on rescaled dx and dy
+      result$xend <- result$x + result$dx
+      result$yend <- result$y + result$dy
+    }
+
     # Print the updated dataframe for debugging
     print(result)
 
@@ -486,15 +510,15 @@ GeomVectorSmooth <- ggproto(
         wedge_polygons <- vector("list", nrow(data))
 
         for (i in 1:nrow(data)) {
-          if (use_annular) {
-            # Use r_lower and r_upper for annular wedges
-            inner_radius <- data$r_lower[i]
-            outer_radius <- data$r_upper[i]
-          } else {
+          # if (use_annular) {
+          #   # Use r_lower and r_upper for annular wedges
+          #   inner_radius <- data$r_lower[i]
+          #   outer_radius <- data$r_upper[i]
+          # } else {
             # Use r for regular wedges
             inner_radius <- 0
             outer_radius <- data$r[i]
-          }
+          # }
 
           wedge_polygons[[i]] <- create_wedge_data(
             x = data$x[i], y = data$y[i],
@@ -516,7 +540,7 @@ GeomVectorSmooth <- ggproto(
         wedge_data$alpha <- .4
         wedge_data$fill <- "grey60"
         wedge_data$colour <- NA
-
+print(wedge_data)
         # Draw the wedges using GeomPolygon
         wedge_grob <- GeomPolygon$draw_panel(
           wedge_data,
