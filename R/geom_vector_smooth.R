@@ -231,7 +231,7 @@ StatVectorSmooth <- ggproto(
 
     alpha_levels <- 1 - conf_level
 
-    # For two-tailed intervals, split alpha
+    # two-tailed interval
     lower_probs <- alpha_levels / 2
     upper_probs <- 1 - (alpha_levels / 2)
 
@@ -302,7 +302,7 @@ StatVectorSmooth <- ggproto(
     # Check the number of coefficients
     total_coeffs <- ncol(cov_coef)
 
-    expected_coeffs <- coeffs_per_response * n_resp  # For formula cbind(dx, dy) ~ x * y
+    expected_coeffs <- coeffs_per_response * n_resp
     if (total_coeffs != expected_coeffs) {
       stop("Unexpected number of coefficients in the model. Please verify the formula and data.")
     }
@@ -481,7 +481,7 @@ StatVectorSmooth <- ggproto(
     } else {
       stop("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
     }
-
+print(result)
     return(result)
   }
 )
