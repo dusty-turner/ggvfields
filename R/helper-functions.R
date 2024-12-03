@@ -563,3 +563,70 @@ flow_ode <- function(time, state, parameters) {
   return(list(c(dx, dy)))
 }
 
+# Function to calculate wedge angles from (x, y) to ellipse perimeter
+calculate_wedge_angles <- function(x, y, xend, yend, a, b, angle_deg) {
+  # Convert angle to radians
+  phi <- angle_deg * pi / 180
+
+  # Generate points around the ellipse perimeter
+  theta <- seq(0, 2 * pi, length.out = 360)
+  ellipse_x <- a * cos(theta)
+  ellipse_y <- b * sin(theta)
+
+  # Rotate the ellipse
+  rotated_x <- ellipse_x * cos(phi) - ellipse_y * sin(phi)
+  rotated_y <- ellipse_x * sin(phi) + ellipse_y * cos(phi)
+
+  # Shift the ellipse to (xend, yend)
+  ellipse_coords_x <- rotated_x + xend
+  ellipse_coords_y <- rotated_y + yend
+
+  # Calculate angles from (x, y) to each point on the ellipse
+  angles <- atan2(ellipse_coords_y - y, ellipse_coords_x - x) * 180 / pi
+  angles_deg <- (angles + 360) %% 360
+
+  # Identify the angles corresponding to the upper and lower extremes
+  # For simplicity, we'll take the min and max angles
+  min_angle <- min(angles_deg)
+  max_angle <- max(angles_deg)
+
+  # Handle wrap-around if the span is greater than 180 degrees
+  angle_span <- max_angle - min_angle
+  if (angle_span > 180) {
+    # Choose the smaller arc
+    min_angle_new <- max_angle
+    max_angle_new <- min_angle + 360
+    return(data.frame(min_angle = min_angle_new %% 360, max_angle = max_angle_new %% 360))
+  } else {
+    return(data.frame(min_angle = min_angle, max_angle = max_angle))
+  }
+}
+
+# Define a helper function to compute wedge endpoints (unchanged)
+compute_wedge_endpoints <- function(x, y, a, b, angle_deg, target_angle_deg) {
+  # Convert degrees to radians
+  target_angle_rad <- target_angle_deg * pi / 180
+  phi <- angle_deg * pi / 180
+
+  # Direction vector
+  dx_dir <- cos(target_angle_rad)
+  dy_dir <- sin(target_angle_rad)
+
+  # Rotate direction vector by -phi
+  dx_rot <- dx_dir * cos(phi) + dy_dir * sin(phi)
+  dy_rot <- -dx_dir * sin(phi) + dy_dir * cos(phi)
+
+  # Compute scaling factor t to reach the ellipse perimeter
+  A <- (dx_rot / a)^2 + (dy_rot / b)^2
+  t <- sqrt(1 / A)
+
+  # Intersection point in rotated coordinates
+  x_intersect_rot <- t * dx_rot
+  y_intersect_rot <- t * dy_rot
+
+  # Rotate back to original coordinates and translate
+  x_intersect <- x + x_intersect_rot * cos(phi) - y_intersect_rot * sin(phi)
+  y_intersect <- y + x_intersect_rot * sin(phi) + y_intersect_rot * cos(phi)
+
+  return(c(x_intersect, y_intersect))
+}

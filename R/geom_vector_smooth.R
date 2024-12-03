@@ -213,7 +213,7 @@ StatVectorSmooth <- ggproto(
       message("eval_points is NULL; changing pi_type from 'ellipse' to 'wedge'.")
       pi_type <- "wedge"
     }
-    # use helper function to validate input
+    # Use helper function to validate input
     validation_result <- validate_aesthetics(data)
 
     # If 'angle' and 'distance' are provided, compute 'dx' and 'dy'
@@ -231,7 +231,7 @@ StatVectorSmooth <- ggproto(
 
     alpha_levels <- 1 - conf_level
 
-    # two-tailed interval
+    # Two-tailed interval
     lower_probs <- alpha_levels / 2
     upper_probs <- 1 - (alpha_levels / 2)
 
@@ -323,7 +323,7 @@ StatVectorSmooth <- ggproto(
     # 4. Compute Prediction Intervals
     # ----------------------------
 
-    if (pi_type == "ellipse") {
+    if (pi_type == "ellipse" | pi_type == "wedge") {
       # Compute ellipse parameters for each grid point
       ellipse_params_list <- mapply(
         compute_ellipse_params,
@@ -357,131 +357,93 @@ StatVectorSmooth <- ggproto(
         id = grid$id
       )
 
-    } else if (pi_type == "wedge") {
-      # Number of simulations per grid point
-      n_sim <- 1000  # Adjust as needed for accuracy vs performance
-
-      # Vectorized simulation using mapply
-      simulations_list <- mapply(
-        function(mu1, mu2, var_dx, var_dy, cov_dx_dy) {
-          sigma <- matrix(c(var_dx, cov_dx_dy, cov_dx_dy, var_dy), nrow = 2)
-
-          # Ensure the covariance matrix is positive definite
-          eigen_vals <- eigen(sigma, symmetric = TRUE)$values
-          if (any(eigen_vals <= 0)) {
-            sigma <- sigma + diag(1e-6, 2)
-          }
-
-          MASS::mvrnorm(n = n_sim, mu = c(mu1, mu2), Sigma = sigma)
-        },
-        mu1 = grid$dx,
-        mu2 = grid$dy,
-        var_dx = cov_pred$var_dx,
-        var_dy = cov_pred$var_dy,
-        cov_dx_dy = cov_pred$cov_dx_dy,
-        SIMPLIFY = FALSE
-      )
-
-      # Extract theta and r from simulations
-      theta_sim_matrix <- do.call(rbind, lapply(simulations_list, function(sim) atan2(sim[, 2], sim[, 1])))
-      r_sim_matrix <- do.call(rbind, lapply(simulations_list, function(sim) sqrt(sim[, 1]^2 + sim[, 2]^2)))
-
-      # ----------------------------
-      # 5. Circular Statistics for Prediction Intervals
-      # ----------------------------
-
-      r_mean <- rowMeans(r_sim_matrix, na.rm = TRUE)
-      r_lower_list <- lapply(lower_probs, function(p) apply(r_sim_matrix, 1, quantile, probs = p, na.rm = TRUE))
-      r_upper_list <- lapply(upper_probs, function(p) apply(r_sim_matrix, 1, quantile, probs = p, na.rm = TRUE))
-
-      # Compute circular mean for each grid point
-      theta_mean <- sapply(1:nrow(theta_sim_matrix), function(i) {
-        circular::mean.circular(circular::circular(theta_sim_matrix[i, ], units = "radians", modulo = "2pi"))
-      })
-
-      # Compute theta_lower and theta_upper
-      theta_lower_list <- lapply(lower_probs, function(p) {
-        sapply(1:nrow(theta_sim_matrix), function(i) {
-          compute_circular_quantile(theta = theta_sim_matrix[i, ], theta_mean = theta_mean[i], prob = p)
-        })
-      })
-
-      theta_upper_list <- lapply(upper_probs, function(p) {
-        sapply(1:nrow(theta_sim_matrix), function(i) {
-          compute_circular_quantile(theta = theta_sim_matrix[i, ], theta_mean = theta_mean[i], prob = p)
-        })
-      })
-
-      r_lower <- r_lower_list[[1]]
-      r_upper <- r_upper_list[[1]]
-      theta_lower <- theta_lower_list[[1]]
-      theta_upper <- theta_upper_list[[1]]
-
-      # ----------------------------
-      # 6. Data Preparation for Geom
-      # ----------------------------
-
-      ## ignore upper and lower bounds and radius if no grid is provided
-      if(is.null(eval_points)){
-        r_mean <- rep(base_radius, nrow(grid))
-        r_lower <- rep(base_radius, nrow(grid))
-        r_upper <- rep(base_radius, nrow(grid))
-      }
-
-      # Add theta and distance statistics to grid
-      grid$theta <- theta_mean
-      grid$theta_lower <- theta_lower
-      grid$theta_upper <- theta_upper
-      grid$r_mean <- r_mean
-      grid$r_lower <- r_lower
-      grid$r_upper <- r_upper
-
-      # Calculate dx and dy for the mean theta and mean distance
-      grid$dx <- cos(grid$theta) * grid$r_mean
-      grid$dy <- sin(grid$theta) * grid$r_mean
-      grid$xend <- grid$x + grid$dx
-      grid$yend <- grid$y + grid$dy
-
-      # Calculate dx and dy for theta_lower and r_lower
-      grid$dx_lower <- cos(grid$theta_lower) * grid$r_lower
-      grid$dy_lower <- sin(grid$theta_lower) * grid$r_lower
-      grid$xend_lower <- grid$x + grid$dx_lower
-      grid$yend_lower <- grid$y + grid$dy_lower
-
-      # Calculate dx and dy for theta_upper and r_upper
-      grid$dx_upper <- cos(grid$theta_upper) * grid$r_upper
-      grid$dy_upper <- sin(grid$theta_upper) * grid$r_upper
-      grid$xend_upper <- grid$x + grid$dx_upper
-      grid$yend_upper <- grid$y + grid$dy_upper
-
-      # Select relevant columns to return
-      result <- data.frame(
-        x = grid$x,
-        y = grid$y,
-        dx = grid$dx,
-        dy = grid$dy,
-        xend = grid$xend,
-        yend = grid$yend,
-        dx_lower = grid$dx_lower,
-        dy_lower = grid$dy_lower,
-        xend_lower = grid$xend_lower,
-        yend_lower = grid$yend_lower,
-        dx_upper = grid$dx_upper,
-        dy_upper = grid$dy_upper,
-        xend_upper = grid$xend_upper,
-        yend_upper = grid$yend_upper,
-        id = grid$id
-      )
-
-      # Calculate lengths of vectors
-      result$r <- sqrt(result$dx^2 + result$dy^2)
-      result$r_lower <- sqrt(result$dx_lower^2 + result$dy_lower^2)
-      result$r_upper <- sqrt(result$dx_upper^2 + result$dy_upper^2)
-
     } else {
       stop("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
     }
-print(result)
+
+    if(pi_type == "wedge"){
+
+      # Apply the corrected calculate_wedge_angles function to each row
+      wedge_angles <- do.call(rbind, lapply(1:nrow(result), function(i) {
+        calculate_wedge_angles(
+          x = result$x[i],
+          y = result$y[i],
+          xend = result$xend[i],
+          yend = result$yend[i],
+          a = result$ellipse_width[i] / 2,
+          b = result$ellipse_height[i] / 2,
+          angle_deg = result$ellipse_angle[i]
+        )
+      }))
+
+      # Combine with original dataframe
+      result <- cbind(result, wedge_angles)
+
+      # Adjust angles to be within 0-360 if necessary
+      result$max_angle <- result$max_angle %% 360
+      result$min_angle <- result$min_angle %% 360
+      result$r_lower <- 0
+      result$r_upper <- sqrt((result$dx)^2 + (result$dy)^2)
+
+      # ----------------------------
+      # 5. Compute Wedge Endpoints
+      # ----------------------------
+
+      # Apply the helper function to compute endpoints
+      endpoints <- mapply(
+        compute_wedge_endpoints,
+        x = result$x,
+        y = result$y,
+        a = result$ellipse_width / 2,
+        b = result$ellipse_height / 2,
+        angle_deg = result$ellipse_angle,
+        target_angle_deg = c(result$min_angle, result$max_angle),
+        SIMPLIFY = FALSE
+      )
+
+      # Initialize vectors to store endpoints
+      xend_upper <- numeric(nrow(result))
+      yend_upper <- numeric(nrow(result))
+      xend_lower <- numeric(nrow(result))
+      yend_lower <- numeric(nrow(result))
+
+      for(i in 1:nrow(result)) {
+        # Upper endpoint at min_angle
+        upper <- compute_wedge_endpoints(
+          x = result$x[i],
+          y = result$y[i],
+          a = result$ellipse_width[i] / 2,
+          b = result$ellipse_height[i] / 2,
+          angle_deg = result$ellipse_angle[i],
+          target_angle_deg = result$min_angle[i]
+        )
+        xend_upper[i] <- upper[1]
+        yend_upper[i] <- upper[2]
+
+        # Lower endpoint at max_angle
+        lower <- compute_wedge_endpoints(
+          x = result$x[i],
+          y = result$y[i],
+          a = result$ellipse_width[i] / 2,
+          b = result$ellipse_height[i] / 2,
+          angle_deg = result$ellipse_angle[i],
+          target_angle_deg = result$max_angle[i]
+        )
+        xend_lower[i] <- lower[1]
+        yend_lower[i] <- lower[2]
+      }
+
+      # Add endpoints to the result dataframe
+      result$xend_upper <- xend_upper
+      result$yend_upper <- yend_upper
+      result$xend_lower <- xend_lower
+      result$yend_lower <- yend_lower
+
+    }
+
+    # Print the updated dataframe for debugging
+    print(result)
+
     return(result)
   }
 )
