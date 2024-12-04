@@ -63,7 +63,6 @@
 #' @examples
 #' library(ggplot2)
 #'
-#' # Define a scalar function
 #' paraboloid_field <- function(v) {
 #'   x <- v[1]
 #'   y <- v[2]
@@ -76,7 +75,6 @@
 #'   x^3 - 3 * x * y^2
 #' }
 #'
-#' # Create a ggplot with the gradient field layer
 #' ggplot() +
 #'   geom_gradient_field(fun = paraboloid_field)
 #'

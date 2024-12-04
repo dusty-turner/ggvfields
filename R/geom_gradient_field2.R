@@ -5,27 +5,26 @@
 #' for gradient field visualizations where vector length is mapped to the vector's magnitude.
 #'
 #' **Default Behavior:**
-#' - **Length** is automatically mapped to the vector norm (`length = after_stat(norm)`), emphasizing the vector's magnitude through its length in the plot.
-#' - **Color** is set to `"black"` by default, ensuring a uniform appearance across vectors. Users can override this by specifying a different aesthetic mapping.
-#' - **Center** is set to `FALSE` by default, so vectors start from the specified (`x`, `y`) coordinates.
-#' - **Arrowheads** are set to `NULL` by default, allowing users to add custom arrowheads if desired.
+#' - **Length** is automatically mapped to the vector norm (`length = after_stat(norm)`), emphasizing the vector
+#'   magnitude through the length of each vector in the plot.
+#' - **Color** is set to `"black"` by default, ensuring a uniform appearance across vectors. Users can override
+#'   this if they wish to map another variable to `color`.
 #'
 #' **Additional Parameters:**
-#' - **`tail_point`**: Logical; if `TRUE`, adds a small point at the tail of each vector to indicate the starting point.
-#' - **`arrow`**: Arrow specification, created by `grid::arrow()`, to add arrowheads to vectors. Default is `NULL`.
+#' - **center** is set to `FALSE` by default, so vectors start from the specified (`x`, `y`) coordinates.
+#' - **tail_point** is set to `TRUE` by default, adding a small point at the tail of each vector to help indicate the starting point.
+#' - **arrow** is set to `NULL`, but users can specify an arrow using `grid::arrow()` to add custom arrowheads.
 #'
 #' @inheritParams geom_gradient_field
 #' @param mapping Aesthetic mappings created by `aes()` or `aes_()`.
 #'   These functions ensure that `length = after_stat(norm)` is mapped by default, and `color` is set to `"black"` unless otherwise specified.
 #' @param tail_point Logical; if `TRUE`, adds a small point at the tail of each vector to help indicate the starting point.
-#' @param ... Other arguments passed on to `geom_gradient_field()`, such as additional aesthetic mappings.
-#'
+#' @param ... Other arguments passed on to `geom_gradient_field()` or `stat_gradient_field()`.
 #' @return A `ggplot2` layer that can be added to a ggplot object to create a gradient field plot.
 #'
 #' @examples
 #' library(ggplot2)
 #'
-#' # Define scalar functions
 #' paraboloid_field <- function(v) {
 #'   x <- v[1]
 #'   y <- v[2]
@@ -38,35 +37,11 @@
 #'   x^3 - 3 * x * y^2
 #' }
 #'
-#' # Create a gradient field plot using geom_gradient_field2
 #' ggplot() +
-#'   geom_gradient_field2(
-#'     fun = paraboloid_field,
-#'     xlim = c(-5, 5),
-#'     ylim = c(-5, 5),
-#'     n = 20,
-#'     aes(color = after_stat(norm)),  # Override default color if desired
-#'     tail_point = TRUE,
-#'     arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
-#'   ) +
-#'   coord_fixed() +
-#'   theme_minimal() +
-#'   labs(title = "Gradient Field of Scalar Function x² + y²")
+#'   geom_gradient_field2(fun = paraboloid_field)
 #'
-#' # Create a gradient field plot using geom_gradient_field2 with saddle_field
 #' ggplot() +
-#'   geom_gradient_field2(
-#'     fun = saddle_field,
-#'     xlim = c(-2, 2),
-#'     ylim = c(-2, 2),
-#'     n = 20,
-#'     aes(color = after_stat(norm)),  # Override default color if desired
-#'     tail_point = TRUE,
-#'     arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
-#'   ) +
-#'   coord_fixed() +
-#'   theme_minimal() +
-#'   labs(title = "Gradient Field of Scalar Function x³ - 3xy²")
+#'   geom_gradient_field2(fun = saddle_field)
 #'
 #' @seealso
 #' Use [geom_gradient_field()] if you prefer to map vector magnitude using a different aesthetic such as `color`.
@@ -92,21 +67,14 @@ geom_gradient_field2 <- function(
     ...
 ) {
 
-  # Define default aesthetic mappings
-  base_mapping <- aes(length = after_stat(norm), color = "black")
+  # Define the base aesthetic mappings
+  base_mapping <- aes(length = after_stat(norm), color = NULL)
 
-  # If user provides a mapping, combine it with the base mapping
+  # Modify the user-specified mapping if provided
   if (is.null(mapping)) {
     mapping <- base_mapping
   } else {
-    # Override base_mapping with user-specified aesthetics, except for length and color
-    # Only set length and color if they are not already mapped
-    if (!"length" %in% names(mapping)) {
-      mapping$length <- after_stat(norm)
-    }
-    if (!"color" %in% names(mapping)) {
-      mapping$color <- "black"
-    }
+    mapping <- modifyList(base_mapping, mapping)
   }
 
   geom_gradient_field(
@@ -136,7 +104,7 @@ stat_gradient_field2 <- function(
     mapping = NULL,
     data = NULL,
     stat = "identity",
-    geom = "gradient_field2",
+    geom = "vector",
     position = "identity",
     na.rm = FALSE,
     show.legend = NA,
@@ -152,23 +120,17 @@ stat_gradient_field2 <- function(
     ...
 ) {
 
-  # Define default aesthetic mappings
-  base_mapping <- aes(length = after_stat(norm), color = "black")
+  # Define the base aesthetic mappings
+  base_mapping <- aes(length = after_stat(norm), color = NULL)
 
-  # If user provides a mapping, combine it with the base mapping
+  # Modify the user-specified mapping if provided
   if (is.null(mapping)) {
     mapping <- base_mapping
   } else {
-    # Override base_mapping with user-specified aesthetics, except for length and color
-    if (!"length" %in% names(mapping)) {
-      mapping$length <- after_stat(norm)
-    }
-    if (!"color" %in% names(mapping)) {
-      mapping$color <- "black"
-    }
+    mapping <- modifyList(base_mapping, mapping)
   }
 
-  geom_gradient_field2(
+  stat_gradient_field(
     mapping = mapping,
     data = data,
     stat = stat,
@@ -183,8 +145,8 @@ stat_gradient_field2 <- function(
     n = n,
     center = center,
     normalize = normalize,
-    tail_point = tail_point,
     arrow = arrow,
+    tail_point = tail_point,
     ...
   )
 }

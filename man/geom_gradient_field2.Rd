@@ -29,7 +29,7 @@ stat_gradient_field2(
   mapping = NULL,
   data = NULL,
   stat = "identity",
-  geom = "gradient_field2",
+  geom = "vector",
   position = "identity",
   na.rm = FALSE,
   show.legend = NA,
@@ -137,7 +137,7 @@ Set to \code{FALSE} to view the original lengths of the vectors.}
 \item{arrow}{Arrow specification, created by \code{grid::arrow()}, to add
 arrowheads to vectors.}
 
-\item{...}{Other arguments passed on to \code{geom_gradient_field()}, such as additional aesthetic mappings.}
+\item{...}{Other arguments passed on to \code{geom_gradient_field()} or \code{stat_gradient_field()}.}
 }
 \value{
 A \code{ggplot2} layer that can be added to a ggplot object to create a gradient field plot.
@@ -150,22 +150,22 @@ for gradient field visualizations where vector length is mapped to the vector's 
 \details{
 \strong{Default Behavior:}
 \itemize{
-\item \strong{Length} is automatically mapped to the vector norm (\code{length = after_stat(norm)}), emphasizing the vector's magnitude through its length in the plot.
-\item \strong{Color} is set to \code{"black"} by default, ensuring a uniform appearance across vectors. Users can override this by specifying a different aesthetic mapping.
-\item \strong{Center} is set to \code{FALSE} by default, so vectors start from the specified (\code{x}, \code{y}) coordinates.
-\item \strong{Arrowheads} are set to \code{NULL} by default, allowing users to add custom arrowheads if desired.
+\item \strong{Length} is automatically mapped to the vector norm (\code{length = after_stat(norm)}), emphasizing the vector
+magnitude through the length of each vector in the plot.
+\item \strong{Color} is set to \code{"black"} by default, ensuring a uniform appearance across vectors. Users can override
+this if they wish to map another variable to \code{color}.
 }
 
 \strong{Additional Parameters:}
 \itemize{
-\item \strong{\code{tail_point}}: Logical; if \code{TRUE}, adds a small point at the tail of each vector to indicate the starting point.
-\item \strong{\code{arrow}}: Arrow specification, created by \code{grid::arrow()}, to add arrowheads to vectors. Default is \code{NULL}.
+\item \strong{center} is set to \code{FALSE} by default, so vectors start from the specified (\code{x}, \code{y}) coordinates.
+\item \strong{tail_point} is set to \code{TRUE} by default, adding a small point at the tail of each vector to help indicate the starting point.
+\item \strong{arrow} is set to \code{NULL}, but users can specify an arrow using \code{grid::arrow()} to add custom arrowheads.
 }
 }
 \examples{
 library(ggplot2)
 
-# Define scalar functions
 paraboloid_field <- function(v) {
   x <- v[1]
   y <- v[2]
@@ -178,35 +178,11 @@ saddle_field <- function(v) {
   x^3 - 3 * x * y^2
 }
 
-# Create a gradient field plot using geom_gradient_field2
 ggplot() +
-  geom_gradient_field2(
-    fun = paraboloid_field,
-    xlim = c(-5, 5),
-    ylim = c(-5, 5),
-    n = 20,
-    aes(color = after_stat(norm)),  # Override default color if desired
-    tail_point = TRUE,
-    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
-  ) +
-  coord_fixed() +
-  theme_minimal() +
-  labs(title = "Gradient Field of Scalar Function x² + y²")
+  geom_gradient_field2(fun = paraboloid_field)
 
-# Create a gradient field plot using geom_gradient_field2 with saddle_field
 ggplot() +
-  geom_gradient_field2(
-    fun = saddle_field,
-    xlim = c(-2, 2),
-    ylim = c(-2, 2),
-    n = 20,
-    aes(color = after_stat(norm)),  # Override default color if desired
-    tail_point = TRUE,
-    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
-  ) +
-  coord_fixed() +
-  theme_minimal() +
-  labs(title = "Gradient Field of Scalar Function x³ - 3xy²")
+  geom_gradient_field2(fun = saddle_field)
 
 }
 \seealso{
