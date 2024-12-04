@@ -134,7 +134,7 @@ geom_vector_field <- function(
     na.rm = na.rm,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
-    fun = fun,  # Pass the user function for divergence/curl calculation
+    fun = fun,
     center = center,
     normalize = normalize,
     arrow = arrow,
