@@ -76,83 +76,6 @@ draw_key_length <- function(data, params, size) {
 # Utility function to replace %||%
 `%||%` <- function(a, b) if (!is.null(a)) a else b
 
-# create circles in geom_vector_smooth
-create_circle_data <- function(x, y, radius, n = 100, group) {
-  angle <- seq(0, 2 * pi, length.out = n)
-  data.frame(
-    x = x + radius * cos(angle),
-    y = y + radius * sin(angle),
-    group = group
-  )
-}
-
-# create circles in geom_vector_smooth
-create_wedge_data <- function(
-    x, y, xend_upper, yend_upper, xend_lower, yend_lower,
-    xend, yend, id, n_points = 100,
-    outer_radius = NULL,
-    inner_radius = 0
-) {
-  # Calculate angles using atan2 for upper, lower, and midpoint
-  angle_upper <- atan2(yend_upper - y, xend_upper - x) %% (2 * pi)
-  angle_lower <- atan2(yend_lower - y, xend_lower - x) %% (2 * pi)
-  midpoint_angle <- atan2(yend - y, xend - x) %% (2 * pi)
-
-  # Calculate the shift to bring the midpoint to 0 radians
-  shift <- -midpoint_angle
-
-  # Shift all angles by the same amount
-  shifted_upper <- (angle_upper + shift) %% (2 * pi)
-  shifted_lower <- (angle_lower + shift) %% (2 * pi)
-
-  # Adjust shifted angles to ensure they are relative to the midpoint:
-  # Upper should be positive, lower should be negative
-  if (shifted_upper > pi) shifted_upper <- shifted_upper - 2 * pi
-  if (shifted_lower > pi) shifted_lower <- shifted_lower - 2 * pi
-
-  # Generate arc points from upper (positive) to lower (negative)
-  arc_angles <- seq(shifted_upper, shifted_lower, length.out = n_points)
-
-  # Create outer arc
-  arc_x_outer <- outer_radius * cos(arc_angles)
-  arc_y_outer <- outer_radius * sin(arc_angles)
-
-  # Rotate the arc points back to the original coordinate system
-  final_x_outer <- x + arc_x_outer * cos(-shift) - arc_y_outer * sin(-shift)
-  final_y_outer <- y + arc_x_outer * sin(-shift) + arc_y_outer * cos(-shift)
-
-  if (inner_radius > 0) {
-  # if (inner_radius > 0 && !is.null(inner_radius)) {
-    # Create inner arc
-    arc_x_inner <- inner_radius * cos(arc_angles)
-    arc_y_inner <- inner_radius * sin(arc_angles)
-
-    # Rotate the inner arc points back to the original coordinate system
-    final_x_inner <- x + arc_x_inner * cos(-shift) - arc_y_inner * sin(-shift)
-    final_y_inner <- y + arc_x_inner * sin(-shift) + arc_y_inner * cos(-shift)
-
-    # Combine outer and inner arcs to form an annular wedge
-    wedge_data <- data.frame(
-      x = c(final_x_outer, rev(final_x_inner)),
-      y = c(final_y_outer, rev(final_y_inner)),
-      group = rep(id, each = length(final_x_outer) + length(final_x_inner)),
-      id = rep(id, each = length(final_x_outer) + length(final_x_inner))
-    )
-
-} else {
-  # Create regular wedge by connecting outer arc to center
-  wedge_data <- data.frame(
-    x = c(x, final_x_outer, x),
-    y = c(y, final_y_outer, y),
-    group = rep(id, length.out = n_points + 2),
-    id = rep(id, length.out = n_points + 2)
-  )
-}
-
-  return(wedge_data)
-  }
-
-
 
 calculate_bounds <- function(fit, se, probs) {
   if (!se) return(NULL)
@@ -248,28 +171,6 @@ compute_ellipse_params <- function(var_dx, var_dy, cov_dx_dy, conf_level = 0.95)
   height <- 2 * scale_factor * sqrt(eigenvalues[2])
 
   return(list(width = width, height = height, angle = angle))
-}
-
-
-# Helper function to create ellipse polygon data
-create_ellipse_data <- function(x_center, y_center, width, height, angle, n_points = 50) {
-  theta <- seq(0, 2 * pi, length.out = n_points)
-  ellipse <- data.frame(
-    theta = theta,
-    x = width / 2 * cos(theta),
-    y = height / 2 * sin(theta)
-  )
-
-  # Rotation matrix
-  rotation_matrix <- matrix(c(cos(angle * pi / 180), -sin(angle * pi / 180),
-                              sin(angle * pi / 180),  cos(angle * pi / 180)),
-                            nrow = 2)
-
-  rotated <- as.matrix(ellipse[, c("x", "y")]) %*% rotation_matrix
-  ellipse$x <- rotated[,1] + x_center
-  ellipse$y <- rotated[,2] + y_center
-
-  return(ellipse)
 }
 
 
@@ -629,4 +530,101 @@ compute_wedge_endpoints <- function(x, y, a, b, angle_deg, target_angle_deg) {
   y_intersect <- y + x_intersect_rot * sin(phi) + y_intersect_rot * cos(phi)
 
   return(c(x_intersect, y_intersect))
+}
+
+# create circles in geom_vector_smooth
+create_circle_data <- function(x, y, radius, n = 100, group) {
+  angle <- seq(0, 2 * pi, length.out = n)
+  data.frame(
+    x = x + radius * cos(angle),
+    y = y + radius * sin(angle),
+    group = group
+  )
+}
+
+# create circles in geom_vector_smooth
+create_wedge_data <- function(
+    x, y, xend_upper, yend_upper, xend_lower, yend_lower,
+    xend, yend, id, n_points = 100,
+    outer_radius = NULL,
+    inner_radius = 0
+) {
+  # Calculate angles using atan2 for upper, lower, and midpoint
+  angle_upper <- atan2(yend_upper - y, xend_upper - x) %% (2 * pi)
+  angle_lower <- atan2(yend_lower - y, xend_lower - x) %% (2 * pi)
+  midpoint_angle <- atan2(yend - y, xend - x) %% (2 * pi)
+
+  # Calculate the shift to bring the midpoint to 0 radians
+  shift <- -midpoint_angle
+
+  # Shift all angles by the same amount
+  shifted_upper <- (angle_upper + shift) %% (2 * pi)
+  shifted_lower <- (angle_lower + shift) %% (2 * pi)
+
+  # Adjust shifted angles to ensure they are relative to the midpoint:
+  # Upper should be positive, lower should be negative
+  if (shifted_upper > pi) shifted_upper <- shifted_upper - 2 * pi
+  if (shifted_lower > pi) shifted_lower <- shifted_lower - 2 * pi
+
+  # Generate arc points from upper (positive) to lower (negative)
+  arc_angles <- seq(shifted_upper, shifted_lower, length.out = n_points)
+
+  # Create outer arc
+  arc_x_outer <- outer_radius * cos(arc_angles)
+  arc_y_outer <- outer_radius * sin(arc_angles)
+
+  # Rotate the arc points back to the original coordinate system
+  final_x_outer <- x + arc_x_outer * cos(-shift) - arc_y_outer * sin(-shift)
+  final_y_outer <- y + arc_x_outer * sin(-shift) + arc_y_outer * cos(-shift)
+
+  if (inner_radius > 0) {
+    # if (inner_radius > 0 && !is.null(inner_radius)) {
+    # Create inner arc
+    arc_x_inner <- inner_radius * cos(arc_angles)
+    arc_y_inner <- inner_radius * sin(arc_angles)
+
+    # Rotate the inner arc points back to the original coordinate system
+    final_x_inner <- x + arc_x_inner * cos(-shift) - arc_y_inner * sin(-shift)
+    final_y_inner <- y + arc_x_inner * sin(-shift) + arc_y_inner * cos(-shift)
+
+    # Combine outer and inner arcs to form an annular wedge
+    wedge_data <- data.frame(
+      x = c(final_x_outer, rev(final_x_inner)),
+      y = c(final_y_outer, rev(final_y_inner)),
+      group = rep(id, each = length(final_x_outer) + length(final_x_inner)),
+      id = rep(id, each = length(final_x_outer) + length(final_x_inner))
+    )
+
+  } else {
+    # Create regular wedge by connecting outer arc to center
+    wedge_data <- data.frame(
+      x = c(x, final_x_outer, x),
+      y = c(y, final_y_outer, y),
+      group = rep(id, length.out = n_points + 2),
+      id = rep(id, length.out = n_points + 2)
+    )
+  }
+
+  return(wedge_data)
+}
+
+# Helper function to create ellipse polygon data
+create_ellipse_data <- function(x_center, y_center, width, height, angle, n_points = 50) {
+  theta <- seq(0, 2 * pi, length.out = n_points)
+  ellipse <- data.frame(
+    theta = theta,
+    x = width / 2 * cos(theta),
+    y = height / 2 * sin(theta)
+  )
+
+  # Rotation matrix
+  rotation_matrix <- matrix(c(cos(angle * pi / 180), -sin(angle * pi / 180),
+                              sin(angle * pi / 180),  cos(angle * pi / 180)),
+                            nrow = 2)
+
+  rotated <- as.matrix(ellipse[, c("x", "y")]) %*% rotation_matrix
+  ellipse$x <- rotated[,1] + x_center
+  ellipse$y <- rotated[,2] + y_center
+
+  return(ellipse)
 }

@@ -442,8 +442,22 @@ StatVectorSmooth <- ggproto(
     }
 
     if (is.null(eval_points)) {
-      # Rescale outer_radius to base_radius
-      result$r_upper <- base_radius
+      # Calculate current magnitudes
+      current_magnitudes <- sqrt(result$dx^2 + result$dy^2)
+
+      # Avoid division by zero by setting zero magnitudes to one (vectors with no length)
+      current_magnitudes[current_magnitudes == 0] <- 1
+
+      # Calculate scaling factors to adjust magnitudes to base_radius
+      scaling_factors <- base_radius / current_magnitudes
+
+      # Scale dx and dy to have length base_radius while preserving direction
+      result$dx <- result$dx * scaling_factors
+      result$dy <- result$dy * scaling_factors
+
+      # Recompute xend and yend based on scaled dx and dy
+      result$xend <- result$x + result$dx
+      result$yend <- result$y + result$dy
 
       # Recompute xend_upper and yend_upper based on base_radius and min_angle
       min_angle_rad <- result$min_angle * pi / 180
@@ -455,18 +469,11 @@ StatVectorSmooth <- ggproto(
       result$xend_lower <- result$x + base_radius * cos(max_angle_rad)
       result$yend_lower <- result$y + base_radius * sin(max_angle_rad)
 
-      # Rescale main vectors dx and dy to have length base_radius
-      result$angle <- atan2(result$dy, result$dx)  # Recompute angle after rescaling
-      result$dx <- base_radius * cos(result$angle)
-      result$dy <- base_radius * sin(result$angle)
-
-      # Recompute xend and yend based on rescaled dx and dy
-      result$xend <- result$x + result$dx
-      result$yend <- result$y + result$dy
+      # Update r_upper and r_lower if necessary
+      result$r_upper <- base_radius
+      result$r_lower <- 0
     }
 
-    # Print the updated dataframe for debugging
-    print(result)
 
     return(result)
   }
@@ -503,22 +510,11 @@ GeomVectorSmooth <- ggproto(
 
     if (se) {
       if (pi_type == "wedge") {
-        # Determine if annular wedges should be used
-        use_annular <- !is.null(eval_points)
 
         # Initialize a list to store all wedge polygons
         wedge_polygons <- vector("list", nrow(data))
 
         for (i in 1:nrow(data)) {
-          # if (use_annular) {
-          #   # Use r_lower and r_upper for annular wedges
-          #   inner_radius <- data$r_lower[i]
-          #   outer_radius <- data$r_upper[i]
-          # } else {
-            # Use r for regular wedges
-            inner_radius <- 0
-            outer_radius <- data$r[i]
-          # }
 
           wedge_polygons[[i]] <- create_wedge_data(
             x = data$x[i], y = data$y[i],
@@ -527,8 +523,8 @@ GeomVectorSmooth <- ggproto(
             xend = data$xend[i], yend = data$yend[i],
             id = data$id[i],
             n_points = 50,
-            outer_radius = outer_radius,
-            inner_radius = inner_radius
+            outer_radius = data$r_lower[i],
+            inner_radius = data$r_upper[i]
           )
         }
 
@@ -540,7 +536,7 @@ GeomVectorSmooth <- ggproto(
         wedge_data$alpha <- .4
         wedge_data$fill <- "grey60"
         wedge_data$colour <- NA
-print(wedge_data)
+
         # Draw the wedges using GeomPolygon
         wedge_grob <- GeomPolygon$draw_panel(
           wedge_data,
@@ -631,7 +627,7 @@ print(wedge_data)
     return(combined_grob)
   },
 
-  draw_key = draw_key_smooth  # Ensure this function is defined
+  draw_key = draw_key_smooth
 )
 
 
