@@ -301,6 +301,17 @@ StatVectorSmooth <- ggproto(
     # Check the number of coefficients
     total_coeffs <- ncol(cov_coef)
 
+    # Extract residuals from the model
+    residuals_mv <- resid(model_mv)
+
+    # Compute covariance matrix of residuals
+    Sigma <- cov(residuals_mv)
+
+    # Extract correlation coefficient
+    sigma_x <- sqrt(Sigma["dx", "dx"])
+    sigma_y <- sqrt(Sigma["dy", "dy"])
+    rho <- Sigma["dx", "dy"] / (sigma_x * sigma_y)
+
     expected_coeffs <- coeffs_per_response * n_resp
     if (total_coeffs != expected_coeffs) {
       stop("Unexpected number of coefficients in the model. Please verify the formula and data.")
@@ -332,7 +343,6 @@ StatVectorSmooth <- ggproto(
         MoreArgs = list(conf_level = conf_level[1]),
         SIMPLIFY = FALSE
       )
-
       # Extract ellipse parameters and add to grid
       grid$ellipse_width <- sapply(ellipse_params_list, `[[`, "width")
       grid$ellipse_height <- sapply(ellipse_params_list, `[[`, "height")
@@ -356,14 +366,14 @@ StatVectorSmooth <- ggproto(
         id = grid$id
       )
 
-    } else {
-      stop("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
-    }
+  } else {
+    stop("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
+  }
 
     if(pi_type == "wedge"){
 
-print("grid")
-print(grid)
+      print("grid")
+      print(grid)
 
       wedge_angles <- do.call(rbind, mapply(
         predict_theta_interval_single,
@@ -439,8 +449,9 @@ print(grid)
     # print(result[result$x == 5 & result$y == 5, c(1,2,11,12)])
 
     return(result)
-  }
-)
+    }
+  )
+
 
 
 #' @rdname geom_vector_smooth

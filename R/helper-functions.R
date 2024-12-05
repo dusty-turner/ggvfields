@@ -92,6 +92,7 @@ calculate_bounds <- function(fit, se, probs) {
 }
 
 
+
 # Compute Euclidean distances only between nearest neighbors
 euclidean_distances <- function(points) {
   n <- nrow(points)
@@ -505,46 +506,46 @@ calculate_wedge_angles <- function(x, y, xend, yend, a, b, angle_deg) {
 
 # Define a helper function to compute wedge endpoints (unchanged)
 compute_prediction_endpoints <- function(x, y, dx, dy, angle_lower, angle_upper) {
-    # Validate inputs
-    if (!is.numeric(x) || length(x) != 1) {
-      stop("Input 'x' must be a single numeric value.")
-    }
-    if (!is.numeric(y) || length(y) != 1) {
-      stop("Input 'y' must be a single numeric value.")
-    }
-    if (!is.numeric(dx) || length(dx) != 1) {
-      stop("Input 'dx' must be a single numeric value.")
-    }
-    if (!is.numeric(dy) || length(dy) != 1) {
-      stop("Input 'dy' must be a single numeric value.")
-    }
-    if (!is.numeric(angle_lower) || length(angle_lower) != 1) {
-      stop("Input 'angle_lower' must be a single numeric value in radians.")
-    }
-    if (!is.numeric(angle_upper) || length(angle_upper) != 1) {
-      stop("Input 'angle_upper' must be a single numeric value in radians.")
-    }
-
-    # Calculate the magnitude of the predicted vector
-    magnitude <- sqrt(dx^2 + dy^2)
-
-    # Compute the endpoints based on absolute angles
-    xend_lower <- x + magnitude * cos(angle_lower)
-    yend_lower <- y + magnitude * sin(angle_lower)
-
-    xend_upper <- x + magnitude * cos(angle_upper)
-    yend_upper <- y + magnitude * sin(angle_upper)
-
-    # Create and return the output dataframe
-    result_df <- data.frame(
-      xend_lower = xend_lower,
-      yend_lower = yend_lower,
-      xend_upper = xend_upper,
-      yend_upper = yend_upper
-    )
-
-    return(result_df)
+  # Validate inputs
+  if (!is.numeric(x) || length(x) != 1) {
+    stop("Input 'x' must be a single numeric value.")
   }
+  if (!is.numeric(y) || length(y) != 1) {
+    stop("Input 'y' must be a single numeric value.")
+  }
+  if (!is.numeric(dx) || length(dx) != 1) {
+    stop("Input 'dx' must be a single numeric value.")
+  }
+  if (!is.numeric(dy) || length(dy) != 1) {
+    stop("Input 'dy' must be a single numeric value.")
+  }
+  if (!is.numeric(angle_lower) || length(angle_lower) != 1) {
+    stop("Input 'angle_lower' must be a single numeric value in radians.")
+  }
+  if (!is.numeric(angle_upper) || length(angle_upper) != 1) {
+    stop("Input 'angle_upper' must be a single numeric value in radians.")
+  }
+
+  # Calculate the magnitude of the predicted vector
+  magnitude <- sqrt(dx^2 + dy^2)
+
+  # Compute the endpoints based on absolute angles
+  xend_lower <- x + magnitude * cos(angle_lower)
+  yend_lower <- y + magnitude * sin(angle_lower)
+
+  xend_upper <- x + magnitude * cos(angle_upper)
+  yend_upper <- y + magnitude * sin(angle_upper)
+
+  # Create and return the output dataframe
+  result_df <- data.frame(
+    xend_lower = xend_lower,
+    yend_lower = yend_lower,
+    xend_upper = xend_upper,
+    yend_upper = yend_upper
+  )
+
+  return(result_df)
+}
 
 
 
@@ -736,4 +737,3 @@ predict_theta_interval_single <- function(x, y, mux, muy, Sigma, rho = NULL) {
 
   return(result_df)
 }
-
