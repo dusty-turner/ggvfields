@@ -504,33 +504,49 @@ calculate_wedge_angles <- function(x, y, xend, yend, a, b, angle_deg) {
 }
 
 # Define a helper function to compute wedge endpoints (unchanged)
-compute_wedge_endpoints <- function(x, y, a, b, angle_deg, target_angle_deg) {
-  # Convert degrees to radians
-  target_angle_rad <- target_angle_deg * pi / 180
-  phi <- angle_deg * pi / 180
+compute_prediction_endpoints <- function(x, y, dx, dy, angle_lower, angle_upper) {
+    # Validate inputs
+    if (!is.numeric(x) || length(x) != 1) {
+      stop("Input 'x' must be a single numeric value.")
+    }
+    if (!is.numeric(y) || length(y) != 1) {
+      stop("Input 'y' must be a single numeric value.")
+    }
+    if (!is.numeric(dx) || length(dx) != 1) {
+      stop("Input 'dx' must be a single numeric value.")
+    }
+    if (!is.numeric(dy) || length(dy) != 1) {
+      stop("Input 'dy' must be a single numeric value.")
+    }
+    if (!is.numeric(angle_lower) || length(angle_lower) != 1) {
+      stop("Input 'angle_lower' must be a single numeric value in radians.")
+    }
+    if (!is.numeric(angle_upper) || length(angle_upper) != 1) {
+      stop("Input 'angle_upper' must be a single numeric value in radians.")
+    }
 
-  # Direction vector
-  dx_dir <- cos(target_angle_rad)
-  dy_dir <- sin(target_angle_rad)
+    # Calculate the magnitude of the predicted vector
+    magnitude <- sqrt(dx^2 + dy^2)
 
-  # Rotate direction vector by -phi
-  dx_rot <- dx_dir * cos(phi) + dy_dir * sin(phi)
-  dy_rot <- -dx_dir * sin(phi) + dy_dir * cos(phi)
+    # Compute the endpoints based on absolute angles
+    xend_lower <- x + magnitude * cos(angle_lower)
+    yend_lower <- y + magnitude * sin(angle_lower)
 
-  # Compute scaling factor t to reach the ellipse perimeter
-  A <- (dx_rot / a)^2 + (dy_rot / b)^2
-  t <- sqrt(1 / A)
+    xend_upper <- x + magnitude * cos(angle_upper)
+    yend_upper <- y + magnitude * sin(angle_upper)
 
-  # Intersection point in rotated coordinates
-  x_intersect_rot <- t * dx_rot
-  y_intersect_rot <- t * dy_rot
+    # Create and return the output dataframe
+    result_df <- data.frame(
+      xend_lower = xend_lower,
+      yend_lower = yend_lower,
+      xend_upper = xend_upper,
+      yend_upper = yend_upper
+    )
 
-  # Rotate back to original coordinates and translate
-  x_intersect <- x + x_intersect_rot * cos(phi) - y_intersect_rot * sin(phi)
-  y_intersect <- y + x_intersect_rot * sin(phi) + y_intersect_rot * cos(phi)
+    return(result_df)
+  }
 
-  return(c(x_intersect, y_intersect))
-}
+
 
 # create circles in geom_vector_smooth
 create_circle_data <- function(x, y, radius, n = 100, group) {
@@ -628,3 +644,96 @@ create_ellipse_data <- function(x_center, y_center, width, height, angle, n_poin
 
   return(ellipse)
 }
+
+# Define the predict_theta_interval_single function (as defined above)
+
+predict_theta_interval_single <- function(x, y, mux, muy, Sigma, rho = NULL) {
+  # Validate inputs
+  if (!is.numeric(x) || length(x) != 1) {
+    stop("Input 'x' must be a single numeric value.")
+  }
+  if (!is.numeric(y) || length(y) != 1) {
+    stop("Input 'y' must be a single numeric value.")
+  }
+  if (!is.numeric(mux) || length(mux) != 1) {
+    stop("Input 'mux' must be a single numeric value.")
+  }
+  if (!is.numeric(muy) || length(muy) != 1) {
+    stop("Input 'muy' must be a single numeric value.")
+  }
+  if (!is.matrix(Sigma) || any(dim(Sigma) != c(2, 2))) {
+    stop("Input 'Sigma' must be a 2x2 covariance matrix.")
+  }
+
+
+  # If rho is not provided, calculate it from Sigma
+  if (is.null(rho)) {
+    sigma_x <- sqrt(Sigma[1, 1])
+    sigma_y <- sqrt(Sigma[2, 2])
+    rho <- Sigma[1, 2] / (sigma_x * sigma_y)
+  }
+
+  # Define the bivariate normal PDF in polar coordinates
+  bivariate_normal <- function(r, theta, mux, muy, Sigma) {
+    x_val <- r * cos(theta)
+    y_val <- r * sin(theta)
+
+    z1 <- x_val - mux
+    z2 <- y_val - muy
+
+    inv_Sigma <- solve(Sigma)
+    det_Sigma <- det(Sigma)
+
+    # Compute the exponent term using matrix notation
+    exponent <- -0.5 * (inv_Sigma[1, 1] * z1^2 +
+                          2 * inv_Sigma[1, 2] * z1 * z2 +
+                          inv_Sigma[2, 2] * z2^2)
+
+    exp_term <- exp(exponent)
+
+    # Return the PDF value
+    return((r / (2 * pi * sqrt(det_Sigma))) * exp_term)
+  }
+
+  # Define the marginal_theta function by integrating out r
+  marginal_theta <- function(theta) {
+    integrate(
+      f = function(r) {
+        bivariate_normal(r, theta, mux, muy, Sigma)
+      },
+      lower = 0, upper = Inf,
+      rel.tol = 1e-8 # Increase precision if needed
+    )$value
+  }
+
+  # Generate a sequence of theta values from -pi to pi
+  theta_vals <- seq(-pi, pi, length.out = 200) # Increased resolution for better accuracy
+
+  # Compute the marginal PDF for each theta
+  pdf_vals <- sapply(theta_vals, marginal_theta)
+
+  # Normalize the PDF to ensure it integrates to 1
+  delta_theta <- diff(theta_vals)[1]
+  pdf_vals <- pdf_vals / sum(pdf_vals * delta_theta)
+
+  # Compute the cumulative distribution function (CDF)
+  cdf_vals <- cumsum(pdf_vals * delta_theta)
+
+
+  # Determine the 2.5th and 97.5th percentiles for the 95% prediction interval
+  theta_lower <- theta_vals[which(cdf_vals >= 0.05)[1]]
+  theta_upper <- theta_vals[which(cdf_vals >= 0.95)[1]]
+
+  # Create the output dataframe
+  result_df <- data.frame(
+    # x = x,
+    # y = y,
+    # dx = mux,
+    # dy = muy,
+    min_angle = theta_lower,
+    max_angle = theta_upper
+  )
+
+  return(result_df)
+}
+

@@ -234,7 +234,6 @@ StatVectorSmooth <- ggproto(
     # Two-tailed interval
     lower_probs <- alpha_levels / 2
     upper_probs <- 1 - (alpha_levels / 2)
-
     # Create grid for evaluation
     if (!is.null(eval_points)) {
       if (!all(c("x", "y") %in% names(eval_points))) {
@@ -363,117 +362,81 @@ StatVectorSmooth <- ggproto(
 
     if(pi_type == "wedge"){
 
-      # Apply the corrected calculate_wedge_angles function to each row
-      wedge_angles <- do.call(rbind, lapply(1:nrow(result), function(i) {
-        calculate_wedge_angles(
-          x = result$x[i],
-          y = result$y[i],
-          xend = result$xend[i],
-          yend = result$yend[i],
-          a = result$ellipse_width[i] / 2,
-          b = result$ellipse_height[i] / 2,
-          angle_deg = result$ellipse_angle[i]
-        )
-      }))
+print("grid")
+print(grid)
 
+      wedge_angles <- do.call(rbind, mapply(
+        predict_theta_interval_single,
+        x = grid$x,
+        y = grid$y,
+        mux = grid$dx,
+        muy = grid$dy,
+        MoreArgs = list(Sigma = Sigma, rho = rho),
+        SIMPLIFY = FALSE
+      ))
+
+      # Apply the corrected calculate_wedge_angles function to each row
+      # wedge_angles <- do.call(rbind, lapply(1:nrow(result), function(i) {
+      #   calculate_wedge_angles(
+      #     x = result$x[i],
+      #     y = result$y[i],
+      #     xend = result$xend[i],
+      #     yend = result$yend[i],
+      #     a = result$ellipse_width[i] / 2,
+      #     b = result$ellipse_height[i] / 2,
+      #     angle_deg = result$ellipse_angle[i]
+      #   )
+      # }))
       # Combine with original dataframe
       result <- cbind(result, wedge_angles)
 
-      # Adjust angles to be within 0-360 if necessary
-      result$max_angle <- result$max_angle %% 360
-      result$min_angle <- result$min_angle %% 360
-      result$r_lower <- 0
       result$r_upper <- sqrt((result$dx)^2 + (result$dy)^2)
+      result$r_lower <- 0
 
-      # ----------------------------
-      # 5. Compute Wedge Endpoints
-      # ----------------------------
+      if (is.null(eval_points)) { ## rescales circle and arrow for grid shapes
+        current_magnitudes <- sqrt(result$dx^2 + result$dy^2)
 
-      # Apply the helper function to compute endpoints
-      endpoints <- mapply(
-        compute_wedge_endpoints,
+        # Avoid division by zero by setting zero magnitudes to one (vectors with no length)
+        current_magnitudes[current_magnitudes == 0] <- 1
+
+        # Calculate scaling factors to adjust magnitudes to base_radius
+        scaling_factors <- base_radius / current_magnitudes
+
+        # Scale dx and dy to have length base_radius while preserving direction
+        result$dx <- result$dx * scaling_factors
+        result$dy <- result$dy * scaling_factors
+
+        # Recompute xend and yend based on scaled dx and dy
+        result$xend <- result$x + result$dx
+        result$yend <- result$y + result$dy
+
+        result$r_upper <- base_radius
+      }
+
+
+      # Apply the function to each row using mapply
+      prediction_results <- mapply(
+        compute_prediction_endpoints,
         x = result$x,
         y = result$y,
-        a = result$ellipse_width / 2,
-        b = result$ellipse_height / 2,
-        angle_deg = result$ellipse_angle,
-        target_angle_deg = c(result$min_angle, result$max_angle),
+        dx = result$dx,
+        dy = result$dy,
+        angle_lower = result$min_angle,
+        angle_upper = result$max_angle,
         SIMPLIFY = FALSE
       )
 
-      # Initialize vectors to store endpoints
-      xend_upper <- numeric(nrow(result))
-      yend_upper <- numeric(nrow(result))
-      xend_lower <- numeric(nrow(result))
-      yend_lower <- numeric(nrow(result))
+      # Combine the list of dataframes into one dataframe
+      prediction_df <- do.call(rbind, prediction_results)
 
-      for(i in 1:nrow(result)) {
-        # Upper endpoint at min_angle
-        upper <- compute_wedge_endpoints(
-          x = result$x[i],
-          y = result$y[i],
-          a = result$ellipse_width[i] / 2,
-          b = result$ellipse_height[i] / 2,
-          angle_deg = result$ellipse_angle[i],
-          target_angle_deg = result$min_angle[i]
-        )
-        xend_upper[i] <- upper[1]
-        yend_upper[i] <- upper[2]
+      # View the prediction results
 
-        # Lower endpoint at max_angle
-        lower <- compute_wedge_endpoints(
-          x = result$x[i],
-          y = result$y[i],
-          a = result$ellipse_width[i] / 2,
-          b = result$ellipse_height[i] / 2,
-          angle_deg = result$ellipse_angle[i],
-          target_angle_deg = result$max_angle[i]
-        )
-        xend_lower[i] <- lower[1]
-        yend_lower[i] <- lower[2]
-      }
-
-      # Add endpoints to the result dataframe
-      result$xend_upper <- xend_upper
-      result$yend_upper <- yend_upper
-      result$xend_lower <- xend_lower
-      result$yend_lower <- yend_lower
-
+      result <- cbind(result, prediction_df)
     }
 
-    if (is.null(eval_points)) {
-      # Calculate current magnitudes
-      current_magnitudes <- sqrt(result$dx^2 + result$dy^2)
-
-      # Avoid division by zero by setting zero magnitudes to one (vectors with no length)
-      current_magnitudes[current_magnitudes == 0] <- 1
-
-      # Calculate scaling factors to adjust magnitudes to base_radius
-      scaling_factors <- base_radius / current_magnitudes
-
-      # Scale dx and dy to have length base_radius while preserving direction
-      result$dx <- result$dx * scaling_factors
-      result$dy <- result$dy * scaling_factors
-
-      # Recompute xend and yend based on scaled dx and dy
-      result$xend <- result$x + result$dx
-      result$yend <- result$y + result$dy
-
-      # Recompute xend_upper and yend_upper based on base_radius and min_angle
-      min_angle_rad <- result$min_angle * pi / 180
-      result$xend_upper <- result$x + base_radius * cos(min_angle_rad)
-      result$yend_upper <- result$y + base_radius * sin(min_angle_rad)
-
-      # Recompute xend_lower and yend_lower based on base_radius and max_angle
-      max_angle_rad <- result$max_angle * pi / 180
-      result$xend_lower <- result$x + base_radius * cos(max_angle_rad)
-      result$yend_lower <- result$y + base_radius * sin(max_angle_rad)
-
-      # Update r_upper and r_lower if necessary
-      result$r_upper <- base_radius
-      result$r_lower <- 0
-    }
-
+    print(result)
+    # print(result[result$x == 7.5 & result$y == 5, ])
+    # print(result[result$x == 5 & result$y == 5, c(1,2,11,12)])
 
     return(result)
   }
