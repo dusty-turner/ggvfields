@@ -567,21 +567,20 @@ create_wedge_data <- function(
     inner_radius = 0
 ) {
   # Calculate angles using atan2 for upper, lower, and midpoint
-  angle_upper <- atan2(yend_upper - y, xend_upper - x) %% (2 * pi)
-  angle_lower <- atan2(yend_lower - y, xend_lower - x) %% (2 * pi)
-  midpoint_angle <- atan2(yend - y, xend - x) %% (2 * pi)
+  angle_upper <- atan2(yend_upper - y, xend_upper - x) + 2*pi#%% (2 * pi)
+  angle_lower <- atan2(yend_lower - y, xend_lower - x) + 2*pi#%% (2 * pi)
+  midpoint_angle <- atan2(yend - y, xend - x) + 2*pi#%% (2 * pi)
+
+  if(angle_upper < angle_lower){
+    angle_upper <- angle_upper + 2*pi
+  }
 
   # Calculate the shift to bring the midpoint to 0 radians
   shift <- -midpoint_angle
 
   # Shift all angles by the same amount
-  shifted_upper <- (angle_upper + shift) %% (2 * pi)
-  shifted_lower <- (angle_lower + shift) %% (2 * pi)
-
-  # Adjust shifted angles to ensure they are relative to the midpoint:
-  # Upper should be positive, lower should be negative
-  if (shifted_upper > pi) shifted_upper <- shifted_upper - 2 * pi
-  if (shifted_lower > pi) shifted_lower <- shifted_lower - 2 * pi
+  shifted_upper <- (angle_upper + shift) #%% (2 * pi)
+  shifted_lower <- (angle_lower + shift) #%% (2 * pi)
 
   # Generate arc points from upper (positive) to lower (negative)
   arc_angles <- seq(shifted_upper, shifted_lower, length.out = n_points)
