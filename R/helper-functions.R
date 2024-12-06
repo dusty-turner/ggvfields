@@ -646,7 +646,7 @@ create_ellipse_data <- function(x_center, y_center, width, height, angle, n_poin
   return(ellipse)
 }
 
-predict_theta_interval_single <- function(x, y, mux, muy, Sigma, rho = NULL) {
+predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL) {
   # Validate inputs
   if (!is.numeric(x) || length(x) != 1) {
     stop("Input 'x' must be a single numeric value.")
@@ -723,9 +723,6 @@ predict_theta_interval_single <- function(x, y, mux, muy, Sigma, rho = NULL) {
     theta_lower <- theta_vals[lower_index]
     theta_upper <- theta_vals[upper_index]
 
-    print("from computer interval")
-    print(list(theta_lower = theta_lower, theta_upper = theta_upper, cdf_vals = cdf_vals))
-
     return(list(theta_lower = theta_lower, theta_upper = theta_upper, cdf_vals = cdf_vals))
   }
 
@@ -746,6 +743,7 @@ predict_theta_interval_single <- function(x, y, mux, muy, Sigma, rho = NULL) {
       min_angle = theta_lower_initial,
       max_angle = theta_upper_initial
     )
+    # print(result_df)
     return(result_df)
   } else {
     # Invalid interval detected, redo integration from 0 to 2pi
@@ -754,20 +752,12 @@ predict_theta_interval_single <- function(x, y, mux, muy, Sigma, rho = NULL) {
     theta_lower_new <- interval_new$theta_lower
     theta_upper_new <- interval_new$theta_upper
 
-    # Optional: Check again if the new interval is valid
-    is_invalid_new <- theta_lower_new == theta_upper_new
-    if (is_invalid_new) {
-      stop("Failed to compute a valid prediction interval even after changing integration bounds.")
-    }
-
-    # Optionally, adjust angles to be within -pi to pi
-    theta_lower_adj <- ifelse(theta_lower_new > pi, theta_lower_new - 2 * pi, theta_lower_new)
-    theta_upper_adj <- ifelse(theta_upper_new > pi, theta_upper_new - 2 * pi, theta_upper_new)
-
+    # print("c(x,y)")
+    # print(c(x,y))
     # Create the output dataframe
     result_df <- data.frame(
-      min_angle = theta_lower_adj,
-      max_angle = theta_upper_adj
+      min_angle = theta_lower_new,
+      max_angle = theta_upper_new
     )
 
     return(result_df)

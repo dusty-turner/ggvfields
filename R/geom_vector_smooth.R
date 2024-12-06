@@ -242,8 +242,8 @@ StatVectorSmooth <- ggproto(
       grid <- eval_points
 
       if (nrow(grid) > 1) {
-        min_distance <- euclidean_distances(grid)
-        base_radius <- min_distance / 2.5
+        # min_distance <- euclidean_distances(grid)
+        # base_radius <- min_distance / 2.5
       } else {
         data_range_x <- diff(range(data$x))
         data_range_y <- diff(range(data$y))
@@ -377,10 +377,9 @@ StatVectorSmooth <- ggproto(
   }
 
     if(pi_type == "wedge"){
-print(grid)
-      print(cov_pred)
+
       wedge_angles <- do.call(rbind, mapply(
-        predict_theta_interval_single,
+        predict_theta_interval,
         x = grid$x,
         y = grid$y,
         mux = grid$dx,
@@ -389,22 +388,8 @@ print(grid)
         SIMPLIFY = FALSE
       ))
 
-      # Apply the corrected calculate_wedge_angles function to each row
-      # wedge_angles <- do.call(rbind, lapply(1:nrow(result), function(i) {
-      #   calculate_wedge_angles(
-      #     x = result$x[i],
-      #     y = result$y[i],
-      #     xend = result$xend[i],
-      #     yend = result$yend[i],
-      #     a = result$ellipse_width[i] / 2,
-      #     b = result$ellipse_height[i] / 2,
-      #     angle_deg = result$ellipse_angle[i]
-      #   )
-      # }))
       # Combine with original dataframe
       result <- cbind(result, wedge_angles)
-
-      print(result)
 
       result$r_upper <- sqrt((result$dx)^2 + (result$dy)^2)
       result$r_lower <- 0
