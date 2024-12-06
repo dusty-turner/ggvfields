@@ -316,6 +316,7 @@ StatVectorSmooth <- ggproto(
     if (total_coeffs != expected_coeffs) {
       stop("Unexpected number of coefficients in the model. Please verify the formula and data.")
     }
+
     # Extract covariance matrices
     cov_beta_dx <- cov_coef[1:coeffs_per_response, 1:coeffs_per_response]     # Covariance for dx coefficients
     cov_beta_dy <- cov_coef[(coeffs_per_response+1):(expected_coeffs), (coeffs_per_response+1):(expected_coeffs)]     # Covariance for dy coefficients
@@ -325,6 +326,11 @@ StatVectorSmooth <- ggproto(
     var_dx <- rowSums(design_matrix * (design_matrix %*% cov_beta_dx))
     var_dy <- rowSums(design_matrix * (design_matrix %*% cov_beta_dy))
     cov_dx_dy <- rowSums(design_matrix * (design_matrix %*% cov_beta_dx_dy))
+
+    # Add residual variances and covariance
+    var_dx <- var_dx + Sigma["dx", "dx"]
+    var_dy <- var_dy + Sigma["dy", "dy"]
+    cov_dx_dy <- cov_dx_dy + Sigma["dx", "dy"]
 
     # Assemble the covariance matrix for (dx, dy) predictions
     cov_pred <- data.frame(var_dx, var_dy, cov_dx_dy)
@@ -371,10 +377,8 @@ StatVectorSmooth <- ggproto(
   }
 
     if(pi_type == "wedge"){
-
-      print("grid")
-      print(grid)
-
+print(grid)
+      print(cov_pred)
       wedge_angles <- do.call(rbind, mapply(
         predict_theta_interval_single,
         x = grid$x,
@@ -399,6 +403,8 @@ StatVectorSmooth <- ggproto(
       # }))
       # Combine with original dataframe
       result <- cbind(result, wedge_angles)
+
+      print(result)
 
       result$r_upper <- sqrt((result$dx)^2 + (result$dy)^2)
       result$r_lower <- 0
@@ -444,9 +450,6 @@ StatVectorSmooth <- ggproto(
       result <- cbind(result, prediction_df)
     }
 
-    print(result)
-    # print(result[result$x == 7.5 & result$y == 5, ])
-    # print(result[result$x == 5 & result$y == 5, c(1,2,11,12)])
 
     return(result)
     }

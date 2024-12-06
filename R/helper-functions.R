@@ -646,8 +646,6 @@ create_ellipse_data <- function(x_center, y_center, width, height, angle, n_poin
   return(ellipse)
 }
 
-# Define the predict_theta_interval_single function (as defined above)
-
 predict_theta_interval_single <- function(x, y, mux, muy, Sigma, rho = NULL) {
   # Validate inputs
   if (!is.numeric(x) || length(x) != 1) {
@@ -665,7 +663,6 @@ predict_theta_interval_single <- function(x, y, mux, muy, Sigma, rho = NULL) {
   if (!is.matrix(Sigma) || any(dim(Sigma) != c(2, 2))) {
     stop("Input 'Sigma' must be a 2x2 covariance matrix.")
   }
-
 
   # If rho is not provided, calculate it from Sigma
   if (is.null(rho)) {
@@ -707,33 +704,72 @@ predict_theta_interval_single <- function(x, y, mux, muy, Sigma, rho = NULL) {
     )$value
   }
 
-  # Generate a sequence of theta values from -pi to pi
-  theta_vals <- seq(-pi, pi, length.out = 200) # Increased resolution for better accuracy
+  # Helper function to compute interval
+  compute_interval <- function(theta_vals) {
+    # Compute the marginal PDF for each theta
+    pdf_vals <- sapply(theta_vals, marginal_theta)
 
-  # Compute the marginal PDF for each theta
-  pdf_vals <- sapply(theta_vals, marginal_theta)
+    # Normalize the PDF to ensure it integrates to 1
+    delta_theta <- diff(theta_vals)[1]
+    pdf_vals <- pdf_vals / sum(pdf_vals * delta_theta)
 
-  # Normalize the PDF to ensure it integrates to 1
-  delta_theta <- diff(theta_vals)[1]
-  pdf_vals <- pdf_vals / sum(pdf_vals * delta_theta)
+    # Compute the cumulative distribution function (CDF)
+    cdf_vals <- cumsum(pdf_vals * delta_theta)
 
-  # Compute the cumulative distribution function (CDF)
-  cdf_vals <- cumsum(pdf_vals * delta_theta)
+    # Determine the 2.5th and 97.5th percentiles for the 95% prediction interval
+    lower_index <- which(cdf_vals >= 0.025)[1]
+    upper_index <- which(cdf_vals >= 0.975)[1]
 
+    theta_lower <- theta_vals[lower_index]
+    theta_upper <- theta_vals[upper_index]
 
-  # Determine the 2.5th and 97.5th percentiles for the 95% prediction interval
-  theta_lower <- theta_vals[which(cdf_vals >= 0.05)[1]]
-  theta_upper <- theta_vals[which(cdf_vals >= 0.95)[1]]
+    print("from computer interval")
+    print(list(theta_lower = theta_lower, theta_upper = theta_upper, cdf_vals = cdf_vals))
 
-  # Create the output dataframe
-  result_df <- data.frame(
-    # x = x,
-    # y = y,
-    # dx = mux,
-    # dy = muy,
-    min_angle = theta_lower,
-    max_angle = theta_upper
-  )
+    return(list(theta_lower = theta_lower, theta_upper = theta_upper, cdf_vals = cdf_vals))
+  }
 
-  return(result_df)
+  # First attempt: integrate from -pi to pi
+  theta_vals_initial <- seq(-pi, pi, length.out = 200)
+  interval_initial <- compute_interval(theta_vals_initial)
+  theta_lower_initial <- interval_initial$theta_lower
+  theta_upper_initial <- interval_initial$theta_upper
+
+  # Check if theta_lower is approximately equal to -theta_upper
+  # Define a small threshold for numerical precision
+  epsilon <- 1e-6
+  is_invalid <- abs(theta_lower_initial + theta_upper_initial) < epsilon
+
+  if (!is_invalid) {
+    # Valid interval found with -pi to pi integration
+    result_df <- data.frame(
+      min_angle = theta_lower_initial,
+      max_angle = theta_upper_initial
+    )
+    return(result_df)
+  } else {
+    # Invalid interval detected, redo integration from 0 to 2pi
+    theta_vals_new <- seq(0, 2 * pi, length.out = 200)
+    interval_new <- compute_interval(theta_vals_new)
+    theta_lower_new <- interval_new$theta_lower
+    theta_upper_new <- interval_new$theta_upper
+
+    # Optional: Check again if the new interval is valid
+    is_invalid_new <- theta_lower_new == theta_upper_new
+    if (is_invalid_new) {
+      stop("Failed to compute a valid prediction interval even after changing integration bounds.")
+    }
+
+    # Optionally, adjust angles to be within -pi to pi
+    theta_lower_adj <- ifelse(theta_lower_new > pi, theta_lower_new - 2 * pi, theta_lower_new)
+    theta_upper_adj <- ifelse(theta_upper_new > pi, theta_upper_new - 2 * pi, theta_upper_new)
+
+    # Create the output dataframe
+    result_df <- data.frame(
+      min_angle = theta_lower_adj,
+      max_angle = theta_upper_adj
+    )
+
+    return(result_df)
+  }
 }
