@@ -27,7 +27,7 @@ stat_vector_smooth(
   se.circle = TRUE,
   conf_level = c(0.95, NA),
   pi_type = "wedge",
-  default_formula = cbind(dx, dy) ~ x * y,
+  formula = cbind(dx, dy) ~ x * y,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   eval_points = NULL,
   ...
@@ -47,7 +47,7 @@ geom_vector_smooth(
   se.circle = TRUE,
   pi_type = "wedge",
   conf_level = c(0.95, NA),
-  default_formula = cbind(dx, dy) ~ x * y,
+  formula = cbind(dx, dy) ~ x * y,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   eval_points = NULL,
   ...
@@ -149,7 +149,7 @@ is \code{NULL}, the function switches \code{pi_type} to \code{"wedge"} to ensure
 interval representation.
 }}
 
-\item{default_formula}{A formula specifying the multivariate linear model used
+\item{formula}{A formula specifying the multivariate linear model used
 for smoothing. The default formula is \code{cbind(dx, dy) ~ x * y}.}
 
 \item{arrow}{Arrow specification created by \code{grid::arrow()}. This parameter

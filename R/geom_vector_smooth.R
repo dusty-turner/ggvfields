@@ -36,7 +36,7 @@
 #' @param arrow Arrow specification created by `grid::arrow()`. This parameter
 #'   controls the appearance of arrowheads at the ends of vectors, including
 #'   angle, length, and type.
-#' @param default_formula A formula specifying the multivariate linear model used
+#' @param formula A formula specifying the multivariate linear model used
 #'   for smoothing. The default formula is `cbind(dx, dy) ~ x * y`.
 #' @return A `ggplot2` layer that can be added to a ggplot object to create a
 #'   smooth vector field plot.
@@ -150,7 +150,7 @@ stat_vector_smooth <- function(
     se.circle = TRUE,
     conf_level = c(.95, NA),
     pi_type = "wedge",
-    default_formula = cbind(dx, dy) ~ x * y,
+    formula = cbind(dx, dy) ~ x * y,
     arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
     eval_points = NULL,
     ...
@@ -195,7 +195,7 @@ geom_vector_smooth <- function(
     se.circle = TRUE,
     pi_type = "wedge",
     conf_level = c(.95, NA),
-    default_formula = cbind(dx, dy) ~ x * y,
+    formula = cbind(dx, dy) ~ x * y,
     arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
     eval_points = NULL,
     ...
@@ -218,7 +218,7 @@ geom_vector_smooth <- function(
       conf_level = conf_level,
       arrow = arrow,
       eval_points = eval_points,
-      formula = default_formula,
+      formula = formula,
       na.rm = na.rm,
       ...
     )
