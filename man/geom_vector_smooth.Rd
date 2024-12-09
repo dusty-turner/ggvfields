@@ -3,9 +3,9 @@
 \docType{data}
 \name{geom_vector_smooth}
 \alias{geom_vector_smooth}
+\alias{stat_vector_smooth}
 \alias{StatVectorSmooth}
 \alias{GeomVectorSmooth}
-\alias{stat_vector_smooth}
 \title{Create a Smooth Vector Plot Layer}
 \format{
 An object of class \code{StatVectorSmooth} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 5.
@@ -13,10 +13,6 @@ An object of class \code{StatVectorSmooth} (inherits from \code{Stat}, \code{ggp
 An object of class \code{GeomVectorSmooth} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 6.
 }
 \usage{
-StatVectorSmooth
-
-GeomVectorSmooth
-
 stat_vector_smooth(
   mapping = NULL,
   data = NULL,
@@ -56,6 +52,10 @@ geom_vector_smooth(
   eval_points = NULL,
   ...
 )
+
+StatVectorSmooth
+
+GeomVectorSmooth
 }
 \arguments{
 \item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and
@@ -119,48 +119,46 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{n}{An integer vector specifying the number of grid points along each
-axis.}
+axis for smoothing.}
 
-\item{method}{Character; specifies the smoothing method to be used.
-Supported methods are \code{"lm"} (linear modeling) and \code{"boot"} (bootstrapping).
-\code{"boot"} generates smoother results by calculating angles with bootstrapping,
-and the prediction intervals are determined using quantiles.}
+\item{method}{Character; specifies the smoothing method to use. The only
+supported method is \code{"lm"}, which fits a multivariate linear model to predict
+the vector displacements \code{dx} and \code{dy} based on the coordinates \code{x} and \code{y}.}
 
-\item{se}{Logical; if \code{TRUE}, plots the confidence intervals around the
+\item{se}{Logical; if \code{TRUE}, confidence intervals are plotted around the
 smoothed vectors.}
 
-\item{se.circle}{Logical; if \code{TRUE}, draws circles around the origin of the
-vectors to represent the radius of the confidence interval. This is useful
-for visualizing variability when \code{se = TRUE}.}
+\item{se.circle}{Logical; if \code{TRUE}, circles are drawn around the origin of
+the vectors to represent the radius of the confidence interval. This feature
+is useful when \code{se = TRUE}.}
 
-\item{conf_level}{Numeric vector; specifies the prediction interval levels to be
-plotted when \code{se = TRUE}. \strong{Default is \code{conf_level = 0.95}}.}
+\item{conf_level}{Numeric vector; specifies the confidence levels for the
+prediction intervals when \code{se = TRUE}. \strong{Default is \code{conf_level = 0.95}}.}
 
-\item{pi_type}{Character; specifies the type of prediction interval to
-display around the smoothed vectors.
+\item{pi_type}{Character; determines how prediction intervals are displayed
+around the smoothed vectors. Two options are available:
 \itemize{
-\item \code{"wedge"}: Represents prediction intervals as angular wedges, illustrating
-uncertainty in both the direction and magnitude of the vectors. This method
-visualizes variability by displaying a sector emanating from the vector's
-origin, capturing the range of possible vector directions and lengths.
-\item \code{"ellipse"}: Depicts prediction intervals as ellipses surrounding the
-vectors, reflecting the covariance between the vector components (\code{dx} and
-\code{dy}). This approach provides a clear representation of the joint uncertainty
-in both directions, allowing for the visualization of correlated variability.
-\strong{Default is \code{"wedge"}}. Note that if \code{pi_type} is set to \code{"ellipse"} but
-\code{eval_points} is \code{NULL}, the function will automatically switch \code{pi_type} to
-\code{"wedge"} to ensure appropriate interval representation.
+\item \code{"wedge"}: Displays angular wedges that indicate uncertainty in both the
+direction and magnitude of the vectors. Wedges show the range of possible
+vector orientations and lengths.
+\item \code{"ellipse"}: Uses ellipses to depict prediction intervals, reflecting
+the covariance between the vector components (\code{dx} and \code{dy}). Ellipses
+provide a visual representation of joint uncertainty in vector directions.
+The default is \code{"wedge"}. If \code{pi_type} is set to \code{"ellipse"} and \code{eval_points}
+is \code{NULL}, the function switches \code{pi_type} to \code{"wedge"} to ensure proper
+interval representation.
 }}
 
-\item{default_formula}{A formula specifying the model to fit for smoothing.
-Defaults to \code{cbind(dx, dy) ~ x * y}.}
+\item{default_formula}{A formula specifying the multivariate linear model used
+for smoothing. The default formula is \code{cbind(dx, dy) ~ x * y}.}
 
-\item{arrow}{Arrow specification, as created by \code{grid::arrow()}. This
-controls the appearance of the arrowheads at the end of the vectors,
-including properties like angle, length, and type.}
+\item{arrow}{Arrow specification created by \code{grid::arrow()}. This parameter
+controls the appearance of arrowheads at the ends of vectors, including
+angle, length, and type.}
 
-\item{eval_points}{Number of points at which the function is evaluated for
-smoothing.}
+\item{eval_points}{Data frame of evaluation points, or \code{NULL}. When provided,
+it specifies the grid points where the smoothing model is evaluated. If
+\code{NULL}, the function generates a grid based on \code{n}.}
 
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}'s \code{params} argument. These
 arguments broadly fall into one of 4 categories below. Notably, further
@@ -204,139 +202,75 @@ give the stat as \code{"count"}.
 }}
 }
 \value{
-A \code{ggplot2} layer that can be added to a ggplot object to produce a
+A \code{ggplot2} layer that can be added to a ggplot object to create a
 smooth vector field plot.
 }
 \description{
 \code{geom_vector_smooth} generates a ggplot layer that visualizes a smooth vector
-field by taking in raw vector data and applying smoothing techniques to
-estimate the underlying vector field. This is similar in concept to how
-\code{geom_smooth()} in ggplot2 estimates a smooth line, but for vector data
-instead of scalar data.
+field. It uses raw vector data and applies smoothing techniques to estimate
+the underlying vector field. This functionality is similar to \code{geom_smooth()}
+in ggplot2, but is designed specifically for vector data rather than scalar data.
 }
 \details{
-\strong{Mathematics of Prediction and Prediction Intervals}:
+\strong{Multivariate Linear Model}:
 
-This section explains the methods for computing predictions and prediction
-intervals using the \strong{x} and \strong{y} coordinates.
-\subsection{Linear Model (lm) Method}{
+The \code{"lm"} method fits a multivariate linear model to predict vector displacements
+\code{dx} and \code{dy} based on the input coordinates \code{x} and \code{y}. This model includes
+interaction terms (\code{x * y}) to capture more complex relationships in the vector field.
 
-The \code{"lm"} method fits a multivariate linear regression to predict the vector
-displacements \emph{dx} and \emph{dy} based on \strong{x} and \strong{y}.
+\strong{Prediction Intervals}:
 
-\strong{Model:}
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{dx, dy = b_0 + b_1 * x + b_2 * y + b_3 * (x * y) + e
-}\if{html}{\out{</div>}}
+Two types of prediction intervals are supported:
 \itemize{
-\item \emph{b_0}, \emph{b_1}, \emph{b_2}, and \emph{b_3} are the model coefficients.
-\item \emph{e} is the residual error.
+\item \strong{Ellipse}: Ellipses are used to represent the covariance of predicted \code{dx}
+and \code{dy} values. The size and orientation of the ellipses illustrate both
+the uncertainty in vector magnitude and the correlation between vector components.
+\item \strong{Wedge}: Wedges are angular sectors that indicate the range of possible
+directions and lengths for the vectors. This type of prediction interval
+provides an intuitive visualization of uncertainty in vector orientation.
 }
 
-\strong{Prediction:}
-For a new grid point, the predicted displacements are:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{Z_i = X_i * beta
-}\if{html}{\out{</div>}}
-\itemize{
-\item \emph{X_i} is the design matrix for the new grid point.
-\item \emph{beta} is the vector of estimated coefficients.
-}
-
-\strong{Prediction Intervals:}
-The standard error of the prediction is:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{SE(Z_i) = sqrt(diag(X_i * V * t(X_i)))
-}\if{html}{\out{</div>}}
-\itemize{
-\item \emph{V} is the covariance matrix of the coefficients.
-}
-
-The prediction interval at confidence level (1 - alpha) is:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{Z_i ± t_(alpha / 2) * SE(Z_i)
-}\if{html}{\out{</div>}}
-}
-
-\subsection{Bootstrapping (boot) Method}{
-
-The \code{"boot"} method uses resampling to estimate angles and displacements.
-
-\strong{Process:}
-\itemize{
-\item Resample the original data with replacement.
-\item Fit models for the sine and cosine of the vector angle:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{sin(theta) = b_0 + b_1 * x + b_2 * y + e
-}\if{html}{\out{</div>}}
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{cos(theta) = b_0 + b_1 * x + b_2 * y + e
-}\if{html}{\out{</div>}}
-\item Use the predicted sine and cosine to compute:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{theta = atan2(sin(theta), cos(theta))
-}\if{html}{\out{</div>}}
-}
-
-\strong{Prediction Intervals:}
-Based on quantiles from bootstrapped angles:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{Lower Bound = Q_(alpha / 2)(theta)
-Upper Bound = Q_(1 - alpha / 2)(theta)
-}\if{html}{\out{</div>}}
-
-\strong{Displacements:}
-Using predicted angle \emph{theta} and distance \emph{d}:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{dx = d * cos(theta), dy = d * sin(theta)
-}\if{html}{\out{</div>}}
-}
+The intervals are computed using the confidence level specified by the \code{conf_level}
+parameter.
 }
 \section{Aesthetics}{
 
-\code{geom_vector_smooth} understands the following aesthetics (required aesthetics are in bold):
+\code{geom_vector_smooth} supports the following aesthetics (required aesthetics are in bold):
 \itemize{
-\item \strong{\code{x}}: x-coordinate of the starting point of the vector.
-\item \strong{\code{y}}: y-coordinate of the starting point of the vector.
-\item \strong{\code{dx}}: x-displacement of the vector.
-\item \strong{\code{dy}}: y-displacement of the vector.
-\item \code{angle}: The angle of the vector in radians (optional, used with \code{distance}).
-\item \code{distance}: The magnitude of the vector (optional, used with \code{angle}).
+\item \strong{\code{x}}: The x-coordinate of the vector's starting point.
+\item \strong{\code{y}}: The y-coordinate of the vector's starting point.
+\item \strong{\code{dx}}: The vector's displacement along the x-axis.
+\item \strong{\code{dy}}: The vector's displacement along the y-axis.
 \item \code{color}: The color of the vector line.
 \item \code{linewidth}: The thickness of the vector line.
-\item \code{linetype}: The type of the vector line (solid, dashed, etc.).
+\item \code{linetype}: The type of the vector line (e.g., solid or dashed).
 \item \code{alpha}: The transparency level of the vector.
-\item \code{arrow}: Specification for arrowheads at the end of the vector.
-
-Additionally, when using smoothing:
-\item \code{norm}: A computed variable representing the magnitude of the smoothed vector,
-available via \code{after_stat()}.
+\item \code{arrow}: Specifies arrowheads for the vectors.
 }
 }
 
 \examples{
-library(ggvfields)
-
-# Function to generate random vectors based on (x, y) inputs
+# Function to generate vectors
 generate_vectors <- function(v) {
   x <- v[1]
   y <- v[2]
-  c(sin(x) + sin(y) + rnorm(1, 5, 3), sin(x) - sin(y) + rnorm(1, 5, 3))
+  c(
+    sin(x) + sin(y) + rnorm(1, 5, 1),
+    sin(x) - sin(y) - rnorm(1, 5, 1)
+  )
 }
 
 # Set seed for reproducibility
 set.seed(123)
 
-# Generate sample data
+# Create sample points and compute vectors
 sample_points <- data.frame(
-  x = runif(50, min = -10, max = 10),
-  y = runif(50, min = -10, max = 10)
+  x = runif(30, 0, 10),
+  y = runif(30, 0, 10)
 )
 
-# Apply the generate_vectors function to each row
 result <- t(apply(sample_points, 1, generate_vectors))
 
-# Create new columns for displacements (dx, dy) and polar coordinates
 sample_points$xend <- result[, 1]
 sample_points$yend <- result[, 2]
 sample_points$dx <- sample_points$xend - sample_points$x
@@ -344,23 +278,29 @@ sample_points$dy <- sample_points$yend - sample_points$y
 sample_points$distance <- sqrt(sample_points$dx^2 + sample_points$dy^2)
 sample_points$angle <- atan2(sample_points$dy, sample_points$dx)
 
-# Example 1: Cartesian Coordinates with Linear Model (lm)
+# Define evaluation points
+eval_points <- data.frame(
+  x = c(0, 7.5),
+  y = c(10, 5)
+)
+
+# Example 1:
 ggplot(sample_points, aes(x = x, y = y)) +
-  geom_vector_smooth(aes(dx = dx, dy = dy), method = "lm", se = TRUE) +
-  geom_vector(aes(dx = dx, dy = dy)) +
-  ggtitle("Vector Smoothing with Linear Model (lm)")
+  geom_vector(aes(dx = dx, dy = dy, color = NULL), center = FALSE, alpha = 0.2) +
+  geom_vector_smooth(aes(dx = dx, dy = dy), n = 5) +
+  ggtitle("Smoothed Vector Field")
 
-# Example 2: Polar Coordinates with Bootstrapping (boot)
-ggplot(sample_points, aes(x = x, y = y, angle = angle, distance = distance)) +
-  geom_vector_smooth(method = "boot", se = TRUE, conf_level = c(0.95, 0.68)) +
-  geom_vector(aes(dx = dx, dy = dy)) +
-  ggtitle("Vector Smoothing with Bootstrapping (boot)")
+# Example 2: Ellipse with eval_points
+ggplot(sample_points, aes(x = x, y = y)) +
+  geom_vector(aes(dx = dx, dy = dy, color = NULL), center = FALSE, alpha = 0.2) +
+  geom_vector_smooth(aes(dx = dx, dy = dy), eval_points = eval_points, conf_level = c(0.9)) +
+  ggtitle("Smoothed Vector Field with Ellipse Intervals")
 
-# Example 3: Using Polar Coordinates with coord_polar
-ggplot(sample_points, aes(x = x, y = y, angle = angle, distance = distance)) +
-  geom_vector_smooth(method = "lm", se = TRUE, n = 4) +
-  geom_vector(aes(dx = dx, dy = dy)) +
-  ggtitle("Vector Smoothing in Polar Coordinates")
+# Example 3: Wedge with eval_points
+ggplot(sample_points, aes(x = x, y = y)) +
+  geom_vector(aes(dx = dx, dy = dy, color = NULL), center = FALSE, alpha = 0.2) +
+  geom_vector_smooth(aes(dx = dx, dy = dy), eval_points = eval_points, pi_type = "ellipse") +
+  ggtitle("Smoothed Vector Field with Wedge Intervals")
 
 }
 \keyword{datasets}

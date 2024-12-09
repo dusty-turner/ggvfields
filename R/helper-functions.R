@@ -755,7 +755,7 @@ predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL, conf_level
   } else {
     # Invalid interval detected, redo integration from 0 to 2pi
     theta_vals_new <- seq(0, 2 * pi, length.out = 200)
-    interval_new <- compute_interval(theta_vals_new)
+    interval_new <- compute_interval(theta_vals_new, conf_level = conf_level)
     theta_lower_new <- interval_new$theta_lower
     theta_upper_new <- interval_new$theta_upper
 
