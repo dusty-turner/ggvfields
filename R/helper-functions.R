@@ -645,7 +645,7 @@ create_ellipse_data <- function(x_center, y_center, width, height, angle, n_poin
   return(ellipse)
 }
 
-predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL) {
+predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL, conf_level) {
   # Validate inputs
   if (!is.numeric(x) || length(x) != 1) {
     stop("Input 'x' must be a single numeric value.")
@@ -661,6 +661,9 @@ predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL) {
   }
   if (!is.matrix(Sigma) || any(dim(Sigma) != c(2, 2))) {
     stop("Input 'Sigma' must be a 2x2 covariance matrix.")
+  }
+  if (!is.numeric(conf_level) || conf_level <= 0 || conf_level >= 1) {
+    stop("Input 'conf_level' must be a numeric value between 0 and 1.")
   }
 
   # If rho is not provided, calculate it from Sigma
@@ -704,7 +707,7 @@ predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL) {
   }
 
   # Helper function to compute interval
-  compute_interval <- function(theta_vals) {
+  compute_interval <- function(theta_vals, conf_level) {
     # Compute the marginal PDF for each theta
     pdf_vals <- sapply(theta_vals, marginal_theta)
 
@@ -715,9 +718,14 @@ predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL) {
     # Compute the cumulative distribution function (CDF)
     cdf_vals <- cumsum(pdf_vals * delta_theta)
 
+    # Calculate lower and upper percentiles based on conf_level
+    alpha <- 1 - conf_level
+    lower_bound <- alpha / 2
+    upper_bound <- 1 - lower_bound
+
     # Determine the 2.5th and 97.5th percentiles for the 95% prediction interval
-    lower_index <- which(cdf_vals >= 0.025)[1]
-    upper_index <- which(cdf_vals >= 0.975)[1]
+    lower_index <- which(cdf_vals >= lower_bound)[1]
+    upper_index <- which(cdf_vals >= upper_bound)[1]
 
     theta_lower <- theta_vals[lower_index]
     theta_upper <- theta_vals[upper_index]
@@ -727,7 +735,7 @@ predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL) {
 
   # First attempt: integrate from -pi to pi
   theta_vals_initial <- seq(-pi, pi, length.out = 200)
-  interval_initial <- compute_interval(theta_vals_initial)
+  interval_initial <- compute_interval(theta_vals_initial, conf_level = conf_level)
   theta_lower_initial <- interval_initial$theta_lower
   theta_upper_initial <- interval_initial$theta_upper
 

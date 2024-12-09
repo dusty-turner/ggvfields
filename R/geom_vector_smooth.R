@@ -384,7 +384,7 @@ StatVectorSmooth <- ggproto(
         y = grid$y,
         mux = grid$dx,
         muy = grid$dy,
-        MoreArgs = list(Sigma = Sigma, rho = rho),
+        MoreArgs = list(Sigma = Sigma, rho = rho, conf_level = conf_level[1]),
         SIMPLIFY = FALSE
       ))
 
