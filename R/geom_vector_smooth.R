@@ -269,9 +269,6 @@ StatVectorSmooth <- ggproto(
 
     alpha_levels <- 1 - conf_level
 
-    # Two-tailed interval
-    lower_probs <- alpha_levels / 2
-    upper_probs <- 1 - (alpha_levels / 2)
     # Create grid for evaluation
     if (!is.null(eval_points)) {
       # Validate eval_points contains necessary columns
@@ -377,102 +374,71 @@ StatVectorSmooth <- ggproto(
     # 4. Compute Prediction Intervals
     # ----------------------------
 
-    if (pi_type == "ellipse" | pi_type == "wedge") {
-      # Compute ellipse parameters for each grid point
-      ellipse_params_list <- mapply(
-        compute_ellipse_params,
-        var_dx = cov_pred$var_dx,
-        var_dy = cov_pred$var_dy,
-        cov_dx_dy = cov_pred$cov_dx_dy,
-        MoreArgs = list(conf_level = conf_level[1]),
-        SIMPLIFY = FALSE
-      )
-      # Extract ellipse parameters and add to grid
-      grid$ellipse_width <- sapply(ellipse_params_list, `[[`, "width")
-      grid$ellipse_height <- sapply(ellipse_params_list, `[[`, "height")
-      grid$ellipse_angle <- sapply(ellipse_params_list, `[[`, "angle")
-
-      # Compute mean dx, dy, xend, yend
-      grid$xend <- grid$x + grid$dx
-      grid$yend <- grid$y + grid$dy
-
-      # Result data frame
-      result <- data.frame(
-        x = grid$x,
-        y = grid$y,
-        dx = grid$dx,
-        dy = grid$dy,
-        xend = grid$xend,
-        yend = grid$yend,
-        ellipse_width = grid$ellipse_width,
-        ellipse_height = grid$ellipse_height,
-        ellipse_angle = grid$ellipse_angle,
-        id = grid$id
-      )
-
-  } else {
-    stop("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
-  }
-
-    if(pi_type == "wedge"){
-
-      wedge_angles <- do.call(rbind, mapply(
-        predict_theta_interval,
-        x = grid$x,
-        y = grid$y,
-        mux = grid$dx,
-        muy = grid$dy,
-        MoreArgs = list(Sigma = Sigma, rho = rho, conf_level = conf_level[1]),
-        SIMPLIFY = FALSE
-      ))
-
-      # Combine with original dataframe
-      result <- cbind(result, wedge_angles)
-
-      result$r_upper <- sqrt((result$dx)^2 + (result$dy)^2)
-      result$r_lower <- 0
-
-      if (is.null(eval_points)) { ## rescales circle and arrow for grid shapes
-        current_magnitudes <- sqrt(result$dx^2 + result$dy^2)
-
-        # Avoid division by zero by setting zero magnitudes to one (vectors with no length)
-        current_magnitudes[current_magnitudes == 0] <- 1
-
-        # Calculate scaling factors to adjust magnitudes to base_radius
-        scaling_factors <- base_radius / current_magnitudes
-
-        # Scale dx and dy to have length base_radius while preserving direction
-        result$dx <- result$dx * scaling_factors
-        result$dy <- result$dy * scaling_factors
-
-        # Recompute xend and yend based on scaled dx and dy
-        result$xend <- result$x + result$dx
-        result$yend <- result$y + result$dy
-
-        result$r_upper <- base_radius
+    if (pi_type == "ellipse" || pi_type == "wedge") {
+      # Compute prediction intervals based on pi_type
+      if (pi_type == "ellipse") {
+        ellipse_params_list <- mapply(
+          compute_ellipse_params,
+          var_dx = cov_pred$var_dx,
+          var_dy = cov_pred$var_dy,
+          cov_dx_dy = cov_pred$cov_dx_dy,
+          MoreArgs = list(conf_level = conf_level[1]),
+          SIMPLIFY = FALSE
+        )
+        # Extract ellipse parameters and add to grid
+        grid$ellipse_width <- sapply(ellipse_params_list, `[[`, "width")
+        grid$ellipse_height <- sapply(ellipse_params_list, `[[`, "height")
+        grid$ellipse_angle <- sapply(ellipse_params_list, `[[`, "angle")
       }
 
+      if (pi_type == "wedge") {
+        wedge_angles <- do.call(rbind, mapply(
+          predict_theta_interval,
+          x = grid$x,
+          y = grid$y,
+          mux = grid$dx,
+          muy = grid$dy,
+          MoreArgs = list(Sigma = Sigma, rho = rho, conf_level = conf_level[1]),
+          SIMPLIFY = FALSE
+        ))
+        grid <- cbind(grid, wedge_angles)
+        grid$r_upper <- sqrt(grid$dx^2 + grid$dy^2)
+        grid$r_lower <- 0
 
-      # Apply the function to each row using mapply
-      prediction_results <- mapply(
-        compute_prediction_endpoints,
-        x = result$x,
-        y = result$y,
-        dx = result$dx,
-        dy = result$dy,
-        angle_lower = result$min_angle,
-        angle_upper = result$max_angle,
-        SIMPLIFY = FALSE
-      )
+        # Adjust scale if eval_points is NULL
+        if (is.null(eval_points)) {
+          current_magnitudes <- sqrt(grid$dx^2 + grid$dy^2)
+          current_magnitudes[current_magnitudes == 0] <- 1  # Avoid division by zero
+          scaling_factors <- base_radius / current_magnitudes
+          grid$dx <- grid$dx * scaling_factors
+          grid$dy <- grid$dy * scaling_factors
+          grid$xend <- grid$x + grid$dx
+          grid$yend <- grid$y + grid$dy
+          grid$r_upper <- base_radius
+        }
 
-      # Combine the list of dataframes into one dataframe
-      prediction_df <- do.call(rbind, prediction_results)
+        # Compute prediction endpoints
+        prediction_results <- mapply(
+          compute_prediction_endpoints,
+          x = grid$x,
+          y = grid$y,
+          dx = grid$dx,
+          dy = grid$dy,
+          angle_lower = grid$min_angle,
+          angle_upper = grid$max_angle,
+          SIMPLIFY = FALSE
+        )
+        prediction_df <- do.call(rbind, prediction_results)
+        grid <- cbind(grid, prediction_df)
+      }
 
-      # View the prediction results
-
-      result <- cbind(result, prediction_df)
+      # Finalize result
+      result <- grid
+      result$xend <- result$x + result$dx
+      result$yend <- result$y + result$dy
+    } else {
+      stop("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
     }
-
 
     return(result)
     }
