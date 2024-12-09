@@ -274,30 +274,30 @@ StatVectorSmooth <- ggproto(
     upper_probs <- 1 - (alpha_levels / 2)
     # Create grid for evaluation
     if (!is.null(eval_points)) {
+      # Validate eval_points contains necessary columns
       if (!all(c("x", "y") %in% names(eval_points))) {
         stop("The 'eval_points' argument must contain 'x' and 'y' columns.")
       }
+
       grid <- eval_points
 
-      if (nrow(grid) > 1) {
-        # min_distance <- euclidean_distances(grid)
-        # base_radius <- min_distance / 2.5
-      } else {
-        data_range_x <- diff(range(data$x))
-        data_range_y <- diff(range(data$y))
-        data_range <- min(data_range_x, data_range_y)
-        base_radius <- data_range / 2.5
-      }
-
+      # Compute base_radius based on data range
+      data_range <- min(diff(range(data$x)), diff(range(data$y)))
+      base_radius <- data_range / 2.5
     } else {
+      # Generate grid when eval_points is not provided
       x_seq <- seq(min(data$x), max(data$x), length.out = n[1])
       y_seq <- seq(min(data$y), max(data$y), length.out = n[2])
       grid <- expand.grid(x = x_seq, y = y_seq)
+
+      # Calculate grid spacing and base radius
       x_spacing <- diff(sort(unique(grid$x)))[1]
       y_spacing <- diff(sort(unique(grid$y)))[1]
       base_radius <- min(x_spacing, y_spacing) / 2.5
     }
-    grid$id <- 1:nrow(grid)
+
+    grid$id <- seq_len(nrow(grid))
+
 
     # Calculate xend and yend using dx and dy
     data$xend <- data$x + data$dx
