@@ -537,6 +537,7 @@ ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
   geom_vector_smooth() +
   geom_vector(aes(color = after_stat(NULL))) +
   coord_equal()
+#> eval_points is NULL; changing pi_type from 'ellipse' to 'wedge'.
 ```
 
 <img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
@@ -546,8 +547,9 @@ In this example:
 - We use `geom_vector_smooth()` to create a smoothed estimate of the
   vector field based on the observed vectors.  
 - The smoothed vectors are overlaid on the plot.  
-- We add the original vectors using geom_vector() and set aes(color =
-  after_stat(NULL)) to allow the vectors to be colored black.
+- We add the original vectors using `geom_vector()` and set
+  `aes(color = after_stat(NULL))` to allow the vectors to be colored
+  black.
 
 #### Adjusting the Grid Resolution with `n`:
 
@@ -556,6 +558,7 @@ ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
   geom_vector_smooth(n = 4) +
   geom_vector(aes(color = after_stat(NULL))) +
   coord_equal()
+#> eval_points is NULL; changing pi_type from 'ellipse' to 'wedge'.
 ```
 
 <img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
@@ -584,8 +587,8 @@ ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
 
 In this example:
 
-- We create a tibble `eval_point` containing the specific point (x = -1,
-  y = 1) where we want to evaluate the smoothed vector field.  
+- We create a tibble `eval_point` containing the specific point (x =
+  -.5, y = -.5) where we want to evaluate the smoothed vector field.  
 - By passing `eval_points = eval_point` to geom_vector_smooth(), we
   compute the smoothed vector only at this location.
 - We set the confidence level `conf_level` to .75 for a 75% prediction
@@ -599,9 +602,6 @@ In this example:
 - Smoothing Methods: `geom_vector_smooth()` uses linear modeling
   (`method = "lm"`) by default to smooth the vector components. Future
   work will allow you to declare other techniques.  
-- Confidence Intervals: By specifying `probs = c(0.95, 0.68)`, you can
-  add prediction intervals to the smoothed vectors. This representing
-  the uncertainty in the estimates.  
 - Grid Resolution: The `n` parameter controls the number of grid points
   in the x and y directions over which the smoothing is evaluated.
   Adjusting `n` allows you to balance detail and clarity in your
@@ -618,7 +618,8 @@ ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
   geom_vector_smooth(
     n = c(6, 6),
     conf_level = c(0.95),
-    method = "lm"
+    method = "lm",
+    pi_type = "wedge"
   ) +
   geom_vector(aes(color = after_stat(NULL))) +
   coord_equal()

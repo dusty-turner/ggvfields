@@ -149,7 +149,7 @@ stat_vector_smooth <- function(
     se = TRUE,
     se.circle = TRUE,
     conf_level = c(.95, NA),
-    pi_type = "wedge",
+    pi_type = "ellipse",
     formula = cbind(dx, dy) ~ x * y,
     arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
     eval_points = NULL,
@@ -193,7 +193,7 @@ geom_vector_smooth <- function(
     method = "lm",
     se = TRUE,
     se.circle = TRUE,
-    pi_type = "wedge",
+    pi_type = "ellipse",
     conf_level = c(.95, NA),
     formula = cbind(dx, dy) ~ x * y,
     arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
@@ -266,8 +266,6 @@ StatVectorSmooth <- ggproto(
 
     # Ensure 'n' is a numeric vector of length 2
     n <- ensure_length_two(n)
-
-    alpha_levels <- 1 - conf_level
 
     # Create grid for evaluation
     if (!is.null(eval_points)) {
