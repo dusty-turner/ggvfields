@@ -104,6 +104,15 @@ geom_vector_field <- function(
   ...
 ) {
 
+  if(is.null(xlim)){
+    xlim <- c(-10,10)
+    message("xlim not provided. Defaulting to c(-10,10)")
+  }
+  if(is.null(ylim)){
+    ylim <- c(-10,10)
+    message("ylim not provided. Defaulting to c(-10,10)")
+  }
+
   # Create a grid of points based on xlim, ylim, and n
   grid <- expand.grid(
     x = seq(xlim[1], xlim[2], length.out = n),
