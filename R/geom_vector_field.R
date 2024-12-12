@@ -88,30 +88,21 @@
 #'
 #' @export
 geom_vector_field <- function(
-  mapping = NULL,
-  data = NULL,
-  stat = StatVector,
-  geom = GeomVector,
-  position = "identity",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE, fun,
-  xlim = NULL,
-  ylim = NULL, n = 16,
-  center = TRUE,
-  normalize = TRUE,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-  ...
+    mapping = NULL,
+    data = NULL,
+    stat = StatVector,
+    geom = GeomVector,
+    position = "identity",
+    na.rm = FALSE,
+    show.legend = NA,
+    inherit.aes = TRUE, fun,
+    xlim = NULL,
+    ylim = NULL, n = 16,
+    center = TRUE,
+    normalize = TRUE,
+    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+    ...
 ) {
-
-  if(is.null(xlim)){
-    xlim <- c(-10,10)
-    message("xlim not provided. Defaulting to c(-10,10)")
-  }
-  if(is.null(ylim)){
-    ylim <- c(-10,10)
-    message("ylim not provided. Defaulting to c(-10,10)")
-  }
 
   # Create a grid of points based on xlim, ylim, and n
   grid <- expand.grid(
@@ -126,49 +117,68 @@ geom_vector_field <- function(
   grid$dx <- vectors[, 1]
   grid$dy <- vectors[, 2]
 
-  # Ensure default mappings for x, y, dx, dy, length, if not provided
-  if (is.null(mapping)) {
-    mapping <- aes(x = x, y = y, dx = dx, dy = dy)
+  default_mapping <- aes(x = x, y = y, dx = dx, dy = dy, color = after_stat(norm), length = after_stat(NA))
+
+  if (!is.null(mapping)) {
+    # Merge user mappings with defaults, allowing user mappings to override defaults
+    mapping <- modifyList(default_mapping, mapping)
   } else {
-    # Add dx and dy to the mapping if not already present
-    mapping <- modifyList(mapping, aes(x = x, y = y, dx = dx, dy = dy))
+    mapping <- default_mapping
   }
 
-  # Pass the grid and function along to geom_vector for further processing
-  geom_vector(
-    mapping = mapping,
+  layer(
+    geom = GeomVector,      # Assuming GeomVector is your custom geom
+    stat = StatVector,
+    # stat = stat,
     data = grid,
-    stat = stat,
+    mapping = mapping,
     position = position,
-    na.rm = na.rm,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
-    fun = fun,
-    center = center,
-    normalize = normalize,
-    arrow = arrow,
-    ...
+    params = list(
+      na.rm = na.rm,
+      fun = fun,
+      center = center,
+      normalize = normalize,
+      arrow = arrow,
+      ...
+    )
   )
+  # geom_vector(
+  #   mapping = mapping,
+  #   data = grid,
+  #   stat = StatVector,
+  #   # stat = stat,
+  #   position = position,
+  #   na.rm = na.rm,
+  #   show.legend = show.legend,
+  #   inherit.aes = inherit.aes,
+  #   fun = fun,
+  #   center = center,
+  #   normalize = normalize,
+  #   arrow = arrow,
+  #   ...
+  # )
 }
 
 #' @rdname geom_vector_field
 #' @export
 stat_vector_field <- function(
-  mapping = NULL,
-  data = NULL,
-  geom = GeomVector,
-  position = "identity",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  fun,
-  xlim = NULL,
-  ylim = NULL,
-  n = 16,
-  center = TRUE,
-  normalize = TRUE,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-  ...
+    mapping = NULL,
+    data = NULL,
+    geom = GeomVector,
+    position = "identity",
+    na.rm = FALSE,
+    show.legend = NA,
+    inherit.aes = TRUE,
+    fun,
+    xlim = NULL,
+    ylim = NULL,
+    n = 16,
+    center = TRUE,
+    normalize = TRUE,
+    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+    ...
 ) {
   geom_vector_field(
     mapping = mapping,

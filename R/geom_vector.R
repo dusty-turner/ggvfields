@@ -185,7 +185,6 @@ StatVector <- ggproto(
     data$yend <- data$y + data$dy
 
     data$norm <- sqrt(data$dx^2 + data$dy^2)
-
     return(data)
   }
 )
@@ -206,7 +205,8 @@ draw_panel_vector <- function(
 ) {
 
   # If length is not mapped, normalize and center using the original data before transformation
-  if (is.na(data$length[1])) {
+  # if (is.na(data$length[1])) {
+  if (!("length" %in% names(data)) || is.na(data$length[1])) {
 
     # Now transform the modified data into the coordinate system
     coords <- coord$transform(data, panel_params)
@@ -376,8 +376,9 @@ GeomVector <- ggproto(
     # if (!is.na(data$length[1]) && params$normalize) {
     #   message("Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.\nEnsure your `length` values reflect the intended scaling.")
     # }
+  # if (is.na(data$length[1])) {
+    if (!("length" %in% names(data)) || is.na(data$length[1])) {
 
-  if (is.na(data$length[1])) {
 
     # Normalize dx and dy to unit vectors if normalize is TRUE
 
@@ -402,10 +403,13 @@ GeomVector <- ggproto(
           1
         } else if (all(abs(x_spacing - mean(x_spacing)) < 1e-6) &&
                    all(abs(y_spacing - mean(y_spacing)) < 1e-6)) {
+          print("here")
           min(x_spacing, y_spacing) * .9
         } else {
+          print("here2")
           1  # No scaling for non-grid data
         }
+        print(min_spacing)
 
       # Normalize the vectors to unit length and scale by the minimum spacing
       norms <- sqrt(data$dx^2 + data$dy^2)
@@ -435,7 +439,7 @@ GeomVector <- ggproto(
   } else {
 
     # If length aesthetic is mapped
-
+print("here3")
     # 1. Normalize dx and dy to unit vectors (like in draw_panel)
     norms <- sqrt(data$dx^2 + data$dy^2)
     norms[norms == 0] <- 1  # Avoid division by zero
@@ -463,6 +467,7 @@ GeomVector <- ggproto(
     }
 
   }
+    print(data)
     return(data)
   },
 
