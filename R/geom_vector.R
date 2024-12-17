@@ -519,12 +519,21 @@ if (!"length" %in% colnames(data) || all(is.na(data$length))) {
 #' aesthetic in a ggplot. This is particularly useful when working with vector plots
 #' where vector lengths are mapped to a continuous scale.
 #'
+#' @param range rescales the input to the specific output range. Numeric vector of
+#' length two, giving range of possible values. Should be between 0 and 1
 #' @param ... Other arguments passed to `continuous_scale()`.
 #' @export
-scale_length_continuous <- function(...) {
+# scale_length_continuous <- function(...) {
+#   continuous_scale(
+#     aesthetics = "length",
+#     palette = scales::rescale_pal(c(0.1, .5)),
+#     ...
+#   )
+# }
+scale_length_continuous <- function(range = c(0.1, 0.5), ...) {
   continuous_scale(
     aesthetics = "length",
-    palette = scales::rescale_pal(c(0.1, .5)),
+    palette = scales::rescale_pal(range),
     ...
   )
 }
