@@ -2,6 +2,7 @@
 % Please edit documentation in R/geom_vector_field2.R
 \name{geom_vector_field2}
 \alias{geom_vector_field2}
+\alias{stat_vector_field2}
 \title{Create a Vector Field Plot Layer with Length Mapped to Norm}
 \usage{
 geom_vector_field2(
@@ -11,8 +12,34 @@ geom_vector_field2(
   geom = GeomVector,
   position = "identity",
   center = FALSE,
+  normalize = TRUE,
   tail_point = TRUE,
+  tail_point.size = 2,
   arrow = NULL,
+  fun = NULL,
+  x_lim = NULL,
+  y_lim = NULL,
+  n = NULL,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  ...
+)
+
+stat_vector_field2(
+  mapping = NULL,
+  data = NULL,
+  geom = GeomVector,
+  stat = StatVector,
+  position = "identity",
+  center = FALSE,
+  normalize = TRUE,
+  tail_point = TRUE,
+  tail_point.size = 2,
+  arrow = NULL,
+  fun = NULL,
+  x_lim = c(-10, 10),
+  y_lim = c(-10, 10),
+  n = 10,
   show.legend = NA,
   inherit.aes = TRUE,
   ...
@@ -20,7 +47,7 @@ geom_vector_field2(
 }
 \arguments{
 \item{mapping}{Aesthetic mappings created by \code{aes()} or \code{aes_()}.
-These functions ensure that \code{length = after_stat(norm)} is mapped by default, and \code{color} is set to \code{"black"} unless otherwise specified.}
+These functions ensure that \code{length = after_stat(norm)} is mapped by default and leave \code{color} unset, allowing for user customization.}
 
 \item{data}{The data to be displayed in this layer. There are three
 options:
@@ -76,13 +103,22 @@ to use \code{position_jitter()}, give the position as \code{"jitter"}.
 \link[ggplot2:layer_positions]{layer position} documentation.
 }}
 
-\item{center}{Logical; if \code{TRUE}, centers the vectors on their respective
-grid points.}
+\item{center}{Logical; if \code{TRUE}, centers the vectors on their grid points. Defaults to \code{FALSE} here.}
 
-\item{tail_point}{Logical; if \code{TRUE}, adds a small point at the tail of each vector to help indicate the starting point.}
+\item{normalize}{Logical; if \code{TRUE}, normalizes vectors before scaling.}
 
-\item{arrow}{Arrow specification, created by \code{grid::arrow()}, to add
-arrowheads to vectors.}
+\item{tail_point}{Logical; if \code{TRUE}, a small point is added at the tail of each vector. Defaults to \code{TRUE}.}
+
+\item{tail_point.size}{Numeric; size of the tail point if \code{tail_point = TRUE}.}
+
+\item{arrow}{Arrow specification created by \code{grid::arrow()}. Defaults to \code{NULL}.}
+
+\item{fun}{A function that takes a vector \verb{(x, y)} and returns \verb{(dx, dy)}, defining
+vector displacements.}
+
+\item{x_lim, y_lim}{Numeric vectors of length 2 defining the domain limits on the x/y-axis.}
+
+\item{n}{Integer, the number of grid points along each axis.}
 
 \item{show.legend}{logical. Should this layer be included in the legends?
 \code{NA}, the default, includes if any aesthetics are mapped.
@@ -101,24 +137,24 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 A \code{ggplot2} layer that can be added to a ggplot object to create a vector field plot.
 }
 \description{
-\code{geom_vector_field2} and \code{stat_vector_field2} are extensions of \code{geom_vector_field} and \code{stat_vector_field},
+\code{geom_vector_field2()} and \code{stat_vector_field2()} are extensions of \code{geom_vector_field()} and \code{stat_vector_field()},
 providing identical functionality but with different default aesthetics. These functions are particularly useful
 for vector field visualizations where vector length is mapped to the vector's magnitude.
 }
 \details{
 \strong{Default Behavior:}
 \itemize{
-\item \strong{Length} is automatically mapped to the vector norm (\code{length = after_stat(norm)}), meaning that vector
-magnitude is emphasized through the length of each vector in the plot.
-\item \strong{Color} is set to \code{"black"} by default, ensuring a uniform appearance across vectors. Users can override
-this if they wish to map another variable to \code{color}.
+\item \strong{Length} is automatically mapped to the vector norm (\code{length = after_stat(norm)}) so that vector magnitude is
+emphasized through the vector length in the plot.
+\item \strong{Color} defaults to \code{NULL}, allowing the user to set a fixed color or another aesthetic if desired. By leaving
+\code{color} unset, it won't override the \code{geom_vector_field} default which maps \code{color = after_stat(norm)} unless you specify it.
 }
 
 \strong{Additional Parameters:}
 \itemize{
-\item \strong{center} is set to \code{FALSE} by default, so vectors start from the specified (\code{x}, \code{y}) coordinates.
+\item \strong{center} is set to \code{FALSE} by default, so vectors start from the specified (\code{x}, \code{y}) coordinates rather than being centered.
 \item \strong{tail_point} is set to \code{TRUE}, adding a small point at the tail of each vector to help indicate the starting point.
-\item \strong{arrow} is set to \code{NULL}, but users can specify an arrow using \code{grid::arrow()} to add custom arrowheads.
+\item \strong{arrow} is set to \code{NULL} by default. Users can specify a custom arrow using \code{grid::arrow()} to add arrowheads.
 }
 }
 \examples{
@@ -128,9 +164,9 @@ f <- function(v) {
   c(x + y, y - x)
 }
 
-# Create a vector field plot with geom_vector_field2
+# Create a vector field plot with geom_vector_field2:
 ggplot() +
-  geom_vector_field2(fun = f, xlim = c(-5, 5), ylim = c(-5, 5))
+  geom_vector_field2(fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5))
 
 }
 \seealso{

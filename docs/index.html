@@ -420,7 +420,8 @@ $$</span></p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; eval_points is NULL; changing pi_type from 'ellipse' to 'wedge'.</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-17-1.png" width="100%"></p>
 <p>In this example:</p>
 <ul>
@@ -428,7 +429,7 @@ $$</span></p>
 </li>
 <li>The smoothed vectors are overlaid on the plot.<br>
 </li>
-<li>We add the original vectors using geom_vector() and set aes(color = after_stat(NULL)) to allow the vectors to be colored black.</li>
+<li>We add the original vectors using <code><a href="reference/geom_vector.html">geom_vector()</a></code> and set <code>aes(color = after_stat(NULL))</code> to allow the vectors to be colored black.</li>
 </ul>
 </div>
 <div class="section level4">
@@ -438,7 +439,8 @@ $$</span></p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; eval_points is NULL; changing pi_type from 'ellipse' to 'wedge'.</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-18-1.png" width="100%"></p>
 <p>In this example:</p>
 <ul>
@@ -460,7 +462,7 @@ $$</span></p>
 <p><img src="reference/figures/README-unnamed-chunk-19-1.png" width="100%"></p>
 <p>In this example:</p>
 <ul>
-<li>We create a tibble <code>eval_point</code> containing the specific point (x = -1, y = 1) where we want to evaluate the smoothed vector field.<br>
+<li>We create a tibble <code>eval_point</code> containing the specific point (x = -.5, y = -.5) where we want to evaluate the smoothed vector field.<br>
 </li>
 <li>By passing <code>eval_points = eval_point</code> to geom_vector_smooth(), we compute the smoothed vector only at this location.</li>
 <li>We set the confidence level <code>conf_level</code> to .75 for a 75% prediction interval on both the angle and direction.</li>
@@ -472,8 +474,6 @@ $$</span></p>
 </h4>
 <ul>
 <li>Smoothing Methods: <code><a href="reference/geom_vector_smooth.html">geom_vector_smooth()</a></code> uses linear modeling (<code>method = "lm"</code>) by default to smooth the vector components. Future work will allow you to declare other techniques.<br>
-</li>
-<li>Confidence Intervals: By specifying <code>probs = c(0.95, 0.68)</code>, you can add prediction intervals to the smoothed vectors. This representing the uncertainty in the estimates.<br>
 </li>
 <li>Grid Resolution: The <code>n</code> parameter controls the number of grid points in the x and y directions over which the smoothing is evaluated. Adjusting <code>n</code> allows you to balance detail and clarity in your visualization.<br>
 </li>
@@ -488,7 +488,8 @@ $$</span></p>
 <span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span></span>
 <span>    n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">6</span><span class="op">)</span>,</span>
 <span>    conf_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.95</span><span class="op">)</span>,</span>
-<span>    method <span class="op">=</span> <span class="st">"lm"</span></span>
+<span>    method <span class="op">=</span> <span class="st">"lm"</span>,</span>
+<span>    pi_type <span class="op">=</span> <span class="st">"wedge"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>

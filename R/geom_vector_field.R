@@ -1,93 +1,84 @@
 #' Create a Vector Field Plot Layer
 #'
-#' `geom_vector_field()` generates a vector field plot layer using a user-defined
-#' function to compute vector displacements (`dx`, `dy`) at each grid point. The
-#' function automatically generates a grid of points (specified by `x_lim` and `y_lim`)
-#' and evaluates the vector displacements at those points.
+#' `geom_vector_field()` generates a vector field plot layer from a user-defined
+#' function `fun` that computes vector displacements (`dx`, `dy`) over a specified domain.
 #'
-#' The user must provide a function that takes a vector `(x, y)` and returns the
-#' **displacements** `(dx, dy)` at that point in the vector field. Optionally, the
-#' layer can compute **divergence**, **curl**, and **vector norm**, which can be
-#' mapped to aesthetics using `after_stat()`.
+#' **How the Domain is Determined**:
+#' - If you provide **data with `aes(x, y)`**, the domain is inferred from the data.
+#' - If you also specify **`x_lim` and `y_lim`**, they override any domain inferred from the data.
+#' - If you do **not provide data**, but supply **`fun`, `x_lim`, and `y_lim`**, then `geom_vector_field()`
+#'   generates its own grid of points within these limits.
+#' - If data is provided **without `aes(x, y)`** mapped, you must provide `x_lim` and `y_lim`
+#'   so the domain can be determined.
 #'
 #' **Default Behavior**:
-#' - The **magnitude of each vector (`norm`) is mapped to the `color` aesthetic** by default.
+#' - The **magnitude of each vector (`norm`) is mapped to `color` by default**, emphasizing vector strength.
 #' - **Vector lengths** are scaled to **90% of the grid spacing**.
-#' - **Vectors are normalized to unit length** before scaling by grid spacing.
-#'   - **To see the original lengths of the vectors, set `normalize = FALSE`.**
-#' - **Arrowheads** are included by default to indicate direction.
+#' - **Vectors are normalized to unit length** before scaling. To see original lengths, set `normalize = FALSE`.
+#' - **Arrowheads** are included by default.
 #'
 #' @inheritParams ggplot2::geom_raster
 #' @inheritParams ggplot2::stat_identity
 #'
-#' @param fun A user-defined function that takes a vector `(x, y)` and returns a
-#'   vector `(dx, dy)`, representing the displacements at that point in the vector
-#'   field.
-#' @param x_lim,y_lim Numeric vectors of length 2 specifying the x/y-axis limits for
-#'   the grid.
-#' @param n Integer specifying the number of grid points along each axis
-#'   (the grid resolution).
-#' @param center Logical; if `TRUE`, centers the vectors on their respective grid points.
-#' @param normalize Logical; if `TRUE`, normalizes the vectors to unit length before scaling.
-#'   Set to `FALSE` to see their original lengths.
-#' @param tail_point Logical; if `TRUE`, adds a point at the tail of each vector to mark
-#'   the starting position more clearly.
+#' @param fun A function that takes a vector `(x, y)` and returns `(dx, dy)`, defining
+#'   vector displacements.
+#' @param x_lim,y_lim Numeric vectors of length 2 defining the domain limits on the x/y-axis.
+#' @param n Integer, the number of grid points along each axis.
+#' @param center Logical; if `TRUE`, centers vectors on their grid points.
+#' @param normalize Logical; if `TRUE`, normalizes vectors before scaling.
+#' @param tail_point Logical; if `TRUE`, adds a point at the tail of each vector.
 #' @param tail_point.size Numeric; size of the tail point if `tail_point = TRUE`.
-#' @param arrow Arrow specification, created by `grid::arrow()`, to add arrowheads to vectors.
-#' @param ... Other arguments passed to `layer()`, such as additional aesthetic mappings.
+#' @param arrow Arrow specification created by `grid::arrow()`.
+#' @param ... Additional arguments passed to `layer()`.
 #'
-#' @return A `ggplot2` layer that can be added to a ggplot object to create a
-#'   vector field plot. The following mathematical measures are available as computed
-#'   variables and can be mapped using `after_stat()`:
-#'
-#' ### Curl
-#' \deqn{\text{curl}(\mathbf{f})(x, y) = \frac{\partial f_2}{\partial x} - \frac{\partial f_1}{\partial y}}
-#'
-#' ### Divergence
-#' \deqn{\text{div}(\mathbf{f})(x, y) = \frac{\partial f_1}{\partial x} + \frac{\partial f_2}{\partial y}}
-#'
-#' ### Norm
-#' \deqn{\|\mathbf{f}(x, y)\| = \sqrt{dx^2 + dy^2}}
-#'
-#' @section Aesthetic mappings:
-#' You can map the following measures using `after_stat()`:
-#' - **`norm`**: Magnitude (norm) of the vector at each point.
-#' - **`divergence`**: Divergence of the vector field at each point.
-#' - **`curl`**: Curl of the vector field at each point.
-#'
-#' For example, to map `curl` to color:
-#' ```r
-#' aes(color = after_stat(curl))
-#' ```
-#'
-#' @examples
-#' # Example user-defined vector field function
-#' f <- function(v) {
-#'   x <- v[1]; y <- v[2]
-#'   c(x + y, y - x)  # Return displacements (dx, dy)
+#' @section Computed Variables:
+#' \describe{
+#'   \item{norm}{\eqn{\sqrt{dx^2 + dy^2}}: Magnitude of the vector.}
+#'   \item{divergence}{\eqn{\frac{\partial f_1}{\partial x} + \frac{\partial f_2}{\partial y}}: Divergence.}
+#'   \item{curl}{\eqn{\frac{\partial f_2}{\partial x} - \frac{\partial f_1}{\partial y}}: Curl.}
 #' }
 #'
-#' # Create a ggplot with the vector field layer
-#' ggplot() +
-#'   geom_vector_field(fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5), n = 20)
+#' @section Aesthetic mappings:
+#' - `norm`, `divergence`, and `curl` can be mapped with `after_stat()`.
 #'
-#' # Example of mapping norm to length
-#' ggplot() +
-#'   geom_vector_field(
-#'     aes(length = after_stat(norm)),
-#'     fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5), n = 20,
-#'   )
+#' @examples
 #'
-#' # Example with both length and curl mapped
-#' ggplot() +
-#'   geom_vector_field(
-#'     fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5), n = 20, normalize = FALSE,
-#'     mapping = aes(length = after_stat(norm), color = after_stat(curl))
-#'   )
+#' # Example user-defined vector field function with a small random error
+#' f <- function(v) {
+#'   x <- v[1]
+#'   y <- v[2]
+#'   c(x + y, y - x)
+#' }
 #'
+#' set.seed(1234)
+#' n <- 10
+#' wind_data <- data.frame(
+#'   lon = rnorm(n),
+#'   lat = rnorm(n)
+#' )
+#'
+#' # Apply function f to each row to compute dx and dy with error
+#' wind_data[, c("dx", "dy")] <- t(apply(wind_data[, c("lon", "lat")], 1, f))
+#'
+#' ### 1. No data provided:
+#' #    `fun`, `x_lim`, and `y_lim` define the domain.
+#' #    The layer generates a grid of points within (-5,5) for x and y.
+#' ggplot() +
+#'   geom_vector_field(fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5))
+#'
+#' ### 2. With data provided:
+#' #    Create sample data and compute dx, dy using function f with error.
+#' # Plot data's own vectors and add a computed vector field
+#' ggplot(wind_data, aes(x = lon, y = lat)) +
+#'   geom_vector(aes(dx = dx, dy = dy), color = "black") +
+#'   geom_vector_field(fun = f)
+#'
+#' ### 3. With data provided but overriding with x_lim and y_lim:
+#' #    Supply `x_lim` and `y_lim` so the domain is determined by these limits instead of the data.
+#' ggplot(wind_data) +
+#'   geom_vector_field(fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5))
 #' @export
-#' @rdname geom_vector_field
-#' @export
+
 geom_vector_field <- function(
     mapping = NULL,
     data = NULL,
@@ -107,6 +98,15 @@ geom_vector_field <- function(
     inherit.aes = TRUE,
     ...
 ) {
+
+  # Check if x and y are in the mapping
+  mapping_defines_xy <- !is.null(mapping) && all(c("x", "y") %in% names(mapping))
+
+  # If no data and no x,y aesthetics are specified, but we have fun, x_lim, y_lim,
+  # we need dummy data to trigger compute_group().
+  if (is.null(data) && !mapping_defines_xy && !is.null(fun) && !is.null(x_lim) && !is.null(y_lim)) {
+    data <- data.frame(x = NA_real_, y = NA_real_)
+  }
 
   # Default aesthetic mappings: Ensure color reflects norm
   default_mapping <- aes(color = after_stat(norm), length = after_stat(NA))

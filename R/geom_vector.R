@@ -94,8 +94,6 @@
 #'
 #' @rdname geom_vector
 #' @export
-
-
 geom_vector <- function(
     mapping = NULL,
     data = NULL,
@@ -111,11 +109,6 @@ geom_vector <- function(
     tail_point.size = 2,
     ...
 ) {
-
-  # if(is.null(data)){
-  #   data <- ensure_nonempty_data(data)
-  # }
-  # print(data)
 
   if (is.null(mapping)) {
     mapping <- aes()
@@ -191,25 +184,28 @@ stat_vector <- function(
 StatVector <- ggproto(
   "StatVector",
   Stat,
-  # required_aes = NULL,
-  required_aes = c("x", "y"),
-  default_aes = aes(dx = NA, dy = NA, distance = NA, angle = NA, length = 1,
-                    color = "black", fill = "black", linewidth = 2, linetype = 1, alpha = 1),
+  # required_aes = character(0), # No required aesthetics to allow flexibility
+  default_aes = aes(x = NA, y = NA,
+    dx = NA, dy = NA, distance = NA, angle = NA, length = 1,
+    color = "black", fill = "black", linewidth = 2, linetype = 1, alpha = 1
+  ),
 
   compute_group = function(data, scales, center = FALSE, fun = NULL, x_lim = NULL, y_lim = NULL, n = NULL, ...) {
-print(fun)
-    # If a function is provided, calculate curl and divergence
+
+    # Scenario: Using a function to generate the vector field
     if (!is.null(fun)) {
-print("fun")
-
-      if (is.null(x_lim)) {
-        x_lim <- range(data$x)
+      # If x_lim and y_lim provided, generate grid from those
+      # If not provided, try to infer from data
+      if (is.null(x_lim) || is.null(y_lim)) {
+        if (nrow(data) > 0 && all(c("x", "y") %in% names(data))) {
+          x_lim <- x_lim %||% range(data$x, na.rm = TRUE)
+          y_lim <- y_lim %||% range(data$y, na.rm = TRUE)
+        } else {
+          stop("When using `fun` without specifying aes `x, y` from data, you must supply `x_lim` and `y_lim`.")
+        }
       }
-      if (is.null(y_lim)) {
-        y_lim <- range(data$y)
-      }
 
-      if (is.null(n)){
+      if (is.null(n)) {
         n <- 10
       }
 
@@ -218,41 +214,46 @@ print("fun")
         y = seq(y_lim[1], y_lim[2], length.out = n)
       )
 
-      # Apply the user-defined vectorized function to the entire grid
       vectors <- vectorize(fun)(as.matrix(data))
 
-      # Split the vectors into dx and dy components
       data$dx <- vectors[, 1]
       data$dy <- vectors[, 2]
 
-      # Calculate the gradient for each point
+      # Compute divergence and curl
       grad <- apply(data[, c("x", "y")], 1, function(v) numDeriv::grad(fun, v)) |> t()
       grad_u <- grad[, 1]
       grad_v <- grad[, 2]
 
-      # Calculate divergence and curl
       data$divergence <- grad_u + grad_v
       data$curl <- grad_v - grad_u
-    }
 
-    # If dx and dy are provided directly, use them
-    if (all(is.na(data$dx)) | all(is.na(data$dy))) {
-      if (!is.na(data$distance[1]) && !is.na(data$angle[1])) {
+    } else {
+      # fun is NULL, expecting user-provided data with x,y and dx,dy or angle/distance
+      if (!all(c("x", "y") %in% names(data))) {
+        stop("`stat_vector()` requires `x` and `y` aesthetics or a `fun` with `x_lim`/`y_lim`.")
+      }
+
+      # If dx/dy are missing, try angle/distance
+      if ((all(is.na(data$dx)) || all(is.na(data$dy))) &&
+          (!is.na(data$distance[1]) && !is.na(data$angle[1]))) {
         data$dx <- data$distance * cos(data$angle)
         data$dy <- data$distance * sin(data$angle)
-      } else {
+      }
+
+      # Check again if dx,dy are available
+      if (all(is.na(data$dx)) | all(is.na(data$dy))) {
         stop("Either dx/dy or distance/angle must be provided.")
       }
     }
 
     data$xend <- data$x + data$dx
     data$yend <- data$y + data$dy
-
     data$norm <- sqrt(data$dx^2 + data$dy^2)
 
-    return(data)
+    data
   }
 )
+
 
 
 #' @keywords internal
@@ -421,7 +422,7 @@ GeomVector <- ggproto(
   "GeomVector",
   Geom,
   # required_aes = NULL,
-  required_aes = c("x", "y"),
+  # required_aes = c("x", "y"),
   default_aes = aes(color = "black", fill = "black", size = 0.5, length = 1, linewidth = 2, linetype = 1, alpha = 1),
 
   setup_data = function(data, params){
