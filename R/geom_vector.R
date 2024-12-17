@@ -86,20 +86,23 @@
 #' @rdname geom_vector
 #' @export
 geom_vector <- function(
-  mapping = NULL,
-  data = NULL,
-  stat = StatVector,
-  position = "identity",
-  ...,
-  na.rm = FALSE,
-  show.legend = NA,
-  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
-  inherit.aes = TRUE,
-  center = TRUE,
-  normalize = TRUE,
-  tail_point = FALSE,
-  tail_point.size = 2,
-  fun = NULL
+    mapping = NULL,
+    data = NULL,
+    stat = StatVector,
+    position = "identity",
+    ...,
+    na.rm = FALSE,
+    show.legend = NA,
+    arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
+    inherit.aes = TRUE,
+    center = TRUE,
+    normalize = TRUE,
+    tail_point = FALSE,
+    tail_point.size = 2,
+    fun = NULL,
+    x_lim = NULL,
+    y_lim = NULL,
+    n = NULL
 ) {
 
   if (is.null(mapping)) {
@@ -110,10 +113,26 @@ geom_vector <- function(
   mapping <- modifyList(aes(color = after_stat(norm), length = after_stat(NA)), mapping)
 
   layer(
-    stat = StatVector, geom = GeomVector, mapping = mapping, data = data,
-    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, arrow = arrow, center = center, normalize = normalize,
-                  tail_point = tail_point, tail_point.size = tail_point.size, fun = fun, ...)
+    stat = StatVector,
+    geom = GeomVector,
+    mapping = mapping,
+    data = data,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      arrow = arrow,
+      center = center,
+      normalize = normalize,
+      tail_point = tail_point,
+      tail_point.size = tail_point.size,
+      fun = fun,
+      x_lim = x_lim,
+      y_lim = y_lim,
+      n = n,
+      ...
+    )
   )
 }
 
@@ -121,29 +140,48 @@ geom_vector <- function(
 #' @rdname geom_vector
 #' @export
 stat_vector <- function(
-  mapping = NULL,
-  data = NULL,
-  geom = GeomVector,
-  position = "identity",
-  ...,
-  na.rm = FALSE,
-  show.legend = NA,
-  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
-  inherit.aes = TRUE,
-  center = TRUE,
-  normalize = TRUE,
-  tail_point = FALSE,
-  tail_point.size = 2
+    mapping = NULL,
+    data = NULL,
+    geom = GeomVector,
+    position = "identity",
+    ...,
+    na.rm = FALSE,
+    show.legend = NA,
+    arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
+    inherit.aes = TRUE,
+    center = TRUE,
+    normalize = TRUE,
+    tail_point = FALSE,
+    tail_point.size = 2,
+    x_lim = NULL,
+    y_lim = NULL,
+    fun = NULL,
+    n = NULL
 ) {
 
   mapping <- modifyList(aes(color = after_stat(norm), length = after_stat(NA)), mapping)
 
-
   layer(
-    stat = StatVector, geom = geom, mapping = mapping, data = data,
-    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, arrow = arrow, center = center, normalize = normalize,
-                  tail_point = tail_point, tail_point.size = tail_point.size, ...)
+    stat = StatVector,
+    geom = geom,
+    mapping = mapping,
+    data = data,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      arrow = arrow,
+      center = center,
+      normalize = normalize,
+      tail_point = tail_point,
+      tail_point.size = tail_point.size,
+      x_lim = x_lim,
+      y_lim = y_lim,
+      fun = fun,
+      n = n,
+      ...
+    )
   )
 }
 
@@ -157,10 +195,43 @@ StatVector <- ggproto(
   default_aes = aes(dx = NA, dy = NA, distance = NA, angle = NA, length = 1,
                     color = "black", fill = "black", linewidth = 2, linetype = 1, alpha = 1),
 
-  compute_group = function(data, scales, center = FALSE, fun = NULL, ...) {
+  compute_group = function(data, scales, center = FALSE, fun = NULL, x_lim = NULL, y_lim = NULL, n = NULL, ...) {
+
+    print("fun")
+    print("x_lim")
+    print("n")
+    print(fun)
+    print(x_lim)
+    print(n)
 
     # If a function is provided, calculate curl and divergence
     if (!is.null(fun)) {
+
+      if (is.null(x_lim)) {
+        x_lim <- range(data$x)
+        print(x_lim)
+      }
+      if (is.null(y_lim)) {
+        y_lim <- range(data$y)
+        print(y_lim)
+      }
+
+      if (is.null(n)){
+        n <- 10
+      }
+
+      data <- expand.grid(
+        x = seq(x_lim[1], x_lim[2], length.out = n),
+        y = seq(y_lim[1], y_lim[2], length.out = n)
+      )
+
+      # Apply the user-defined vectorized function to the entire grid
+      vectors <- vectorize(fun)(as.matrix(data))
+
+      # Split the vectors into dx and dy components
+      data$dx <- vectors[, 1]
+      data$dy <- vectors[, 2]
+
       # Calculate the gradient for each point
       grad <- apply(data[, c("x", "y")], 1, function(v) numDeriv::grad(fun, v)) |> t()
       grad_u <- grad[, 1]
@@ -169,6 +240,7 @@ StatVector <- ggproto(
       # Calculate divergence and curl
       data$divergence <- grad_u + grad_v
       data$curl <- grad_v - grad_u
+      print("here")
     }
 
     # If dx and dy are provided directly, use them
@@ -185,6 +257,7 @@ StatVector <- ggproto(
     data$yend <- data$y + data$dy
 
     data$norm <- sqrt(data$dx^2 + data$dy^2)
+
     return(data)
   }
 )
@@ -192,21 +265,20 @@ StatVector <- ggproto(
 
 #' @keywords internal
 draw_panel_vector <- function(
-  data,
-  panel_params,
-  coord,
-  na.rm = FALSE,
-  arrow = NULL,
-  center = TRUE,
-  normalize = TRUE,
-  tail_point = FALSE,
-  tail_point.size = 2,
-  linewidth = 2
+    data,
+    panel_params,
+    coord,
+    na.rm = FALSE,
+    arrow = NULL,
+    center = TRUE,
+    normalize = TRUE,
+    tail_point = FALSE,
+    tail_point.size = 2,
+    linewidth = 2
 ) {
 
   # If length is not mapped, normalize and center using the original data before transformation
-  # if (is.na(data$length[1])) {
-  if (!("length" %in% names(data)) || is.na(data$length[1])) {
+  if (is.na(data$length[1])) {
 
     # Now transform the modified data into the coordinate system
     coords <- coord$transform(data, panel_params)
@@ -376,98 +448,93 @@ GeomVector <- ggproto(
     # if (!is.na(data$length[1]) && params$normalize) {
     #   message("Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.\nEnsure your `length` values reflect the intended scaling.")
     # }
-  # if (is.na(data$length[1])) {
-    if (!("length" %in% names(data)) || is.na(data$length[1])) {
+
+    if (is.na(data$length[1])) {
+
+      # Normalize dx and dy to unit vectors if normalize is TRUE
+
+      if (params$normalize) {
+
+        # norms <- sqrt(data$dx^2 + data$dy^2)
+        # norms[norms == 0] <- 1  # Avoid division by zero
+        # data$dx <- data$dx / norms
+        # data$dy <- data$dy / norms
+        #
+        # # Recalculate xend and yend after normalization
+        # data$xend <- data$x + data$dx
+        # data$yend <- data$y + data$dy
+
+        # Detect if the data forms a regular grid by checking unique x and y spacings
+        x_spacing <- unique(diff(sort(unique(data$x))))
+        y_spacing <- unique(diff(sort(unique(data$y))))
 
 
-    # Normalize dx and dy to unit vectors if normalize is TRUE
-
-    if (params$normalize) {
-
-      # norms <- sqrt(data$dx^2 + data$dy^2)
-      # norms[norms == 0] <- 1  # Avoid division by zero
-      # data$dx <- data$dx / norms
-      # data$dy <- data$dy / norms
-      #
-      # # Recalculate xend and yend after normalization
-      # data$xend <- data$x + data$dx
-      # data$yend <- data$y + data$dy
-
-      # Detect if the data forms a regular grid by checking unique x and y spacings
-      x_spacing <- unique(diff(sort(unique(data$x))))
-      y_spacing <- unique(diff(sort(unique(data$y))))
-
-
-      # Calculate the minimum spacing or default to 1 if not a grid
+        # Calculate the minimum spacing or default to 1 if not a grid
         min_spacing <- if (length(x_spacing) == 0 || length(y_spacing) == 0) {
           1
         } else if (all(abs(x_spacing - mean(x_spacing)) < 1e-6) &&
                    all(abs(y_spacing - mean(y_spacing)) < 1e-6)) {
-          print("here")
           min(x_spacing, y_spacing) * .9
         } else {
-          print("here2")
           1  # No scaling for non-grid data
         }
-        print(min_spacing)
 
-      # Normalize the vectors to unit length and scale by the minimum spacing
+        # Normalize the vectors to unit length and scale by the minimum spacing
+        norms <- sqrt(data$dx^2 + data$dy^2)
+        norms[norms == 0] <- 1  # Avoid division by zero
+        data$dx <- (data$dx / norms) * min_spacing
+        data$dy <- (data$dy / norms) * min_spacing
+
+        # Recalculate xend and yend after normalization/scaling
+        data$xend <- data$x + data$dx
+        data$yend <- data$y + data$dy
+
+      }
+
+      # Handle centering if requested (using the original data)
+      if (params$center) {
+        # Calculate midpoint for centering the vector (using data, not coords)
+        half_dx <- (data$xend - data$x) / 2
+        half_dy <- (data$yend - data$y) / 2
+
+        # Adjust the original data to center the vector around its midpoint
+        data$x <- data$x - half_dx
+        data$y <- data$y - half_dy
+        data$xend <- data$xend - half_dx
+        data$yend <- data$yend - half_dy
+      }
+
+    } else {
+
+      # If length aesthetic is mapped
+
+      # 1. Normalize dx and dy to unit vectors (like in draw_panel)
       norms <- sqrt(data$dx^2 + data$dy^2)
       norms[norms == 0] <- 1  # Avoid division by zero
-      data$dx <- (data$dx / norms) * min_spacing
-      data$dy <- (data$dy / norms) * min_spacing
+      data$dx <- data$dx / norms
+      data$dy <- data$dy / norms
 
-      # Recalculate xend and yend after normalization/scaling
+      # 2. Multiply dx and dy by the length aesthetic
+      data$dx <- data$dx * data$length * .01
+      data$dy <- data$dy * data$length * .01
+
+      # 3. Recalculate xend and yend based on the new dx and dy
       data$xend <- data$x + data$dx
       data$yend <- data$y + data$dy
 
+      # 4. Handle centering if requested
+      if (params$center) {
+        half_dx <- (data$xend - data$x) / 2
+        half_dy <- (data$yend - data$y) / 2
+
+        # Adjust the original data to center the vector around its midpoint
+        data$x <- data$x - half_dx
+        data$y <- data$y - half_dy
+        data$xend <- data$xend - half_dx
+        data$yend <- data$yend - half_dy
+      }
+
     }
-
-    # Handle centering if requested (using the original data)
-    if (params$center) {
-      # Calculate midpoint for centering the vector (using data, not coords)
-      half_dx <- (data$xend - data$x) / 2
-      half_dy <- (data$yend - data$y) / 2
-
-      # Adjust the original data to center the vector around its midpoint
-      data$x <- data$x - half_dx
-      data$y <- data$y - half_dy
-      data$xend <- data$xend - half_dx
-      data$yend <- data$yend - half_dy
-    }
-
-  } else {
-
-    # If length aesthetic is mapped
-print("here3")
-    # 1. Normalize dx and dy to unit vectors (like in draw_panel)
-    norms <- sqrt(data$dx^2 + data$dy^2)
-    norms[norms == 0] <- 1  # Avoid division by zero
-    data$dx <- data$dx / norms
-    data$dy <- data$dy / norms
-
-    # 2. Multiply dx and dy by the length aesthetic
-    data$dx <- data$dx * data$length * .01
-    data$dy <- data$dy * data$length * .01
-
-    # 3. Recalculate xend and yend based on the new dx and dy
-    data$xend <- data$x + data$dx
-    data$yend <- data$y + data$dy
-
-    # 4. Handle centering if requested
-    if (params$center) {
-      half_dx <- (data$xend - data$x) / 2
-      half_dy <- (data$yend - data$y) / 2
-
-      # Adjust the original data to center the vector around its midpoint
-      data$x <- data$x - half_dx
-      data$y <- data$y - half_dy
-      data$xend <- data$xend - half_dx
-      data$yend <- data$yend - half_dy
-    }
-
-  }
-    print(data)
     return(data)
   },
 
@@ -492,4 +559,3 @@ scale_length_continuous <- function(...) {
     ...
   )
 }
-
