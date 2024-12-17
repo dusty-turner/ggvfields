@@ -2,7 +2,6 @@
 % Please edit documentation in R/geom_vector_field2.R
 \name{geom_vector_field2}
 \alias{geom_vector_field2}
-\alias{stat_vector_field2}
 \title{Create a Vector Field Plot Layer with Length Mapped to Norm}
 \usage{
 geom_vector_field2(
@@ -14,16 +13,8 @@ geom_vector_field2(
   center = FALSE,
   tail_point = TRUE,
   arrow = NULL,
-  ...
-)
-
-stat_vector_field2(
-  mapping = NULL,
-  data = NULL,
-  geom = GeomVector,
-  center = center,
-  tail_point = tail_point,
-  position = "identity",
+  show.legend = NA,
+  inherit.aes = TRUE,
   ...
 )
 }
@@ -92,6 +83,17 @@ grid points.}
 
 \item{arrow}{Arrow specification, created by \code{grid::arrow()}, to add
 arrowheads to vectors.}
+
+\item{show.legend}{logical. Should this layer be included in the legends?
+\code{NA}, the default, includes if any aesthetics are mapped.
+\code{FALSE} never includes, and \code{TRUE} always includes.
+It can also be a named logical vector to finely select the aesthetics to
+display.}
+
+\item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
+rather than combining with them. This is most useful for helper functions
+that define both data and aesthetics and shouldn't inherit behaviour from
+the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{...}{Other arguments passed on to \code{geom_vector_field()} or \code{stat_vector_field()}.}
 }

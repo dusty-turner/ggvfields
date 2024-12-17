@@ -1,9 +1,9 @@
 #' Create a Vector Field Plot Layer
 #'
-#' `geom_vector_field` generates a vector field plot layer using a user-defined
-#' function to compute the vector displacements (`dx`, `dy`) at each grid point.
-#' The function automatically generates a grid of points (specified by `x_lim`
-#' and `y_lim`) and evaluates the vector displacements at those points.
+#' `geom_vector_field()` generates a vector field plot layer using a user-defined
+#' function to compute vector displacements (`dx`, `dy`) at each grid point. The
+#' function automatically generates a grid of points (specified by `x_lim` and `y_lim`)
+#' and evaluates the vector displacements at those points.
 #'
 #' The user must provide a function that takes a vector `(x, y)` and returns the
 #' **displacements** `(dx, dy)` at that point in the vector field. Optionally, the
@@ -19,35 +19,34 @@
 #'
 #' @inheritParams ggplot2::geom_raster
 #' @inheritParams ggplot2::stat_identity
-#' @importFrom boot boot
+#'
 #' @param fun A user-defined function that takes a vector `(x, y)` and returns a
 #'   vector `(dx, dy)`, representing the displacements at that point in the vector
 #'   field.
 #' @param x_lim,y_lim Numeric vectors of length 2 specifying the x/y-axis limits for
 #'   the grid.
 #' @param n Integer specifying the number of grid points along each axis
-#'   (resolution of the grid).
-#' @param center Logical; if `TRUE`, centers the vectors on their respective
-#'   grid points.
-#' @param normalize Logical; if `TRUE`, normalizes the vectors to unit length.
-#'   Set to `FALSE` to view the original lengths of the vectors.
-#' @param arrow Arrow specification, created by `grid::arrow()`, to add
-#'   arrowheads to vectors.
-#' @param ... Other arguments passed to `layer()`, such as aesthetic mappings.
+#'   (the grid resolution).
+#' @param center Logical; if `TRUE`, centers the vectors on their respective grid points.
+#' @param normalize Logical; if `TRUE`, normalizes the vectors to unit length before scaling.
+#'   Set to `FALSE` to see their original lengths.
+#' @param tail_point Logical; if `TRUE`, adds a point at the tail of each vector to mark
+#'   the starting position more clearly.
+#' @param tail_point.size Numeric; size of the tail point if `tail_point = TRUE`.
+#' @param arrow Arrow specification, created by `grid::arrow()`, to add arrowheads to vectors.
+#' @param ... Other arguments passed to `layer()`, such as additional aesthetic mappings.
 #'
 #' @return A `ggplot2` layer that can be added to a ggplot object to create a
-#'   vector field plot. The following mathematical measures are available:
+#'   vector field plot. The following mathematical measures are available as computed
+#'   variables and can be mapped using `after_stat()`:
 #'
 #' ### Curl
-#' The curl represents the rotation or "twisting" of vectors around a point:
 #' \deqn{\text{curl}(\mathbf{f})(x, y) = \frac{\partial f_2}{\partial x} - \frac{\partial f_1}{\partial y}}
 #'
 #' ### Divergence
-#' The divergence measures the rate at which vectors "spread out" from a point:
 #' \deqn{\text{div}(\mathbf{f})(x, y) = \frac{\partial f_1}{\partial x} + \frac{\partial f_2}{\partial y}}
 #'
 #' ### Norm
-#' The norm (magnitude) of a vector:
 #' \deqn{\|\mathbf{f}(x, y)\| = \sqrt{dx^2 + dy^2}}
 #'
 #' @section Aesthetic mappings:
@@ -100,14 +99,15 @@ geom_vector_field <- function(
     tail_point = FALSE,
     tail_point.size = 2,
     arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
-    fun = NULL,       # User-provided function for grid-based vector field
-    x_lim = NULL, # Default x limits for the grid
-    y_lim = NULL, # Default y limits for the grid
-    n = NULL,           # Grid resolution
+    fun = NULL,
+    x_lim = NULL,
+    y_lim = NULL,
+    n = NULL,
     show.legend = NA,
     inherit.aes = TRUE,
     ...
 ) {
+
   # Default aesthetic mappings: Ensure color reflects norm
   default_mapping <- aes(color = after_stat(norm), length = after_stat(NA))
 
@@ -133,10 +133,10 @@ geom_vector_field <- function(
       tail_point = tail_point,
       tail_point.size = tail_point.size,
       arrow = arrow,
-      fun = fun,        # Pass user-provided function
-      x_lim = x_lim,    # Pass x limits
-      y_lim = y_lim,    # Pass y limits
-      n = n,            # Pass grid resolution
+      fun = fun,
+      x_lim = x_lim,
+      y_lim = y_lim,
+      n = n,
       ...
     )
   )
@@ -155,10 +155,10 @@ stat_vector_field <- function(
     na.rm = FALSE,
     show.legend = NA,
     inherit.aes = TRUE,
-    fun = NULL,        # User-defined function for vector fields
-    x_lim = c(-10, 10), # Default x limits for the grid
-    y_lim = c(-10, 10), # Default y limits for the grid
-    n = 10,            # Grid resolution
+    fun = NULL,
+    x_lim = c(-10, 10),
+    y_lim = c(-10, 10),
+    n = 10,
     center = TRUE,
     normalize = TRUE,
     tail_point = FALSE,
@@ -192,10 +192,10 @@ stat_vector_field <- function(
       normalize = normalize,
       tail_point = tail_point,
       tail_point.size = tail_point.size,
-      fun = fun,        # Pass user-provided function
-      x_lim = x_lim,    # Pass x limits
-      y_lim = y_lim,    # Pass y limits
-      n = n,            # Pass grid resolution
+      fun = fun,
+      x_lim = x_lim,
+      y_lim = y_lim,
+      n = n,
       ...
     )
   )

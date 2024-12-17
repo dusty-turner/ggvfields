@@ -1,44 +1,68 @@
 #' Create a Vector Plot Layer
 #'
-#' `geom_vector` generates a ggplot layer that visualizes vectors as line
-#' segments with optional arrowheads. Vectors are defined by their start (`x`, `y`)
-#' and directional components (`dx`, `dy`), which indicate the change in position.
-#' Alternatively, vectors can be defined by angular (`angle`) and distance (`distance`) information.
+#' `geom_vector()` generates a ggplot layer that visualizes vectors as line segments
+#' with optional arrowheads. Vectors are defined by their start coordinates (`x`, `y`)
+#' and either directional components (`dx`, `dy`) or polar coordinates (`angle` and `distance`).
+#'
+#' This geom is designed for situations where the vector data is already available
+#' (e.g., wind directions and speeds at known locations). If you need to generate
+#' a vector field from a user-defined function over a specified grid (which can
+#' compute `divergence` and `curl`), consider using [`geom_vector_field()`].
 #'
 #' @inheritParams ggplot2::geom_segment
 #' @inheritParams ggplot2::stat_identity
-#' @param fun A function applied to vector data if additional transformations are needed.
-#' @param center Logical; if `TRUE`, centers the vector on the specified (`x`, `y`) location.
-#'   If `FALSE`, the vector starts at the specified (`x`, `y`) point. When centering is enabled,
-#'   the vector's midpoint aligns with the original (`x`, `y`) location.
-#' @param normalize Logical; if `TRUE`, normalizes each vector to a unit length before applying any scaling.
-#'   This prevents overplotting and ensures consistent visual presentation in dense plots.
-#' @param tail_point Logical; if `TRUE`, adds a point to mark the tail of each vector.
-#' @param tail_point.size Integer; sets the size of the tail point if `tail_point = TRUE`.
-#' @param arrow Arrow specification for vector arrowheads, created with `grid::arrow()`.
-#'   Controls the appearance of arrowheads, including angle, length, and type.
-#' @return A `ggplot2` layer that can be added to a ggplot object to produce a vector plot.
-#' @name geom_vector
-#' @section Aesthetics:
-#' `geom_vector` understands the following aesthetics (required aesthetics are in **bold**):
-#' - **`x`**: x-coordinate of the start point of the vector.
-#' - **`y`**: y-coordinate of the start point of the vector.
-#' - **`dx`**: Change in the x-direction (length component along the x-axis).
-#' - **`dy`**: Change in the y-direction (length component along the y-axis).
-#' - `angle`: The angle of the vector in degrees (optional, used with `distance`).
-#' - `distance`: The magnitude of the vector (optional, used with `angle`).
-#' - `length`: Length of the vector (default: `after_stat(NA)`).
-#'   - You can also manually scale vector length by using `aes(length = after_stat(norm))`.
-#'   - Alternatively, use `geom_vector2()` to map vector magnitude (`norm`) to length automatically.
-#' - `color`: **By default, `color = after_stat(norm)`** to reflect vector magnitude.
-#' - `fill`: Fill color for arrowheads and points.
-#' - `linewidth`: Thickness of the vector line.
-#' - `linetype`: Type of line (solid, dashed, etc.).
-#' - `alpha`: Transparency level of the vector.
-#' - `arrow`: Arrowhead specification for the vector.
 #'
-#' @seealso
-#' Use [geom_vector2()] for automatically mapping the vector's magnitude (`norm`) to length.
+#' @param center Logical; if `TRUE`, the vector is centered on the (`x`, `y`) location.
+#'   If `FALSE`, the vector originates at the (`x`, `y`) location. When centered, the
+#'   midpoint of the vector aligns with the original (`x`, `y`) position.
+#' @param normalize Logical; if `TRUE`, normalizes each vector to a unit length before
+#'   applying any scaling. This can help prevent overplotting in dense plots and
+#'   ensures consistent visual representation.
+#' @param tail_point Logical; if `TRUE`, adds a point at the tail of each vector to mark
+#'   the starting position more clearly.
+#' @param tail_point.size Numeric value indicating the size of the tail point if
+#'   `tail_point = TRUE`.
+#' @param arrow Arrow specification for adding arrowheads to vectors, created with
+#'   `grid::arrow()`. Controls arrowhead angle, length, and type.
+#'
+#' @return A `ggplot2` layer that can be added to a ggplot object to produce a vector plot.
+#'
+#' @name geom_vector
+#'
+#' @section Aesthetics:
+#' `geom_vector()` understands the following aesthetics (required aesthetics are in **bold**):
+#' - **`x`**: The x-coordinate of the vector's start (or center) point.
+#' - **`y`**: The y-coordinate of the vector's start (or center) point.
+#' - **`dx`**: The vector's x-component of displacement.
+#' - **`dy`**: The vector's y-component of displacement.
+#' - `angle` (in radians): The angle of the vector, used with `distance`.
+#' - `distance`: The magnitude of the vector, used with `angle`.
+#' - `length`: The displayed length of the vector on the plot. By default, the vector
+#'   is drawn at its actual data-defined size. To modify this, you can:
+#'   - Assign a constant length: `aes(length = 0.5)` (for example).
+#'   - Scale length by a computed statistic, such as `aes(length = after_stat(norm))` to
+#'     represent the vector's magnitude.
+#' - `color`: By default, `color = after_stat(norm)` to map the magnitude of each vector
+#'   to its color, providing a visual cue of vector strength.
+#' - `fill`: Fill color for arrowheads and tail points.
+#' - `linewidth`: The thickness of the vector line.
+#' - `linetype`: The type of line (e.g., solid, dashed).
+#' - `alpha`: The transparency level of the vector.
+#'
+#' @section Key Notes:
+#' - **Default Color Mapping**:
+#'   - The default maps vector magnitude (`norm`) to `color`.
+#'   - This makes stronger (longer) vectors more visually prominent.
+#'   - To override this behavior, specify `aes(color = "black")` or another fixed color.
+#'
+#' - **Scaling by Length**:
+#'   - By default, vectors are drawn at their data-defined size.
+#'   - To scale by the vector's magnitude, use `aes(length = after_stat(norm))`.
+#'   - For a shortcut, `geom_vector2()` automatically maps magnitude to length.
+#'
+#' @section Computed Variables:
+#' `geom_vector()` computes:
+#' - `norm`: The magnitude of each vector, \eqn{\sqrt{dx^2 + dy^2}}.
 #'
 #' @examples
 #' set.seed(1234)
@@ -52,39 +76,26 @@
 #'   dy = rchisq(n, df = 2) * sin(runif(n, -pi, pi))
 #' )
 #'
+#' # Basic vector plot using dx and dy
 #' ggplot(wind_data) +
 #'   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy))
 #'
-#' # Example using Polar coordinates: angle and distance
+#' # Using angle and distance instead of dx, dy
 #' ggplot(wind_data) +
 #'   geom_vector(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd))
 #'
-#' # To scale vector length by magnitude, use geom_vector2():
+#' # To scale vector length by magnitude, use geom_vector2()
 #' ggplot(wind_data) +
 #'   geom_vector2(aes(x = lon, y = lat, dx = dx, dy = dy))
 #'
-#' # Or manually set length mapping with after_stat():
+#' # Manually map length to norm
 #' ggplot(wind_data) +
 #'   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)))
 #'
-#' @section Key Notes:
-#' - **Default Color Mapping**:
-#'   - The default behavior maps the vector's magnitude (`norm`) to the `color` aesthetic.
-#'   - This ensures that vector strength is visually emphasized through color.
-#'   - To override this behavior, you can set `aes(color = "black")` or another fixed color.
-#'
-#' - **Scaling by Length**:
-#'   - By default, vector length is not scaled (`length = after_stat(NA)`).
-#'   - You can manually enable length scaling by using `aes(length = after_stat(norm))`.
-#'   - Alternatively, use the `geom_vector2()` function for automatic length scaling based on magnitude.
-#'
-#' @section Computed Variables:
-#' \describe{
-#'   \item{norm}{The magnitude of each vector, calculated as \eqn{\|\mathbf{v}\| = \sqrt{dx^2 + dy^2}}.}
-#' }
-#'
 #' @rdname geom_vector
 #' @export
+
+
 geom_vector <- function(
     mapping = NULL,
     data = NULL,
@@ -100,6 +111,11 @@ geom_vector <- function(
     tail_point.size = 2,
     ...
 ) {
+
+  # if(is.null(data)){
+  #   data <- ensure_nonempty_data(data)
+  # }
+  # print(data)
 
   if (is.null(mapping)) {
     mapping <- aes()
@@ -123,10 +139,6 @@ geom_vector <- function(
       normalize = normalize,
       tail_point = tail_point,
       tail_point.size = tail_point.size,
-      fun = fun,
-      x_lim = x_lim,
-      y_lim = y_lim,
-      n = n,
       ...
     )
   )
@@ -168,10 +180,6 @@ stat_vector <- function(
       normalize = normalize,
       tail_point = tail_point,
       tail_point.size = tail_point.size,
-      x_lim = x_lim,
-      y_lim = y_lim,
-      fun = fun,
-      n = n,
       ...
     )
   )
@@ -183,14 +191,16 @@ stat_vector <- function(
 StatVector <- ggproto(
   "StatVector",
   Stat,
+  # required_aes = NULL,
   required_aes = c("x", "y"),
   default_aes = aes(dx = NA, dy = NA, distance = NA, angle = NA, length = 1,
                     color = "black", fill = "black", linewidth = 2, linetype = 1, alpha = 1),
 
   compute_group = function(data, scales, center = FALSE, fun = NULL, x_lim = NULL, y_lim = NULL, n = NULL, ...) {
-
+print(fun)
     # If a function is provided, calculate curl and divergence
     if (!is.null(fun)) {
+print("fun")
 
       if (is.null(x_lim)) {
         x_lim <- range(data$x)
@@ -290,14 +300,6 @@ draw_panel_vector <- function(
     return(grid::grobTree(do.call(grid::gList, grobs)))
 
   } else {
-    # When length is mapped, proceed as usual
-    # Display a message and ignore normalization if normalize = TRUE
-    # if (normalize) {
-    #   message("Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.\nEnsure your `length` values reflect the intended scaling.")
-    # }
-
-    #### Untransform the data here ####
-    # Reverse the transformation done in setup_data to get the original data back
 
     # 1. Undo centering if it was applied
     if (center) {
@@ -418,6 +420,7 @@ draw_key_vector <- function(data, params, size, linewidth) {
 GeomVector <- ggproto(
   "GeomVector",
   Geom,
+  # required_aes = NULL,
   required_aes = c("x", "y"),
   default_aes = aes(color = "black", fill = "black", size = 0.5, length = 1, linewidth = 2, linetype = 1, alpha = 1),
 
@@ -429,15 +432,6 @@ if (!"length" %in% colnames(data) || all(is.na(data$length))) {
       # Normalize dx and dy to unit vectors if normalize is TRUE
 
       if (params$normalize) {
-
-        # norms <- sqrt(data$dx^2 + data$dy^2)
-        # norms[norms == 0] <- 1  # Avoid division by zero
-        # data$dx <- data$dx / norms
-        # data$dy <- data$dy / norms
-        #
-        # # Recalculate xend and yend after normalization
-        # data$xend <- data$x + data$dx
-        # data$yend <- data$y + data$dy
 
         # Detect if the data forms a regular grid by checking unique x and y spacings
         x_spacing <- unique(diff(sort(unique(data$x))))
@@ -513,7 +507,6 @@ if (!"length" %in% colnames(data) || all(is.na(data$length))) {
     return(data)
   },
 
-  required_aes = c("x", "y"),
   draw_group = draw_panel_vector,
   draw_key = draw_key_vector
 )
