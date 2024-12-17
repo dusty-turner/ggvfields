@@ -46,59 +46,74 @@ geom_vector_field2 <- function(
     center = FALSE,
     tail_point = TRUE,
     arrow = NULL,
+    show.legend = NA,
+    inherit.aes = TRUE,
     ...
 ) {
-
+  # Default aesthetics: length maps to norm, and color is unset
   base_mapping <- aes(length = after_stat(norm), color = NULL)
 
+  # Merge user-provided mappings with the base defaults
   if (is.null(mapping)) {
     mapping <- base_mapping
   } else {
     mapping <- modifyList(base_mapping, mapping)
   }
 
-  geom_vector_field(
-    mapping = mapping,
-    data = data,
+  layer(
     stat = stat,
     geom = geom,
+    mapping = mapping,
+    data = data,
     position = position,
-    center = center,
-    tail_point = tail_point,
-    arrow = arrow,
-    ...
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      center = center,
+      tail_point = tail_point,
+      arrow = arrow,
+      ...
+    )
   )
 }
 
-
-#' @rdname geom_vector_field2
+#' @rdname geom_vector_field
 #' @export
 stat_vector_field2 <- function(
     mapping = NULL,
     data = NULL,
     geom = GeomVector,
-    center = center,
-    tail_point = tail_point,
+    stat = StatVector,
     position = "identity",
+    center = FALSE,
+    tail_point = TRUE,
+    show.legend = NA,
+    inherit.aes = TRUE,
     ...
 ) {
-
+  # Default aesthetics: length maps to norm, and color is unset
   base_mapping <- aes(length = after_stat(norm), color = NULL)
 
+  # Merge user-provided mappings with the base defaults
   if (is.null(mapping)) {
     mapping <- base_mapping
   } else {
     mapping <- modifyList(base_mapping, mapping)
   }
 
-  stat_vector_field(
+  layer(
+    stat = stat,
+    geom = geom,
     mapping = mapping,
     data = data,
-    geom = geom,
     position = position,
-    center = center,
-    tail_point = tail_point,
-    arrow = arrow,
-    ...
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      center = center,
+      tail_point = tail_point,
+      ...
+    )
   )
 }
+

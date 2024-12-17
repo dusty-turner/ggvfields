@@ -90,7 +90,6 @@ geom_vector <- function(
     data = NULL,
     stat = StatVector,
     position = "identity",
-    ...,
     na.rm = FALSE,
     show.legend = NA,
     arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
@@ -99,10 +98,7 @@ geom_vector <- function(
     normalize = TRUE,
     tail_point = FALSE,
     tail_point.size = 2,
-    fun = NULL,
-    x_lim = NULL,
-    y_lim = NULL,
-    n = NULL
+    ...
 ) {
 
   if (is.null(mapping)) {
@@ -144,7 +140,6 @@ stat_vector <- function(
     data = NULL,
     geom = GeomVector,
     position = "identity",
-    ...,
     na.rm = FALSE,
     show.legend = NA,
     arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
@@ -153,10 +148,7 @@ stat_vector <- function(
     normalize = TRUE,
     tail_point = FALSE,
     tail_point.size = 2,
-    x_lim = NULL,
-    y_lim = NULL,
-    fun = NULL,
-    n = NULL
+    ...
 ) {
 
   mapping <- modifyList(aes(color = after_stat(norm), length = after_stat(NA)), mapping)
@@ -197,23 +189,14 @@ StatVector <- ggproto(
 
   compute_group = function(data, scales, center = FALSE, fun = NULL, x_lim = NULL, y_lim = NULL, n = NULL, ...) {
 
-    print("fun")
-    print("x_lim")
-    print("n")
-    print(fun)
-    print(x_lim)
-    print(n)
-
     # If a function is provided, calculate curl and divergence
     if (!is.null(fun)) {
 
       if (is.null(x_lim)) {
         x_lim <- range(data$x)
-        print(x_lim)
       }
       if (is.null(y_lim)) {
         y_lim <- range(data$y)
-        print(y_lim)
       }
 
       if (is.null(n)){
@@ -240,7 +223,6 @@ StatVector <- ggproto(
       # Calculate divergence and curl
       data$divergence <- grad_u + grad_v
       data$curl <- grad_v - grad_u
-      print("here")
     }
 
     # If dx and dy are provided directly, use them
@@ -441,15 +423,8 @@ GeomVector <- ggproto(
 
   setup_data = function(data, params){
 
-    # print(params)
-    #
-    # inherits(params$length, "after_stat")
-    #
-    # if (!is.na(data$length[1]) && params$normalize) {
-    #   message("Note: `normalize = TRUE` does not affect `dx` and `dy` when the `length` aesthetic is mapped.\nEnsure your `length` values reflect the intended scaling.")
-    # }
-
-    if (is.na(data$length[1])) {
+if (!"length" %in% colnames(data) || all(is.na(data$length))) {
+    # if (is.na(data$length[1])) {
 
       # Normalize dx and dy to unit vectors if normalize is TRUE
 

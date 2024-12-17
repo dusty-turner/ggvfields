@@ -2,8 +2,8 @@
 #'
 #' `geom_vector_field` generates a vector field plot layer using a user-defined
 #' function to compute the vector displacements (`dx`, `dy`) at each grid point.
-#' The function automatically generates a grid of points (specified by `xlim`
-#' and `ylim`) and evaluates the vector displacements at those points.
+#' The function automatically generates a grid of points (specified by `x_lim`
+#' and `y_lim`) and evaluates the vector displacements at those points.
 #'
 #' The user must provide a function that takes a vector `(x, y)` and returns the
 #' **displacements** `(dx, dy)` at that point in the vector field. Optionally, the
@@ -23,7 +23,7 @@
 #' @param fun A user-defined function that takes a vector `(x, y)` and returns a
 #'   vector `(dx, dy)`, representing the displacements at that point in the vector
 #'   field.
-#' @param xlim,ylim Numeric vectors of length 2 specifying the x/y-axis limits for
+#' @param x_lim,y_lim Numeric vectors of length 2 specifying the x/y-axis limits for
 #'   the grid.
 #' @param n Integer specifying the number of grid points along each axis
 #'   (resolution of the grid).
@@ -70,22 +70,24 @@
 #'
 #' # Create a ggplot with the vector field layer
 #' ggplot() +
-#'   geom_vector_field(fun = f, xlim = c(-5, 5), ylim = c(-5, 5), n = 20)
+#'   geom_vector_field(fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5), n = 20)
 #'
 #' # Example of mapping norm to length
 #' ggplot() +
 #'   geom_vector_field(
 #'     aes(length = after_stat(norm)),
-#'     fun = f, xlim = c(-5, 5), ylim = c(-5, 5), n = 20,
+#'     fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5), n = 20,
 #'   )
 #'
 #' # Example with both length and curl mapped
 #' ggplot() +
 #'   geom_vector_field(
-#'     fun = f, xlim = c(-5, 5), ylim = c(-5, 5), n = 20, normalize = FALSE,
+#'     fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5), n = 20, normalize = FALSE,
 #'     mapping = aes(length = after_stat(norm), color = after_stat(curl))
 #'   )
 #'
+#' @export
+#' @rdname geom_vector_field
 #' @export
 geom_vector_field <- function(
     mapping = NULL,
@@ -93,73 +95,55 @@ geom_vector_field <- function(
     stat = StatVector,
     geom = GeomVector,
     position = "identity",
-    na.rm = FALSE,
-    show.legend = NA,
-    inherit.aes = TRUE, fun,
-    xlim = NULL,
-    ylim = NULL, n = 16,
     center = TRUE,
     normalize = TRUE,
-    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+    tail_point = FALSE,
+    tail_point.size = 2,
+    arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
+    fun = NULL,       # User-provided function for grid-based vector field
+    x_lim = NULL, # Default x limits for the grid
+    y_lim = NULL, # Default y limits for the grid
+    n = NULL,           # Grid resolution
+    show.legend = NA,
+    inherit.aes = TRUE,
     ...
 ) {
+  # Default aesthetic mappings: Ensure color reflects norm
+  default_mapping <- aes(color = after_stat(norm), length = after_stat(NA))
 
-  # Create a grid of points based on xlim, ylim, and n
-  grid <- expand.grid(
-    x = seq(xlim[1], xlim[2], length.out = n),
-    y = seq(ylim[1], ylim[2], length.out = n)
-  )
-
-  # Apply the user-defined vectorized function to the entire grid
-  vectors <- vectorize(fun)(as.matrix(grid))
-
-  # Split the vectors into dx and dy components
-  grid$dx <- vectors[, 1]
-  grid$dy <- vectors[, 2]
-
-  default_mapping <- aes(x = x, y = y, dx = dx, dy = dy, color = after_stat(norm), length = after_stat(NA))
-
-  if (!is.null(mapping)) {
-    # Merge user mappings with defaults, allowing user mappings to override defaults
-    mapping <- modifyList(default_mapping, mapping)
-  } else {
+  # Merge user-provided mappings with defaults
+  if (is.null(mapping)) {
     mapping <- default_mapping
+  } else {
+    mapping <- modifyList(default_mapping, mapping)
   }
 
+  # Pass the parameters via `params` only
   layer(
-    geom = GeomVector,      # Assuming GeomVector is your custom geom
-    stat = StatVector,
-    # stat = stat,
-    data = grid,
+    stat = stat,
+    geom = geom,
     mapping = mapping,
+    data = data,
     position = position,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
-      na.rm = na.rm,
-      fun = fun,
       center = center,
       normalize = normalize,
+      tail_point = tail_point,
+      tail_point.size = tail_point.size,
       arrow = arrow,
+      fun = fun,        # Pass user-provided function
+      x_lim = x_lim,    # Pass x limits
+      y_lim = y_lim,    # Pass y limits
+      n = n,            # Pass grid resolution
       ...
     )
   )
-  # geom_vector(
-  #   mapping = mapping,
-  #   data = grid,
-  #   stat = StatVector,
-  #   # stat = stat,
-  #   position = position,
-  #   na.rm = na.rm,
-  #   show.legend = show.legend,
-  #   inherit.aes = inherit.aes,
-  #   fun = fun,
-  #   center = center,
-  #   normalize = normalize,
-  #   arrow = arrow,
-  #   ...
-  # )
 }
+
+
+
 
 #' @rdname geom_vector_field
 #' @export
@@ -171,33 +155,51 @@ stat_vector_field <- function(
     na.rm = FALSE,
     show.legend = NA,
     inherit.aes = TRUE,
-    fun,
-    xlim = NULL,
-    ylim = NULL,
-    n = 16,
+    fun = NULL,        # User-defined function for vector fields
+    x_lim = c(-10, 10), # Default x limits for the grid
+    y_lim = c(-10, 10), # Default y limits for the grid
+    n = 10,            # Grid resolution
     center = TRUE,
     normalize = TRUE,
+    tail_point = FALSE,
+    tail_point.size = 2,
     arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
     ...
 ) {
-  geom_vector_field(
-    mapping = mapping,
-    data = data,
+  # Default aesthetics: color reflects norm (magnitude) and length defaults to NA
+  default_aes <- aes(color = after_stat(norm), length = after_stat(NA))
+
+  # Merge user-provided mappings with defaults
+  if (is.null(mapping)) {
+    mapping <- default_aes
+  } else {
+    mapping <- modifyList(default_aes, mapping)
+  }
+
+  # Pass the parameters via `params` only
+  layer(
     stat = StatVector,
     geom = geom,
+    mapping = mapping,
+    data = data,
     position = position,
-    na.rm = na.rm,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
-    fun = fun,
-    xlim = xlim,
-    ylim = ylim,
-    n = n,
-    center = center,
-    normalize = normalize,
-    arrow = arrow,
-    ...
+    params = list(
+      na.rm = na.rm,
+      arrow = arrow,
+      center = center,
+      normalize = normalize,
+      tail_point = tail_point,
+      tail_point.size = tail_point.size,
+      fun = fun,        # Pass user-provided function
+      x_lim = x_lim,    # Pass x limits
+      y_lim = y_lim,    # Pass y limits
+      n = n,            # Pass grid resolution
+      ...
+    )
   )
 }
+
 
 utils::globalVariables(c("x", "y", "dx", "dy"))
