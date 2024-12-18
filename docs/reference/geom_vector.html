@@ -59,15 +59,15 @@ and either directional components (<code>dx</code>, <code>dy</code>) or polar co
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stat <span class="op">=</span> <span class="va">StatVector</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">25</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">25</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  tail_point.size <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  tail_point.size <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">stat_vector</span><span class="op">(</span></span>
@@ -75,6 +75,7 @@ and either directional components (<code>dx</code>, <code>dy</code>) or polar co
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  geom <span class="op">=</span> <span class="va">GeomVector</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">25</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
@@ -82,8 +83,7 @@ and either directional components (<code>dx</code>, <code>dy</code>) or polar co
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  tail_point.size <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  tail_point.size <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">StatVector</span></span>
@@ -145,53 +145,6 @@ to use <code><a href="https://ggplot2.tidyverse.org/reference/position_jitter.ht
 </ul></dd>
 
 
-<dt>na.rm</dt>
-<dd><p>If <code>FALSE</code>, the default, missing values are removed with
-a warning. If <code>TRUE</code>, missing values are silently removed.</p></dd>
-
-
-<dt>show.legend</dt>
-<dd><p>logical. Should this layer be included in the legends?
-<code>NA</code>, the default, includes if any aesthetics are mapped.
-<code>FALSE</code> never includes, and <code>TRUE</code> always includes.
-It can also be a named logical vector to finely select the aesthetics to
-display.</p></dd>
-
-
-<dt>arrow</dt>
-<dd><p>Arrow specification for adding arrowheads to vectors, created with
-<code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code>. Controls arrowhead angle, length, and type.</p></dd>
-
-
-<dt>inherit.aes</dt>
-<dd><p>If <code>FALSE</code>, overrides the default aesthetics,
-rather than combining with them. This is most useful for helper functions
-that define both data and aesthetics and shouldn't inherit behaviour from
-the default plot specification, e.g. <code><a href="https://ggplot2.tidyverse.org/reference/borders.html">borders()</a></code>.</p></dd>
-
-
-<dt>center</dt>
-<dd><p>Logical; if <code>TRUE</code>, the vector is centered on the (<code>x</code>, <code>y</code>) location.
-If <code>FALSE</code>, the vector originates at the (<code>x</code>, <code>y</code>) location. When centered, the
-midpoint of the vector aligns with the original (<code>x</code>, <code>y</code>) position.</p></dd>
-
-
-<dt>normalize</dt>
-<dd><p>Logical; if <code>TRUE</code>, normalizes each vector to a unit length before
-applying any scaling. This can help prevent overplotting in dense plots and
-ensures consistent visual representation.</p></dd>
-
-
-<dt>tail_point</dt>
-<dd><p>Logical; if <code>TRUE</code>, adds a point at the tail of each vector to mark
-the starting position more clearly.</p></dd>
-
-
-<dt>tail_point.size</dt>
-<dd><p>Numeric value indicating the size of the tail point if
-<code>tail_point = TRUE</code>.</p></dd>
-
-
 <dt>...</dt>
 <dd><p>Other arguments passed on to <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">layer()</a></code>'s <code>params</code> argument. These
 arguments broadly fall into one of 4 categories below. Notably, further
@@ -218,6 +171,53 @@ lists which parameters it can accept.</p></li>
 <code>...</code>. This can be one of the functions described as
 <a href="https://ggplot2.tidyverse.org/reference/draw_key.html">key glyphs</a>, to change the display of the layer in the legend.</p></li>
 </ul></dd>
+
+
+<dt>na.rm</dt>
+<dd><p>If <code>FALSE</code>, the default, missing values are removed with
+a warning. If <code>TRUE</code>, missing values are silently removed.</p></dd>
+
+
+<dt>show.legend</dt>
+<dd><p>logical. Should this layer be included in the legends?
+<code>NA</code>, the default, includes if any aesthetics are mapped.
+<code>FALSE</code> never includes, and <code>TRUE</code> always includes.
+It can also be a named logical vector to finely select the aesthetics to
+display.</p></dd>
+
+
+<dt>inherit.aes</dt>
+<dd><p>If <code>FALSE</code>, overrides the default aesthetics,
+rather than combining with them. This is most useful for helper functions
+that define both data and aesthetics and shouldn't inherit behaviour from
+the default plot specification, e.g. <code><a href="https://ggplot2.tidyverse.org/reference/borders.html">borders()</a></code>.</p></dd>
+
+
+<dt>arrow</dt>
+<dd><p>Arrow specification for adding arrowheads to vectors, created with
+<code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code>. Controls arrowhead angle, length, and type.</p></dd>
+
+
+<dt>center</dt>
+<dd><p>Logical; if <code>TRUE</code>, the vector is centered on the (<code>x</code>, <code>y</code>) location.
+If <code>FALSE</code>, the vector originates at the (<code>x</code>, <code>y</code>) location. When centered, the
+midpoint of the vector aligns with the original (<code>x</code>, <code>y</code>) position.</p></dd>
+
+
+<dt>normalize</dt>
+<dd><p>Logical; if <code>TRUE</code>, normalizes each vector to a unit length before
+applying any scaling. This can help prevent overplotting in dense plots and
+ensures consistent visual representation.</p></dd>
+
+
+<dt>tail_point</dt>
+<dd><p>Logical; if <code>TRUE</code>, adds a point at the tail of each vector to mark
+the starting position more clearly.</p></dd>
+
+
+<dt>tail_point.size</dt>
+<dd><p>Numeric value indicating the size of the tail point if
+<code>tail_point = TRUE</code>.</p></dd>
 
 
 <dt>geom</dt>
