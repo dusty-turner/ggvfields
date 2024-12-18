@@ -27,5 +27,6 @@ reference:
       - geom_flow
       - geom_streamplot
       - geom_vector_smooth
+      - geom_potential
       - ggvfields
       - animation_transition

@@ -99,15 +99,15 @@ geom_vector <- function(
     data = NULL,
     stat = StatVector,
     position = "identity",
+    ...,
     na.rm = FALSE,
     show.legend = NA,
-    arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
     inherit.aes = TRUE,
+    arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
     center = TRUE,
     normalize = TRUE,
     tail_point = FALSE,
-    tail_point.size = 2,
-    ...
+    tail_point.size = 2
 ) {
 
   if (is.null(mapping)) {
@@ -145,6 +145,7 @@ stat_vector <- function(
     data = NULL,
     geom = GeomVector,
     position = "identity",
+    ...,
     na.rm = FALSE,
     show.legend = NA,
     arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
@@ -152,8 +153,7 @@ stat_vector <- function(
     center = TRUE,
     normalize = TRUE,
     tail_point = FALSE,
-    tail_point.size = 2,
-    ...
+    tail_point.size = 2
 ) {
 
   mapping <- modifyList(aes(color = after_stat(norm), length = after_stat(NA)), mapping)

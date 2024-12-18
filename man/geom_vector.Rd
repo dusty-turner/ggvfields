@@ -18,15 +18,15 @@ geom_vector(
   data = NULL,
   stat = StatVector,
   position = "identity",
+  ...,
   na.rm = FALSE,
   show.legend = NA,
-  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
   inherit.aes = TRUE,
+  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
   center = TRUE,
   normalize = TRUE,
   tail_point = FALSE,
-  tail_point.size = 2,
-  ...
+  tail_point.size = 2
 )
 
 stat_vector(
@@ -34,6 +34,7 @@ stat_vector(
   data = NULL,
   geom = GeomVector,
   position = "identity",
+  ...,
   na.rm = FALSE,
   show.legend = NA,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
@@ -41,8 +42,7 @@ stat_vector(
   center = TRUE,
   normalize = TRUE,
   tail_point = FALSE,
-  tail_point.size = 2,
-  ...
+  tail_point.size = 2
 )
 
 StatVector
@@ -96,37 +96,6 @@ to use \code{position_jitter()}, give the position as \code{"jitter"}.
 \link[ggplot2:layer_positions]{layer position} documentation.
 }}
 
-\item{na.rm}{If \code{FALSE}, the default, missing values are removed with
-a warning. If \code{TRUE}, missing values are silently removed.}
-
-\item{show.legend}{logical. Should this layer be included in the legends?
-\code{NA}, the default, includes if any aesthetics are mapped.
-\code{FALSE} never includes, and \code{TRUE} always includes.
-It can also be a named logical vector to finely select the aesthetics to
-display.}
-
-\item{arrow}{Arrow specification for adding arrowheads to vectors, created with
-\code{grid::arrow()}. Controls arrowhead angle, length, and type.}
-
-\item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
-rather than combining with them. This is most useful for helper functions
-that define both data and aesthetics and shouldn't inherit behaviour from
-the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
-
-\item{center}{Logical; if \code{TRUE}, the vector is centered on the (\code{x}, \code{y}) location.
-If \code{FALSE}, the vector originates at the (\code{x}, \code{y}) location. When centered, the
-midpoint of the vector aligns with the original (\code{x}, \code{y}) position.}
-
-\item{normalize}{Logical; if \code{TRUE}, normalizes each vector to a unit length before
-applying any scaling. This can help prevent overplotting in dense plots and
-ensures consistent visual representation.}
-
-\item{tail_point}{Logical; if \code{TRUE}, adds a point at the tail of each vector to mark
-the starting position more clearly.}
-
-\item{tail_point.size}{Numeric value indicating the size of the tail point if
-\code{tail_point = TRUE}.}
-
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}'s \code{params} argument. These
 arguments broadly fall into one of 4 categories below. Notably, further
 arguments to the \code{position} argument, or aesthetics that are required
@@ -154,6 +123,37 @@ lists which parameters it can accept.
 \code{...}. This can be one of the functions described as
 \link[ggplot2:draw_key]{key glyphs}, to change the display of the layer in the legend.
 }}
+
+\item{na.rm}{If \code{FALSE}, the default, missing values are removed with
+a warning. If \code{TRUE}, missing values are silently removed.}
+
+\item{show.legend}{logical. Should this layer be included in the legends?
+\code{NA}, the default, includes if any aesthetics are mapped.
+\code{FALSE} never includes, and \code{TRUE} always includes.
+It can also be a named logical vector to finely select the aesthetics to
+display.}
+
+\item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
+rather than combining with them. This is most useful for helper functions
+that define both data and aesthetics and shouldn't inherit behaviour from
+the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
+
+\item{arrow}{Arrow specification for adding arrowheads to vectors, created with
+\code{grid::arrow()}. Controls arrowhead angle, length, and type.}
+
+\item{center}{Logical; if \code{TRUE}, the vector is centered on the (\code{x}, \code{y}) location.
+If \code{FALSE}, the vector originates at the (\code{x}, \code{y}) location. When centered, the
+midpoint of the vector aligns with the original (\code{x}, \code{y}) position.}
+
+\item{normalize}{Logical; if \code{TRUE}, normalizes each vector to a unit length before
+applying any scaling. This can help prevent overplotting in dense plots and
+ensures consistent visual representation.}
+
+\item{tail_point}{Logical; if \code{TRUE}, adds a point at the tail of each vector to mark
+the starting position more clearly.}
+
+\item{tail_point.size}{Numeric value indicating the size of the tail point if
+\code{tail_point = TRUE}.}
 
 \item{geom}{The geometric object to use to display the data for this layer.
 When using a \verb{stat_*()} function to construct a layer, the \code{geom} argument

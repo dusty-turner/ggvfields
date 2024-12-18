@@ -770,3 +770,37 @@ predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL, conf_level
     return(result_df)
   }
 }
+
+## potential helpers
+# Define the numerical potential computation function with proper vectorization
+compute_potential <- function(point, x0 = x_lim[1], y0 = y_lim[1]) {
+  x <- point[1]
+  y <- point[2]
+
+  # Path 1: Integrate F_x from x0 to x with y = y0
+  F_x_func <- function(s) {
+    sapply(s, function(si) fun(c(si, y0))[1])
+  }
+
+  integral_x <- tryCatch(
+    integrate(F_x_func, lower = x0, upper = x)$value,
+    error = function(e) NA
+  )
+
+  # Path 2: Integrate F_y from y0 to y with x = x
+  F_y_func <- function(t) {
+    sapply(t, function(ti) fun(c(x, ti))[2])
+  }
+
+  integral_y <- tryCatch(
+    integrate(F_y_func, lower = y0, upper = y)$value,
+    error = function(e) NA
+  )
+
+  # Sum the integrals to get the potential
+  f_xy <- integral_x + integral_y
+
+  return(f_xy)
+}
+
+utils::globalVariables(c("x_lim", "y_lim", "Potential", "fun"))
