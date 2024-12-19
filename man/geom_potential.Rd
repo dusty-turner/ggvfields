@@ -9,7 +9,7 @@
 \format{
 An object of class \code{StatPotential} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
 
-An object of class \code{GeomPotential} (inherits from \code{GeomRaster}, \code{Geom}, \code{ggproto}, \code{gg}) of length 4.
+An object of class \code{GeomPotential} (inherits from \code{GeomRaster}, \code{Geom}, \code{ggproto}, \code{gg}) of length 5.
 }
 \usage{
 geom_potential(
@@ -22,8 +22,8 @@ geom_potential(
   show.legend = NA,
   position = "identity",
   fun,
-  x_lim = NULL,
-  y_lim = NULL,
+  xlim = NULL,
+  ylim = NULL,
   n = 21,
   tolerance = 1e-06
 )
@@ -122,7 +122,7 @@ to use \code{position_jitter()}, give the position as \code{"jitter"}.
 \item{fun}{A function that takes a numeric vector of length 2 (\code{c(x, y)}) and returns
 a numeric vector of length 2 (\code{c(dx, dy)}), defining the vector field.}
 
-\item{x_lim, y_lim}{Numeric vectors of length 2 defining the domain limits on the x/y-axis.}
+\item{xlim, ylim}{Numeric vectors of length 2 defining the domain limits on the x/y-axis.}
 
 \item{n}{Integer, the number of grid points along each axis. Defaults to 21.}
 
@@ -146,12 +146,12 @@ fun <- function(v) {
 }
 
 # Define domain limits
-x_lim <- c(7, 10)
-y_lim <- c(7, 10)
+xlim <- c(7, 10)
+ylim <- c(7, 10)
 
 # Create the potential function heatmap
 ggplot() +
-  geom_potential(fun = fun, x_lim = x_lim, y_lim = y_lim)
+  geom_potential(fun = fun, xlim = xlim, ylim = ylim)
 
 }
 \keyword{datasets}
