@@ -56,6 +56,7 @@ function <code>fun</code> that computes vector displacements (<code>dx</code>, <
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stat <span class="op">=</span> <span class="va">StatVector</span>,</span>
 <span>  geom <span class="op">=</span> <span class="va">GeomVector</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -67,8 +68,7 @@ function <code>fun</code> that computes vector displacements (<code>dx</code>, <
 <span>  y_lim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">stat_vector_field</span><span class="op">(</span></span>
@@ -76,6 +76,7 @@ function <code>fun</code> that computes vector displacements (<code>dx</code>, <
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  geom <span class="op">=</span> <span class="va">GeomVector</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -87,8 +88,7 @@ function <code>fun</code> that computes vector displacements (<code>dx</code>, <
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  tail_point.size <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -139,6 +139,10 @@ give the geom as <code>"point"</code>.</p></li>
 <li><p>For more information and other ways to specify the geom, see the
 <a href="https://ggplot2.tidyverse.org/reference/layer_geoms.html">layer geom</a> documentation.</p></li>
 </ul></dd>
+
+
+<dt>...</dt>
+<dd><p>Additional arguments passed to <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">layer()</a></code>.</p></dd>
 
 
 <dt>position</dt>
@@ -200,10 +204,6 @@ display.</p></dd>
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. <code><a href="https://ggplot2.tidyverse.org/reference/borders.html">borders()</a></code>.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>Additional arguments passed to <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">layer()</a></code>.</p></dd>
 
 
 <dt>na.rm</dt>

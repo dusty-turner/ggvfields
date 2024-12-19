@@ -62,6 +62,7 @@ in ggplot2, but is designed specifically for vector data rather than scalar data
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  geom <span class="op">=</span> <span class="st">"vector_smooth"</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -73,8 +74,7 @@ in ggplot2, but is designed specifically for vector data rather than scalar data
 <span>  pi_type <span class="op">=</span> <span class="st">"ellipse"</span>,</span>
 <span>  formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">dx</span>, <span class="va">dy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
-<span>  eval_points <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  eval_points <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">geom_vector_smooth</span><span class="op">(</span></span>
@@ -82,6 +82,7 @@ in ggplot2, but is designed specifically for vector data rather than scalar data
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stat <span class="op">=</span> <span class="st">"vector_smooth"</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -93,8 +94,7 @@ in ggplot2, but is designed specifically for vector data rather than scalar data
 <span>  conf_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
 <span>  formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">dx</span>, <span class="va">dy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
-<span>  eval_points <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  eval_points <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">StatVectorSmooth</span></span>
@@ -153,6 +153,34 @@ string, strip the function name of the <code>position_</code> prefix. For exampl
 to use <code><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html">position_jitter()</a></code>, give the position as <code>"jitter"</code>.</p></li>
 <li><p>For more information and other ways to specify the position, see the
 <a href="https://ggplot2.tidyverse.org/reference/layer_positions.html">layer position</a> documentation.</p></li>
+</ul></dd>
+
+
+<dt>...</dt>
+<dd><p>Other arguments passed on to <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">layer()</a></code>'s <code>params</code> argument. These
+arguments broadly fall into one of 4 categories below. Notably, further
+arguments to the <code>position</code> argument, or aesthetics that are required
+can <em>not</em> be passed through <code>...</code>. Unknown arguments that are not part
+of the 4 categories below are ignored.</p><ul><li><p>Static aesthetics that are not mapped to a scale, but are at a fixed
+value and apply to the layer as a whole. For example, <code>colour = "red"</code>
+or <code>linewidth = 3</code>. The geom's documentation has an <strong>Aesthetics</strong>
+section that lists the available options. The 'required' aesthetics
+cannot be passed on to the <code>params</code>. Please note that while passing
+unmapped aesthetics as vectors is technically possible, the order and
+required length is not guaranteed to be parallel to the input data.</p></li>
+<li><p>When constructing a layer using
+a <code>stat_*()</code> function, the <code>...</code> argument can be used to pass on
+parameters to the <code>geom</code> part of the layer. An example of this is
+<code>stat_density(geom = "area", outline.type = "both")</code>. The geom's
+documentation lists which parameters it can accept.</p></li>
+<li><p>Inversely, when constructing a layer using a
+<code>geom_*()</code> function, the <code>...</code> argument can be used to pass on parameters
+to the <code>stat</code> part of the layer. An example of this is
+<code>geom_area(stat = "density", adjust = 0.5)</code>. The stat's documentation
+lists which parameters it can accept.</p></li>
+<li><p>The <code>key_glyph</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">layer()</a></code> may also be passed on through
+<code>...</code>. This can be one of the functions described as
+<a href="https://ggplot2.tidyverse.org/reference/draw_key.html">key glyphs</a>, to change the display of the layer in the legend.</p></li>
 </ul></dd>
 
 
@@ -232,34 +260,6 @@ angle, length, and type.</p></dd>
 <dd><p>Data frame of evaluation points, or <code>NULL</code>. When provided,
 it specifies the grid points where the smoothing model is evaluated. If
 <code>NULL</code>, the function generates a grid based on <code>n</code>.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>Other arguments passed on to <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">layer()</a></code>'s <code>params</code> argument. These
-arguments broadly fall into one of 4 categories below. Notably, further
-arguments to the <code>position</code> argument, or aesthetics that are required
-can <em>not</em> be passed through <code>...</code>. Unknown arguments that are not part
-of the 4 categories below are ignored.</p><ul><li><p>Static aesthetics that are not mapped to a scale, but are at a fixed
-value and apply to the layer as a whole. For example, <code>colour = "red"</code>
-or <code>linewidth = 3</code>. The geom's documentation has an <strong>Aesthetics</strong>
-section that lists the available options. The 'required' aesthetics
-cannot be passed on to the <code>params</code>. Please note that while passing
-unmapped aesthetics as vectors is technically possible, the order and
-required length is not guaranteed to be parallel to the input data.</p></li>
-<li><p>When constructing a layer using
-a <code>stat_*()</code> function, the <code>...</code> argument can be used to pass on
-parameters to the <code>geom</code> part of the layer. An example of this is
-<code>stat_density(geom = "area", outline.type = "both")</code>. The geom's
-documentation lists which parameters it can accept.</p></li>
-<li><p>Inversely, when constructing a layer using a
-<code>geom_*()</code> function, the <code>...</code> argument can be used to pass on parameters
-to the <code>stat</code> part of the layer. An example of this is
-<code>geom_area(stat = "density", adjust = 0.5)</code>. The stat's documentation
-lists which parameters it can accept.</p></li>
-<li><p>The <code>key_glyph</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">layer()</a></code> may also be passed on through
-<code>...</code>. This can be one of the functions described as
-<a href="https://ggplot2.tidyverse.org/reference/draw_key.html">key glyphs</a>, to change the display of the layer in the legend.</p></li>
-</ul></dd>
 
 
 <dt>stat</dt>

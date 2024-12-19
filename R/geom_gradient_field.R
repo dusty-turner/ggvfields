@@ -82,24 +82,21 @@
 #'   geom_gradient_field(fun = saddle_field)
 #'
 #' @export
-geom_gradient_field <- function(
-    mapping = NULL,
-    data = NULL,
-    stat = "identity",
-    geom = "vector",
-    position = "identity",
-    na.rm = FALSE,
-    show.legend = NA,
-    inherit.aes = TRUE,
-    fun,
-    xlim = NULL,
-    ylim = NULL,
-    n = 16,
-    center = TRUE,
-    normalize = TRUE,
-    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-    ...
-) {
+geom_gradient_field <- function(mapping = NULL, data = NULL,
+                                stat = "identity", geom = "vector",
+                                ...,
+                                position = "identity",
+                                na.rm = FALSE,
+                                show.legend = NA,
+                                inherit.aes = TRUE,
+                                fun,
+                                xlim = NULL,
+                                ylim = NULL,
+                                n = 16,
+                                center = TRUE,
+                                normalize = TRUE,
+                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
+                                ) {
   if (missing(fun) || !is.function(fun)) {
     stop("Please provide a valid scalar function 'fun' that takes a numeric vector (x, y) and returns a single numeric value.")
   }
@@ -138,24 +135,21 @@ geom_gradient_field <- function(
 
 #' @rdname geom_gradient_field
 #' @export
-stat_gradient_field <- function(
-    mapping = NULL,
-    data = NULL,
-    stat = "identity",
-    geom = "vector",
-    position = "identity",
-    na.rm = FALSE,
-    show.legend = NA,
-    inherit.aes = TRUE,
-    fun,
-    xlim = NULL,
-    ylim = NULL,
-    n = 16,
-    center = TRUE,
-    normalize = TRUE,
-    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-    ...
-) {
+stat_gradient_field <- function(mapping = NULL, data = NULL,
+                                stat = "identity", geom = "vector",
+                                ...,
+                                position = "identity",
+                                na.rm = FALSE,
+                                show.legend = NA,
+                                inherit.aes = TRUE,
+                                fun,
+                                xlim = NULL,
+                                ylim = NULL,
+                                n = 16,
+                                center = TRUE,
+                                normalize = TRUE,
+                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
+                                ) {
 
   geom_gradient_field(
     mapping = mapping,

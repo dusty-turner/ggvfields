@@ -10,6 +10,7 @@ geom_vector_field(
   data = NULL,
   stat = StatVector,
   geom = GeomVector,
+  ...,
   position = "identity",
   center = TRUE,
   normalize = TRUE,
@@ -21,8 +22,7 @@ geom_vector_field(
   y_lim = NULL,
   n = NULL,
   show.legend = NA,
-  inherit.aes = TRUE,
-  ...
+  inherit.aes = TRUE
 )
 
 stat_vector_field(
@@ -30,6 +30,7 @@ stat_vector_field(
   data = NULL,
   geom = GeomVector,
   position = "identity",
+  ...,
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
@@ -41,8 +42,7 @@ stat_vector_field(
   normalize = TRUE,
   tail_point = FALSE,
   tail_point.size = 2,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-  ...
+  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
 )
 }
 \arguments{
@@ -92,6 +92,8 @@ give the geom as \code{"point"}.
 \link[ggplot2:layer_geoms]{layer geom} documentation.
 }}
 
+\item{...}{Additional arguments passed to \code{layer()}.}
+
 \item{position}{A position adjustment to use on the data for this layer. This
 can be used in various ways, including to prevent overplotting and
 improving the display. The \code{position} argument accepts the following:
@@ -132,8 +134,6 @@ display.}
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
-
-\item{...}{Additional arguments passed to \code{layer()}.}
 
 \item{na.rm}{If \code{FALSE}, the default, missing values are removed with
 a warning. If \code{TRUE}, missing values are silently removed.}

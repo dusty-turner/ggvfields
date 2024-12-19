@@ -10,6 +10,7 @@ geom_gradient_field2(
   data = NULL,
   stat = "identity",
   geom = "vector",
+  ...,
   position = "identity",
   na.rm = FALSE,
   show.legend = NA,
@@ -21,8 +22,7 @@ geom_gradient_field2(
   center = FALSE,
   normalize = TRUE,
   tail_point = TRUE,
-  arrow = NULL,
-  ...
+  arrow = NULL
 )
 
 stat_gradient_field2(
@@ -90,6 +90,8 @@ give the geom as \code{"point"}.
 \link[ggplot2:layer_geoms]{layer geom} documentation.
 }}
 
+\item{...}{Other arguments passed on to \code{geom_gradient_field()} or \code{stat_gradient_field()}.}
+
 \item{position}{A position adjustment to use on the data for this layer. This
 can be used in various ways, including to prevent overplotting and
 improving the display. The \code{position} argument accepts the following:
@@ -136,8 +138,6 @@ Set to \code{FALSE} to view the original lengths of the vectors.}
 
 \item{arrow}{Arrow specification, created by \code{grid::arrow()}, to add
 arrowheads to vectors.}
-
-\item{...}{Other arguments passed on to \code{geom_gradient_field()} or \code{stat_gradient_field()}.}
 }
 \value{
 A \code{ggplot2} layer that can be added to a ggplot object to create a gradient field plot.

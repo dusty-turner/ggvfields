@@ -10,6 +10,7 @@ geom_vector_field2(
   data = NULL,
   stat = StatVector,
   geom = GeomVector,
+  ...,
   position = "identity",
   center = FALSE,
   normalize = TRUE,
@@ -21,8 +22,7 @@ geom_vector_field2(
   y_lim = NULL,
   n = NULL,
   show.legend = NA,
-  inherit.aes = TRUE,
-  ...
+  inherit.aes = TRUE
 )
 
 stat_vector_field2(
@@ -30,6 +30,7 @@ stat_vector_field2(
   data = NULL,
   geom = GeomVector,
   stat = StatVector,
+  ...,
   position = "identity",
   center = FALSE,
   normalize = TRUE,
@@ -41,8 +42,7 @@ stat_vector_field2(
   y_lim = c(-10, 10),
   n = 10,
   show.legend = NA,
-  inherit.aes = TRUE,
-  ...
+  inherit.aes = TRUE
 )
 }
 \arguments{
@@ -90,6 +90,8 @@ give the geom as \code{"point"}.
 \link[ggplot2:layer_geoms]{layer geom} documentation.
 }}
 
+\item{...}{Other arguments passed on to \code{geom_vector_field()} or \code{stat_vector_field()}.}
+
 \item{position}{A position adjustment to use on the data for this layer. This
 can be used in various ways, including to prevent overplotting and
 improving the display. The \code{position} argument accepts the following:
@@ -130,8 +132,6 @@ display.}
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
-
-\item{...}{Other arguments passed on to \code{geom_vector_field()} or \code{stat_vector_field()}.}
 }
 \value{
 A \code{ggplot2} layer that can be added to a ggplot object to create a vector field plot.

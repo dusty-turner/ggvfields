@@ -47,25 +47,22 @@
 #' Use [geom_gradient_field()] if you prefer to map vector magnitude using a different aesthetic such as `color`.
 #'
 #' @export
-geom_gradient_field2 <- function(
-    mapping = NULL,
-    data = NULL,
-    stat = "identity",
-    geom = "vector",
-    position = "identity",
-    na.rm = FALSE,
-    show.legend = NA,
-    inherit.aes = TRUE,
-    fun,
-    xlim = NULL,
-    ylim = NULL,
-    n = 16,
-    center = FALSE,
-    normalize = TRUE,
-    tail_point = TRUE,
-    arrow = NULL,
-    ...
-) {
+geom_gradient_field2 <- function(mapping = NULL, data = NULL,
+                                 stat = "identity", geom = "vector",
+                                 ...,
+                                 position = "identity",
+                                 na.rm = FALSE,
+                                 show.legend = NA,
+                                 inherit.aes = TRUE,
+                                 fun,
+                                 xlim = NULL,
+                                 ylim = NULL,
+                                 n = 16,
+                                 center = FALSE,
+                                 normalize = TRUE,
+                                 tail_point = TRUE,
+                                 arrow = NULL
+                                 ) {
 
   # Define the base aesthetic mappings
   base_mapping <- aes(length = after_stat(norm), color = NULL)

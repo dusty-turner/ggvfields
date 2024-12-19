@@ -59,6 +59,7 @@ for vector field visualizations where vector length is mapped to the vector's ma
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stat <span class="op">=</span> <span class="va">StatVector</span>,</span>
 <span>  geom <span class="op">=</span> <span class="va">GeomVector</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -70,8 +71,7 @@ for vector field visualizations where vector length is mapped to the vector's ma
 <span>  y_lim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">stat_vector_field2</span><span class="op">(</span></span>
@@ -79,6 +79,7 @@ for vector field visualizations where vector length is mapped to the vector's ma
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  geom <span class="op">=</span> <span class="va">GeomVector</span>,</span>
 <span>  stat <span class="op">=</span> <span class="va">StatVector</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -90,8 +91,7 @@ for vector field visualizations where vector length is mapped to the vector's ma
 <span>  y_lim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -140,6 +140,10 @@ give the geom as <code>"point"</code>.</p></li>
 <li><p>For more information and other ways to specify the geom, see the
 <a href="https://ggplot2.tidyverse.org/reference/layer_geoms.html">layer geom</a> documentation.</p></li>
 </ul></dd>
+
+
+<dt>...</dt>
+<dd><p>Other arguments passed on to <code><a href="geom_vector_field.html">geom_vector_field()</a></code> or <code><a href="geom_vector_field.html">stat_vector_field()</a></code>.</p></dd>
 
 
 <dt>position</dt>
@@ -201,10 +205,6 @@ display.</p></dd>
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. <code><a href="https://ggplot2.tidyverse.org/reference/borders.html">borders()</a></code>.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>Other arguments passed on to <code><a href="geom_vector_field.html">geom_vector_field()</a></code> or <code><a href="geom_vector_field.html">stat_vector_field()</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

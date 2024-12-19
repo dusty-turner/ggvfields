@@ -52,19 +52,15 @@
 #'
 #' @export
 
-geom_vector2 <- function(
-    mapping = NULL,
-    data = NULL,
-    stat = StatVector,
-    position = "identity",
-    ...,
-    na.rm = FALSE,
-    show.legend = NA,
-    inherit.aes = TRUE,
-    center = FALSE,
-    tail_point = TRUE,
-    arrow = NULL
-) {
+geom_vector2 <- function(mapping = NULL, data = NULL,
+                         stat = StatVector, position = "identity",
+                         ...,
+                         na.rm = FALSE,
+                         show.legend = NA,
+                         inherit.aes = TRUE,
+                         center = FALSE,
+                         tail_point = TRUE,
+                         arrow = NULL) {
 
   if (is.null(mapping)) {
     mapping <- aes()
@@ -90,19 +86,16 @@ geom_vector2 <- function(
 
 #' @rdname geom_vector2
 #' @export
-stat_vector2 <- function(
-    mapping = NULL,
-    data = NULL,
-    geom = GeomVector,
-    position = "identity",
-    ...,
-    na.rm = FALSE,
-    show.legend = NA,
-    inherit.aes = TRUE,
-    center = FALSE,
-    tail_point = TRUE,
-    arrow = NULL
-) {
+stat_vector2 <- function(mapping = NULL, data = NULL,
+                         geom = GeomVector, position = "identity",
+                         ...,
+                         na.rm = FALSE,
+                         show.legend = NA,
+                         inherit.aes = TRUE,
+                         center = FALSE,
+                         tail_point = TRUE,
+                         arrow = NULL
+                         ) {
   mapping <- modifyList(aes(length = after_stat(norm), color = NULL), mapping)
   stat_vector(
     mapping = mapping,

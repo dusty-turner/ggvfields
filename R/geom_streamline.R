@@ -49,14 +49,25 @@ NULL
 #' @rdname geom_streamplot
 #' @export
 # Geom function to add the stream plot layer
-geom_streamplot <- function(mapping = NULL, data = NULL, stat = "streamplot",
-                            position = "identity", na.rm = FALSE,
-                            show.legend = TRUE, inherit.aes = TRUE,
-                            fun, xlim = c(-10, 10), ylim = c(-10, 10),
-                            n = c(21, 21), mask_shape_type = "square",
-                            iterations = 100, stream_density = 1,
-                            arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                            chop = TRUE, scale_stream = 1, ...) {
+geom_streamplot <- function(mapping = NULL, data = NULL,
+                            stat = "streamplot", position = "identity",
+                            ...,
+                            na.rm = FALSE,
+                            show.legend = TRUE,
+                            inherit.aes = TRUE,
+                            fun,
+                            xlim = c(-10, 10),
+                            ylim = c(-10, 10),
+                            n = c(21, 21),
+                            mask_shape_type = "square",
+                            iterations = 100,
+                            stream_density = 1,
+                            arrow = grid::arrow(angle = 20,
+                                                length = unit(0.015, "npc"),
+                                                type = "closed"),
+                            chop = TRUE,
+                            scale_stream = 1) {
+
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
   layer(
@@ -96,12 +107,24 @@ GeomStreamplot <- ggproto("GeomStreamplot", GeomPath)
 # Stat function for stream plot computation
 stat_streamplot <- function(mapping = NULL, data = NULL,
                             stat = "streamplot", position = "identity",
-                            na.rm = FALSE, show.legend = TRUE,
-                            inherit.aes = TRUE, fun, xlim = c(-10, 10),
-                            ylim = c(-10, 10), n = c(21, 21),
-                            mask_shape_type = "square", iterations = 100, stream_density = 1,
-                            arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                            chop = TRUE, scale_stream = 1, ...) {
+                            ...,
+                            na.rm = FALSE,
+                            show.legend = TRUE,
+                            inherit.aes = TRUE,
+                            fun,
+                            xlim = c(-10, 10),
+                            ylim = c(-10, 10),
+                            n = c(21, 21),
+                            mask_shape_type = "square",
+                            iterations = 100,
+                            stream_density = 1,
+                            arrow = grid::arrow(angle = 20,
+                                                length = unit(0.015, "npc"),
+                                                type = "closed"),
+                            chop = TRUE,
+                            scale_stream = 1) {
+
+
   if (is.null(data)) data <- ensure_nonempty_data(data)
   layer(
     stat = StatStreamplot,

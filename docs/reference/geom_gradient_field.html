@@ -59,6 +59,7 @@ using <code><a href="https://rdrr.io/pkg/numDeriv/man/grad.html">numDeriv::grad(
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stat <span class="op">=</span> <span class="st">"identity"</span>,</span>
 <span>  geom <span class="op">=</span> <span class="st">"vector"</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
@@ -69,8 +70,7 @@ using <code><a href="https://rdrr.io/pkg/numDeriv/man/grad.html">numDeriv::grad(
 <span>  n <span class="op">=</span> <span class="fl">16</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">stat_gradient_field</span><span class="op">(</span></span>
@@ -78,6 +78,7 @@ using <code><a href="https://rdrr.io/pkg/numDeriv/man/grad.html">numDeriv::grad(
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stat <span class="op">=</span> <span class="st">"identity"</span>,</span>
 <span>  geom <span class="op">=</span> <span class="st">"vector"</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
@@ -88,8 +89,7 @@ using <code><a href="https://rdrr.io/pkg/numDeriv/man/grad.html">numDeriv::grad(
 <span>  n <span class="op">=</span> <span class="fl">16</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -140,6 +140,10 @@ give the geom as <code>"point"</code>.</p></li>
 <li><p>For more information and other ways to specify the geom, see the
 <a href="https://ggplot2.tidyverse.org/reference/layer_geoms.html">layer geom</a> documentation.</p></li>
 </ul></dd>
+
+
+<dt>...</dt>
+<dd><p>Other arguments passed to <code><a href="geom_vector_field.html">geom_vector_field()</a></code>, such as aesthetic mappings.</p></dd>
 
 
 <dt>position</dt>
@@ -203,10 +207,6 @@ Set to <code>FALSE</code> to view the original lengths of the vectors.</p></dd>
 <dt>arrow</dt>
 <dd><p>Arrow specification, created by <code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code>, to add
 arrowheads to vectors.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>Other arguments passed to <code><a href="geom_vector_field.html">geom_vector_field()</a></code>, such as aesthetic mappings.</p></dd>
 
 </dl></div>
     <div class="section level2">

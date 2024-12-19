@@ -94,21 +94,17 @@
 #'
 #' @rdname geom_vector
 #' @export
-geom_vector <- function(
-    mapping = NULL,
-    data = NULL,
-    stat = StatVector,
-    position = "identity",
-    ...,
-    na.rm = FALSE,
-    show.legend = NA,
-    inherit.aes = TRUE,
-    arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
-    center = TRUE,
-    normalize = TRUE,
-    tail_point = FALSE,
-    tail_point.size = 2
-) {
+geom_vector <- function(mapping = NULL, data = NULL,
+                        stat = StatVector,position = "identity",
+                        ...,
+                        na.rm = FALSE,
+                        show.legend = NA,
+                        inherit.aes = TRUE,
+                        arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
+                        center = TRUE,
+                        normalize = TRUE,
+                        tail_point = FALSE,
+                        tail_point.size = 2) {
 
   if (is.null(mapping)) {
     mapping <- aes()
@@ -140,21 +136,17 @@ geom_vector <- function(
 
 #' @rdname geom_vector
 #' @export
-stat_vector <- function(
-    mapping = NULL,
-    data = NULL,
-    geom = GeomVector,
-    position = "identity",
-    ...,
-    na.rm = FALSE,
-    show.legend = NA,
-    arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
-    inherit.aes = TRUE,
-    center = TRUE,
-    normalize = TRUE,
-    tail_point = FALSE,
-    tail_point.size = 2
-) {
+stat_vector <- function(mapping = NULL, data = NULL,
+                        geom = GeomVector, position = "identity",
+                        ...,
+                        na.rm = FALSE,
+                        show.legend = NA,
+                        arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
+                        inherit.aes = TRUE,
+                        center = TRUE,
+                        normalize = TRUE,
+                        tail_point = FALSE,
+                        tail_point.size = 2) {
 
   mapping <- modifyList(aes(color = after_stat(norm), length = after_stat(NA)), mapping)
 

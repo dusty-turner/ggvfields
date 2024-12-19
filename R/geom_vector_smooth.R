@@ -136,25 +136,21 @@ NULL
 
 #' @rdname geom_vector_smooth
 #' @export
-stat_vector_smooth <- function(
-    mapping = NULL,
-    data = NULL,
-    geom = "vector_smooth",
-    position = "identity",
-    na.rm = FALSE,
-    show.legend = NA,
-    inherit.aes = TRUE,
-    n = c(11, 11),
-    method = "lm",
-    se = TRUE,
-    se.circle = TRUE,
-    conf_level = c(.95, NA),
-    pi_type = "ellipse",
-    formula = cbind(dx, dy) ~ x * y,
-    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-    eval_points = NULL,
-    ...
-) {
+stat_vector_smooth <- function(mapping = NULL, data = NULL,
+                               geom = "vector_smooth", position = "identity",
+                               ...,
+                               na.rm = FALSE,
+                               show.legend = NA,
+                               inherit.aes = TRUE,
+                               n = c(11, 11),
+                               method = "lm",
+                               se = TRUE,
+                               se.circle = TRUE,
+                               conf_level = c(.95, NA),
+                               pi_type = "ellipse",
+                               formula = cbind(dx, dy) ~ x * y,
+                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+                               eval_points = NULL) {
 
   layer(
     stat = StatVectorSmooth,
@@ -182,24 +178,21 @@ stat_vector_smooth <- function(
 
 #' @rdname geom_vector_smooth
 #' @export
-geom_vector_smooth <- function(
-    mapping = NULL,
-    data = NULL,
-    stat = "vector_smooth",
-    position = "identity",
-    na.rm = FALSE, show.legend = NA,
-    inherit.aes = TRUE,
-    n = c(11, 11),
-    method = "lm",
-    se = TRUE,
-    se.circle = TRUE,
-    pi_type = "ellipse",
-    conf_level = c(.95, NA),
-    formula = cbind(dx, dy) ~ x * y,
-    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-    eval_points = NULL,
-    ...
-) {
+geom_vector_smooth <- function(mapping = NULL, data = NULL,
+                               stat = "vector_smooth", position = "identity",
+                               ...,
+                               na.rm = FALSE,
+                               show.legend = NA,
+                               inherit.aes = TRUE,
+                               n = c(11, 11),
+                               method = "lm",
+                               se = TRUE,
+                               se.circle = TRUE,
+                               pi_type = "ellipse",
+                               conf_level = c(.95, NA),
+                               formula = cbind(dx, dy) ~ x * y,
+                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
+                               eval_points = NULL) {
 
   layer(
     stat = StatVectorSmooth,

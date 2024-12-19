@@ -10,6 +10,7 @@ geom_gradient_field(
   data = NULL,
   stat = "identity",
   geom = "vector",
+  ...,
   position = "identity",
   na.rm = FALSE,
   show.legend = NA,
@@ -20,8 +21,7 @@ geom_gradient_field(
   n = 16,
   center = TRUE,
   normalize = TRUE,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-  ...
+  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
 )
 
 stat_gradient_field(
@@ -29,6 +29,7 @@ stat_gradient_field(
   data = NULL,
   stat = "identity",
   geom = "vector",
+  ...,
   position = "identity",
   na.rm = FALSE,
   show.legend = NA,
@@ -39,8 +40,7 @@ stat_gradient_field(
   n = 16,
   center = TRUE,
   normalize = TRUE,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-  ...
+  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
 )
 }
 \arguments{
@@ -90,6 +90,8 @@ give the geom as \code{"point"}.
 \link[ggplot2:layer_geoms]{layer geom} documentation.
 }}
 
+\item{...}{Other arguments passed to \code{geom_vector_field()}, such as aesthetic mappings.}
+
 \item{position}{A position adjustment to use on the data for this layer. This
 can be used in various ways, including to prevent overplotting and
 improving the display. The \code{position} argument accepts the following:
@@ -134,8 +136,6 @@ Set to \code{FALSE} to view the original lengths of the vectors.}
 
 \item{arrow}{Arrow specification, created by \code{grid::arrow()}, to add
 arrowheads to vectors.}
-
-\item{...}{Other arguments passed to \code{geom_vector_field()}, such as aesthetic mappings.}
 }
 \value{
 A \code{ggplot2} layer that can be added to a ggplot object to create a

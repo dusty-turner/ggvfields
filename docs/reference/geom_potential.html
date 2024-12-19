@@ -59,10 +59,10 @@ grid and displays it as a heatmap.</p>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stat <span class="op">=</span> <span class="va">StatPotential</span>,</span>
 <span>  geom <span class="op">=</span> <span class="va">GeomPotential</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
-<span>  <span class="va">...</span>,</span>
 <span>  <span class="va">fun</span>,</span>
 <span>  x_lim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_lim <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -120,34 +120,6 @@ give the geom as <code>"point"</code>.</p></li>
 </ul></dd>
 
 
-<dt>inherit.aes</dt>
-<dd><p>If <code>FALSE</code>, overrides the default aesthetics,
-rather than combining with them. This is most useful for helper functions
-that define both data and aesthetics and shouldn't inherit behaviour from
-the default plot specification, e.g. <code><a href="https://ggplot2.tidyverse.org/reference/borders.html">borders()</a></code>.</p></dd>
-
-
-<dt>show.legend</dt>
-<dd><p>logical. Should this layer be included in the legends?
-<code>NA</code>, the default, includes if any aesthetics are mapped.
-<code>FALSE</code> never includes, and <code>TRUE</code> always includes.
-It can also be a named logical vector to finely select the aesthetics to
-display.</p></dd>
-
-
-<dt>position</dt>
-<dd><p>A position adjustment to use on the data for this layer. This
-can be used in various ways, including to prevent overplotting and
-improving the display. The <code>position</code> argument accepts the following:</p><ul><li><p>The result of calling a position function, such as <code><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html">position_jitter()</a></code>.
-This method allows for passing extra arguments to the position.</p></li>
-<li><p>A string naming the position adjustment. To give the position as a
-string, strip the function name of the <code>position_</code> prefix. For example,
-to use <code><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html">position_jitter()</a></code>, give the position as <code>"jitter"</code>.</p></li>
-<li><p>For more information and other ways to specify the position, see the
-<a href="https://ggplot2.tidyverse.org/reference/layer_positions.html">layer position</a> documentation.</p></li>
-</ul></dd>
-
-
 <dt>...</dt>
 <dd><p>Other arguments passed on to <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">layer()</a></code>'s <code>params</code> argument. These
 arguments broadly fall into one of 4 categories below. Notably, further
@@ -173,6 +145,34 @@ lists which parameters it can accept.</p></li>
 <li><p>The <code>key_glyph</code> argument of <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">layer()</a></code> may also be passed on through
 <code>...</code>. This can be one of the functions described as
 <a href="https://ggplot2.tidyverse.org/reference/draw_key.html">key glyphs</a>, to change the display of the layer in the legend.</p></li>
+</ul></dd>
+
+
+<dt>inherit.aes</dt>
+<dd><p>If <code>FALSE</code>, overrides the default aesthetics,
+rather than combining with them. This is most useful for helper functions
+that define both data and aesthetics and shouldn't inherit behaviour from
+the default plot specification, e.g. <code><a href="https://ggplot2.tidyverse.org/reference/borders.html">borders()</a></code>.</p></dd>
+
+
+<dt>show.legend</dt>
+<dd><p>logical. Should this layer be included in the legends?
+<code>NA</code>, the default, includes if any aesthetics are mapped.
+<code>FALSE</code> never includes, and <code>TRUE</code> always includes.
+It can also be a named logical vector to finely select the aesthetics to
+display.</p></dd>
+
+
+<dt>position</dt>
+<dd><p>A position adjustment to use on the data for this layer. This
+can be used in various ways, including to prevent overplotting and
+improving the display. The <code>position</code> argument accepts the following:</p><ul><li><p>The result of calling a position function, such as <code><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html">position_jitter()</a></code>.
+This method allows for passing extra arguments to the position.</p></li>
+<li><p>A string naming the position adjustment. To give the position as a
+string, strip the function name of the <code>position_</code> prefix. For example,
+to use <code><a href="https://ggplot2.tidyverse.org/reference/position_jitter.html">position_jitter()</a></code>, give the position as <code>"jitter"</code>.</p></li>
+<li><p>For more information and other ways to specify the position, see the
+<a href="https://ggplot2.tidyverse.org/reference/layer_positions.html">layer position</a> documentation.</p></li>
 </ul></dd>
 
 

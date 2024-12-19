@@ -59,6 +59,7 @@ for gradient field visualizations where vector length is mapped to the vector's 
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stat <span class="op">=</span> <span class="st">"identity"</span>,</span>
 <span>  geom <span class="op">=</span> <span class="st">"vector"</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
@@ -70,8 +71,7 @@ for gradient field visualizations where vector length is mapped to the vector's 
 <span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  tail_point <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  arrow <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  arrow <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">stat_gradient_field2</span><span class="op">(</span></span>
@@ -142,6 +142,10 @@ give the geom as <code>"point"</code>.</p></li>
 </ul></dd>
 
 
+<dt>...</dt>
+<dd><p>Other arguments passed on to <code><a href="geom_gradient_field.html">geom_gradient_field()</a></code> or <code><a href="geom_gradient_field.html">stat_gradient_field()</a></code>.</p></dd>
+
+
 <dt>position</dt>
 <dd><p>A position adjustment to use on the data for this layer. This
 can be used in various ways, including to prevent overplotting and
@@ -207,10 +211,6 @@ Set to <code>FALSE</code> to view the original lengths of the vectors.</p></dd>
 <dt>arrow</dt>
 <dd><p>Arrow specification, created by <code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code>, to add
 arrowheads to vectors.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>Other arguments passed on to <code><a href="geom_gradient_field.html">geom_gradient_field()</a></code> or <code><a href="geom_gradient_field.html">stat_gradient_field()</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

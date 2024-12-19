@@ -29,10 +29,15 @@ NULL
 
 #' @keywords internal
 geom_complex_function <- function(mapping = NULL, data = NULL,
-                                  stat = "complex_function",
-                                  position = "identity", na.rm = FALSE,
-                                  show.legend = TRUE, inherit.aes = TRUE,
-                                  fun, relim, imlim, n = 10, ...) {
+                                  stat = "complex_function", position = "identity",
+                                  na.rm = FALSE,
+                                  ...,
+                                  show.legend = TRUE,
+                                  inherit.aes = TRUE,
+                                  fun,
+                                  relim,
+                                  imlim,
+                                  n = 10) {
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
 
@@ -59,10 +64,18 @@ geom_complex_function <- function(mapping = NULL, data = NULL,
 GeomComplexFunction <- ggproto("GeomComplexFunction", GeomRaster)
 
 #' @keywords internal
-stat_complex_function <- function(mapping = NULL, data = NULL, geom = "raster",
-                                  position = "identity", na.rm = FALSE,
-                                  show.legend = TRUE, inherit.aes = TRUE,
-                                  fun, relim, imlim, n = 10, ...) {
+stat_complex_function <- function(mapping = NULL,
+                                  data = NULL,
+                                  geom = "raster",
+                                  position = "identity",
+                                  ...,
+                                  na.rm = FALSE,
+                                  show.legend = TRUE,
+                                  inherit.aes = TRUE,
+                                  fun,
+                                  relim,
+                                  imlim,
+                                  n = 10) {
 
   if (is.null(data)) data <- ensure_nonempty_data
 

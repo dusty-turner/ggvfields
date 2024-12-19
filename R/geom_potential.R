@@ -35,21 +35,18 @@
 #'   geom_potential(fun = fun, x_lim = x_lim, y_lim = y_lim)
 #'
 #' @export
-geom_potential <- function(
-    mapping = NULL,
-    data = NULL,
-    stat = StatPotential,
-    geom = GeomPotential,
-    inherit.aes = TRUE,
-    show.legend = NA,
-    position = "identity",
-    ...,
-    fun,
-    x_lim = NULL,
-    y_lim = NULL,
-    n = 21,
-    tolerance = 1e-6
-) {
+geom_potential <- function(mapping = NULL, data = NULL,
+                           stat = StatPotential, geom = GeomPotential,
+                           ...,
+                           inherit.aes = TRUE,
+                           show.legend = NA,
+                           position = "identity",
+                           fun,
+                           x_lim = NULL,
+                           y_lim = NULL,
+                           n = 21,
+                           tolerance = 1e-6) {
+
 
   if (is.null(data)) {
     data <- data.frame(x = NA_real_, y = NA_real_)

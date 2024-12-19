@@ -40,25 +40,21 @@
 #' Use [geom_vector_field()] if you prefer to map vector magnitude using a different aesthetic such as `color`.
 #'
 #' @export
-geom_vector_field2 <- function(
-    mapping = NULL,
-    data = NULL,
-    stat = StatVector,
-    geom = GeomVector,
-    position = "identity",
-    center = FALSE,
-    normalize = TRUE,
-    tail_point = TRUE,
-    tail_point.size = 2,
-    arrow = NULL,
-    fun = NULL,
-    x_lim = NULL,
-    y_lim = NULL,
-    n = NULL,
-    show.legend = NA,
-    inherit.aes = TRUE,
-    ...
-) {
+geom_vector_field2 <- function(mapping = NULL, data = NULL,
+                               stat = StatVector, geom = GeomVector,
+                               ...,
+                               position = "identity",
+                               center = FALSE,
+                               normalize = TRUE,
+                               tail_point = TRUE,
+                               tail_point.size = 2,
+                               arrow = NULL,
+                               fun = NULL,
+                               x_lim = NULL,
+                               y_lim = NULL,
+                               n = NULL,
+                               show.legend = NA,
+                               inherit.aes = TRUE) {
 
   # Check if x and y are in the mapping
   mapping_defines_xy <- !is.null(mapping) && all(c("x", "y") %in% names(mapping))
@@ -104,25 +100,21 @@ geom_vector_field2 <- function(
 
 #' @rdname geom_vector_field2
 #' @export
-stat_vector_field2 <- function(
-    mapping = NULL,
-    data = NULL,
-    geom = GeomVector,
-    stat = StatVector,
-    position = "identity",
-    center = FALSE,
-    normalize = TRUE,
-    tail_point = TRUE,
-    tail_point.size = 2,
-    arrow = NULL,
-    fun = NULL,
-    x_lim = c(-10, 10),
-    y_lim = c(-10, 10),
-    n = 10,
-    show.legend = NA,
-    inherit.aes = TRUE,
-    ...
-) {
+stat_vector_field2 <- function(mapping = NULL, data = NULL,
+                               geom = GeomVector, stat = StatVector,
+                               ...,
+                               position = "identity",
+                               center = FALSE,
+                               normalize = TRUE,
+                               tail_point = TRUE,
+                               tail_point.size = 2,
+                               arrow = NULL,
+                               fun = NULL,
+                               x_lim = c(-10, 10),
+                               y_lim = c(-10, 10),
+                               n = 10,
+                               show.legend = NA,
+                               inherit.aes = TRUE) {
   # Default aesthetics: length maps to norm, and color is left unset (NULL).
   base_mapping <- aes(length = after_stat(norm), color = NULL)
 

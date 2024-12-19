@@ -58,11 +58,17 @@ NULL
 #' @export
 geom_flow <- function(mapping = NULL, data = NULL,
                       stat = "flow", position = "identity",
-                      na.rm = FALSE, show.legend = TRUE, inherit.aes = TRUE,
-                      fun, xlim = c(-10,10), ylim = c(-10,10), n = c(21, 21),
-                      iterations = 100, threshold_distance = .5,
-                      arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                      ...) {
+                      ...,
+                      na.rm = FALSE,
+                      show.legend = TRUE,
+                      inherit.aes = TRUE,
+                      fun,
+                      xlim = c(-10, 10),
+                      ylim = c(-10, 10),
+                      n = c(21, 21),
+                      iterations = 100,
+                      threshold_distance = .5,
+                      arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")) {
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
   layer(
@@ -91,11 +97,17 @@ geom_flow <- function(mapping = NULL, data = NULL,
 #' @export
 stat_flow <- function(mapping = NULL, data = NULL,
                       stat = "flow", position = "identity",
-                      na.rm = FALSE, show.legend = TRUE, inherit.aes = TRUE,
-                      fun, xlim = c(-10,10), ylim = c(-10,10), n = c(21, 21),
-                      iterations = 100, threshold_distance = .5,
-                      arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-                      ...) {
+                      ...,
+                      na.rm = FALSE,
+                      show.legend = TRUE,
+                      inherit.aes = TRUE,
+                      fun,
+                      xlim = c(-10,10),
+                      ylim = c(-10,10),
+                      n = c(21, 21),
+                      iterations = 100,
+                      threshold_distance = .5,
+                      arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")) {
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   layer(

@@ -79,25 +79,21 @@
 #'   geom_vector_field(fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5))
 #' @export
 
-geom_vector_field <- function(
-    mapping = NULL,
-    data = NULL,
-    stat = StatVector,
-    geom = GeomVector,
-    position = "identity",
-    center = TRUE,
-    normalize = TRUE,
-    tail_point = FALSE,
-    tail_point.size = 2,
-    arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
-    fun = NULL,
-    x_lim = NULL,
-    y_lim = NULL,
-    n = NULL,
-    show.legend = NA,
-    inherit.aes = TRUE,
-    ...
-) {
+geom_vector_field <- function(mapping = NULL, data = NULL,
+                              stat = StatVector, geom = GeomVector,
+                              ...,
+                              position = "identity",
+                              center = TRUE,
+                              normalize = TRUE,
+                              tail_point = FALSE,
+                              tail_point.size = 2,
+                              arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
+                              fun = NULL,
+                              x_lim = NULL,
+                              y_lim = NULL,
+                              n = NULL,
+                              show.legend = NA,
+                              inherit.aes = TRUE) {
 
   # Check if x and y are in the mapping
   mapping_defines_xy <- !is.null(mapping) && all(c("x", "y") %in% names(mapping))
@@ -147,25 +143,21 @@ geom_vector_field <- function(
 
 #' @rdname geom_vector_field
 #' @export
-stat_vector_field <- function(
-    mapping = NULL,
-    data = NULL,
-    geom = GeomVector,
-    position = "identity",
-    na.rm = FALSE,
-    show.legend = NA,
-    inherit.aes = TRUE,
-    fun = NULL,
-    x_lim = c(-10, 10),
-    y_lim = c(-10, 10),
-    n = 10,
-    center = TRUE,
-    normalize = TRUE,
-    tail_point = FALSE,
-    tail_point.size = 2,
-    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-    ...
-) {
+stat_vector_field <- function(mapping = NULL, data = NULL,
+                              geom = GeomVector, position = "identity",
+                              ...,
+                              na.rm = FALSE,
+                              show.legend = NA,
+                              inherit.aes = TRUE,
+                              fun = NULL,
+                              x_lim = c(-10, 10),
+                              y_lim = c(-10, 10),
+                              n = 10,
+                              center = TRUE,
+                              normalize = TRUE,
+                              tail_point = FALSE,
+                              tail_point.size = 2,
+                              arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")) {
   # Default aesthetics: color reflects norm (magnitude) and length defaults to NA
   default_aes <- aes(color = after_stat(norm), length = after_stat(NA))
 
