@@ -4,11 +4,11 @@
 \alias{scale_length_continuous}
 \title{Create a Continuous Scale for Vector Length}
 \usage{
-scale_length_continuous(range = c(0.1, 0.5), ...)
+scale_length_continuous(max_range = 0.5, ...)
 }
 \arguments{
-\item{range}{rescales the input to the specific output range. Numeric vector of
-length two, giving range of possible values. Should be between 0 and 1}
+\item{max_range}{The maximum value to which the input is rescaled. Numeric scalar
+specifying the upper bound of the output range. Should be between 0 and 1.}
 
 \item{...}{Other arguments passed to \code{continuous_scale()}.}
 }

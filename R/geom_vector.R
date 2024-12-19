@@ -268,11 +268,14 @@ draw_panel_vector <- function(
     # Now transform the modified data into the coordinate system
     coords <- coord$transform(data, panel_params)
 
+    vector_coords <- coords[coords$norm!=0,] ## only plot vectors that have a norm (norm != 0)
+    # still allows for the tail point if the user wants a tail point
+
     # Create the vector grob
     vector_grob <- grid::segmentsGrob(
-      x0 = unit(coords$x, "npc"), y0 = unit(coords$y, "npc"),
-      x1 = unit(coords$xend, "npc"), y1 = unit(coords$yend, "npc"),
-      gp = grid::gpar(col = coords$colour, fill = coords$colour, lwd = linewidth, alpha = coords$alpha),
+      x0 = unit(vector_coords$x, "npc"), y0 = unit(vector_coords$y, "npc"),
+      x1 = unit(vector_coords$xend, "npc"), y1 = unit(vector_coords$yend, "npc"),
+      gp = grid::gpar(col = vector_coords$colour, fill = vector_coords$colour, lwd = linewidth, alpha = vector_coords$alpha),
       arrow = arrow
     )
 
@@ -292,8 +295,7 @@ draw_panel_vector <- function(
     grobs <- Filter(Negate(is.null), grobs)  # Remove NULL entries
     return(grid::grobTree(do.call(grid::gList, grobs)))
 
-  } else {
-
+  } else { ## if length is mapped
     # 1. Undo centering if it was applied
     if (center) {
       half_dx <- (data$xend - data$x) / 2
@@ -314,12 +316,17 @@ draw_panel_vector <- function(
     norms <- sqrt(data$dx^2 + data$dy^2)
     norms[norms == 0] <- 1  # Avoid division by zero
 
+    ## properly scale min vector length
+    length_range <- range(norms)
+
+    data$length[data$length == 0] <- length_range[1]/length_range[2]/5
+
     data$dx <- data$dx / data$length / .01  # Undo the multiplication by length
     data$dy <- data$dy / data$length / .01  # Undo the multiplication by length
 
     # Transform data into the coordinate system
-    coords <- coord$transform(data, panel_params)
 
+    coords <- coord$transform(data, panel_params)
     # Normalize dx and dy to unit vectors (for direction)
     norms <- sqrt(coords$dx^2 + coords$dy^2)
     norms[norms == 0] <- 1  # Avoid division by zero
@@ -339,13 +346,15 @@ draw_panel_vector <- function(
         arrow$length <- unit(0.015, "npc")
       }
 
+    # non_zero_coords <- coords[coords$norm > .0001,] ## tried to do this to remove 0 length norms but it messes up the legend
+
       vector_grob <- grid::segmentsGrob(
         x0 = unit(coords$x, "npc") - unit(half_dx, "cm"),
         y0 = unit(coords$y, "npc") - unit(half_dy, "cm"),
         x1 = unit(coords$x, "npc") + unit(half_dx, "cm"),
         y1 = unit(coords$y, "npc") + unit(half_dy, "cm"),
-        gp = grid::gpar(col = coords$colour, fill = coords$colour, lwd = linewidth),  # Use mapped fill
-        arrow = arrow  # Pass the arrow parameter here
+        gp = grid::gpar(col = coords$colour, fill = coords$colour, lwd = linewidth),
+        arrow = arrow
       )
       points_grob <- NULL
       if (tail_point) {
@@ -359,7 +368,7 @@ draw_panel_vector <- function(
       }
     } else {
 
-      ## this determins if the user has adjusted the length of the arrow away from the default and makes it smaller
+      ## this determines if the user has adjusted the length of the arrow away from the default and makes it smaller
       ## if the user has altered the default then leave it alone
       if (!is.null(arrow) && round(grid::convertUnit(arrow$length, "npc", valueOnly = TRUE), 3) == 0.025) {
         arrow$length <- unit(0.015, "npc")
@@ -392,7 +401,8 @@ draw_panel_vector <- function(
 
 
 #' @keywords internal
-draw_key_vector <- function(data, params, size, linewidth) {
+draw_key_vector <- function(data, params, size) {
+
   x0 <- unit(0.1, "npc")
   y0 <- unit(0.5, "npc")
 
@@ -415,34 +425,41 @@ GeomVector <- ggproto(
   Geom,
   # required_aes = NULL,
   # required_aes = c("x", "y"),
-  default_aes = aes(color = "black", fill = "black", size = 0.5, length = 1, linewidth = 2, linetype = 1, alpha = 1),
+  default_aes = aes(
+    color = "black",
+    fill = "black",
+    size = 0.5,
+    length = 1,
+    linewidth = 2,
+    linetype = 1,
+    alpha = 1
+  ),
 
-  setup_data = function(data, params){
-
-if (!"length" %in% colnames(data) || all(is.na(data$length))) {
-    # if (is.na(data$length[1])) {
+  setup_data = function(data, params) {
+    if (!"length" %in% colnames(data) || all(is.na(data$length))) {
+      # if (is.na(data$length[1])) {
 
       # Normalize dx and dy to unit vectors if normalize is TRUE
 
       if (params$normalize) {
-
         # Detect if the data forms a regular grid by checking unique x and y spacings
         x_spacing <- unique(diff(sort(unique(data$x))))
         y_spacing <- unique(diff(sort(unique(data$y))))
 
 
         # Calculate the minimum spacing or default to 1 if not a grid
-        min_spacing <- if (length(x_spacing) == 0 || length(y_spacing) == 0) {
-          1
-        } else if (all(abs(x_spacing - mean(x_spacing)) < 1e-6) &&
-                   all(abs(y_spacing - mean(y_spacing)) < 1e-6)) {
-          min(x_spacing, y_spacing) * .9
-        } else {
-          1  # No scaling for non-grid data
-        }
+        min_spacing <-
+          if (length(x_spacing) == 0 || length(y_spacing) == 0) {
+            1
+          } else if (all(abs(x_spacing - mean(x_spacing)) < 1e-6) &&
+                     all(abs(y_spacing - mean(y_spacing)) < 1e-6)) {
+            min(x_spacing, y_spacing) * .9
+          } else {
+            1  # No scaling for non-grid data
+          }
 
         # Normalize the vectors to unit length and scale by the minimum spacing
-        norms <- sqrt(data$dx^2 + data$dy^2)
+        norms <- sqrt(data$dx ^ 2 + data$dy ^ 2)
         norms[norms == 0] <- 1  # Avoid division by zero
         data$dx <- (data$dx / norms) * min_spacing
         data$dy <- (data$dy / norms) * min_spacing
@@ -467,11 +484,10 @@ if (!"length" %in% colnames(data) || all(is.na(data$length))) {
       }
 
     } else {
-
       # If length aesthetic is mapped
 
       # 1. Normalize dx and dy to unit vectors (like in draw_panel)
-      norms <- sqrt(data$dx^2 + data$dy^2)
+      norms <- sqrt(data$dx ^ 2 + data$dy ^ 2)
       norms[norms == 0] <- 1  # Avoid division by zero
       data$dx <- data$dx / norms
       data$dy <- data$dy / norms
@@ -497,6 +513,7 @@ if (!"length" %in% colnames(data) || all(is.na(data$length))) {
       }
 
     }
+
     return(data)
   },
 
@@ -511,21 +528,15 @@ if (!"length" %in% colnames(data) || all(is.na(data$length))) {
 #' aesthetic in a ggplot. This is particularly useful when working with vector plots
 #' where vector lengths are mapped to a continuous scale.
 #'
-#' @param range rescales the input to the specific output range. Numeric vector of
-#' length two, giving range of possible values. Should be between 0 and 1
+#' @param max_range The maximum value to which the input is rescaled. Numeric scalar
+#'   specifying the upper bound of the output range. Should be between 0 and 1.
 #' @param ... Other arguments passed to `continuous_scale()`.
 #' @export
-# scale_length_continuous <- function(...) {
-#   continuous_scale(
-#     aesthetics = "length",
-#     palette = scales::rescale_pal(c(0.1, .5)),
-#     ...
-#   )
-# }
-scale_length_continuous <- function(range = c(0.1, 0.5), ...) {
+scale_length_continuous <- function(max_range = 0.5, ...) {
   continuous_scale(
     aesthetics = "length",
-    palette = scales::rescale_pal(range),
+    palette = scales::rescale_pal(range = c(0, max_range)),
     ...
   )
 }
+

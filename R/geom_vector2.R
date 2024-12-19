@@ -78,7 +78,7 @@ geom_vector2 <- function(mapping = NULL, data = NULL,
     na.rm = na.rm,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
-    center = FALSE,
+    center = center,
     tail_point = tail_point,
     arrow = arrow
   )
