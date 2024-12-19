@@ -17,7 +17,7 @@
 #' @keywords internal
 #'
 #' @examples
-#' #library(ggplot2)
+#' #library(ggvfields)
 #' # Example user-defined function
 #' f <- function(z) (z^2 + 1) / (z^2 - 1)
 #'

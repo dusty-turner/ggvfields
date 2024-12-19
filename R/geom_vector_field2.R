@@ -34,7 +34,7 @@
 #'
 #' # Create a vector field plot with geom_vector_field2:
 #' ggplot() +
-#'   geom_vector_field2(fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5))
+#'   geom_vector_field2(fun = f, xlim = c(-5, 5), ylim = c(-5, 5))
 #'
 #' @seealso
 #' Use [geom_vector_field()] if you prefer to map vector magnitude using a different aesthetic such as `color`.
@@ -50,8 +50,8 @@ geom_vector_field2 <- function(mapping = NULL, data = NULL,
                                tail_point.size = 2,
                                arrow = NULL,
                                fun = NULL,
-                               x_lim = NULL,
-                               y_lim = NULL,
+                               xlim = NULL,
+                               ylim = NULL,
                                n = NULL,
                                show.legend = NA,
                                inherit.aes = TRUE) {
@@ -59,9 +59,9 @@ geom_vector_field2 <- function(mapping = NULL, data = NULL,
   # Check if x and y are in the mapping
   mapping_defines_xy <- !is.null(mapping) && all(c("x", "y") %in% names(mapping))
 
-  # If no data and no x,y aesthetics are specified, but fun, x_lim, y_lim are provided,
+  # If no data and no x,y aesthetics are specified, but fun, xlim, ylim are provided,
   # we need dummy data to trigger compute_group().
-  if (is.null(data) && !mapping_defines_xy && !is.null(fun) && !is.null(x_lim) && !is.null(y_lim)) {
+  if (is.null(data) && !mapping_defines_xy && !is.null(fun) && !is.null(xlim) && !is.null(ylim)) {
     data <- data.frame(x = NA_real_, y = NA_real_)
   }
 
@@ -90,8 +90,8 @@ geom_vector_field2 <- function(mapping = NULL, data = NULL,
       tail_point.size = tail_point.size,
       arrow = arrow,
       fun = fun,
-      x_lim = x_lim,
-      y_lim = y_lim,
+      xlim = xlim,
+      ylim = ylim,
       n = n,
       ...
     )
@@ -110,8 +110,8 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
                                tail_point.size = 2,
                                arrow = NULL,
                                fun = NULL,
-                               x_lim = c(-10, 10),
-                               y_lim = c(-10, 10),
+                               xlim = c(-10, 10),
+                               ylim = c(-10, 10),
                                n = 10,
                                show.legend = NA,
                                inherit.aes = TRUE) {
@@ -140,8 +140,8 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
       tail_point.size = tail_point.size,
       arrow = arrow,
       fun = fun,
-      x_lim = x_lim,
-      y_lim = y_lim,
+      xlim = xlim,
+      ylim = ylim,
       n = n,
       ...
     )

@@ -25,7 +25,7 @@ of the vector. The lightness of the color reflects the magnitude of the
 vector, providing a visual representation of both direction and intensity.
 }
 \examples{
-#library(ggplot2)
+#library(ggvfields)
 # Example user-defined function
 f <- function(z) (z^2 + 1) / (z^2 - 1)
 

@@ -61,7 +61,7 @@
 #' ```
 #'
 #' @examples
-#' library(ggplot2)
+#' library(ggvfields)
 #'
 #' paraboloid_field <- function(v) {
 #'   x <- v[1]

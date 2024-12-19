@@ -5,10 +5,10 @@
 #'
 #' **How the Domain is Determined**:
 #' - If you provide **data with `aes(x, y)`**, the domain is inferred from the data.
-#' - If you also specify **`x_lim` and `y_lim`**, they override any domain inferred from the data.
-#' - If you do **not provide data**, but supply **`fun`, `x_lim`, and `y_lim`**, then `geom_vector_field()`
+#' - If you also specify **`xlim` and `ylim`**, they override any domain inferred from the data.
+#' - If you do **not provide data**, but supply **`fun`, `xlim`, and `ylim`**, then `geom_vector_field()`
 #'   generates its own grid of points within these limits.
-#' - If data is provided **without `aes(x, y)`** mapped, you must provide `x_lim` and `y_lim`
+#' - If data is provided **without `aes(x, y)`** mapped, you must provide `xlim` and `ylim`
 #'   so the domain can be determined.
 #'
 #' **Default Behavior**:
@@ -22,7 +22,7 @@
 #'
 #' @param fun A function that takes a vector `(x, y)` and returns `(dx, dy)`, defining
 #'   vector displacements.
-#' @param x_lim,y_lim Numeric vectors of length 2 defining the domain limits on the x/y-axis.
+#' @param xlim,ylim Numeric vectors of length 2 defining the domain limits on the x/y-axis.
 #' @param n Integer, the number of grid points along each axis.
 #' @param center Logical; if `TRUE`, centers vectors on their grid points.
 #' @param normalize Logical; if `TRUE`, normalizes vectors before scaling.
@@ -61,10 +61,10 @@
 #' wind_data[, c("dx", "dy")] <- t(apply(wind_data[, c("lon", "lat")], 1, f))
 #'
 #' ### 1. No data provided:
-#' #    `fun`, `x_lim`, and `y_lim` define the domain.
+#' #    `fun`, `xlim`, and `ylim` define the domain.
 #' #    The layer generates a grid of points within (-5,5) for x and y.
 #' ggplot() +
-#'   geom_vector_field(fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5))
+#'   geom_vector_field(fun = f, xlim = c(-5, 5), ylim = c(-5, 5))
 #'
 #' ### 2. With data provided:
 #' #    Create sample data and compute dx, dy using function f with error.
@@ -73,10 +73,11 @@
 #'   geom_vector(aes(dx = dx, dy = dy), color = "black") +
 #'   geom_vector_field(fun = f)
 #'
-#' ### 3. With data provided but overriding with x_lim and y_lim:
-#' #    Supply `x_lim` and `y_lim` so the domain is determined by these limits instead of the data.
+#' ### 3. With data provided but overriding with xlim and ylim:
+#' #    Supply `xlim` and `ylim` so the domain is determined by these limits instead of the data.
 #' ggplot(wind_data) +
-#'   geom_vector_field(fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5))
+#'   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy), color = "black", normalize = FALSE) +
+#'   geom_vector_field(fun = f, xlim = c(-5, 5), ylim = c(-5, 5))
 #' @export
 
 geom_vector_field <- function(mapping = NULL, data = NULL,
@@ -89,8 +90,8 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
                               tail_point.size = 2,
                               arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
                               fun = NULL,
-                              x_lim = NULL,
-                              y_lim = NULL,
+                              xlim = NULL,
+                              ylim = NULL,
                               n = NULL,
                               show.legend = NA,
                               inherit.aes = TRUE) {
@@ -98,9 +99,9 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
   # Check if x and y are in the mapping
   mapping_defines_xy <- !is.null(mapping) && all(c("x", "y") %in% names(mapping))
 
-  # If no data and no x,y aesthetics are specified, but we have fun, x_lim, y_lim,
+  # If no data and no x,y aesthetics are specified, but we have fun, xlim, ylim,
   # we need dummy data to trigger compute_group().
-  if (is.null(data) && !mapping_defines_xy && !is.null(fun) && !is.null(x_lim) && !is.null(y_lim)) {
+  if (is.null(data) && !mapping_defines_xy && !is.null(fun) && !is.null(xlim) && !is.null(ylim)) {
     data <- data.frame(x = NA_real_, y = NA_real_)
   }
 
@@ -130,8 +131,8 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
       tail_point.size = tail_point.size,
       arrow = arrow,
       fun = fun,
-      x_lim = x_lim,
-      y_lim = y_lim,
+      xlim = xlim,
+      ylim = ylim,
       n = n,
       ...
     )
@@ -150,8 +151,8 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
                               show.legend = NA,
                               inherit.aes = TRUE,
                               fun = NULL,
-                              x_lim = c(-10, 10),
-                              y_lim = c(-10, 10),
+                              xlim = c(-10, 10),
+                              ylim = c(-10, 10),
                               n = 10,
                               center = TRUE,
                               normalize = TRUE,
@@ -185,8 +186,8 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
       tail_point = tail_point,
       tail_point.size = tail_point.size,
       fun = fun,
-      x_lim = x_lim,
-      y_lim = y_lim,
+      xlim = xlim,
+      ylim = ylim,
       n = n,
       ...
     )

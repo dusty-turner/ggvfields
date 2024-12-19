@@ -194,7 +194,7 @@ For example, to map \code{curl} to color:
 }
 
 \examples{
-library(ggplot2)
+library(ggvfields)
 
 paraboloid_field <- function(v) {
   x <- v[1]

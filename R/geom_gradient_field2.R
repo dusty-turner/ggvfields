@@ -23,7 +23,7 @@
 #' @return A `ggplot2` layer that can be added to a ggplot object to create a gradient field plot.
 #'
 #' @examples
-#' library(ggplot2)
+#' library(ggvfields)
 #'
 #' paraboloid_field <- function(v) {
 #'   x <- v[1]

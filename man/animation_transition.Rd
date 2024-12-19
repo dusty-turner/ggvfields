@@ -19,7 +19,6 @@ will work with gganimate syntax.
 }
 \examples{
 \dontrun{
-library(ggplot2)
 library(ggvfields)
 library(gganimate)
 

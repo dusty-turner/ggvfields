@@ -175,7 +175,7 @@ field function. The lines in the plot represent the flow of data points
 through the vector field.
 }
 \examples{
-library(ggplot2)
+library(ggvfields)
 # Example user-defined function
 f <- function(v) {
   x <- v[1]

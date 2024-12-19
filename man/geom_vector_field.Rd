@@ -18,8 +18,8 @@ geom_vector_field(
   tail_point.size = 2,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
   fun = NULL,
-  x_lim = NULL,
-  y_lim = NULL,
+  xlim = NULL,
+  ylim = NULL,
   n = NULL,
   show.legend = NA,
   inherit.aes = TRUE
@@ -35,8 +35,8 @@ stat_vector_field(
   show.legend = NA,
   inherit.aes = TRUE,
   fun = NULL,
-  x_lim = c(-10, 10),
-  y_lim = c(-10, 10),
+  xlim = c(-10, 10),
+  ylim = c(-10, 10),
   n = 10,
   center = TRUE,
   normalize = TRUE,
@@ -120,7 +120,7 @@ to use \code{position_jitter()}, give the position as \code{"jitter"}.
 \item{fun}{A function that takes a vector \verb{(x, y)} and returns \verb{(dx, dy)}, defining
 vector displacements.}
 
-\item{x_lim, y_lim}{Numeric vectors of length 2 defining the domain limits on the x/y-axis.}
+\item{xlim, ylim}{Numeric vectors of length 2 defining the domain limits on the x/y-axis.}
 
 \item{n}{Integer, the number of grid points along each axis.}
 
@@ -146,10 +146,10 @@ function \code{fun} that computes vector displacements (\code{dx}, \code{dy}) ov
 \strong{How the Domain is Determined}:
 \itemize{
 \item If you provide \strong{data with \code{aes(x, y)}}, the domain is inferred from the data.
-\item If you also specify \strong{\code{x_lim} and \code{y_lim}}, they override any domain inferred from the data.
-\item If you do \strong{not provide data}, but supply \strong{\code{fun}, \code{x_lim}, and \code{y_lim}}, then \code{geom_vector_field()}
+\item If you also specify \strong{\code{xlim} and \code{ylim}}, they override any domain inferred from the data.
+\item If you do \strong{not provide data}, but supply \strong{\code{fun}, \code{xlim}, and \code{ylim}}, then \code{geom_vector_field()}
 generates its own grid of points within these limits.
-\item If data is provided \strong{without \code{aes(x, y)}} mapped, you must provide \code{x_lim} and \code{y_lim}
+\item If data is provided \strong{without \code{aes(x, y)}} mapped, you must provide \code{xlim} and \code{ylim}
 so the domain can be determined.
 }
 
@@ -197,10 +197,10 @@ wind_data <- data.frame(
 wind_data[, c("dx", "dy")] <- t(apply(wind_data[, c("lon", "lat")], 1, f))
 
 ### 1. No data provided:
-#    `fun`, `x_lim`, and `y_lim` define the domain.
+#    `fun`, `xlim`, and `ylim` define the domain.
 #    The layer generates a grid of points within (-5,5) for x and y.
 ggplot() +
-  geom_vector_field(fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5))
+  geom_vector_field(fun = f, xlim = c(-5, 5), ylim = c(-5, 5))
 
 ### 2. With data provided:
 #    Create sample data and compute dx, dy using function f with error.
@@ -209,8 +209,9 @@ ggplot(wind_data, aes(x = lon, y = lat)) +
   geom_vector(aes(dx = dx, dy = dy), color = "black") +
   geom_vector_field(fun = f)
 
-### 3. With data provided but overriding with x_lim and y_lim:
-#    Supply `x_lim` and `y_lim` so the domain is determined by these limits instead of the data.
+### 3. With data provided but overriding with xlim and ylim:
+#    Supply `xlim` and `ylim` so the domain is determined by these limits instead of the data.
 ggplot(wind_data) +
-  geom_vector_field(fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5))
+  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy), color = "black", normalize = FALSE) +
+  geom_vector_field(fun = f, xlim = c(-5, 5), ylim = c(-5, 5))
 }

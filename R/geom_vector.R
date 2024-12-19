@@ -182,18 +182,18 @@ StatVector <- ggproto(
     color = "black", fill = "black", linewidth = 2, linetype = 1, alpha = 1
   ),
 
-  compute_group = function(data, scales, center = FALSE, fun = NULL, x_lim = NULL, y_lim = NULL, n = NULL, ...) {
+  compute_group = function(data, scales, center = FALSE, fun = NULL, xlim = NULL, ylim = NULL, n = NULL, ...) {
 
     # Scenario: Using a function to generate the vector field
     if (!is.null(fun)) {
-      # If x_lim and y_lim provided, generate grid from those
+      # If xlim and ylim provided, generate grid from those
       # If not provided, try to infer from data
-      if (is.null(x_lim) || is.null(y_lim)) {
+      if (is.null(xlim) || is.null(ylim)) {
         if (nrow(data) > 0 && all(c("x", "y") %in% names(data))) {
-          x_lim <- x_lim %||% range(data$x, na.rm = TRUE)
-          y_lim <- y_lim %||% range(data$y, na.rm = TRUE)
+          xlim <- xlim %||% range(data$x, na.rm = TRUE)
+          ylim <- ylim %||% range(data$y, na.rm = TRUE)
         } else {
-          stop("When using `fun` without specifying aes `x, y` from data, you must supply `x_lim` and `y_lim`.")
+          stop("When using `fun` without specifying aes `x, y` from data, you must supply `xlim` and `ylim`.")
         }
       }
 
@@ -202,8 +202,8 @@ StatVector <- ggproto(
       }
 
       data <- expand.grid(
-        x = seq(x_lim[1], x_lim[2], length.out = n),
-        y = seq(y_lim[1], y_lim[2], length.out = n)
+        x = seq(xlim[1], xlim[2], length.out = n),
+        y = seq(ylim[1], ylim[2], length.out = n)
       )
 
       vectors <- vectorize(fun)(as.matrix(data))
@@ -222,7 +222,7 @@ StatVector <- ggproto(
     } else {
       # fun is NULL, expecting user-provided data with x,y and dx,dy or angle/distance
       if (!all(c("x", "y") %in% names(data))) {
-        stop("`stat_vector()` requires `x` and `y` aesthetics or a `fun` with `x_lim`/`y_lim`.")
+        stop("`stat_vector()` requires `x` and `y` aesthetics or a `fun` with `xlim`/`ylim`.")
       }
 
       # If dx/dy are missing, try angle/distance

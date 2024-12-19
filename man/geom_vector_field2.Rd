@@ -18,8 +18,8 @@ geom_vector_field2(
   tail_point.size = 2,
   arrow = NULL,
   fun = NULL,
-  x_lim = NULL,
-  y_lim = NULL,
+  xlim = NULL,
+  ylim = NULL,
   n = NULL,
   show.legend = NA,
   inherit.aes = TRUE
@@ -38,8 +38,8 @@ stat_vector_field2(
   tail_point.size = 2,
   arrow = NULL,
   fun = NULL,
-  x_lim = c(-10, 10),
-  y_lim = c(-10, 10),
+  xlim = c(-10, 10),
+  ylim = c(-10, 10),
   n = 10,
   show.legend = NA,
   inherit.aes = TRUE
@@ -118,7 +118,7 @@ to use \code{position_jitter()}, give the position as \code{"jitter"}.
 \item{fun}{A function that takes a vector \verb{(x, y)} and returns \verb{(dx, dy)}, defining
 vector displacements.}
 
-\item{x_lim, y_lim}{Numeric vectors of length 2 defining the domain limits on the x/y-axis.}
+\item{xlim, ylim}{Numeric vectors of length 2 defining the domain limits on the x/y-axis.}
 
 \item{n}{Integer, the number of grid points along each axis.}
 
@@ -166,7 +166,7 @@ f <- function(v) {
 
 # Create a vector field plot with geom_vector_field2:
 ggplot() +
-  geom_vector_field2(fun = f, x_lim = c(-5, 5), y_lim = c(-5, 5))
+  geom_vector_field2(fun = f, xlim = c(-5, 5), ylim = c(-5, 5))
 
 }
 \seealso{

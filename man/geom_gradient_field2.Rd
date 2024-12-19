@@ -164,7 +164,7 @@ this if they wish to map another variable to \code{color}.
 }
 }
 \examples{
-library(ggplot2)
+library(ggvfields)
 
 paraboloid_field <- function(v) {
   x <- v[1]

@@ -34,7 +34,7 @@
 #' @export
 #'
 #' @examples
-#' library(ggplot2)
+#' library(ggvfields)
 #' # Example user-defined function
 #' f <- function(v) {
 #'   x <- v[1]
