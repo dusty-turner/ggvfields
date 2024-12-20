@@ -815,4 +815,19 @@ verify_potential <- function(point, fun, tolerance) {
   return(symmetric)
 }
 
+## for gradient field
+gradient_fun <- function(fun) {
+  # This returned function is what geom_vector_field() will actually use
+  function(v) {
+    # Ensure v is a numeric vector (x, y)
+    if (!is.numeric(v) || length(v) != 2) {
+      stop("Input to the gradient function must be a numeric vector of length 2 (x, y).")
+    }
+    # Compute the gradient using numDeriv
+    grad_val <- numDeriv::grad(func = fun, x = v)
+    return(grad_val)
+  }
+}
+
+
 utils::globalVariables(c("x_lim", "y_lim", "Potential", "fun"))

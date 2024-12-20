@@ -79,7 +79,7 @@
 #'   geom_gradient_field(fun = paraboloid_field, xlim = c(-10,10), ylim = c(-10,10), n = 10)
 #'
 #' ggplot() +
-#'   geom_gradient_field(fun = saddle_field)
+#'   geom_gradient_field(fun = saddle_field, xlim = c(-10,10), ylim = c(-10,10), n = 10)
 #'
 #' @export
 geom_gradient_field <- function(mapping = NULL, data = NULL,
@@ -95,26 +95,12 @@ geom_gradient_field <- function(mapping = NULL, data = NULL,
                                 n = 16,
                                 center = TRUE,
                                 normalize = TRUE,
-                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
+                                arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 ) {
   if (missing(fun) || !is.function(fun)) {
     stop("Please provide a valid scalar function 'fun' that takes a numeric vector (x, y) and returns a single numeric value.")
   }
 
-  gradient_fun <- function(fun) {
-    # This returned function is what geom_vector_field() will actually use
-    function(v) {
-      # Ensure v is a numeric vector (x, y)
-      if (!is.numeric(v) || length(v) != 2) {
-        stop("Input to the gradient function must be a numeric vector of length 2 (x, y).")
-      }
-      # Compute the gradient using numDeriv
-      grad_val <- numDeriv::grad(func = fun, x = v)
-      return(grad_val)
-    }
-  }
-
-  # Use the factory to create the gradient function from the scalar function
   grad_function <- gradient_fun(fun)
 
   geom_vector_field(
@@ -126,7 +112,7 @@ geom_gradient_field <- function(mapping = NULL, data = NULL,
     na.rm = na.rm,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
-    fun = grad_function,  # Passing the generated gradient function here
+    fun = grad_function,
     xlim = xlim,
     ylim = ylim,
     n = n,
@@ -142,7 +128,7 @@ geom_gradient_field <- function(mapping = NULL, data = NULL,
 #' @rdname geom_gradient_field
 #' @export
 stat_gradient_field <- function(mapping = NULL, data = NULL,
-                                stat = "identity", geom = "vector",
+                                geom = "vector",
                                 ...,
                                 position = "identity",
                                 na.rm = FALSE,
@@ -154,19 +140,32 @@ stat_gradient_field <- function(mapping = NULL, data = NULL,
                                 n = 16,
                                 center = TRUE,
                                 normalize = TRUE,
-                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
-                                ) {
+                                arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")) {
+  if (missing(fun) || !is.function(fun)) {
+    stop("Please provide a valid scalar function 'fun' that takes a numeric vector (x, y) and returns a single numeric value.")
+  }
 
-  geom_gradient_field(
+  gradient_fun <- function(fun) {
+    function(v) {
+      if (!is.numeric(v) || length(v) != 2) {
+        stop("Input to the gradient function must be a numeric vector of length 2 (x, y).")
+      }
+      numDeriv::grad(func = fun, x = v)
+    }
+  }
+
+  grad_function <- gradient_fun(fun)
+
+  stat_vector_field(
     mapping = mapping,
     data = data,
-    stat = stat,
-    geom = geom,
+    # stat = StatVector,
+    geom = GeomVector,
     position = position,
     na.rm = na.rm,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
-    fun = fun,
+    fun = grad_function,
     xlim = xlim,
     ylim = ylim,
     n = n,
@@ -176,3 +175,4 @@ stat_gradient_field <- function(mapping = NULL, data = NULL,
     ...
   )
 }
+

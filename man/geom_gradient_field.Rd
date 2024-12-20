@@ -21,13 +21,12 @@ geom_gradient_field(
   n = 16,
   center = TRUE,
   normalize = TRUE,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
+  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 )
 
 stat_gradient_field(
   mapping = NULL,
   data = NULL,
-  stat = "identity",
   geom = "vector",
   ...,
   position = "identity",
@@ -40,7 +39,7 @@ stat_gradient_field(
   n = 16,
   center = TRUE,
   normalize = TRUE,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
+  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 )
 }
 \arguments{
@@ -209,9 +208,9 @@ saddle_field <- function(v) {
 }
 
 ggplot() +
-  geom_gradient_field(fun = paraboloid_field)
+  geom_gradient_field(fun = paraboloid_field, xlim = c(-10,10), ylim = c(-10,10), n = 10)
 
 ggplot() +
-  geom_gradient_field(fun = saddle_field)
+  geom_gradient_field(fun = saddle_field, xlim = c(-10,10), ylim = c(-10,10), n = 10)
 
 }

@@ -64,8 +64,8 @@ grid and displays it as a heatmap.</p>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
 <span>  <span class="va">fun</span>,</span>
-<span>  x_lim <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  y_lim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">21</span>,</span>
 <span>  tolerance <span class="op">=</span> <span class="fl">1e-06</span></span>
 <span><span class="op">)</span></span>
@@ -78,7 +78,7 @@ grid and displays it as a heatmap.</p>
     <div class="section level2">
     <h2 id="format">Format<a class="anchor" aria-label="anchor" href="#format"></a></h2>
     <p>An object of class <code>StatPotential</code> (inherits from <code>Stat</code>, <code>ggproto</code>, <code>gg</code>) of length 3.</p>
-<p>An object of class <code>GeomPotential</code> (inherits from <code>GeomRaster</code>, <code>Geom</code>, <code>ggproto</code>, <code>gg</code>) of length 4.</p>
+<p>An object of class <code>GeomPotential</code> (inherits from <code>GeomRaster</code>, <code>Geom</code>, <code>ggproto</code>, <code>gg</code>) of length 5.</p>
     </div>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
@@ -181,7 +181,7 @@ to use <code><a href="https://ggplot2.tidyverse.org/reference/position_jitter.ht
 a numeric vector of length 2 (<code>c(dx, dy)</code>), defining the vector field.</p></dd>
 
 
-<dt>x_lim, y_lim</dt>
+<dt>xlim, ylim</dt>
 <dd><p>Numeric vectors of length 2 defining the domain limits on the x/y-axis.</p></dd>
 
 
@@ -211,15 +211,12 @@ is conservative. Defaults to <code>1e-6</code>.</p></dd>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Define domain limits</span></span></span>
-<span class="r-in"><span><span class="va">x_lim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">10</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">y_lim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">xlim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">ylim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Create the potential function heatmap</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_potential</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">fun</span>, x_lim <span class="op">=</span> <span class="va">x_lim</span>, y_lim <span class="op">=</span> <span class="va">y_lim</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Computation failed in `stat_potential()`.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> Caused by error in `jacobian()`:</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> could not find function "jacobian"</span>
+<span class="r-in"><span>  <span class="fu">geom_potential</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">fun</span>, xlim <span class="op">=</span> <span class="va">xlim</span>, ylim <span class="op">=</span> <span class="va">ylim</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="geom_potential-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

@@ -193,7 +193,7 @@ StatVector <- ggproto(
           xlim <- xlim %||% range(data$x, na.rm = TRUE)
           ylim <- ylim %||% range(data$y, na.rm = TRUE)
         } else {
-          stop("When using `fun` without specifying aes `x, y` from data, you must supply `xlim` and `ylim`.")
+          stop("When using `fun` without specifying aes `x, y` from data, you must supply `xlim` and `ylim` or specify `x, y` using aes()")
         }
       }
 
