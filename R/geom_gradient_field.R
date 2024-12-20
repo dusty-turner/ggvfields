@@ -76,7 +76,7 @@
 #' }
 #'
 #' ggplot() +
-#'   geom_gradient_field(fun = paraboloid_field)
+#'   geom_gradient_field(fun = paraboloid_field, xlim = c(-10,10), ylim = c(-10,10), n = 10)
 #'
 #' ggplot() +
 #'   geom_gradient_field(fun = saddle_field)
@@ -96,32 +96,37 @@ geom_gradient_field <- function(mapping = NULL, data = NULL,
                                 center = TRUE,
                                 normalize = TRUE,
                                 arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
-                                ) {
+) {
   if (missing(fun) || !is.function(fun)) {
     stop("Please provide a valid scalar function 'fun' that takes a numeric vector (x, y) and returns a single numeric value.")
   }
 
-  # Define a gradient function using numDeriv::grad
-  gradient_fun <- function(v) {
-    # Ensure that v is a numeric vector of length 2
-    if (!is.numeric(v) || length(v) != 2) {
-      stop("Input to the gradient function must be a numeric vector of length 2 (x, y).")
+  gradient_fun <- function(fun) {
+    # This returned function is what geom_vector_field() will actually use
+    function(v) {
+      # Ensure v is a numeric vector (x, y)
+      if (!is.numeric(v) || length(v) != 2) {
+        stop("Input to the gradient function must be a numeric vector of length 2 (x, y).")
+      }
+      # Compute the gradient using numDeriv
+      grad_val <- numDeriv::grad(func = fun, x = v)
+      return(grad_val)
     }
-    grad_val <- numDeriv::grad(func = fun, x = v)
-    return(grad_val)
   }
 
-  # Pass the gradient function to geom_vector_field
+  # Use the factory to create the gradient function from the scalar function
+  grad_function <- gradient_fun(fun)
+
   geom_vector_field(
     mapping = mapping,
     data = data,
-    stat = stat,
-    geom = geom,
+    stat = StatVector,
+    geom = GeomVector,
     position = position,
     na.rm = na.rm,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
-    fun = gradient_fun,
+    fun = grad_function,  # Passing the generated gradient function here
     xlim = xlim,
     ylim = ylim,
     n = n,
@@ -131,6 +136,7 @@ geom_gradient_field <- function(mapping = NULL, data = NULL,
     ...
   )
 }
+
 
 
 #' @rdname geom_gradient_field
