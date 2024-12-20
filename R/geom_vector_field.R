@@ -158,7 +158,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
                               normalize = TRUE,
                               tail_point = FALSE,
                               tail_point.size = 2,
-                              arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")) {
+                              arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")) {
   # Default aesthetics: color reflects norm (magnitude) and length defaults to NA
   default_aes <- aes(color = after_stat(norm), length = after_stat(NA))
 

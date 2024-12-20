@@ -1,26 +1,26 @@
 #' Create a Gradient Field Plot Layer
 #'
 #' `geom_gradient_field` generates a vector field plot layer by computing the gradient
-#' of a user-defined scalar function at each grid point. The gradient is calculated
-#' using `numDeriv::grad()` and then visualized as vectors on the plot.
+#' of a user-defined scalar function at each grid point. This function wraps
+#' `geom_vector_field` and inherits its features and capabilities, while automatically
+#' converting a scalar field into its gradient vector field for visualization.
 #'
-#' This function is a wrapper around `geom_vector_field`, inheriting all its functionalities
-#' and capabilities. By converting a scalar field into its gradient vector field, you can
-#' leverage features such as divergence, curl, and norm calculations provided by
-#' `geom_vector_field`.
+#' `geom_gradient_field2` is an enhanced version of `geom_gradient_field` that
+#' works in conjunction with `geom_vector_field2`. It includes additional features
+#' and improvements for advanced use cases, providing more flexibility and customization.
 #'
-#' The function automatically generates a grid of points (specified by `xlim`
-#' and `ylim`) and evaluates the gradient at those points.
+#' The gradient is calculated using `numDeriv::grad()` at grid points defined by
+#' the `xlim` and `ylim` parameters, with the grid resolution controlled by `n`.
+#' The resulting vectors are scaled, normalized, and visualized as arrows on the plot.
 #'
 #' **Default Behavior**:
 #' - The **magnitude of each gradient vector (`norm`) is mapped to the `color` aesthetic** by default.
-#' - **Vector lengths** are scaled to **90% of the grid spacing**.
-#' - **Vectors are normalized to unit length** before scaling by grid spacing.
-#'   - **To see the original lengths of the vectors, set `normalize = FALSE`.**
+#' - **Vectors are normalized to unit length** by default. Set `normalize = FALSE` to view
+#'   original vector lengths.
 #' - **Arrowheads** are included by default to indicate direction.
 #'
-#' @inheritParams ggplot2::geom_raster
-#' @inheritParams ggplot2::stat_identity
+#' @inheritParams geom_vector_field
+#' @inheritParams geom_vector_field2
 #' @importFrom numDeriv grad
 #' @param fun A user-defined scalar function that takes a numeric vector `(x, y)`
 #'   and returns a single numeric value, representing the scalar field.
@@ -28,37 +28,11 @@
 #'   the grid.
 #' @param n Integer specifying the number of grid points along each axis
 #'   (resolution of the grid).
-#' @param center Logical; if `TRUE`, centers the vectors on their respective
-#'   grid points.
-#' @param normalize Logical; if `TRUE`, normalizes the vectors to unit length.
-#'   Set to `FALSE` to view the original lengths of the vectors.
-#' @param arrow Arrow specification, created by `grid::arrow()`, to add
-#'   arrowheads to vectors.
-#' @param ... Other arguments passed to `geom_vector_field()`, such as aesthetic mappings.
+#' @param ... Other arguments passed to `geom_vector_field` or `geom_vector_field2`.
 #'
 #' @return A `ggplot2` layer that can be added to a ggplot object to create a
-#'   gradient field plot. Since `geom_gradient_field` is a wrapper for `geom_vector_field`,
-#'   **all functionalities of `geom_vector_field` are available**. This includes the computation
-#'   and mapping of the following mathematical measures for the resulting gradient vector field:
-#'
-#' ### Mathematical Measures:
-#' - **Curl**: Represents the rotation or "twisting" of vectors around a point:
-#'   \deqn{\text{curl}(\mathbf{f})(x, y) = \frac{\partial f_2}{\partial x} - \frac{\partial f_1}{\partial y}}
-#' - **Divergence**: Measures the rate at which vectors "spread out" from a point:
-#'   \deqn{\text{div}(\mathbf{f})(x, y) = \frac{\partial f_1}{\partial x} + \frac{\partial f_2}{\partial y}}
-#' - **Norm**: The magnitude of a vector:
-#'   \deqn{\|\mathbf{f}(x, y)\| = \sqrt{dx^2 + dy^2}}
-#'
-#' @section Aesthetic mappings:
-#' You can map the following measures using `after_stat()`:
-#' - **`norm`**: Magnitude (norm) of the vector at each point.
-#' - **`divergence`**: Divergence of the vector field at each point.
-#' - **`curl`**: Curl of the vector field at each point.
-#'
-#' For example, to map `curl` to color:
-#' ```r
-#' aes(color = after_stat(curl))
-#' ```
+#'   gradient field plot. Both `geom_gradient_field` and `geom_gradient_field2` wrap their
+#'   respective `geom_vector_field` functions, inheriting their functionalities.
 #'
 #' @examples
 #' library(ggvfields)
@@ -75,13 +49,25 @@
 #'   x^3 - 3 * x * y^2
 #' }
 #'
+#' # Visualizing a paraboloid scalar field with geom_gradient_field
 #' ggplot() +
-#'   geom_gradient_field(fun = paraboloid_field, xlim = c(-10,10), ylim = c(-10,10), n = 10)
+#'   geom_gradient_field(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
 #'
+#' # Visualizing a paraboloid scalar field with geom_gradient_field2
 #' ggplot() +
-#'   geom_gradient_field(fun = saddle_field, xlim = c(-10,10), ylim = c(-10,10), n = 10)
+#'   geom_gradient_field2(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
+#'
+#' # Visualizing a saddle scalar field with geom_gradient_field
+#' ggplot() +
+#'   geom_gradient_field(fun = saddle_field, xlim = c(-10, 10), ylim = c(-10, 10))
+#'
+#' # Visualizing a saddle scalar field with geom_gradient_field2
+#' ggplot() +
+#'   geom_gradient_field2(fun = saddle_field, xlim = c(-10, 10), ylim = c(-10, 10))
+#'
 #'
 #' @export
+
 geom_gradient_field <- function(mapping = NULL, data = NULL,
                                 stat = "identity", geom = "vector",
                                 ...,
@@ -123,8 +109,6 @@ geom_gradient_field <- function(mapping = NULL, data = NULL,
   )
 }
 
-
-
 #' @rdname geom_gradient_field
 #' @export
 stat_gradient_field <- function(mapping = NULL, data = NULL,
@@ -159,7 +143,6 @@ stat_gradient_field <- function(mapping = NULL, data = NULL,
   stat_vector_field(
     mapping = mapping,
     data = data,
-    # stat = StatVector,
     geom = GeomVector,
     position = position,
     na.rm = na.rm,
@@ -174,5 +157,100 @@ stat_gradient_field <- function(mapping = NULL, data = NULL,
     arrow = arrow,
     ...
   )
+}
+
+#' @rdname geom_gradient_field
+#' @export
+geom_gradient_field2 <- function(mapping = NULL, data = NULL,
+                                stat = "identity", geom = "vector",
+                                ...,
+                                position = "identity",
+                                na.rm = FALSE,
+                                show.legend = NA,
+                                inherit.aes = TRUE,
+                                fun,
+                                xlim = NULL,
+                                ylim = NULL,
+                                n = 16,
+                                center = TRUE,
+                                normalize = TRUE,
+                                arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
+) {
+  if (missing(fun) || !is.function(fun)) {
+    stop("Please provide a valid scalar function 'fun' that takes a numeric vector (x, y) and returns a single numeric value.")
+  }
+
+  grad_function <- gradient_fun(fun)
+
+  geom_vector_field2(
+    mapping = mapping,
+    data = data,
+    stat = StatVector,
+    geom = GeomVector,
+    position = position,
+    na.rm = na.rm,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    fun = grad_function,
+    xlim = xlim,
+    ylim = ylim,
+    n = n,
+    center = center,
+    normalize = normalize,
+    arrow = arrow,
+    ...
+  )
+}
+
+#' @rdname geom_gradient_field
+#' @export
+stat_gradient_field2 <- function(mapping = NULL, data = NULL,
+                                # geom = "GeomVector",
+                                geom = "vector",
+                                ...,
+                                position = "identity",
+                                na.rm = FALSE,
+                                show.legend = NA,
+                                inherit.aes = TRUE,
+                                fun,
+                                xlim = NULL,
+                                ylim = NULL,
+                                n = 16,
+                                center = TRUE,
+                                normalize = TRUE,
+                                arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")) {
+  if (missing(fun) || !is.function(fun)) {
+    stop("Please provide a valid scalar function 'fun' that takes a numeric vector (x, y) and returns a single numeric value.")
+  }
+
+  gradient_fun <- function(fun) {
+    function(v) {
+      if (!is.numeric(v) || length(v) != 2) {
+        stop("Input to the gradient function must be a numeric vector of length 2 (x, y).")
+      }
+      numDeriv::grad(func = fun, x = v)
+    }
+  }
+
+  grad_function <- gradient_fun(fun)
+
+  stat_vector_field2(
+    mapping = mapping,
+    data = data,
+    geom = GeomVector,
+    position = position,
+    na.rm = na.rm,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    fun = grad_function,
+    xlim = xlim,
+    ylim = ylim,
+    n = n,
+    center = center,
+    normalize = normalize,
+    arrow = arrow,
+    ...
+  )
+
 }
 

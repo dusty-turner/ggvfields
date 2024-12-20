@@ -3,6 +3,8 @@
 \name{geom_gradient_field}
 \alias{geom_gradient_field}
 \alias{stat_gradient_field}
+\alias{geom_gradient_field2}
+\alias{stat_gradient_field2}
 \title{Create a Gradient Field Plot Layer}
 \usage{
 geom_gradient_field(
@@ -25,6 +27,43 @@ geom_gradient_field(
 )
 
 stat_gradient_field(
+  mapping = NULL,
+  data = NULL,
+  geom = "vector",
+  ...,
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  fun,
+  xlim = NULL,
+  ylim = NULL,
+  n = 16,
+  center = TRUE,
+  normalize = TRUE,
+  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
+)
+
+geom_gradient_field2(
+  mapping = NULL,
+  data = NULL,
+  stat = "identity",
+  geom = "vector",
+  ...,
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  fun,
+  xlim = NULL,
+  ylim = NULL,
+  n = 16,
+  center = TRUE,
+  normalize = TRUE,
+  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
+)
+
+stat_gradient_field2(
   mapping = NULL,
   data = NULL,
   geom = "vector",
@@ -89,7 +128,7 @@ give the geom as \code{"point"}.
 \link[ggplot2:layer_geoms]{layer geom} documentation.
 }}
 
-\item{...}{Other arguments passed to \code{geom_vector_field()}, such as aesthetic mappings.}
+\item{...}{Other arguments passed to \code{geom_vector_field} or \code{geom_vector_field2}.}
 
 \item{position}{A position adjustment to use on the data for this layer. This
 can be used in various ways, including to prevent overplotting and
@@ -127,71 +166,40 @@ the grid.}
 \item{n}{Integer specifying the number of grid points along each axis
 (resolution of the grid).}
 
-\item{center}{Logical; if \code{TRUE}, centers the vectors on their respective
-grid points.}
+\item{center}{Logical; if \code{TRUE}, centers vectors on their grid points.}
 
-\item{normalize}{Logical; if \code{TRUE}, normalizes the vectors to unit length.
-Set to \code{FALSE} to view the original lengths of the vectors.}
+\item{normalize}{Logical; if \code{TRUE}, normalizes vectors before scaling.}
 
-\item{arrow}{Arrow specification, created by \code{grid::arrow()}, to add
-arrowheads to vectors.}
+\item{arrow}{Arrow specification created by \code{grid::arrow()}.}
 }
 \value{
 A \code{ggplot2} layer that can be added to a ggplot object to create a
-gradient field plot. Since \code{geom_gradient_field} is a wrapper for \code{geom_vector_field},
-\strong{all functionalities of \code{geom_vector_field} are available}. This includes the computation
-and mapping of the following mathematical measures for the resulting gradient vector field:
-\subsection{Mathematical Measures:}{
-\itemize{
-\item \strong{Curl}: Represents the rotation or "twisting" of vectors around a point:
-\deqn{\text{curl}(\mathbf{f})(x, y) = \frac{\partial f_2}{\partial x} - \frac{\partial f_1}{\partial y}}
-\item \strong{Divergence}: Measures the rate at which vectors "spread out" from a point:
-\deqn{\text{div}(\mathbf{f})(x, y) = \frac{\partial f_1}{\partial x} + \frac{\partial f_2}{\partial y}}
-\item \strong{Norm}: The magnitude of a vector:
-\deqn{\|\mathbf{f}(x, y)\| = \sqrt{dx^2 + dy^2}}
-}
-}
+gradient field plot. Both \code{geom_gradient_field} and \code{geom_gradient_field2} wrap their
+respective \code{geom_vector_field} functions, inheriting their functionalities.
 }
 \description{
 \code{geom_gradient_field} generates a vector field plot layer by computing the gradient
-of a user-defined scalar function at each grid point. The gradient is calculated
-using \code{numDeriv::grad()} and then visualized as vectors on the plot.
+of a user-defined scalar function at each grid point. This function wraps
+\code{geom_vector_field} and inherits its features and capabilities, while automatically
+converting a scalar field into its gradient vector field for visualization.
 }
 \details{
-This function is a wrapper around \code{geom_vector_field}, inheriting all its functionalities
-and capabilities. By converting a scalar field into its gradient vector field, you can
-leverage features such as divergence, curl, and norm calculations provided by
-\code{geom_vector_field}.
+\code{geom_gradient_field2} is an enhanced version of \code{geom_gradient_field} that
+works in conjunction with \code{geom_vector_field2}. It includes additional features
+and improvements for advanced use cases, providing more flexibility and customization.
 
-The function automatically generates a grid of points (specified by \code{xlim}
-and \code{ylim}) and evaluates the gradient at those points.
+The gradient is calculated using \code{numDeriv::grad()} at grid points defined by
+the \code{xlim} and \code{ylim} parameters, with the grid resolution controlled by \code{n}.
+The resulting vectors are scaled, normalized, and visualized as arrows on the plot.
 
 \strong{Default Behavior}:
 \itemize{
 \item The \strong{magnitude of each gradient vector (\code{norm}) is mapped to the \code{color} aesthetic} by default.
-\item \strong{Vector lengths} are scaled to \strong{90\% of the grid spacing}.
-\item \strong{Vectors are normalized to unit length} before scaling by grid spacing.
-\itemize{
-\item \strong{To see the original lengths of the vectors, set \code{normalize = FALSE}.}
-}
+\item \strong{Vectors are normalized to unit length} by default. Set \code{normalize = FALSE} to view
+original vector lengths.
 \item \strong{Arrowheads} are included by default to indicate direction.
 }
 }
-\section{Aesthetic mappings}{
-
-You can map the following measures using \code{after_stat()}:
-\itemize{
-\item \strong{\code{norm}}: Magnitude (norm) of the vector at each point.
-\item \strong{\code{divergence}}: Divergence of the vector field at each point.
-\item \strong{\code{curl}}: Curl of the vector field at each point.
-}
-
-For example, to map \code{curl} to color:
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{aes(color = after_stat(curl))
-}\if{html}{\out{</div>}}
-}
-
 \examples{
 library(ggvfields)
 
@@ -207,10 +215,21 @@ saddle_field <- function(v) {
   x^3 - 3 * x * y^2
 }
 
+# Visualizing a paraboloid scalar field with geom_gradient_field
 ggplot() +
-  geom_gradient_field(fun = paraboloid_field, xlim = c(-10,10), ylim = c(-10,10), n = 10)
+  geom_gradient_field(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
 
+# Visualizing a paraboloid scalar field with geom_gradient_field2
 ggplot() +
-  geom_gradient_field(fun = saddle_field, xlim = c(-10,10), ylim = c(-10,10), n = 10)
+  geom_gradient_field2(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
+
+# Visualizing a saddle scalar field with geom_gradient_field
+ggplot() +
+  geom_gradient_field(fun = saddle_field, xlim = c(-10, 10), ylim = c(-10, 10))
+
+# Visualizing a saddle scalar field with geom_gradient_field2
+ggplot() +
+  geom_gradient_field2(fun = saddle_field, xlim = c(-10, 10), ylim = c(-10, 10))
+
 
 }

@@ -42,7 +42,7 @@ stat_vector_field(
   normalize = TRUE,
   tail_point = FALSE,
   tail_point.size = 2,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
+  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 )
 }
 \arguments{
