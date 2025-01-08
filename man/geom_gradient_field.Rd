@@ -60,7 +60,7 @@ geom_gradient_field2(
   n = 16,
   center = TRUE,
   normalize = TRUE,
-  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
+  arrow = NULL
 )
 
 stat_gradient_field2(
@@ -78,7 +78,7 @@ stat_gradient_field2(
   n = 16,
   center = TRUE,
   normalize = TRUE,
-  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
+  arrow = NULL
 )
 }
 \arguments{
@@ -201,7 +201,6 @@ original vector lengths.
 }
 }
 \examples{
-library(ggvfields)
 
 paraboloid_field <- function(v) {
   x <- v[1]

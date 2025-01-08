@@ -11,7 +11,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(ggvfields)
+#'
 #' library(gganimate)
 #'
 #' # Example user-defined function

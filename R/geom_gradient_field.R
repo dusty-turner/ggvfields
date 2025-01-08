@@ -35,7 +35,6 @@
 #'   respective `geom_vector_field` functions, inheriting their functionalities.
 #'
 #' @examples
-#' library(ggvfields)
 #'
 #' paraboloid_field <- function(v) {
 #'   x <- v[1]

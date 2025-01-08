@@ -169,7 +169,7 @@ The flows are computed using the \code{deSolve} package's ODE solver. The
 numerical integration of the flows.
 }
 \examples{
-library(ggvfields)
+
 # Example user-defined function
 f <- function(v) {
   x <- v[1]
