@@ -197,9 +197,7 @@ StatVector <- ggproto(
         }
       }
 
-      if (is.null(n)) {
-        n <- 10
-      }
+      if (is.null(n)) n <- 11
 
       data <- expand.grid(
         x = seq(xlim[1], xlim[2], length.out = n),

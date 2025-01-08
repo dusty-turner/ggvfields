@@ -23,7 +23,7 @@ remotes::install_github("dusty-turner/ggvfields")
 Load the package in R:
 
 ``` r
-library(ggvfields)
+library("ggvfields")
 #> Loading required package: ggplot2
 ```
 

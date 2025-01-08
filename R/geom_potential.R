@@ -96,7 +96,7 @@ StatPotential <- ggproto(
 
   default_aes = aes(fill = after_stat(Potential)),
 
-  compute_group = function(data, scales, fun = NULL, xlim = NULL, ylim = NULL, n = 10, tolerance = 1e-6, ...) {
+  compute_group = function(data, scales, fun = NULL, xlim = NULL, ylim = NULL, n = 11, tolerance = 1e-6, ...) {
     # Ensure the vector field function is provided
     if (is.null(fun)) {
       stop("Parameter `fun` must be provided to compute the potential function.")
