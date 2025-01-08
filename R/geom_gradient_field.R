@@ -174,7 +174,7 @@ geom_gradient_field2 <- function(mapping = NULL, data = NULL,
                                 n = 16,
                                 center = TRUE,
                                 normalize = TRUE,
-                                arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
+                                arrow = NULL
 ) {
   if (missing(fun) || !is.function(fun)) {
     stop("Please provide a valid scalar function 'fun' that takes a numeric vector (x, y) and returns a single numeric value.")
@@ -218,7 +218,7 @@ stat_gradient_field2 <- function(mapping = NULL, data = NULL,
                                 n = 16,
                                 center = TRUE,
                                 normalize = TRUE,
-                                arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")) {
+                                arrow = NULL) {
   if (missing(fun) || !is.function(fun)) {
     stop("Please provide a valid scalar function 'fun' that takes a numeric vector (x, y) and returns a single numeric value.")
   }
