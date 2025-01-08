@@ -65,152 +65,361 @@
 <div class="page-header"><h1 id="ggvfields-">ggvfields <img src="reference/figures/ggvfields_hex.png" align="right" width="120" style="padding-left:10px;background-color:white;"><a class="anchor" aria-label="anchor" href="#ggvfields-"></a>
 </h1></div>
 <p><a href="https://www.repostatus.org/#active"><img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active - The project has reached a stable, usable state and is being actively developed."></a></p>
-<p><strong>ggvfields</strong> provides tools for visualizing vector fields, stream plots, and smoothed vector fields.</p>
+<p><strong>ggvfields</strong> is a powerful package for visualizing vector fields, stream plots, and related visualizations. It provides tools to explore directional data, including options for vector smoothing, gradient fields, potential visualizations, and dynamic flow representations.</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>Install <strong>ggvfields</strong> directly from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/dusty-turner/ggvfields">"ggvfields"</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: ggplot2</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>ggplot2.continuous.colour<span class="op">=</span><span class="st">"viridis"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"dusty-turner/ggvfields"</span><span class="op">)</span></span></code></pre></div>
+<p>Load the package in R:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dusty-turner/ggvfields">ggvfields</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: ggplot2</span></span></code></pre></div>
+<p>Generate sample wind data:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
 <span></span>
-<span><span class="op">(</span><span class="va">wind_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span>
-<span>  <span class="st">"lon"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, </span>
-<span>  <span class="st">"lat"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, </span>
-<span>  <span class="st">"dir"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="op">-</span><span class="va">pi</span>, <span class="va">pi</span><span class="op">)</span>,</span>
-<span>  <span class="st">"spd"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Chisquare.html">rchisq</a></span><span class="op">(</span><span class="va">n</span>, df <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">wind_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span>
+<span>  lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, </span>
+<span>  lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, </span>
+<span>  dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="op">-</span><span class="va">pi</span><span class="op">/</span><span class="fl">4</span>, <span class="va">pi</span><span class="op">/</span><span class="fl">4</span><span class="op">)</span>,</span>
+<span>  spd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Chisquare.html">rchisq</a></span><span class="op">(</span><span class="va">n</span>, df <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/with.html">within</a></span><span class="op">(</span><span class="op">{</span></span>
-<span>    <span class="va">dx</span> <span class="op">&lt;-</span> <span class="va">spd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">cos</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span></span>
-<span>    <span class="va">dy</span> <span class="op">&lt;-</span> <span class="va">spd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span></span>
-<span>  <span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;           lon         lat         dir        spd          dy          dx</span></span>
-<span><span class="co">#&gt; 1  -1.2070657 -0.47719270  0.33510483  3.5473948  1.16662525  3.35007394</span></span>
-<span><span class="co">#&gt; 2   0.2774292 -0.99838644  0.91989662  2.1892467  1.74163111  1.32646984</span></span>
-<span><span class="co">#&gt; 3   1.0844412 -0.77625389 -1.18234275  2.9860220 -2.76355109  1.13097871</span></span>
-<span><span class="co">#&gt; 4  -2.3456977  0.06445882  0.76541260 10.8072250  7.48761916  7.79305272</span></span>
-<span><span class="co">#&gt; 5   0.4291247  0.95949406 -1.06958553  3.4477308 -3.02366484  1.65659245</span></span>
-<span><span class="co">#&gt; 6   0.5060559 -0.11028549  0.01255049  3.9071427  0.04903528  3.90683495</span></span>
-<span><span class="co">#&gt; 7  -0.5747400 -0.51100951  1.11271773  0.1561561  0.14005697  0.06905621</span></span>
-<span><span class="co">#&gt; 8  -0.5466319 -0.91119542 -0.09430283  0.4239639 -0.03992176  0.42208012</span></span>
-<span><span class="co">#&gt; 9  -0.5644520 -0.83717168 -1.60894263  0.4160735 -0.41577077 -0.01586782</span></span>
-<span><span class="co">#&gt; 10 -0.8900378  2.41583518  1.66793304  4.1721572  4.15248944 -0.40463261</span></span>
-<span>  </span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">wind_data</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span>    <span class="va">dx</span> <span class="op">&lt;-</span> <span class="va">spd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">cos</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span> <span class="co"># Compute the x-component of the vector</span></span>
+<span>    <span class="va">dy</span> <span class="op">&lt;-</span> <span class="va">spd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span> <span class="co"># Compute the y-component of the vector</span></span>
+<span>  <span class="op">}</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">wind_data</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> </span>
 <span><span class="co">#&gt;      lon   lat   dir   spd    dy    dx</span></span>
-<span><span class="co">#&gt; 1  -1.21 -0.48  0.34  3.55  1.17  3.35</span></span>
-<span><span class="co">#&gt; 2   0.28 -1.00  0.92  2.19  1.74  1.33</span></span>
-<span><span class="co">#&gt; 3   1.08 -0.78 -1.18  2.99 -2.76  1.13</span></span>
-<span><span class="co">#&gt; 4  -2.35  0.06  0.77 10.81  7.49  7.79</span></span>
-<span><span class="co">#&gt; 5   0.43  0.96 -1.07  3.45 -3.02  1.66</span></span>
-<span><span class="co">#&gt; 6   0.51 -0.11  0.01  3.91  0.05  3.91</span></span>
-<span><span class="co">#&gt; 7  -0.57 -0.51  1.11  0.16  0.14  0.07</span></span>
-<span><span class="co">#&gt; 8  -0.55 -0.91 -0.09  0.42 -0.04  0.42</span></span>
-<span><span class="co">#&gt; 9  -0.56 -0.84 -1.61  0.42 -0.42 -0.02</span></span>
-<span><span class="co">#&gt; 10 -0.89  2.42  1.67  4.17  4.15 -0.40</span></span></code></pre></div>
+<span><span class="co">#&gt; 1  -1.21 -0.48  0.08  3.55  0.30  3.53</span></span>
+<span><span class="co">#&gt; 2   0.28 -1.00  0.23  2.19  0.50  2.13</span></span>
+<span><span class="co">#&gt; 3   1.08 -0.78 -0.30  2.99 -0.87  2.86</span></span>
+<span><span class="co">#&gt; 4  -2.35  0.06  0.19 10.81  2.06 10.61</span></span>
+<span><span class="co">#&gt; 5   0.43  0.96 -0.27  3.45 -0.91  3.33</span></span>
+<span><span class="co">#&gt; 6   0.51 -0.11  0.00  3.91  0.01  3.91</span></span>
+<span><span class="co">#&gt; 7  -0.57 -0.51  0.28  0.16  0.04  0.15</span></span>
+<span><span class="co">#&gt; 8  -0.55 -0.91 -0.02  0.42 -0.01  0.42</span></span>
+<span><span class="co">#&gt; 9  -0.56 -0.84 -0.40  0.42 -0.16  0.38</span></span>
+<span><span class="co">#&gt; 10 -0.89  2.42  0.42  4.17  1.69  3.81</span></span></code></pre></div>
+<hr>
+</div>
 <div class="section level2">
-<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+<h2 id="core-features">Core Features<a class="anchor" aria-label="anchor" href="#core-features"></a>
 </h2>
 <div class="section level3">
-<h3 id="geom_vector-visualizing-individual-vectors">
-<code>geom_vector()</code>: Visualizing Individual Vectors<a class="anchor" aria-label="anchor" href="#geom_vector-visualizing-individual-vectors"></a>
+<h3 id="geom_vector-and-geom_vector2">
+<code>geom_vector</code> and <code>geom_vector2</code>
+<a class="anchor" aria-label="anchor" href="#geom_vector-and-geom_vector2"></a>
 </h3>
-<p><code><a href="reference/geom_vector.html">geom_vector()</a></code> is designed to visualize individual vectors, which are essentially just line segments with (typically) arrow heads to signify their direction. As line segments, they are naturally represented as 2 points-2 <span class="math inline">(<em>x</em>,<em>y</em>)</span> pairs-signifying the start point and the end point, where the end point signifies the direction of the vector. This already possible using <code><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment()</a></code>; however, <strong>ggvfields</strong>’s <code><a href="reference/geom_vector.html">geom_vector()</a></code> provides a bit more support.</p>
-<p>ggvfields can plot vectors specified by either Cartesian (<code>dx</code>, <code>dy</code>) or polar (<code>angle</code>, <code>distance</code>) components. It’s especially useful for directional data like wind patterns or flow fields.</p>
-<p>By default, the <strong><code>length</code> aesthetic</strong> is mapped to <code>after_stat(norm)</code>, meaning the vector length reflects its magnitude. More details in this section: <a href="#new-feature-mapping-norm-to-the-length-aesthetic"><strong>New Feature: Mapping Norm to the Length Aesthetic</strong></a>.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-3-1.png" width="100%"></p>
-<p>If you’d prefer to use dots on the tails instead of arrow heads, those are available, too:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span>, </span>
-<span>    tail_point <span class="op">=</span> <span class="cn">TRUE</span>, arrow <span class="op">=</span> <span class="cn">NULL</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="100%"></p>
-<p>For polar coordinates, the vector is defined by an <code>angle</code> and <code>distance</code>:</p>
+<p>These functions allow for flexible visualizations of vector data.</p>
+<ul>
+<li>
+<strong><code>geom_vector</code></strong>: By default, this maps the norm (magnitude) of a vector to its color. This helps compare relative magnitudes visually through color gradients. Users do not need to explicitly specify this unless overriding the default behavior.</li>
+</ul>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, angle <span class="op">=</span> <span class="va">dir</span>, distance <span class="op">=</span> <span class="va">spd</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="100%"></p>
-</div>
-<div class="section level3">
-<h3 id="new-feature-mapping-norm-to-the-length-aesthetic">New Feature: Mapping Norm to the Length Aesthetic<a class="anchor" aria-label="anchor" href="#new-feature-mapping-norm-to-the-length-aesthetic"></a>
-</h3>
-<p>One of the innovations of <strong>ggvfields</strong> is the ability to map the <strong>norm</strong> of vectors directly to their <strong>length</strong> using a length aesthetic. This feature allows for a more intuitive representation of vector magnitudes. The length of each vector directly corresponds to its computed norm - making it easy to compare vector magnitudes visually within the plot.</p>
-<p>Traditionally, vector fields represent direction and magnitude through arrows of uniform length. This leaves magnitude to be inferred from color gradients or external legends. With <strong>ggvfields</strong>, the <strong>length</strong> aesthetic allows users to visually intuit vector magnitude simplifying their interpretation.</p>
-<p>A particularly important aspect of this feature is that the vector lengths in the plot are <strong>accurately reflected in the legend</strong>. This allows viewers to match the visual representation of length directly with the legend’s magnitude scale. This frees up the color aesthetic for use in visualizing other information about the vector field.</p>
-<div class="section level4">
-<h4 id="why-use-the-length-aesthetic">Why Use the Length Aesthetic?<a class="anchor" aria-label="anchor" href="#why-use-the-length-aesthetic"></a>
-</h4>
 <ul>
 <li>
-<strong>Clearer Representation</strong>: Vectors with larger norms appear longer, making magnitude comparison straightforward.</li>
-<li>
-<strong>Length-Consistent Legends</strong>: The lengths of vectors in the plot are directly tied to the values shown in the legend, ensuring a consistent and accurate visual guide.</li>
-<li>
-<strong>Enhanced Visuals</strong>: Length variations add an extra layer of information to the plot, complementing existing aesthetics like color.</li>
-<li>
-<strong>Flexible Customization</strong>: Combine length mapping with other aesthetics such as color gradients or transparency for even richer visualizations.</li>
+<strong><code>geom_vector2</code></strong>: Maps the norm of a vector directly to its length. This provides a more intuitive representation of magnitude. This is done by mapping <code>length = after_stat(norm)</code> by default.</li>
 </ul>
-</div>
-</div>
-<div class="section level3">
-<h3 id="example-mapping-norm-to-length">Example: Mapping Norm to Length<a class="anchor" aria-label="anchor" href="#example-mapping-norm-to-length"></a>
-</h3>
-<p>By mapping the norm of a vector to the length aesthetic, users can directly observe differences in vector magnitude based on the vector’s actual size. You can do this by <code>length = after_stat(norm)</code> or <code><a href="reference/geom_vector2.html">geom_vector2()</a></code> can do this by default.</p>
-<p>In this example, the norm of the wind vectors is mapped to their length:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span>, length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">norm</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    arrow <span class="op">=</span> <span class="cn">NULL</span>, tail_point <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="reference/geom_vector2.html">geom_vector2</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="100%"></p>
+<div class="section level4">
+<h4 id="why-length-mapping-matters">Why Length Mapping Matters<a class="anchor" aria-label="anchor" href="#why-length-mapping-matters"></a>
+</h4>
+<p>Mapping vector lengths to their norms allows viewers to immediately understand magnitude differences without relying solely on color.</p>
+<p>The norm <span class="math inline"><strong>w</strong> = (<em>u</em>,<em>v</em>)</span> is calculated <span class="math display">$$|\mathbf{w}| = \sqrt{u^2 + v^2}$$</span> .</p>
+<p>This feature of <code>geom_vector2</code> enhances interpretability by using actual vector lengths to represent magnitude. The legend reflects the scaling and ensures consistent interpretation.</p>
+</div>
+<div class="section level4">
+<h4 id="polar-coordinates-support">Polar Coordinates Support<a class="anchor" aria-label="anchor" href="#polar-coordinates-support"></a>
+</h4>
+<p>Both <code>geom_vector</code> and <code>geom_vector2</code> also support polar coordinates, where vectors are specified using magnitude (<code>distance</code>) and direction (<code>angle</code>). Instead of providing Cartesian components (<code>dx</code>, <code>dy</code>), users can directly supply polar data. This feature simplifies workflows for directional data and works for all subsequent relevant functions that handle polar coordinates.</p>
+<p>Polar coordinates can be visualized like this:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, distance <span class="op">=</span> <span class="va">spd</span>, angle <span class="op">=</span> <span class="va">dir</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="100%"></p>
+</div>
+<div class="section level4">
+<h4 id="normalize-and-center">Normalize and Center<a class="anchor" aria-label="anchor" href="#normalize-and-center"></a>
+</h4>
+<p>Two important options in <code>geom_vector</code> and subsequent functions are <code>normalize</code> and <code>center</code> - both of which default to <code>TRUE.</code> These options help control the visual representation of vectors:</p>
+<ul>
+<li><p><code>normalize</code>: When set to <code>TRUE</code>, this option scales each vector to have a unit length, which can help avoid overplotting in dense vector fields. This is especially useful when the direction of vectors is more important than their magnitude. However, it’s important to note that normalize is different from mapping the norm of the vector to the length aesthetic. While normalization ensures that all vectors are visually uniform in length, mapping the norm to length preserves the relative differences in magnitude by varying the vector lengths based on their actual norms.</p></li>
+<li><p><code>center</code>: By default, <code>center</code> is also set to <code>TRUE</code>, meaning the midpoint of each vector is placed at the corresponding (<code>x</code>, <code>y</code>) coordinate, effectively “centering” the vector on the point. When center is <code>FALSE</code>, the base of the vector is anchored at the (<code>x</code>, <code>y</code>) point, and the vector extends outward from there.</p></li>
+</ul>
+<p>The example below turns off this default behavior:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span>, center <span class="op">=</span> <span class="cn">FALSE</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> </span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-8-1.png" width="100%"></p>
+</div>
 </div>
 <div class="section level3">
-<h3 id="geom_vector_field-visualizing-vector-fields">
-<code>geom_vector_field()</code>: Visualizing Vector Fields<a class="anchor" aria-label="anchor" href="#geom_vector_field-visualizing-vector-fields"></a>
+<h3 id="geom_vector_field-and-geom_vector_field2">
+<code>geom_vector_field</code> and <code>geom_vector_field2</code>
+<a class="anchor" aria-label="anchor" href="#geom_vector_field-and-geom_vector_field2"></a>
 </h3>
-<p>The <code><a href="reference/geom_vector_field.html">geom_vector_field()</a></code> function creates a vector field plot using a user-defined function to compute vector components. This abstraction simplifies the mathematical computations involved in vector field visualizations. Users no longer need to manually calculate vector components for <code><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html">geom_segment()</a></code>.</p>
-<p>Two important options in <code><a href="reference/geom_vector_field.html">geom_vector_field()</a></code> are <strong>normalize</strong> and <strong>center</strong> - both of which default to <code>TRUE</code>. These options help control the visual representation of vectors:</p>
 <ul>
-<li><p><strong>normalize</strong>: When set to <code>TRUE</code>, this option scales each vector to have a unit length, which can help avoid overplotting in dense vector fields. This is especially useful when the direction of vectors is more important than their magnitude. However, it’s important to note that <strong>normalize</strong> is different from mapping the <strong>norm</strong> of the vector to the <strong>length</strong> aesthetic. While normalization ensures that all vectors are visually uniform in length, mapping the norm to length preserves the relative differences in magnitude by varying the vector lengths based on their actual norms.</p></li>
-<li><p><strong>center</strong>: By default, <strong>center</strong> is also set to <code>TRUE</code>, meaning the midpoint of each vector is placed at the corresponding <code>(x, y)</code> coordinate, effectively “centering” the vector on the point. When <code>center</code> is <code>FALSE</code>, the base of the vector is anchored at the <code>(x, y)</code> point, and the vector extends outward from there. This is useful when the vector field is meant to represent flow starting <em>from</em> a point, rather than centered around it.</p></li>
+<li>
+<strong><code>geom_vector_field</code></strong>: Computes vector fields from a user-defined function and maps the norm to color.</li>
 </ul>
-<p>Additionally, <strong><code><a href="reference/geom_vector_field.html">geom_vector_field()</a></code> defaults to <code>length = after_stat(norm)</code></strong>, which maps the computed vector norms to the <code>length</code> aesthetic. This means that unless specified otherwise, the vectors’ lengths will automatically be proportional to their calculated magnitudes.</p>
-<p>By using these options, you can control whether vector lengths are uniform or reflect their actual magnitudes, how the vectors are positioned relative to their base coordinates, and how the <code>length</code> aesthetic is used in your plot.</p>
-<div class="section level4">
-<h4 id="example-basic-vector-field-plot">Example: Basic Vector Field Plot<a class="anchor" aria-label="anchor" href="#example-basic-vector-field-plot"></a>
-</h4>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>; <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span> <span class="co"># = f(x,y)</span></span>
-<span><span class="op">}</span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="co"># Define a function for the vector field</span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="100%"></p>
-<p>This function allows the user to map several characteristics of the vector field to different aesthetic mappings.</p>
+<p><img src="reference/figures/README-unnamed-chunk-9-1.png" width="100%"></p>
+<ul>
+<li>
+<strong><code>geom_vector_field2</code></strong>: Similar to <code>geom_vector_field</code>, but maps the norm of vectors to their lengths instead of color.</li>
+</ul>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector_field2.html">geom_vector_field2</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-10-1.png" width="100%"></p>
+<div class="section level4">
+<h4 id="automatic-limit-detection">Automatic Limit Detection<a class="anchor" aria-label="anchor" href="#automatic-limit-detection"></a>
+</h4>
+<p>Both <code>geom_vector_field</code> and <code>geom_vector_field2</code> can automatically determine plot limits based on the function provided. This happens when data exists in previous layers or in the base ggplot object. This allows the limits to be inferred from context. Customize limits with the <code>xlim</code> and <code>ylim</code> parameters if needed for more control.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span><span class="op">)</span> <span class="co"># Automatically determines limits based on existing data</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-11-1.png" width="100%"></p>
+<hr>
 </div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="advanced-features">Advanced Features<a class="anchor" aria-label="anchor" href="#advanced-features"></a>
+</h2>
+<p>This section introduces tools for deeper exploration of vector fields, allowing users to analyze properties such as smoothness, uncertainty, gradients, and potential functions. These tools provide mathematical insights into the structure of vector fields and extend visualization capabilities beyond basic representations.</p>
+<p>Key capabilities include:</p>
+<ul>
+<li>
+<strong>Smoothing Vector Fields</strong>: Approximate trends in noisy vector data and compute prediction intervals for uncertainty visualization.<br>
+</li>
+<li>
+<strong>Gradient and Potential Analysis</strong>: Derive gradient fields to study scalar variations and visualize potential functions to identify conservative fields.<br>
+</li>
+<li>
+<strong>Dynamic Flow and Stream Plots</strong>: Model particle trajectories and visualize dynamic behavior in time-dependent fields.<br>
+</li>
+<li>
+<strong>Mathematical Feature Mapping</strong>: Display vector norms, divergence, and curl to highlight flow strength, expansion, and rotational behavior.</li>
+</ul>
+<div class="section level3">
+<h3 id="geom_vector_smooth">
+<code>geom_vector_smooth</code><a class="anchor" aria-label="anchor" href="#geom_vector_smooth"></a>
+</h3>
+<p>Provides smoothed estimates of vector fields by applying statistical techniques to observed vectors.</p>
+<p>Smoothing is performed using a multivariate linear model defined by:</p>
+<p><span class="math display">$$
+\begin{pmatrix}
+\hat{dx} \\
+\hat{dy}
+\end{pmatrix} = \beta_0 + \beta_1 x + \beta_2 y + \beta_3 xy
+$$</span></p>
+<p>where <span class="math inline"><em>β</em></span> are coefficients estimated by ordinary least squares (OLS). This approach captures linear and interaction effects to approximate the underlying vector field. This function also creates a prediction interval around the vector specified by the <code>conf_level</code> argument and defaults to <code>.95</code>.</p>
+<ul>
+<li>
+<strong>Evaluating Specific Points</strong>:</li>
+</ul>
+<p>When evaluation points are provided, smoothing is performed at those locations and prediction intervals can be visualized using either wedges or ellipses to indicate uncertainty.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">eval_point</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">.5</span>, y <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span><span class="op">)</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span>eval_points <span class="op">=</span> <span class="va">eval_point</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">lims</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">7</span>,<span class="fl">10</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-12-1.png" width="100%"></p>
+<ul>
+<li>
+<strong>Using Wedges to Visualize Uncertainty</strong>:</li>
+</ul>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span><span class="op">)</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span>eval_points <span class="op">=</span> <span class="va">eval_point</span>, pi_type <span class="op">=</span> <span class="st">"wedge"</span><span class="op">)</span> </span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-13-1.png" width="100%"></p>
+<ul>
+<li>
+<strong>Grid-Based Smoothing</strong>:</li>
+</ul>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span>pi_type <span class="op">=</span> <span class="st">"wedge"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-14-1.png" width="100%"></p>
+<ul>
+<li>
+<strong>Custom Grid Resolution</strong>:</li>
+</ul>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">6</span>, pi_type <span class="op">=</span> <span class="st">"wedge"</span><span class="op">)</span> </span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-15-1.png" width="100%"></p>
+<ul>
+<li><strong>Altering Confidence Level</strong></li>
+</ul>
+<p>For all options, you can change the confidence level from the default to another value by using the <code>conf_level</code> argument.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span><span class="op">)</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span>eval_points <span class="op">=</span> <span class="va">eval_point</span>, pi_type <span class="op">=</span> <span class="st">"wedge"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span>eval_points <span class="op">=</span> <span class="va">eval_point</span>, pi_type <span class="op">=</span> <span class="st">"wedge"</span>, conf_level <span class="op">=</span> <span class="fl">.7</span><span class="op">)</span> </span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-16-1.png" width="100%"></p>
 </div>
 <div class="section level3">
-<h3 id="norm">Norm<a class="anchor" aria-label="anchor" href="#norm"></a>
+<h3 id="geom_gradient_field-and-geom_gradient_field2">
+<code>geom_gradient_field</code> and <code>geom_gradient_field2</code>
+<a class="anchor" aria-label="anchor" href="#geom_gradient_field-and-geom_gradient_field2"></a>
 </h3>
-<p>The norm of a vector <span class="math inline"><strong>w</strong> = (<em>u</em>,<em>v</em>)</span> is given by:</p>
-<p><span class="math inline">$|\mathbf{w}| = \sqrt{u^2 + v^2}$</span></p>
-<p>We can visualize the norm by mapping it to the length aesthetic:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<p>The geom_gradient_field function computes and visualizes gradient fields derived from scalar functions and displays the gradient vector field of a scalar function, <span class="math inline"><em>f</em>(<em>x</em>,<em>y</em>)</span>. The gradient is given by:</p>
+<p><span class="math display">$$
+\nabla f(x, y) = \left( \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right)
+$$</span></p>
+<p>This vector field points in the direction of the greatest rate of increase of the scalar function. The function numerically evaluates these partial derivatives and visualizes the resulting vectors.</p>
+<ul>
+<li>
+<strong>Gradient Field with Norm to Color</strong>:</li>
+</ul>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">paraboloid_field</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span>  <span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_gradient_field.html">geom_gradient_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">paraboloid_field</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-17-1.png" width="100%"></p>
+<ul>
+<li>
+<strong>Gradient Field with Norm to Length</strong>:</li>
+</ul>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span></span>
-<span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">norm</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> </span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-8-1.png" width="100%"></p>
+<span>  <span class="fu"><a href="reference/geom_gradient_field.html">geom_gradient_field2</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">paraboloid_field</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-18-1.png" width="100%"></p>
+<ul>
+<li>
+<strong>Adjusting Grid Density</strong>:</li>
+</ul>
+<p>The <code>n</code> parameter adjusts the density of the grid used to evaluate the gradient field. Decreasing <code>n</code> reduces the number of vectors which producing a coarser grid while increasing <code>n</code> results in a finer grid with more vectors.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_gradient_field.html">geom_gradient_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">paraboloid_field</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-19-1.png" width="100%"></p>
 </div>
+<div class="section level3">
+<h3 id="geom_potential">
+<code>geom_potential</code><a class="anchor" aria-label="anchor" href="#geom_potential"></a>
+</h3>
+<p>A potential function represents a scalar field whose gradient produces a vector field. It is used to describe conservative vector fields which exist when the curl of the vector field is 0.</p>
+<p>The <code>geom_potential</code> function computes and visualizes the scalar potential function for a given conservative vector field. The input function must represent a 2D vector field and the output is the corresponding potential function. If the input field is not conservative, the function checks this condition numerically based on a tolerance parameter. The tolerance determines how strictly the field must satisfy the conservation condition.</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">potential_fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">{</span></span>
+<span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span> <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="va">y</span>, <span class="va">x</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_potential.html">geom_potential</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">potential_fun</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-20-1.png" width="100%"></p>
+<p>The tolerance parameter can be adjusted to control the sensitivity of the conservativeness check. Decreasing the tolerance makes the check stricter, while increasing it allows for more numerical error.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_potential.html">geom_potential</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">potential_fun</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span>, tolerance <span class="op">=</span> <span class="fl">1e-4</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-21-1.png" width="100%"></p>
+<p>As with other functions, we can increase the granulatity of the visualization with the <code>n</code> parameter.</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_potential.html">geom_potential</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">potential_fun</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-22-1.png" width="100%"></p>
+</div>
+<div class="section level3">
+<h3 id="geom_streamplot">
+<code>geom_streamplot</code><a class="anchor" aria-label="anchor" href="#geom_streamplot"></a>
+</h3>
+<p>The <code>geom_streamplot</code> function generates a stream plot layer of a user-defined vector field function. The lines in the plot represent the flow of data points through the vector field.</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">-</span> <span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">y</span>, <span class="fl">1</span> <span class="op">+</span> <span class="va">x</span> <span class="op">-</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-23-1.png" width="100%"></p>
+<p>The <code>chop</code> parameter (defaulted to <code>TRUE</code>) allows you to chop the trajectories into segments. This can be useful for better visualization of the streamlines when they are long and complex.</p>
+<p>It may be useful to not break up the streamlines.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, chop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> </span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-24-1.png" width="100%"></p>
+<p>It may also be useful to break up the streamlines into more segments. The scale_stream parameter (defaults to 1) adjusts the segmentation of streamlines by specifying the proportion of the streamline length used to divide it into smaller segments.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span></span>
+<span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
+<span>    chop <span class="op">=</span> <span class="cn">TRUE</span>, scale_stream <span class="op">=</span> <span class="fl">.9</span>,</span>
+<span>  <span class="op">)</span> </span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-25-1.png" width="100%"></p>
+</div>
+<div class="section level3">
+<h3 id="geom_flow">
+<code>geom_flow</code><a class="anchor" aria-label="anchor" href="#geom_flow"></a>
+</h3>
+<p>The <code>geom_flow</code> function generates a flow plot layer for a user-defined vector field function. The lines in the plot represent the flow of data points through the vector field, visualizing the trajectory of particles over time. Each flow line traces where a “marble” would move through the vector field if dropped at a specific starting point, making this an intuitive way to visualize dynamic systems.</p>
+<p>By default, the color of each flow line corresponds to time (<code>t</code>), meaning the color transitions along the path represent the progression of time. As the flow line evolves, it shows how a particle would move over time if following the vector field. You can change the coloring by mapping aesthetics to other computed measures if needed, but time remains the default.</p>
+<p>Flows are computed using the deSolve package’s ODE solver, with the rk4 method (a fourth-order Runge-Kutta method) used for numerical integration. This solver ensures accurate and efficient computation of flow lines, abstracting away complex calculations for the user.</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_flow.html">geom_flow</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-26-1.png" width="100%"></p>
+<p>In this example, flow lines evolve according to the vector field defined by <code>f</code>. The color along each line will show how the particle moves over time (<code>t</code>) within the vector field.</p>
+<div class="section level4">
+<h4 id="adaptive-parameters">Adaptive Parameters<a class="anchor" aria-label="anchor" href="#adaptive-parameters"></a>
+</h4>
+<p>Several parameters in <code><a href="reference/geom_flow.html">geom_flow()</a></code> are adaptive, meaning they adjust automatically based on the characteristics of the vector field and the plot limits. These adaptive parameters help optimize the flow visualization without requiring manual tuning:</p>
+<ul>
+<li><p><strong><code>threshold_distance</code></strong>: This parameter controls the minimum distance between adjacent flow lines to prevent them from overlapping. If not specified, it is calculated automatically as half the Euclidean distance between adjacent grid points. This ensures the plot remains uncluttered, with flow lines spaced appropriately based on the grid dimensions (<code>n</code>) and the axis limits (<code>xlim</code>, <code>ylim</code>).</p></li>
+<li><p><strong><code>iterations</code></strong>: This parameter defines the number of time steps for the ODE solver to use when tracing the flow lines. A higher number of iterations results in smoother and more detailed flows. If <code>iterations</code> is left as <code>NULL</code>, it is computed adaptively based on the value of <code>T</code>, ensuring that longer time spans result in more iterations for smoother paths.</p></li>
+</ul>
+<p>These adaptive parameters allow <code><a href="reference/geom_flow.html">geom_flow()</a></code> to create a well-balanced plot by dynamically adjusting the precision and spacing of flow lines, based on the underlying vector field and plot limits.</p>
+</div>
+<div class="section level4">
+<h4 id="example-with-custom-parameters">Example with Custom Parameters<a class="anchor" aria-label="anchor" href="#example-with-custom-parameters"></a>
+</h4>
+<p>Below is an example where we customize the grid size, number of iterations, and the threshold distance between flow lines:</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_flow.html">geom_flow</a></span><span class="op">(</span></span>
+<span>    fun <span class="op">=</span> <span class="va">f</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">21</span>, <span class="fl">21</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>,</span>
+<span>    iterations <span class="op">=</span> <span class="fl">1000</span>, threshold_distance <span class="op">=</span> <span class="fl">0.5</span></span>
+<span>  <span class="op">)</span> </span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-27-1.png" width="100%"></p>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="other-features">Other Features<a class="anchor" aria-label="anchor" href="#other-features"></a>
+</h2>
+<p>This package provides other tools to analyze and visualize mathematical properties of vector fields. These features allow users to map various mathematical characteristics to visual aesthetics like length and color.</p>
+<p>We already introduced mapping norm to color in <code>geom_vector</code>, <code>geom_vector_field</code>, and <code>geom_gradient_field</code> and mapping norm to length in each function’s ‘2’ alternates. We also provide similar ability with a functions curl and divergence.</p>
 <div class="section level3">
 <h3 id="divergence">Divergence<a class="anchor" aria-label="anchor" href="#divergence"></a>
 </h3>
@@ -220,13 +429,13 @@
 \text{div} \, \mathbf{F} = \frac{\partial F_x}{\partial x} + \frac{\partial F_y}{\partial y}
 $$</span></p>
 <p>To visualize the divergence of the vector field, you can map the divergence to the color aesthetic.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">norm</span><span class="op">)</span>, color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">divergence</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">divergence</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> </span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-9-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-28-1.png" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="curl">Curl<a class="anchor" aria-label="anchor" href="#curl"></a>
@@ -237,116 +446,39 @@ $$</span></p>
 \text{curl} \, \mathbf{F} = \frac{\partial F_y}{\partial x} - \frac{\partial F_x}{\partial y}
 $$</span></p>
 <p>To visualize the curl of the vector field, you can map the curl to the color aesthetic.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">curl</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> </span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-10-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-29-1.png" width="100%"></p>
 </div>
-<div class="section level3">
-<h3 id="geom_streamplot">
-<code>geom_streamplot()</code><a class="anchor" aria-label="anchor" href="#geom_streamplot"></a>
-</h3>
-<p>The <code><a href="reference/geom_streamplot.html">geom_streamplot()</a></code> function generates a stream plot layer of a user-defined vector field function. The lines in the plot represent the flow of data points through the vector field.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
-<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">-</span> <span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">y</span>, <span class="fl">1</span> <span class="op">+</span> <span class="va">x</span> <span class="op">-</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-11-1.png" width="100%"></p>
-<p>The <code>chop</code> parameter (defaulted to TRUE) allows you to chop the trajectories into segments. This can be useful for better visualization of the streamlines when they are long and complex.</p>
-<p>It may be useful to not break up the streamlines.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, chop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> </span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-12-1.png" width="100%"></p>
-<p>It may also be useful to break up the streamlines into more segments. The <code>scale_stream</code> parameter (defaults to 1) adjusts the segmentation of streamlines by specifying the proportion of the streamline length used to divide it into smaller segments.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span></span>
-<span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>    chop <span class="op">=</span> <span class="cn">TRUE</span>, scale_stream <span class="op">=</span> <span class="fl">.9</span>,</span>
-<span>  <span class="op">)</span> </span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-13-1.png" width="100%"></p>
 </div>
+<div class="section level2">
+<h2 id="features-in-development">Features in Development<a class="anchor" aria-label="anchor" href="#features-in-development"></a>
+</h2>
 <div class="section level3">
-<h3 id="map-calculus-measures-to-aesthetics">Map Calculus Measures to Aesthetics<a class="anchor" aria-label="anchor" href="#map-calculus-measures-to-aesthetics"></a>
+<h3 id="animation-with-geom_streamplot">Animation with <code>geom_streamplot</code>
+<a class="anchor" aria-label="anchor" href="#animation-with-geom_streamplot"></a>
 </h3>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span></span>
-<span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">divergence</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="va">divergence</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"adjusted\ndivergence"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-14-1.png" width="100%"></p>
-</div>
-<div class="section level3">
-<h3 id="animate-geom_streamplot">Animate <code>geom_streamplot()</code>
-<a class="anchor" aria-label="anchor" href="#animate-geom_streamplot"></a>
-</h3>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create stream plot with rownum aesthetic</span></span>
-<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span> <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span></span>
 <span>   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>rownum <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">rownum</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
 <span> <span class="op">)</span> <span class="op">+</span></span>
 <span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co"># Create an animation transition plot</span></span>
+<span></span>
 <span><span class="va">anim</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/animation_transition.html">animation_transition</a></span><span class="op">(</span>plot <span class="op">=</span> <span class="va">p</span><span class="op">)</span> <span class="op">+</span>   </span>
 <span> <span class="fu">gganimate</span><span class="fu">::</span><span class="fu"><a href="https://gganimate.com/reference/transition_reveal.html">transition_reveal</a></span><span class="op">(</span><span class="va">rownum</span><span class="op">)</span> <span class="op">+</span></span>
 <span> <span class="fu">gganimate</span><span class="fu">::</span><span class="fu"><a href="https://gganimate.com/reference/ease_aes.html">ease_aes</a></span><span class="op">(</span><span class="st">'linear'</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Animate the plot</span></span>
 <span><span class="fu">gganimate</span><span class="fu">::</span><span class="fu"><a href="https://gganimate.com/reference/animate.html">animate</a></span><span class="op">(</span></span>
 <span>  <span class="va">anim</span>, nframes <span class="op">=</span> <span class="fl">25</span>, fps <span class="op">=</span> <span class="fl">5</span>, end_pause <span class="op">=</span> <span class="fl">0</span>, renderer <span class="op">=</span> <span class="fu">gganimate</span><span class="fu">::</span><span class="fu"><a href="https://gganimate.com/reference/renderers.html">gifski_renderer</a></span><span class="op">(</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-animation-1.gif" width="100%"></p>
-</div>
-<div class="section level3">
-<h3 id="geom_flow">
-<code>geom_flow()</code><a class="anchor" aria-label="anchor" href="#geom_flow"></a>
-</h3>
-<p>The <code><a href="reference/geom_flow.html">geom_flow()</a></code> function generates a flow plot layer for a user-defined vector field function. The lines in the plot represent the flow of data points through the vector field, visualizing the trajectory of particles over time. Each flow line traces where a “marble” would move through the vector field if dropped at a specific starting point, making this an intuitive way to visualize dynamic systems.</p>
-<p>By default, the color of each flow line corresponds to time (<code>t</code>), meaning the color transitions along the path represent the progression of time. As the flow line evolves, it shows how a particle would move over time if following the vector field. You can change the coloring by mapping aesthetics to other computed measures if needed, but time remains the default.</p>
-<p>Flows are computed using the <code>deSolve</code> package’s ODE solver, with the <code>rk4</code> method (a fourth-order Runge-Kutta method) used for numerical integration. This solver ensures accurate and efficient computation of flow lines, abstracting away complex calculations for the user.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_flow.html">geom_flow</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-15-1.png" width="100%"></p>
-<p>In this example, flow lines evolve according to the vector field defined by <code>f</code>. The color along each line will show how the particle moves over time (<code>t</code>) within the vector field.</p>
-<div class="section level4">
-<h4 id="adaptive-parameters">Adaptive Parameters<a class="anchor" aria-label="anchor" href="#adaptive-parameters"></a>
-</h4>
-<p>Several parameters in <code><a href="reference/geom_flow.html">geom_flow()</a></code> are adaptive, meaning they adjust automatically based on the characteristics of the vector field and the plot limits. These adaptive parameters help optimize the flow visualization without requiring manual tuning:</p>
-<ul>
-<li><p><strong><code>threshold_distance</code></strong>: This parameter controls the minimum distance between adjacent flow lines to prevent them from overlapping. If not specified, it is calculated automatically as half the Euclidean distance between adjacent grid points. This ensures the plot remains uncluttered, with flow lines spaced appropriately based on the grid dimensions (<code>n</code>) and the axis limits (<code>xlim</code>, <code>ylim</code>).</p></li>
-<li><p><strong><code>T</code></strong>: This parameter represents the total time span for the ODE solver to trace the flow paths. If <code>T</code> is <code>NULL</code>, it is automatically computed by starting from the center of the plot and estimating how long it would take a particle to travel from the center to the farthest boundary of the vector field - assuming that the vector field is not cyclic nor does it reach a sync. This ensures that the trajectories capture the significant dynamics of the vector field without extending unnecessarily.</p></li>
-<li><p><strong><code>iterations</code></strong>: This parameter defines the number of time steps for the ODE solver to use when tracing the flow lines. A higher number of iterations results in smoother and more detailed flows. If <code>iterations</code> is left as <code>NULL</code>, it is computed adaptively based on the value of <code>T</code>, ensuring that longer time spans result in more iterations for smoother paths.</p></li>
-</ul>
-<p>These adaptive parameters allow <code><a href="reference/geom_flow.html">geom_flow()</a></code> to create a well-balanced plot by dynamically adjusting the precision and spacing of flow lines, based on the underlying vector field and plot limits.</p>
-</div>
-<div class="section level4">
-<h4 id="example-with-custom-parameters">Example with Custom Parameters<a class="anchor" aria-label="anchor" href="#example-with-custom-parameters"></a>
-</h4>
-<p>Below is an example where we customize the grid size, time span (<code>T</code>), number of iterations, and the threshold distance between flow lines:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_flow.html">geom_flow</a></span><span class="op">(</span></span>
-<span>    fun <span class="op">=</span> <span class="va">f</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">21</span>, <span class="fl">21</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>,</span>
-<span>    iterations <span class="op">=</span> <span class="fl">1000</span>, threshold_distance <span class="op">=</span> <span class="fl">0.5</span>, T <span class="op">=</span> <span class="fl">5</span></span>
-<span>  <span class="op">)</span> </span>
-<span><span class="co">#&gt; Warning in geom_flow(fun = f, n = c(21, 21), xlim = c(-10, 10), ylim = c(-10, :</span></span>
-<span><span class="co">#&gt; Ignoring unknown parameters: `T`</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-16-1.png" width="100%"></p>
 <!-- The `mask_shape_type` parameter allows you to specify the mask shape used for streamline generation which influences how the streamlines are placed and how closely they can approach each other. The default mask shape is `"square"`, but you can also use `"diamond"`, `"inset_square"`, or `"circle"`.  During streamline generation, when a streamline enters the specified shape, no other streamlines will enter that region.  -->
 <!-- - **Square Mask (default)**: Streamlines are restricted to a grid where each cell is a square. This generally results in evenly spaced streamlines. -->
 <!-- - **Diamond Mask**: Streamlines are restricted to a square grid with diamonds inset within each square.  This can create a more dense pattern which can have better visualizations for some functions. - **Inset Square Mask**: Streamlines are restricted to a grid with smaller squares inset within larger squares. This can create a denser and more detailed pattern of streamlines. -->
@@ -399,119 +531,6 @@ $$</span></p>
 <!-- ``` -->
 </div>
 </div>
-</div>
-<div class="section level2">
-<h2 id="in-development">In Development<a class="anchor" aria-label="anchor" href="#in-development"></a>
-</h2>
-<div class="section level3">
-<h3 id="geom_vector_smooth">
-<code>geom_vector_smooth()</code><a class="anchor" aria-label="anchor" href="#geom_vector_smooth"></a>
-</h3>
-<p>The <code><a href="reference/geom_vector_smooth.html">geom_vector_smooth()</a></code> function is designed to provide a smoothed estimate of a vector field based on observed vector components. Just as <code><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html">geom_smooth()</a></code> fits a regression line through data points, <code><a href="reference/geom_vector_smooth.html">geom_vector_smooth()</a></code> fits a smooth vector field through individual vector observations. It does this by applying statistical smoothing techniques to the vector components (<code>dx</code>, <code>dy</code>) to create a smooth representation of the direction and magnitude transitions across the field.</p>
-<div class="section level4">
-<h4 id="example-usage">Example Usage<a class="anchor" aria-label="anchor" href="#example-usage"></a>
-</h4>
-<p>Let’s revisit the <code>wind_data</code> dataset we used earlier, which contains wind measurements with longitude (<code>lon</code>), latitude (<code>lat</code>), and wind vector components (<code>dx</code>, <code>dy</code>).</p>
-</div>
-<div class="section level4">
-<h4 id="basic-smoothing-of-the-vector-field">Basic Smoothing of the Vector Field:<a class="anchor" aria-label="anchor" href="#basic-smoothing-of-the-vector-field"></a>
-</h4>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; eval_points is NULL; changing pi_type from 'ellipse' to 'wedge'.</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-17-1.png" width="100%"></p>
-<p>In this example:</p>
-<ul>
-<li>We use <code><a href="reference/geom_vector_smooth.html">geom_vector_smooth()</a></code> to create a smoothed estimate of the vector field based on the observed vectors.<br>
-</li>
-<li>The smoothed vectors are overlaid on the plot.<br>
-</li>
-<li>We add the original vectors using <code><a href="reference/geom_vector.html">geom_vector()</a></code> and set <code>aes(color = after_stat(NULL))</code> to allow the vectors to be colored black.</li>
-</ul>
-</div>
-<div class="section level4">
-<h4 id="adjusting-the-grid-resolution-with-n">Adjusting the Grid Resolution with <code>n</code>:<a class="anchor" aria-label="anchor" href="#adjusting-the-grid-resolution-with-n"></a>
-</h4>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; eval_points is NULL; changing pi_type from 'ellipse' to 'wedge'.</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-18-1.png" width="100%"></p>
-<p>In this example:</p>
-<ul>
-<li>We specify <code>n = 4</code> to adjust the grid resolution of the smoothed vector field. This means the smoothing is evaluated over a 4x4 grid across the data range.</li>
-<li>A lower <code>n</code> results in fewer vectors which can help in identifying broader trends in the vector field.</li>
-<li>The original vectors are added for comparison.</li>
-</ul>
-</div>
-<div class="section level4">
-<h4 id="evalutating-at-specific-points-with-eval_points">Evalutating at Specific Points with <code>eval_points</code>:<a class="anchor" aria-label="anchor" href="#evalutating-at-specific-points-with-eval_points"></a>
-</h4>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">eval_point</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="op">-</span><span class="fl">.5</span>, y <span class="op">=</span> <span class="op">-</span><span class="fl">.5</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span>eval_points <span class="op">=</span> <span class="va">eval_point</span>, conf_level <span class="op">=</span> <span class="fl">.75</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span><span class="op">)</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-19-1.png" width="100%"></p>
-<p>In this example:</p>
-<ul>
-<li>We create a tibble <code>eval_point</code> containing the specific point (x = -.5, y = -.5) where we want to evaluate the smoothed vector field.<br>
-</li>
-<li>By passing <code>eval_points = eval_point</code> to geom_vector_smooth(), we compute the smoothed vector only at this location.</li>
-<li>We set the confidence level <code>conf_level</code> to .75 for a 75% prediction interval on both the angle and direction.</li>
-<li>We set <code>normalize = FALSE</code> in geom_vector() to display the original vectors without normalization. This preserves their true magnitudes for comparison.</li>
-</ul>
-</div>
-<div class="section level4">
-<h4 id="additional-details">Additional Details<a class="anchor" aria-label="anchor" href="#additional-details"></a>
-</h4>
-<ul>
-<li>Smoothing Methods: <code><a href="reference/geom_vector_smooth.html">geom_vector_smooth()</a></code> uses linear modeling (<code>method = "lm"</code>) by default to smooth the vector components. Future work will allow you to declare other techniques.<br>
-</li>
-<li>Grid Resolution: The <code>n</code> parameter controls the number of grid points in the x and y directions over which the smoothing is evaluated. Adjusting <code>n</code> allows you to balance detail and clarity in your visualization.<br>
-</li>
-<li>Evaluating at Custom Points: The <code>eval_points</code> parameter accepts a data frame of points at which you want to evaluate the smoothed vector field. This is useful when you are interested in specific locations rather than a regular grid.</li>
-</ul>
-</div>
-<div class="section level4">
-<h4 id="comprehensive-example-with-prediction-intervals">Comprehensive Example with Prediction Intervals<a class="anchor" aria-label="anchor" href="#comprehensive-example-with-prediction-intervals"></a>
-</h4>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, dx <span class="op">=</span> <span class="va">dx</span>, dy <span class="op">=</span> <span class="va">dy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span></span>
-<span>    n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">6</span><span class="op">)</span>,</span>
-<span>    conf_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.95</span><span class="op">)</span>,</span>
-<span>    method <span class="op">=</span> <span class="st">"lm"</span>,</span>
-<span>    pi_type <span class="op">=</span> <span class="st">"wedge"</span></span>
-<span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-20-1.png" width="100%"></p>
-<p>In this example:</p>
-<ul>
-<li>We set <code>n = c(6, 6)</code> to specify a 6x6 grid for smoothing.<br>
-</li>
-<li>The <code>conf_level</code> parameter adds 95% prediction intervals around the smoothed vectors.<br>
-</li>
-<li>We specify <code>method = "lm"</code> for linear smoothing.</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
-</h2>
-<p><strong>ggvfields</strong> is not yet on CRAN. You can install it with</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"dusty-turner/ggvfields"</span><span class="op">)</span></span></code></pre></div>
-</div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
 </h2>
@@ -520,12 +539,17 @@ $$</span></p>
 <div class="section level2">
 <h2 id="contact">Contact<a class="anchor" aria-label="anchor" href="#contact"></a>
 </h2>
-<p>For any questions or issues, please <a href="https://github.com/dusty-turner/ggvfields/issues/new">open an issue</a> on GitHub or contact the maintainer.</p>
+<p>For questions or feedback, please <a href="https://github.com/dusty-turner/ggvfields/issues/new">open an issue</a>.</p>
 </div>
 <div class="section level2">
-<h2 id="related-projects">Related projects<a class="anchor" aria-label="anchor" href="#related-projects"></a>
+<h2 id="related-projects">Related Projects<a class="anchor" aria-label="anchor" href="#related-projects"></a>
 </h2>
-<p>For creating vector fields, the <a href="http://pkg.mitchelloharawild.com/ggquiver/"><strong>ggquiver</strong></a> package provides quiver plots to visualize vector fields, while the <a href="https://github.com/mdhall272/ggarchery"><strong>ggarchery</strong></a> package can handling of segments with arrowheads.</p>
+<ul>
+<li>
+<a href="http://pkg.mitchelloharawild.com/ggquiver/">ggquiver</a>: Quiver plots for vector fields.</li>
+<li>
+<a href="https://github.com/mdhall272/ggarchery">ggarchery</a>: Arrow segment visualizations.</li>
+</ul>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

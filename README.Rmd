@@ -82,7 +82,7 @@ ggplot(wind_data) +
 
 Mapping vector lengths to their norms allows viewers to immediately understand magnitude differences without relying solely on color.
 
-The norm $\mathbf{w} = (u, v)$) is calculated $|\mathbf{w}| = \sqrt{u^2 + v^2}$.
+The norm $\mathbf{w} = (u, v)$ is calculated $$|\mathbf{w}| = \sqrt{u^2 + v^2}$$ .
 
 This feature of `geom_vector2` enhances interpretability by using actual vector lengths to represent magnitude. The legend reflects the scaling and ensures consistent interpretation.
 
