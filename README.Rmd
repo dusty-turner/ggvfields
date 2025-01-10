@@ -285,7 +285,7 @@ As with other functions, we can increase the granulatity of the visualization wi
 
 ```{r}
 ggplot() +
-  geom_potential(fun = potential_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), n = 50)
+  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), n = 50)
 ```
 
 ### `geom_streamplot`

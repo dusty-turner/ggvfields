@@ -360,14 +360,14 @@ tolerance parameter. The tolerance determines how strictly the field
 must satisfy the conservation condition.
 
 ``` r
-potential_fun <- function(v) {
+conservative_fun <- function(v) {
  x <- v[1]
  y <- v[2]
  c(sin(x) + y, x - sin(y))
 }
 
 ggplot() +
-  geom_potential(fun = potential_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi))
+  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi))
 ```
 
 <img src="man/figures/README-unnamed-chunk-20-1.png" width="100%" />
@@ -378,7 +378,7 @@ stricter, while increasing it allows for more numerical error.
 
 ``` r
 ggplot() +
-  geom_potential(fun = potential_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), tolerance = 1e-4)
+  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), tolerance = 1e-4)
 ```
 
 <img src="man/figures/README-unnamed-chunk-21-1.png" width="100%" />
@@ -388,7 +388,7 @@ visualization with the `n` parameter.
 
 ``` r
 ggplot() +
-  geom_potential(fun = potential_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), n = 50)
+  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), n = 50)
 ```
 
 <img src="man/figures/README-unnamed-chunk-22-1.png" width="100%" />
