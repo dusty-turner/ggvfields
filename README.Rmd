@@ -34,6 +34,7 @@ Load the package in R:
   
 ```{r}
 library("ggvfields")
+options(ggplot2.continuous.colour="viridis")
 ```
 
 Generate sample wind data:
