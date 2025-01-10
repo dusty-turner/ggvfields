@@ -242,16 +242,16 @@ generate_starting_points_flow <- function(mask_shape, build_type = "spiral_trave
 
 # Function to solve the ODE using deSolve with boundary checking
 #' @importFrom deSolve ode
-solve_flow <- function(initial_state, fun, times, xlim, ylim) {
-  parameters <- list(fun = fun, xlim = xlim, ylim = ylim)
-
-  result <- ode(y = initial_state, times = times, func = flow_ode, parms = parameters, method = "rk4")
-
-  # Drop rows with NA values, since these indicate where the solver stopped
-  result <- as.data.frame(na.omit(result))
-
-  return(result)
-}
+# solve_flow <- function(initial_state, fun, times, xlim, ylim, method) {
+#   parameters <- list(fun = fun, xlim = xlim, ylim = ylim)
+#
+#   result <- ode(y = initial_state, times = times, func = flow_ode, parms = parameters, method = method)
+#
+#   # Drop rows with NA values, since these indicate where the solver stopped
+#   result <- as.data.frame(na.omit(result))
+#
+#   return(result)
+# }
 
 flow_ode <- function(time, state, parameters) {
   x <- state[1]
@@ -446,9 +446,10 @@ generate_starting_points <- function(mask_shape) {
 # Solve Flow and ODE Functions
 
 # Function to solve the flow using the ODE solver
-solve_flow <- function(initial_state, fun, times, xlim, ylim) {
+#' @importFrom deSolve ode
+solve_flow <- function(initial_state, fun, times, xlim, ylim, method) {
   parameters <- list(fun = fun, xlim = xlim, ylim = ylim)
-  result <- ode(y = initial_state, times = times, func = flow_ode, parms = parameters, method = "rk4")
+  result <- ode(y = initial_state, times = times, func = flow_ode, parms = parameters, method = method)
   result <- as.data.frame(na.omit(result))  # Remove rows with NA values
   return(result)
 }

@@ -22,6 +22,9 @@
 #' @param stream_density A numeric value that controls the density of the streamlines.
 #'   Higher values produce more streamlines. Default is 1.
 #' @param arrow Arrow specification, as created by `grid::arrow()`.
+#' @param method A character string specifying the ODE solver method to be used
+#'   (passed to [deSolve::ode()]). Default is "rk4".
+#'
 #' @name geom_streamplot
 #' @rdname geom_streamplot
 #'
@@ -36,15 +39,17 @@
 #'   y <- v[2]
 #'   c(-1 - x^2 + y, 1 + x - y^2)
 #' }
+#'
 #' ggplot() +
 #'   geom_streamplot(
 #'     fun = f, xlim = c(-3, 3), ylim = c(-3, 3), n = c(15, 15),
 #'     iterations = 100, chop = TRUE, scale_stream = 1,
-#'     mask_shape_type = "square"
+#'     mask_shape_type = "square", method = "rk4"
 #'   ) +
 #'   coord_fixed() +
 #'   theme_minimal()
 NULL
+
 
 #' @rdname geom_streamplot
 #' @export
@@ -62,6 +67,7 @@ geom_streamplot <- function(mapping = NULL, data = NULL,
                             mask_shape_type = "square",
                             iterations = 100,
                             stream_density = 1,
+                            method = "rk4",
                             arrow = grid::arrow(angle = 20,
                                                 length = unit(0.015, "npc"),
                                                 type = "closed"),
@@ -83,9 +89,10 @@ geom_streamplot <- function(mapping = NULL, data = NULL,
       xlim = xlim,
       ylim = ylim,
       n = n,
+      method = method,
       mask_shape_type = mask_shape_type,
       iterations = iterations,
-      stream_density = stream_density,  # Add stream_density here
+      stream_density = stream_density,
       arrow = arrow,
       chop = chop,
       scale_stream = scale_stream,
@@ -118,6 +125,7 @@ stat_streamplot <- function(mapping = NULL, data = NULL,
                             mask_shape_type = "square",
                             iterations = 100,
                             stream_density = 1,
+                            method = "rk4",
                             arrow = grid::arrow(angle = 20,
                                                 length = unit(0.015, "npc"),
                                                 type = "closed"),
@@ -139,9 +147,10 @@ stat_streamplot <- function(mapping = NULL, data = NULL,
       xlim = xlim,
       ylim = ylim,
       n = n,
+      method = method,
       mask_shape_type = mask_shape_type,
       iterations = iterations,
-      stream_density = stream_density,  # Add stream_density here
+      stream_density = stream_density,
       arrow = arrow,
       chop = chop,
       scale_stream = scale_stream,
@@ -160,7 +169,7 @@ StatStreamplot <- ggproto("StatStreamplot", Stat,
 
   default_aes = aes(group = after_stat(super_id), rownum = after_stat(rownum)),
 
-  compute_group = function(data, scales, fun, xlim, ylim, n, chop, scale_stream, stream_density, mask_shape_type, iterations) {
+  compute_group = function(data, scales, fun, xlim, ylim, n, chop, scale_stream, stream_density, mask_shape_type, iterations, method) {
 
     stream_density <- floor(stream_density)
 
@@ -186,7 +195,7 @@ StatStreamplot <- ggproto("StatStreamplot", Stat,
       initial_state <- c(x = grid_coords[[i]][1], y = grid_coords[[i]][2])
 
       # Forward trajectory
-      forward_trajectory <- solve_flow(initial_state, fun, times = times_forward, xlim, ylim)
+      forward_trajectory <- solve_flow(initial_state, fun, times = times_forward, xlim, ylim, method)
       if (nrow(forward_trajectory) > 1) {
         forward_trajectory$stream_moves <- iterations + seq_len(nrow(forward_trajectory))
         forward_trajectory$check_p_in_this_order <- seq_len(nrow(forward_trajectory))
@@ -197,7 +206,7 @@ StatStreamplot <- ggproto("StatStreamplot", Stat,
       }
 
       # Reverse trajectory
-      reverse_trajectory <- solve_flow(initial_state, fun, times = times_backward, xlim, ylim)
+      reverse_trajectory <- solve_flow(initial_state, fun, times = times_backward, xlim, ylim, method)
       if (nrow(reverse_trajectory) > 1) {
         reverse_trajectory$stream_moves <- iterations + rev(seq_len(nrow(reverse_trajectory)))
         reverse_trajectory$check_p_in_this_order <- iterations + 1 + rev(seq_len(nrow(reverse_trajectory)))
