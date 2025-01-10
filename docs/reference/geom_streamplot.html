@@ -70,6 +70,7 @@ through the vector field.</p>
 <span>  mask_shape_type <span class="op">=</span> <span class="st">"square"</span>,</span>
 <span>  iterations <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  stream_density <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"rk4"</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>  chop <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  scale_stream <span class="op">=</span> <span class="fl">1</span></span>
@@ -91,6 +92,7 @@ through the vector field.</p>
 <span>  mask_shape_type <span class="op">=</span> <span class="st">"square"</span>,</span>
 <span>  iterations <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  stream_density <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"rk4"</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span>,</span>
 <span>  chop <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  scale_stream <span class="op">=</span> <span class="fl">1</span></span>
@@ -226,6 +228,11 @@ the numerical integration of the flow.</p></dd>
 Higher values produce more streamlines. Default is 1.</p></dd>
 
 
+<dt>method</dt>
+<dd><p>A character string specifying the ODE solver method to be used
+(passed to <code><a href="https://rdrr.io/pkg/deSolve/man/ode.html">deSolve::ode()</a></code>). Default is "rk4".</p></dd>
+
+
 <dt>arrow</dt>
 <dd><p>Arrow specification, as created by <code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code>.</p></dd>
 
@@ -257,11 +264,12 @@ stream plot.</p>
 <span class="r-in"><span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">-</span> <span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">y</span>, <span class="fl">1</span> <span class="op">+</span> <span class="va">x</span> <span class="op">-</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu">geom_streamplot</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">15</span>, <span class="fl">15</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    iterations <span class="op">=</span> <span class="fl">100</span>, chop <span class="op">=</span> <span class="cn">TRUE</span>, scale_stream <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>    mask_shape_type <span class="op">=</span> <span class="st">"square"</span></span></span>
+<span class="r-in"><span>    mask_shape_type <span class="op">=</span> <span class="st">"square"</span>, method <span class="op">=</span> <span class="st">"rk4"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></span>
