@@ -35,7 +35,6 @@
 #'   respective `geom_vector_field` functions, inheriting their functionalities.
 #'
 #' @examples
-#' library(ggvfields)
 #'
 #' paraboloid_field <- function(v) {
 #'   x <- v[1]
@@ -78,7 +77,7 @@ geom_gradient_field <- function(mapping = NULL, data = NULL,
                                 fun,
                                 xlim = NULL,
                                 ylim = NULL,
-                                n = 16,
+                                n = 11,
                                 center = TRUE,
                                 normalize = TRUE,
                                 arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
@@ -121,7 +120,7 @@ stat_gradient_field <- function(mapping = NULL, data = NULL,
                                 fun,
                                 xlim = NULL,
                                 ylim = NULL,
-                                n = 16,
+                                n = 11,
                                 center = TRUE,
                                 normalize = TRUE,
                                 arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")) {
@@ -171,8 +170,8 @@ geom_gradient_field2 <- function(mapping = NULL, data = NULL,
                                 fun,
                                 xlim = NULL,
                                 ylim = NULL,
-                                n = 16,
-                                center = TRUE,
+                                n = 11,
+                                center = FALSE,
                                 normalize = TRUE,
                                 arrow = NULL
 ) {
@@ -215,7 +214,7 @@ stat_gradient_field2 <- function(mapping = NULL, data = NULL,
                                 fun,
                                 xlim = NULL,
                                 ylim = NULL,
-                                n = 16,
+                                n = 11,
                                 center = TRUE,
                                 normalize = TRUE,
                                 arrow = NULL) {

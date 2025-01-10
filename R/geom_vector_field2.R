@@ -110,9 +110,9 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
                                tail_point.size = 2,
                                arrow = NULL,
                                fun = NULL,
-                               xlim = c(-10, 10),
-                               ylim = c(-10, 10),
-                               n = 10,
+                               xlim = c(-1, 1),
+                               ylim = c(-1, 1),
+                               n = 11,
                                show.legend = NA,
                                inherit.aes = TRUE) {
   # Default aesthetics: length maps to norm, and color is left unset (NULL).

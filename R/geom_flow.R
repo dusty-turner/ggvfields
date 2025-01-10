@@ -34,7 +34,7 @@
 #' @export
 #'
 #' @examples
-#' library(ggvfields)
+#'
 #' # Example user-defined function
 #' f <- function(v) {
 #'   x <- v[1]
@@ -63,8 +63,8 @@ geom_flow <- function(mapping = NULL, data = NULL,
                       show.legend = TRUE,
                       inherit.aes = TRUE,
                       fun,
-                      xlim = c(-10, 10),
-                      ylim = c(-10, 10),
+                      xlim = c(-1, 1),
+                      ylim = c(-1, 1),
                       n = c(21, 21),
                       iterations = 100,
                       threshold_distance = .5,

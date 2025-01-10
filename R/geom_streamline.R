@@ -29,7 +29,7 @@
 #'   stream plot.
 #' @export
 #' @examples
-#' library(ggvfields)
+#'
 #' # Example user-defined function
 #' f <- function(v) {
 #'   x <- v[1]
@@ -56,8 +56,8 @@ geom_streamplot <- function(mapping = NULL, data = NULL,
                             show.legend = TRUE,
                             inherit.aes = TRUE,
                             fun,
-                            xlim = c(-10, 10),
-                            ylim = c(-10, 10),
+                            xlim = c(-1, 1),
+                            ylim = c(-1, 1),
                             n = c(21, 21),
                             mask_shape_type = "square",
                             iterations = 100,
@@ -112,8 +112,8 @@ stat_streamplot <- function(mapping = NULL, data = NULL,
                             show.legend = TRUE,
                             inherit.aes = TRUE,
                             fun,
-                            xlim = c(-10, 10),
-                            ylim = c(-10, 10),
+                            xlim = c(-1, 1),
+                            ylim = c(-1, 1),
                             n = c(21, 21),
                             mask_shape_type = "square",
                             iterations = 100,

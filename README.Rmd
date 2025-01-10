@@ -33,7 +33,7 @@ remotes::install_github("dusty-turner/ggvfields")
 Load the package in R:
   
 ```{r}
-library(ggvfields)
+library("ggvfields")
 ```
 
 Generate sample wind data:

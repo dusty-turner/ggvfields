@@ -19,7 +19,7 @@ will work with gganimate syntax.
 }
 \examples{
 \dontrun{
-library(ggvfields)
+
 library(gganimate)
 
 # Example user-defined function

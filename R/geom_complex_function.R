@@ -37,7 +37,7 @@ geom_complex_function <- function(mapping = NULL, data = NULL,
                                   fun,
                                   relim,
                                   imlim,
-                                  n = 10) {
+                                  n = 11) {
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
 
