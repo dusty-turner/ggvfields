@@ -20,15 +20,16 @@
 #'
 #' @examples
 #' # Define a conservative vector field function
+#' library(ggvfields)
 #' fun <- function(v) {
-#'   x <- v[1]
-#'   y <- v[2]
-#'   c(2 * x * y + exp(x), x^2 + 2 * y)
+#' x <- v[1]
+#' y <- v[2]
+#' c(sin(x) + y, x - sin(y))
 #' }
 #'
 #' # Define domain limits
-#' xlim <- c(7, 10)
-#' ylim <- c(7, 10)
+#' xlim <- c(-pi, pi)
+#' ylim <- c(-pi, pi)
 #'
 #' # Create the potential function heatmap
 #' ggplot() +

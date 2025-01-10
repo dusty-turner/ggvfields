@@ -264,21 +264,21 @@ A potential function represents a scalar field whose gradient produces a vector 
 The `geom_potential` function computes and visualizes the scalar potential function for a given conservative vector field. The input function must represent a 2D vector field and the output is the corresponding potential function. If the input field is not conservative, the function checks this condition numerically based on a tolerance parameter. The tolerance determines how strictly the field must satisfy the conservation condition.
 
 ```{r}
-potential_fun <- function(v) {
+conservative_fun <- function(v) {
  x <- v[1]
  y <- v[2]
  c(sin(x) + y, x - sin(y))
 }
 
 ggplot() +
-  geom_potential(fun = potential_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi))
+  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi))
 ```
 
 The tolerance parameter can be adjusted to control the sensitivity of the conservativeness check. Decreasing the tolerance makes the check stricter, while increasing it allows for more numerical error.
 
 ```{r}
 ggplot() +
-  geom_potential(fun = potential_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), tolerance = 1e-4)
+  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), tolerance = 1e-4)
 ```
 
 As with other functions, we can increase the granulatity of the visualization with the `n` parameter.
