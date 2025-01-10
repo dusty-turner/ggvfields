@@ -40,16 +40,20 @@ empty <- function(df) {
 }
 
 vectorize <- function(f, drop = TRUE) {
-  function(v) {
+  function(v, ...) {
     stopifnot(is.numeric(v))
     if (is.vector(v)) v <- matrix(v, nrow = 1)
-    out <- list(nrow(v))
-    for (i in 1:nrow(v)) out[[i]] <- f(v[i,])
+    out <- vector("list", nrow(v))
+
+    for (i in seq_len(nrow(v))) {
+      # Pass ... along to f()
+      out[[i]] <- f(v[i, ], ...)
+    }
+
     out <- t(simplify2array(out))
-    if ((nrow(out) == 1L) && drop) out[1,] else out
+    if ((nrow(out) == 1L) && drop) out[1, ] else out
   }
 }
-
 ## helper functions for hession / laplacian
 extract_component_function <- function(fun, index) {
   function(v) fun(v)[index]

@@ -182,7 +182,7 @@ StatVector <- ggproto(
     color = "black", fill = "black", linewidth = 2, linetype = 1, alpha = 1
   ),
 
-  compute_group = function(data, scales, center = FALSE, fun = NULL, xlim = NULL, ylim = NULL, n = NULL, ...) {
+  compute_group = function(data, scales, center = FALSE, fun = NULL, xlim = NULL, ylim = NULL, n = NULL, args = list(), ...) {
 
     # Scenario: Using a function to generate the vector field
     if (!is.null(fun)) {
@@ -204,7 +204,11 @@ StatVector <- ggproto(
         y = seq(ylim[1], ylim[2], length.out = n)
       )
 
-      vectors <- vectorize(fun)(as.matrix(data))
+      # vectors <- vectorize(fun)(as.matrix(data))
+
+      vectors <- rlang::inject(
+        vectorize(fun)(as.matrix(data), !!!args)
+      )
 
       data$dx <- vectors[, 1]
       data$dy <- vectors[, 2]

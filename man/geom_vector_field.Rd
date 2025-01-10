@@ -18,6 +18,7 @@ geom_vector_field(
   tail_point.size = 2,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
   fun = NULL,
+  args = list(),
   xlim = NULL,
   ylim = NULL,
   n = NULL,
@@ -37,6 +38,7 @@ stat_vector_field(
   fun = NULL,
   xlim = c(-1, 1),
   ylim = c(-1, 1),
+  args = list(),
   n = 11,
   center = TRUE,
   normalize = TRUE,
@@ -119,6 +121,10 @@ to use \code{position_jitter()}, give the position as \code{"jitter"}.
 
 \item{fun}{A function that takes a vector \verb{(x, y)} and returns \verb{(dx, dy)}, defining
 vector displacements.}
+
+\item{args}{A named list of additional arguments to pass to \code{fun}. For example, if
+your function signature is \verb{function(v, scale = 1)}, you can supply
+\code{args = list(scale = 2)} to change the \code{scale} parameter.}
 
 \item{xlim, ylim}{Numeric vectors of length 2 defining the domain limits on the x/y-axis.}
 
@@ -214,4 +220,22 @@ ggplot(wind_data, aes(x = lon, y = lat)) +
 ggplot(wind_data) +
   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy), color = "black", normalize = FALSE) +
   geom_vector_field(fun = f, xlim = c(-5, 5), ylim = c(-5, 5))
+
+### 4. Passing additional arguments to `fun` using `args`:
+#    Suppose we define a rotation-like field with a tunable scale:
+f_scale <- function(v, scale = 1) {
+  x <- v[1]; y <- v[2]
+  scale * c(-y, x)
+}
+
+#    Now we can pass 'scale' via args = list(scale = 10):
+ggplot() +
+  geom_vector_field(
+    fun = f_scale,
+    xlim = c(-5, 5), ylim = c(-5, 5),
+    args = list(scale = 10), # <- pass scale to fun
+    color = "blue"
+  ) +
+  coord_fixed()
+
 }
