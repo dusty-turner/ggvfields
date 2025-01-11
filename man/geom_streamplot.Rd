@@ -24,6 +24,7 @@ geom_streamplot(
   mask_shape_type = "square",
   iterations = 100,
   stream_density = 1,
+  method = "rk4",
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   chop = TRUE,
   scale_stream = 1
@@ -45,6 +46,7 @@ stat_streamplot(
   mask_shape_type = "square",
   iterations = 100,
   stream_density = 1,
+  method = "rk4",
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   chop = TRUE,
   scale_stream = 1
@@ -157,6 +159,9 @@ the numerical integration of the flow.}
 \item{stream_density}{A numeric value that controls the density of the streamlines.
 Higher values produce more streamlines. Default is 1.}
 
+\item{method}{A character string specifying the ODE solver method to be used
+(passed to \code{\link[deSolve:ode]{deSolve::ode()}}). Default is "rk4".}
+
 \item{arrow}{Arrow specification, as created by \code{grid::arrow()}.}
 
 \item{chop}{A logical value indicating whether to chop the trajectories into
@@ -182,11 +187,12 @@ f <- function(v) {
   y <- v[2]
   c(-1 - x^2 + y, 1 + x - y^2)
 }
+
 ggplot() +
   geom_streamplot(
     fun = f, xlim = c(-3, 3), ylim = c(-3, 3), n = c(15, 15),
     iterations = 100, chop = TRUE, scale_stream = 1,
-    mask_shape_type = "square"
+    mask_shape_type = "square", method = "rk4"
   ) +
   coord_fixed() +
   theme_minimal()

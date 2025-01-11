@@ -25,6 +25,7 @@ Load the package in R:
 ``` r
 library("ggvfields")
 #> Loading required package: ggplot2
+options(ggplot2.continuous.colour="viridis")
 ```
 
 Generate sample wind data:
@@ -464,6 +465,9 @@ flow lines, abstracting away complex calculations for the user.
 ``` r
 ggplot() +
   geom_flow(fun = f, xlim = c(-10, 10), ylim = c(-10, 10))
+#> Warning: Computation failed in `stat_flow()`.
+#> Caused by error in `ode()`:
+#> ! argument "method" is missing, with no default
 ```
 
 <img src="man/figures/README-unnamed-chunk-26-1.png" width="100%" />
@@ -508,6 +512,9 @@ ggplot() +
     fun = f, n = c(21, 21), xlim = c(-10, 10), ylim = c(-10, 10),
     iterations = 1000, threshold_distance = 0.5
   ) 
+#> Warning: Computation failed in `stat_flow()`.
+#> Caused by error in `ode()`:
+#> ! argument "method" is missing, with no default
 ```
 
 <img src="man/figures/README-unnamed-chunk-27-1.png" width="100%" />
