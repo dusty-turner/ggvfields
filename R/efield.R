@@ -16,7 +16,7 @@
 #' @return A vector containing the force felt by the test charge on account of
 #'   the electric field.
 #' @seealso \url{https://en.wikipedia.org/wiki/Coulomb%27s_law}
-#' @export
+#' @name efield
 #'
 #' @examples
 #'
@@ -32,15 +32,16 @@
 #' # visualize electric field
 #' ggplot() +
 #'   geom_vector_field(
-#'     fun = \(u) efield(u, charge_positions, charges),
+#'     fun = function(u) efield(u, charge_positions, charges),
 #'     xlim = c(-2,2), ylim = c(-2,2)
 #'   ) +
 #'   scale_color_viridis_c(trans = "log10")
 #'
+#'
+#' # visualize electric field using efield_maker, which is a simpler wrapper
 #' ggplot() +
 #'   geom_vector_field(
-#'     fun = efield,
-#'     args = list("charge_positions" = charge_positions, "charges" = charges),
+#'     fun = efield_maker(charge_positions, charges),
 #'     xlim = c(-2,2), ylim = c(-2,2)
 #'   ) +
 #'   scale_color_viridis_c(trans = "log10")
@@ -51,7 +52,10 @@
 #' k <- (4*pi*ep0)^-1
 #' efield(c(0,1), charge_positions, charges, k)
 #'
-#'
+
+
+#' @rdname efield
+#' @export efield
 efield <- function(u, charge_positions, charges, k = 1, q_test = +1) {
 
   norm <- function(u) sqrt(sum(u^2))
@@ -66,4 +70,12 @@ efield <- function(u, charge_positions, charges, k = 1, q_test = +1) {
   }
 
   F
+}
+
+
+
+#' @rdname efield
+#' @export efield_maker
+efield_maker <- function(charge_positions, charges, k = 1, q_test = +1) {
+  function(u) efield(u, charge_positions, charges, k = 1, q_test = +1)
 }

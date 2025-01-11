@@ -2,9 +2,12 @@
 % Please edit documentation in R/efield.R
 \name{efield}
 \alias{efield}
+\alias{efield_maker}
 \title{Electric field}
 \usage{
 efield(u, charge_positions, charges, k = 1, q_test = +1)
+
+efield_maker(charge_positions, charges, k = 1, q_test = +1)
 }
 \arguments{
 \item{u}{The position of the test charge.}
@@ -43,15 +46,16 @@ efield(c(0,1), charge_positions, charges)
 # visualize electric field
 ggplot() +
   geom_vector_field(
-    fun = \(u) efield(u, charge_positions, charges),
+    fun = function(u) efield(u, charge_positions, charges),
     xlim = c(-2,2), ylim = c(-2,2)
   ) +
   scale_color_viridis_c(trans = "log10")
 
+
+# visualize electric field using efield_maker, which is a simpler wrapper
 ggplot() +
   geom_vector_field(
-    fun = efield,
-    args = list("charge_positions" = charge_positions, "charges" = charges),
+    fun = efield_maker(charge_positions, charges),
     xlim = c(-2,2), ylim = c(-2,2)
   ) +
   scale_color_viridis_c(trans = "log10")
@@ -61,7 +65,6 @@ ggplot() +
 ep0 <- 8.854187818814e-12
 k <- (4*pi*ep0)^-1
 efield(c(0,1), charge_positions, charges, k)
-
 
 }
 \seealso{
