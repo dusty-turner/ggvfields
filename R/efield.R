@@ -6,9 +6,9 @@
 #'
 #' @param u The position of the test charge.
 #' @param charge_positions The positions of the fixed charges generating the
-#'   electric field.
+#'   electric field. Defaulted in [efield_maker()].
 #' @param charges The charges of the points placed at the positions of
-#'   charge_positions.
+#'   charge_positions. Defaulted in [efield_maker()].
 #' @param k The constant of proportionality, defaulted to 1. See examples for a
 #'   more rigorous use of physical constants.
 #' @param q_test The test charge, defaulted to +1.
@@ -39,11 +39,9 @@
 #'
 #'
 #' # visualize electric field using efield_maker, which is a simpler wrapper
+#' # it defaults charge_positions and charges to those above for easy ex usage
 #' ggplot() +
-#'   geom_vector_field(
-#'     fun = efield_maker(charge_positions, charges),
-#'     xlim = c(-2,2), ylim = c(-2,2)
-#'   ) +
+#'   geom_vector_field(fun = efield_maker(), xlim = c(-2,2), ylim = c(-2,2)) +
 #'   scale_color_viridis_c(trans = "log10")
 #'
 #'
@@ -76,6 +74,11 @@ efield <- function(u, charge_positions, charges, k = 1, q_test = +1) {
 
 #' @rdname efield
 #' @export efield_maker
-efield_maker <- function(charge_positions, charges, k = 1, q_test = +1) {
+efield_maker <- function(
+  charge_positions = rbind(c(-1,-1), c(1,1)),
+  charges = c(-1, +1),
+  k = 1,
+  q_test = +1
+) {
   function(u) efield(u, charge_positions, charges, k = 1, q_test = +1)
 }
