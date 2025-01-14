@@ -16,10 +16,16 @@
     <loc>/reference/animation_transition.html</loc>
   </url>
   <url>
+    <loc>/reference/efield.html</loc>
+  </url>
+  <url>
     <loc>/reference/geom_complex_function.html</loc>
   </url>
   <url>
     <loc>/reference/geom_flow.html</loc>
+  </url>
+  <url>
+    <loc>/reference/geom_function_2d.html</loc>
   </url>
   <url>
     <loc>/reference/geom_gradient_field.html</loc>
