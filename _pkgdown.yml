@@ -19,14 +19,16 @@ reference:
       - stat_vector_field
       - geom_vector_field2
       - stat_vector_field2
-      - stat_gradient_field
       - geom_gradient_field
+      - stat_gradient_field
       - geom_gradient_field2
       - stat_gradient_field2
       - scale_length_continuous
       - geom_flow
       - geom_streamplot
       - geom_vector_smooth
+      - geom_function_2d
       - geom_potential
       - ggvfields
       - animation_transition
+      - efield

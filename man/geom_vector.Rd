@@ -26,6 +26,7 @@ geom_vector(
   center = TRUE,
   normalize = TRUE,
   tail_point = FALSE,
+  eval_point = FALSE,
   tail_point.size = 2
 )
 
@@ -41,6 +42,7 @@ stat_vector(
   inherit.aes = TRUE,
   center = TRUE,
   normalize = TRUE,
+  eval_point = FALSE,
   tail_point = FALSE,
   tail_point.size = 2
 )
@@ -139,7 +141,8 @@ that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
 \item{arrow}{Arrow specification for adding arrowheads to vectors, created with
-\code{grid::arrow()}. Controls arrowhead angle, length, and type.}
+\code{grid::arrow()}. Controls arrowhead angle, length, and type.
+Setting \code{arrow = NULL} will remove arrowheads.}
 
 \item{center}{Logical; if \code{TRUE}, the vector is centered on the (\code{x}, \code{y}) location.
 If \code{FALSE}, the vector originates at the (\code{x}, \code{y}) location. When centered, the
@@ -151,6 +154,9 @@ ensures consistent visual representation.}
 
 \item{tail_point}{Logical; if \code{TRUE}, adds a point at the tail of each vector to mark
 the starting position more clearly.}
+
+\item{eval_point}{Logical; if \code{TRUE}, adds a point at the evaluation end (or midpoint if centered)
+of each vector to mark the target or midpoint position more clearly.}
 
 \item{tail_point.size}{Numeric value indicating the size of the tail point if
 \code{tail_point = TRUE}.}

@@ -64,7 +64,8 @@ to map the <strong>vector norm (magnitude)</strong> to the <code>length</code> a
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  tail_point <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  eval_point <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -78,7 +79,8 @@ to map the <strong>vector norm (magnitude)</strong> to the <code>length</code> a
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  tail_point <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  eval_point <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -163,6 +165,11 @@ Default is <code>FALSE</code>, meaning the vector starts at the specified (<code
 <dt>tail_point</dt>
 <dd><p>Logical; if <code>TRUE</code>, adds a point to mark the tail of each vector.
 Default is <code>TRUE</code> in <code>geom_vector2</code>, providing a small marker at the tail.</p></dd>
+
+
+<dt>eval_point</dt>
+<dd><p>Logical; if <code>TRUE</code>, adds a point at the evaluation end (or midpoint if centered)
+of each vector to mark the target or midpoint position more clearly.</p></dd>
 
 
 <dt>arrow</dt>
