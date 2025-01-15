@@ -551,6 +551,14 @@ GeomVector <- ggproto(
 #' @param ... Other arguments passed to `continuous_scale()`.
 #' @export
 scale_length_continuous <- function(max_range = 0.5, ...) {
+
+  args <- list(...)
+
+  if (any(grepl("trans|transform", names(args), ignore.case = TRUE))) {
+    warning("Applying a log style transformation with scale_length_continuous may yield negative length values for norms below 1,
+            potentially reversing the direction of the vector(s).")
+  }
+
   continuous_scale(
     aesthetics = "length",
     palette = scales::rescale_pal(range = c(0, max_range)),
