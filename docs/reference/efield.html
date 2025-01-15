@@ -56,7 +56,12 @@ for visualizing vector fields with ggvfields.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">efield</span><span class="op">(</span><span class="va">u</span>, <span class="va">charge_positions</span>, <span class="va">charges</span>, k <span class="op">=</span> <span class="fl">1</span>, q_test <span class="op">=</span> <span class="op">+</span><span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">efield_maker</span><span class="op">(</span><span class="va">charge_positions</span>, <span class="va">charges</span>, k <span class="op">=</span> <span class="fl">1</span>, q_test <span class="op">=</span> <span class="op">+</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">efield_maker</span><span class="op">(</span></span>
+<span>  charge_positions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  charges <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="op">+</span><span class="fl">1</span><span class="op">)</span>,</span>
+<span>  k <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  q_test <span class="op">=</span> <span class="op">+</span><span class="fl">1</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -67,12 +72,12 @@ for visualizing vector fields with ggvfields.</p>
 
 <dt>charge_positions</dt>
 <dd><p>The positions of the fixed charges generating the
-electric field.</p></dd>
+electric field. Defaulted in <code>efield_maker()</code>.</p></dd>
 
 
 <dt>charges</dt>
 <dd><p>The charges of the points placed at the positions of
-charge_positions.</p></dd>
+charge_positions. Defaulted in <code>efield_maker()</code>.</p></dd>
 
 
 <dt>k</dt>
@@ -120,11 +125,9 @@ the electric field.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># visualize electric field using efield_maker, which is a simpler wrapper</span></span></span>
+<span class="r-in"><span><span class="co"># it defaults charge_positions and charges to those above for easy ex usage</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    fun <span class="op">=</span> <span class="fu">efield_maker</span><span class="op">(</span><span class="va">charge_positions</span>, <span class="va">charges</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="fu">efield_maker</span><span class="op">(</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">scale_color_viridis_c</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"log10"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="efield-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>

@@ -20,20 +20,71 @@
 #' @export
 #'
 #' @examples
+#' # Function that calculates the norm
 #' f <- function(v) {
 #'   x <- v[1]
 #'   y <- v[2]
-#'   c(y, -x)
+#'   c(sqrt(x^2 + y^2))
 #' }
 #'
 #' ggplot() +
 #'   geom_function_2d(fun = f, xlim = c(-5, 5), ylim = c(-5, 5))
 #'
+#' # Sinusoidal combination of sine and cosine
+#' f_sin_cos <- function(v) {
+#'   x <- v[1]
+#'   y <- v[2]
+#'   sin(x) * cos(y)
+#' }
+#'
 #' ggplot() +
-#'   geom_function_2d(fun = f, xlim = c(-5, 5), ylim = c(-5, 5)) +
-#'   geom_vector_field(fun = f, xlim = c(-5, 5), ylim = c(-5, 5))
-
-
+#'   geom_function_2d(fun = f_sin_cos, xlim = c(-5, 5), ylim = c(-5, 5))
+#'
+#' # Gaussian bump function
+#' f_gaussian <- function(v) {
+#'   x <- v[1]
+#'   y <- v[2]
+#'   exp(-(x^2 + y^2) / 2)
+#' }
+#'
+#' ggplot() +
+#'   geom_function_2d(fun = f_gaussian, xlim = c(-5, 5), ylim = c(-5, 5))
+#'
+#' # Radial sine wave function
+#' f_radial_wave <- function(v) {
+#'   x <- v[1]
+#'   y <- v[2]
+#'   r <- sqrt(x^2 + y^2)
+#'   sin(r)
+#' }
+#'
+#' # Some functions need more resolution for clarity
+#' ggplot() +
+#'   geom_function_2d(fun = f_radial_wave, xlim = c(-50, 50), ylim = c(-50, 50), n = 100)
+#'
+#' # Complex combination of radial and angular components
+#' f_complex <- function(v) {
+#'   x <- v[1]
+#'   y <- v[2]
+#'   r <- sqrt(x^2 + y^2)
+#'   theta <- atan2(y, x)
+#'   sin(r) * cos(theta)
+#' }
+#'
+#' ggplot() +
+#'   geom_function_2d(fun = f_complex, xlim = c(-50, 50), ylim = c(-50, 50), n = 500)
+#'
+#' # Spiral pattern function
+#' f_spiral <- function(v) {
+#'   x <- v[1]
+#'   y <- v[2]
+#'   r <- sqrt(x^2 + y^2)
+#'   theta <- atan2(y, x)
+#'   sin(r + theta)
+#' }
+#'
+#' ggplot() +
+#'   geom_function_2d(fun = f_spiral, xlim = c(-50, 50), ylim = c(-50, 50), n = 500)
 
 geom_function_2d <- function(mapping = NULL, data = NULL,
                               stat = StatFunction2d, geom = GeomFunction2d,
@@ -85,7 +136,7 @@ stat_function_2d <- function(mapping = NULL, data = NULL,
                               fun = NULL,
                               xlim = c(-1, 1),
                               ylim = c(-1, 1),
-                              n = 11) {
+                              n = 50) {
 
   # Pass the parameters via `params` only
   layer(
@@ -131,25 +182,14 @@ StatFunction2d <- ggproto(
         }
       }
 
-      if (is.null(n)) n <- 11
+      if (is.null(n)) n <- 50
 
       data <- expand.grid(
         x = seq(xlim[1], xlim[2], length.out = n),
         y = seq(ylim[1], ylim[2], length.out = n)
       )
 
-      vectors <- vectorize(fun)(as.matrix(data))
-
-      data$dx <- vectors[, 1]
-      data$dy <- vectors[, 2]
-
-      # # Compute divergence and curl
-      # grad <- apply(data[, c("x", "y")], 1, function(v) numDeriv::grad(fun, v)) |> t()
-      # grad_u <- grad[, 1]
-      # grad_v <- grad[, 2]
-      #
-      # data$divergence <- grad_u + grad_v
-      # data$curl <- grad_v - grad_u
+      data$z <- vectorize(fun)(as.matrix(data))
 
     } else {
       # fun is NULL, expecting user-provided data with x,y and dx,dy or angle/distance
@@ -157,24 +197,9 @@ StatFunction2d <- ggproto(
         stop("`stat_vector()` requires `x` and `y` aesthetics or a `fun` with `xlim`/`ylim`.")
       }
 
-      # If dx/dy are missing, try angle/distance
-      if ((all(is.na(data$dx)) || all(is.na(data$dy))) &&
-          (!is.na(data$distance[1]) && !is.na(data$angle[1]))) {
-        data$dx <- data$distance * cos(data$angle)
-        data$dy <- data$distance * sin(data$angle)
-      }
-
-      # Check again if dx,dy are available
-      if (all(is.na(data$dx)) | all(is.na(data$dy))) {
-        stop("Either dx/dy or distance/angle must be provided.")
-      }
     }
 
-    data$xend <- data$x + data$dx
-    data$yend <- data$y + data$dy
-    data$norm <- sqrt(data$dx^2 + data$dy^2)
-
-    data <- data.frame(x = data$x, y = data$y, norm = data$norm)
+    data <- data.frame(x = data$x, y = data$y, z = data$z)
 
     data
   }
@@ -208,7 +233,7 @@ GeomFunction2d <- ggproto(
     color_levels <- pal(n_colors)
 
     # Map norm values to indices in the color palette
-    norm_indices <- round(scales::rescale(coords$norm, to = c(1, n_colors)))
+    norm_indices <- round(scales::rescale(coords$z, to = c(1, n_colors)))
     norm_indices[is.na(norm_indices)] <- 1
 
     # Create a matrix of colors corresponding to the norm values
@@ -232,31 +257,3 @@ GeomFunction2d <- ggproto(
     raster_grob
   }
 )
-
-# GeomFunction2d <- ggproto(
-#   "GeomFunction2d",
-#   Geom,
-#
-#   default_aes = aes(color = "black", alpha = 1),
-#
-#   draw_group = function(data, panel_params, coord, na.rm = FALSE, ...){
-#
-#     coords <- coord$transform(data, panel_params)
-#
-#     image_matrix <- matrix(scales::rescale(coords$norm), nrow = length(unique(coords$x)), ncol = length(unique(coords$y)))
-#
-#     raster_grob <- grid::rasterGrob(
-#       image = image_matrix,
-#       x = unit(0.5, "npc"), # Centered in the plot space
-#       y = unit(0.5, "npc"),
-#       width = unit(1, "npc"),
-#       height = unit(1, "npc"),
-#       interpolate = TRUE,
-#       gp = grid::gpar(alpha = coords$alpha[1])
-#     )
-#
-#     return(raster_grob)
-#
-#   }
-#
-# )

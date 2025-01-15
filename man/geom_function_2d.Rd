@@ -40,7 +40,7 @@ stat_function_2d(
   fun = NULL,
   xlim = c(-1, 1),
   ylim = c(-1, 1),
-  n = 11
+  n = 50
 )
 
 StatFunction2d
@@ -81,17 +81,70 @@ A \code{ggplot2} layer.
 \code{geom_function_2d} adds a layer to visualize 2D functions or vector fields in a \code{ggplot2} plot.
 }
 \examples{
+# Function that calculates the norm
 f <- function(v) {
   x <- v[1]
   y <- v[2]
-  c(y, -x)
+  c(sqrt(x^2 + y^2))
 }
 
 ggplot() +
   geom_function_2d(fun = f, xlim = c(-5, 5), ylim = c(-5, 5))
 
+# Sinusoidal combination of sine and cosine
+f_sin_cos <- function(v) {
+  x <- v[1]
+  y <- v[2]
+  sin(x) * cos(y)
+}
+
 ggplot() +
-  geom_function_2d(fun = f, xlim = c(-5, 5), ylim = c(-5, 5)) +
-  geom_vector_field(fun = f, xlim = c(-5, 5), ylim = c(-5, 5))
+  geom_function_2d(fun = f_sin_cos, xlim = c(-5, 5), ylim = c(-5, 5))
+
+# Gaussian bump function
+f_gaussian <- function(v) {
+  x <- v[1]
+  y <- v[2]
+  exp(-(x^2 + y^2) / 2)
+}
+
+ggplot() +
+  geom_function_2d(fun = f_gaussian, xlim = c(-5, 5), ylim = c(-5, 5))
+
+# Radial sine wave function
+f_radial_wave <- function(v) {
+  x <- v[1]
+  y <- v[2]
+  r <- sqrt(x^2 + y^2)
+  sin(r)
+}
+
+# Some functions need more resolution for clarity
+ggplot() +
+  geom_function_2d(fun = f_radial_wave, xlim = c(-50, 50), ylim = c(-50, 50), n = 100)
+
+# Complex combination of radial and angular components
+f_complex <- function(v) {
+  x <- v[1]
+  y <- v[2]
+  r <- sqrt(x^2 + y^2)
+  theta <- atan2(y, x)
+  sin(r) * cos(theta)
+}
+
+ggplot() +
+  geom_function_2d(fun = f_complex, xlim = c(-50, 50), ylim = c(-50, 50), n = 500)
+
+# Spiral pattern function
+f_spiral <- function(v) {
+  x <- v[1]
+  y <- v[2]
+  r <- sqrt(x^2 + y^2)
+  theta <- atan2(y, x)
+  sin(r + theta)
+}
+
+ggplot() +
+  geom_function_2d(fun = f_spiral, xlim = c(-50, 50), ylim = c(-50, 50), n = 500)
 }
 \keyword{datasets}

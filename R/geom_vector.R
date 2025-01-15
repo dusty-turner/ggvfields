@@ -186,6 +186,22 @@ StatVector <- ggproto(
 
     # Scenario: Using a function to generate the vector field
     if (!is.null(fun)) {
+
+      if (length(args) > 0) {
+        # only enters this if there are arguments passed
+        possible_fun <- try(rlang::inject(fun(!!!args)), silent = TRUE)
+        if (!inherits(possible_fun, "try-error") && is.function(possible_fun)) {
+          # If here then the function given creates more functions (generating function)
+          fun <- possible_fun
+        } else {
+          # If here then not a generating function - inject arguments and move on
+          original_fun <- fun
+          fun <- function(v) {
+            rlang::inject(original_fun(v, !!!args))
+          }
+        }
+      }
+
       # If xlim and ylim provided, generate grid from those
       # If not provided, try to infer from data
       if (is.null(xlim) || is.null(ylim)) {
@@ -204,11 +220,11 @@ StatVector <- ggproto(
         y = seq(ylim[1], ylim[2], length.out = n)
       )
 
-      # vectors <- vectorize(fun)(as.matrix(data))
+      vectors <- vectorize(fun)(as.matrix(data))
 
-      vectors <- rlang::inject(
-        vectorize(fun)(as.matrix(data), !!!args)
-      )
+      # vectors <- rlang::inject(
+      #   vectorize(fun)(as.matrix(data), !!!args)
+      # )
 
       data$dx <- vectors[, 1]
       data$dy <- vectors[, 2]
