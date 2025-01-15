@@ -15,7 +15,8 @@ geom_vector2(
   show.legend = NA,
   inherit.aes = TRUE,
   center = FALSE,
-  tail_point = TRUE,
+  tail_point = FALSE,
+  eval_point = TRUE,
   arrow = NULL
 )
 
@@ -29,7 +30,8 @@ stat_vector2(
   show.legend = NA,
   inherit.aes = TRUE,
   center = FALSE,
-  tail_point = TRUE,
+  tail_point = FALSE,
+  eval_point = TRUE,
   arrow = NULL
 )
 }
@@ -100,6 +102,9 @@ Default is \code{FALSE}, meaning the vector starts at the specified (\code{x}, \
 
 \item{tail_point}{Logical; if \code{TRUE}, adds a point to mark the tail of each vector.
 Default is \code{TRUE} in \code{geom_vector2}, providing a small marker at the tail.}
+
+\item{eval_point}{Logical; if \code{TRUE}, adds a point at the evaluation end (or midpoint if centered)
+of each vector to mark the target or midpoint position more clearly.}
 
 \item{arrow}{Arrow specification for vector arrowheads, created with \code{grid::arrow()}.
 Controls the appearance of arrowheads, including angle, length, and type. Default is \code{NULL}.}

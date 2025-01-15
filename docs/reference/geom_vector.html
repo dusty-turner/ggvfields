@@ -67,6 +67,7 @@ and either directional components (<code>dx</code>, <code>dy</code>) or polar co
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  tail_point.size <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -82,6 +83,7 @@ and either directional components (<code>dx</code>, <code>dy</code>) or polar co
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  tail_point.size <span class="op">=</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span>
@@ -195,7 +197,8 @@ the default plot specification, e.g. <code><a href="https://ggplot2.tidyverse.or
 
 <dt>arrow</dt>
 <dd><p>Arrow specification for adding arrowheads to vectors, created with
-<code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code>. Controls arrowhead angle, length, and type.</p></dd>
+<code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code>. Controls arrowhead angle, length, and type.
+Setting <code>arrow = NULL</code> will remove arrowheads.</p></dd>
 
 
 <dt>center</dt>
@@ -213,6 +216,11 @@ ensures consistent visual representation.</p></dd>
 <dt>tail_point</dt>
 <dd><p>Logical; if <code>TRUE</code>, adds a point at the tail of each vector to mark
 the starting position more clearly.</p></dd>
+
+
+<dt>eval_point</dt>
+<dd><p>Logical; if <code>TRUE</code>, adds a point at the evaluation end (or midpoint if centered)
+of each vector to mark the target or midpoint position more clearly.</p></dd>
 
 
 <dt>tail_point.size</dt>

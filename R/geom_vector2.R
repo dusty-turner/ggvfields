@@ -59,7 +59,8 @@ geom_vector2 <- function(mapping = NULL, data = NULL,
                          show.legend = NA,
                          inherit.aes = TRUE,
                          center = FALSE,
-                         tail_point = TRUE,
+                         tail_point = FALSE,
+                         eval_point = TRUE,
                          arrow = NULL) {
 
   if (is.null(mapping)) {
@@ -80,6 +81,7 @@ geom_vector2 <- function(mapping = NULL, data = NULL,
     inherit.aes = inherit.aes,
     center = center,
     tail_point = tail_point,
+    eval_point = eval_point,
     arrow = arrow
   )
 }
@@ -93,7 +95,8 @@ stat_vector2 <- function(mapping = NULL, data = NULL,
                          show.legend = NA,
                          inherit.aes = TRUE,
                          center = FALSE,
-                         tail_point = TRUE,
+                         tail_point = FALSE,
+                         eval_point = TRUE,
                          arrow = NULL
                          ) {
   mapping <- modifyList(aes(length = after_stat(norm), color = NULL), mapping)
@@ -108,6 +111,7 @@ stat_vector2 <- function(mapping = NULL, data = NULL,
     inherit.aes = inherit.aes,
     center = center,
     tail_point = tail_point,
+    eval_point = eval_point,
     arrow = arrow
   )
 }

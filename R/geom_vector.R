@@ -20,10 +20,13 @@
 #'   ensures consistent visual representation.
 #' @param tail_point Logical; if `TRUE`, adds a point at the tail of each vector to mark
 #'   the starting position more clearly.
+#' @param eval_point Logical; if `TRUE`, adds a point at the evaluation end (or midpoint if centered)
+#'   of each vector to mark the target or midpoint position more clearly.
 #' @param tail_point.size Numeric value indicating the size of the tail point if
 #'   `tail_point = TRUE`.
 #' @param arrow Arrow specification for adding arrowheads to vectors, created with
 #'   `grid::arrow()`. Controls arrowhead angle, length, and type.
+#'   Setting `arrow = NULL` will remove arrowheads.
 #'
 #' @return A `ggplot2` layer that can be added to a ggplot object to produce a vector plot.
 #'
@@ -104,6 +107,7 @@ geom_vector <- function(mapping = NULL, data = NULL,
                         center = TRUE,
                         normalize = TRUE,
                         tail_point = FALSE,
+                        eval_point = FALSE,
                         tail_point.size = 2) {
 
   if (is.null(mapping)) {
@@ -127,6 +131,7 @@ geom_vector <- function(mapping = NULL, data = NULL,
       center = center,
       normalize = normalize,
       tail_point = tail_point,
+      eval_point = eval_point,
       tail_point.size = tail_point.size,
       ...
     )
@@ -145,6 +150,7 @@ stat_vector <- function(mapping = NULL, data = NULL,
                         inherit.aes = TRUE,
                         center = TRUE,
                         normalize = TRUE,
+                        eval_point = FALSE,
                         tail_point = FALSE,
                         tail_point.size = 2) {
 
@@ -275,11 +281,14 @@ draw_panel_vector <- function(
     arrow = NULL,
     center = TRUE,
     normalize = TRUE,
+    eval_point = FALSE,
     tail_point = FALSE,
     tail_point.size = 2,
     linewidth = 2
 ) {
-
+  ## initialize grobs
+  eval_points_grob <- NULL
+  points_grob <- NULL
   # If length is not mapped, normalize and center using the original data before transformation
   if (is.na(data$length[1])) {
 
@@ -287,7 +296,6 @@ draw_panel_vector <- function(
     coords <- coord$transform(data, panel_params)
 
     vector_coords <- coords[coords$norm!=0,] ## only plot vectors that have a norm (norm != 0)
-    # still allows for the tail point if the user wants a tail point
 
     # Create the vector grob
     vector_grob <- grid::segmentsGrob(
@@ -297,7 +305,6 @@ draw_panel_vector <- function(
       arrow = arrow
     )
 
-    points_grob <- NULL
     if (tail_point) {
       points_grob <- grid::pointsGrob(
         x = unit(coords$x, "npc"),  # The starting point (adjusted by centering)
@@ -307,9 +314,30 @@ draw_panel_vector <- function(
         gp = grid::gpar(col = coords$colour, fill = coords$fill, alpha = coords$alpha)
       )
     }
+    if (eval_point) {
+      # Determine the point coordinates based on the 'center' flag
+      if (center) {
+        # Calculate midpoints between (x, y) and (xend, yend)
+        x_point <- (coords$x + coords$xend) / 2
+        y_point <- (coords$y + coords$yend) / 2
+      } else {
+        # Use original starting point coordinates
+        x_point <- coords$x
+        y_point <- coords$y
+      }
+      # Create the pointsGrob at the determined coordinates
+      eval_points_grob <- grid::pointsGrob(
+        x = unit(x_point, "npc"),
+        y = unit(y_point, "npc"),
+        pch = 16,  # Solid circle
+        size = unit(2, "mm"),
+        gp = grid::gpar(col = coords$colour, fill = coords$fill)
+      )
+
+    }
 
     # Combine vector and points grobs
-    grobs <- list(vector_grob, points_grob)
+    grobs <- list(vector_grob, points_grob, eval_points_grob)
     grobs <- Filter(Negate(is.null), grobs)  # Remove NULL entries
     return(grid::grobTree(do.call(grid::gList, grobs)))
 
@@ -384,6 +412,15 @@ draw_panel_vector <- function(
           gp = grid::gpar(col = coords$colour, fill = coords$fill)  # Use mapped fill
         )
       }
+      if (eval_point) {
+        eval_points_grob <- grid::pointsGrob(
+          x = unit(coords$x, "npc"),
+          y = unit(coords$y, "npc"),
+          pch = 16,  # Solid circle
+          size = unit(2, "mm"),
+          gp = grid::gpar(col = coords$colour, fill = coords$fill)  # Use mapped fill
+        )
+      }
     } else {
 
       ## this determines if the user has adjusted the length of the arrow away from the default and makes it smaller
@@ -398,7 +435,6 @@ draw_panel_vector <- function(
         gp = grid::gpar(col = coords$colour, fill = coords$colour, lwd = linewidth),  # Use mapped fill
         arrow = arrow
       )
-      points_grob <- NULL
       if (tail_point) {
         points_grob <- grid::pointsGrob(
           x = unit(coords$x, "npc"),  # The starting point (adjusted by centering)
@@ -408,10 +444,20 @@ draw_panel_vector <- function(
           gp = grid::gpar(col = coords$colour, fill = coords$fill)  # Use mapped fill
         )
       }
+      if (eval_point) {
+        eval_points_grob <- grid::pointsGrob(
+          x = unit(coords$x, "npc"),
+          y = unit(coords$y, "npc"),
+          pch = 16,  # Solid circle
+          size = unit(2, "mm"),
+          gp = grid::gpar(col = coords$colour, fill = coords$fill)  # Use mapped fill
+        )
+      }
+
     }
 
     # Combine vector and points grobs
-    grobs <- list(vector_grob, points_grob)
+    grobs <- list(vector_grob, points_grob, eval_points_grob)
     grobs <- Filter(Negate(is.null), grobs)  # Remove NULL entries
     return(grid::grobTree(do.call(grid::gList, grobs)))
   }
@@ -464,7 +510,6 @@ GeomVector <- ggproto(
         x_spacing <- unique(diff(sort(unique(data$x))))
         y_spacing <- unique(diff(sort(unique(data$y))))
 
-
         # Calculate the minimum spacing or default to 1 if not a grid
         min_spacing <-
           if (length(x_spacing) == 0 || length(y_spacing) == 0) {
@@ -485,7 +530,6 @@ GeomVector <- ggproto(
         # Recalculate xend and yend after normalization/scaling
         data$xend <- data$x + data$dx
         data$yend <- data$y + data$dy
-
       }
 
       # Handle centering if requested (using the original data)
