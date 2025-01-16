@@ -13,7 +13,7 @@ specifying the upper bound of the output range. Should be between 0 and 1.}
 \item{...}{Other arguments passed to \code{continuous_scale()}.}
 }
 \description{
-\code{scale_length_continuous} provides a continuous scale for controlling the length
+\code{\link[=scale_length_continuous]{scale_length_continuous()}} provides a continuous scale for controlling the length
 aesthetic in a ggplot. This is particularly useful when working with vector plots
 where vector lengths are mapped to a continuous scale.
 }
