@@ -19,7 +19,7 @@ geom_flow(
   fun,
   xlim = c(-1, 1),
   ylim = c(-1, 1),
-  n = c(21, 21),
+  n = 11,
   iterations = 100,
   threshold_distance = 0.5,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
@@ -37,7 +37,7 @@ stat_flow(
   fun,
   xlim = c(-10, 10),
   ylim = c(-10, 10),
-  n = c(21, 21),
+  n = 11,
   iterations = 100,
   threshold_distance = 0.5,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")

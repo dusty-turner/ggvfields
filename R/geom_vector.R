@@ -467,7 +467,8 @@ draw_panel_vector <- function(
 #' @keywords internal
 draw_key_vector <- function(data, params, size) {
 
-  x0 <- unit(0.1, "npc")
+  # x0 <- unit(0.1, "npc")
+  x0 <- unit(0.05, "npc")
   y0 <- unit(0.5, "npc")
 
   length_value <- data$length
@@ -594,6 +595,21 @@ GeomVector <- ggproto(
 #'   specifying the upper bound of the output range. Should be between 0 and 1.
 #' @param ... Other arguments passed to `continuous_scale()`.
 #' @export
+# scale_length_continuous <- function(max_range = 0.5, ...) {
+#
+#   args <- list(...)
+#
+#   if (any(grepl("trans|transform", names(args), ignore.case = TRUE))) {
+#     warning("Applying a log style transformation with scale_length_continuous may yield negative length values for norms below 1,
+#             potentially reversing the direction of the vector(s).")
+#   }
+#
+#   continuous_scale(
+#     aesthetics = "length",
+#     palette = scales::rescale_pal(range = c(0, max_range)),
+#     ...
+#   )
+# }
 scale_length_continuous <- function(max_range = 0.5, ...) {
 
   args <- list(...)
@@ -603,10 +619,23 @@ scale_length_continuous <- function(max_range = 0.5, ...) {
             potentially reversing the direction of the vector(s).")
   }
 
-  continuous_scale(
+  scale <- continuous_scale(
     aesthetics = "length",
     palette = scales::rescale_pal(range = c(0, max_range)),
     ...
+  )
+
+  # Return only the scale if max_range is at its default value
+  if (max_range <= 0.5) {
+    return(scale)
+  }
+
+  # For larger max_range, combine scale with theme modification
+  adjusted_width <- unit(max(0.5, max_range * 1.1), "cm")
+
+  list(
+    scale,
+    theme(legend.key.width = adjusted_width)
   )
 }
 
