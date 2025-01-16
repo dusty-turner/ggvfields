@@ -123,7 +123,10 @@ StatPotential <- ggproto(
     grid_data$curl <- apply(grid_data[, c("x", "y")], 1, function(v) verify_potential(point = v, fun = fun, tolerance = tolerance))
 
     if (any(!grid_data$curl)) {
-      warning("The provided vector field does not have a potential function everywhere within the specified domain.")
+      cli::cli_warn(c(
+        "!" = "The provided vector field does not have a potential function everywhere within the specified domain.",
+        ">" = "Ensure that the vector field satisfies the necessary conditions for a potential function."
+      ))
     }
 
     # Apply the numerical potential computation to all points

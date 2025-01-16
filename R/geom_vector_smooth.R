@@ -241,7 +241,10 @@ StatVectorSmooth <- ggproto(
     # 1. Initial Data Checks and Manipulation
     # ----------------------------
     if (pi_type == "ellipse" && is.null(eval_points)) {
-      message("eval_points is NULL; changing pi_type from 'ellipse' to 'wedge'.")
+      cli::cli_warn(c(
+        "!" = "{.field eval_points} is {.code NULL}; changing {.field pi_type} from {.val ellipse} to {.val wedge}."
+      ))
+
       pi_type <- "wedge"
     }
     # Use helper function to validate input

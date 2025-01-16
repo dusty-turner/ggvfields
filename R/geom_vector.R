@@ -615,8 +615,10 @@ scale_length_continuous <- function(max_range = 0.5, ...) {
   args <- list(...)
 
   if (any(grepl("trans|transform", names(args), ignore.case = TRUE))) {
-    warning("Applying a log style transformation with scale_length_continuous may yield negative length values for norms below 1,
-            potentially reversing the direction of the vector(s).")
+    cli::cli_warn(c(
+      "!" = "Applying a log style transformation with `scale_length_continuous` may yield negative length values for norms below 1.",
+      ">" = "This may potentially reverse the direction of the vector(s)."
+    ))
   }
 
   scale <- continuous_scale(
