@@ -587,36 +587,31 @@ GeomVector <- ggproto(
 
 #' Create a Continuous Scale for Vector Length
 #'
-#' `scale_length_continuous` provides a continuous scale for controlling the length
-#' aesthetic in a ggplot. This is particularly useful when working with vector plots
-#' where vector lengths are mapped to a continuous scale.
+#' [scale_length_continuous()] provides a continuous scale for controlling the
+#' length aesthetic in a ggplot. This is particularly useful when working with
+#' vector plots where vector lengths are mapped to a continuous scale.
 #'
-#' @param max_range The maximum value to which the input is rescaled. Numeric scalar
-#'   specifying the upper bound of the output range. Should be between 0 and 1.
-#' @param ... Other arguments passed to `continuous_scale()`.
+#' @param max_range The maximum value to which the input is rescaled. Numeric
+#'   scalar specifying the upper bound of the output range. Should be between 0
+#'   and 1.
+#' @param ... Other arguments passed to [continuous_scale()].
 #' @export
-# scale_length_continuous <- function(max_range = 0.5, ...) {
-#
-#   args <- list(...)
-#
-#   if (any(grepl("trans|transform", names(args), ignore.case = TRUE))) {
-#     warning("Applying a log style transformation with scale_length_continuous may yield negative length values for norms below 1,
-#             potentially reversing the direction of the vector(s).")
-#   }
-#
-#   continuous_scale(
-#     aesthetics = "length",
-#     palette = scales::rescale_pal(range = c(0, max_range)),
-#     ...
-#   )
-# }
+#' @examples
+#'
+#' ggplot() +
+#'   geom_vector_field2(fun = efield_maker(), xlim = c(-2, 2), ylim = c(-2, 2)) +
+#'   scale_length_continuous(trans = "log10")
+#'
+#' ggplot() +
+#'   geom_vector_field2(fun = f, xlim = c(-2, 2), ylim = c(-2, 2)) +
+#'   scale_length_continuous(trans = "log10")
 scale_length_continuous <- function(max_range = 0.5, ...) {
 
   args <- list(...)
 
   if (any(grepl("trans|transform", names(args), ignore.case = TRUE))) {
     cli::cli_warn(c(
-      "!" = "Applying a log style transformation with `scale_length_continuous` may yield negative length values for norms below 1.",
+      "!" = "Applying a log style transformation with {.fn scale_length_continuous} may yield negative length values for norms below 1.",
       ">" = "This may potentially reverse the direction of the vector(s)."
     ))
   }
