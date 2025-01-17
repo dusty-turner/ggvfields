@@ -287,6 +287,8 @@ flow_ode <- function(time, state, parameters) {
 calculate_indices <- function(x, y, xlim, ylim, n) {
   xi <- min(floor((x - xlim[1]) / ((xlim[2] - xlim[1]) / n[2])) + 1, n[2])
   yi <- min(floor((y - ylim[1]) / ((ylim[2] - ylim[1]) / n[1])) + 1, n[1])
+  if(xi <= 0) xi <- 1
+  if(yi <= 0) yi <- 1
   return(c(xi, yi))
 }
 
