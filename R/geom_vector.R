@@ -595,9 +595,17 @@ GeomVector <- ggproto(
 #' @param max_range The maximum value to which the input is rescaled. Numeric
 #'   scalar specifying the upper bound of the output range. Should be between 0
 #'   and 1.
-#' @param ... Other arguments passed to `continuous_scale()`.
+#' @param ... Other arguments passed to [continuous_scale()].
 #' @export
-
+#' @examples
+#'
+#' ggplot() +
+#'   geom_vector_field2(fun = efield_maker(), xlim = c(-2, 2), ylim = c(-2, 2)) +
+#'   scale_length_continuous(trans = "log10")
+#'
+#' ggplot() +
+#'   geom_vector_field2(fun = f, xlim = c(-2, 2), ylim = c(-2, 2)) +
+#'   scale_length_continuous(trans = "log10")
 scale_length_continuous <- function(max_range = 0.5, ...) {
 
   args <- list(...)

@@ -7,13 +7,24 @@
 scale_length_continuous(max_range = 0.5, ...)
 }
 \arguments{
-\item{max_range}{The maximum value to which the input is rescaled. Numeric scalar
-specifying the upper bound of the output range. Should be between 0 and 1.}
+\item{max_range}{The maximum value to which the input is rescaled. Numeric
+scalar specifying the upper bound of the output range. Should be between 0
+and 1.}
 
-\item{...}{Other arguments passed to \code{continuous_scale()}.}
+\item{...}{Other arguments passed to \code{\link[=continuous_scale]{continuous_scale()}}.}
 }
 \description{
-\code{\link[=scale_length_continuous]{scale_length_continuous()}} provides a continuous scale for controlling the length
-aesthetic in a ggplot. This is particularly useful when working with vector plots
-where vector lengths are mapped to a continuous scale.
+\code{\link[=scale_length_continuous]{scale_length_continuous()}} provides a continuous scale for controlling the
+length aesthetic in a ggplot. This is particularly useful when working with
+vector plots where vector lengths are mapped to a continuous scale.
+}
+\examples{
+
+ggplot() +
+  geom_vector_field2(fun = efield_maker(), xlim = c(-2, 2), ylim = c(-2, 2)) +
+  scale_length_continuous(trans = "log10")
+
+ggplot() +
+  geom_vector_field2(fun = f, xlim = c(-2, 2), ylim = c(-2, 2)) +
+  scale_length_continuous(trans = "log10")
 }
