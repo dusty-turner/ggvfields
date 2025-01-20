@@ -69,7 +69,8 @@ geom_vector2 <- function(mapping = NULL, data = NULL,
     stop("mapping must be a list or NULL")
   }
 
-  mapping <- modifyList(aes(length = after_stat(norm), color = NULL), mapping)
+  mapping <- modifyList(aes(length = after_stat(norm)), mapping)
+
   geom_vector(
     mapping = mapping,
     data = data,
