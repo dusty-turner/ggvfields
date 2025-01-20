@@ -283,8 +283,7 @@ draw_panel_vector <- function(
     normalize = TRUE,
     eval_point = FALSE,
     tail_point = FALSE,
-    tail_point.size = 2,
-    linewidth = 2
+    tail_point.size = 2
 ) {
   ## initialize grobs
   eval_points_grob <- NULL
@@ -301,7 +300,7 @@ draw_panel_vector <- function(
     vector_grob <- grid::segmentsGrob(
       x0 = unit(vector_coords$x, "npc"), y0 = unit(vector_coords$y, "npc"),
       x1 = unit(vector_coords$xend, "npc"), y1 = unit(vector_coords$yend, "npc"),
-      gp = grid::gpar(col = vector_coords$colour, fill = vector_coords$colour, lwd = linewidth, alpha = vector_coords$alpha),
+      gp = grid::gpar(col = vector_coords$colour, fill = vector_coords$colour, lwd = vector_coords$linewidth, alpha = vector_coords$alpha),
       arrow = arrow
     )
 
@@ -400,7 +399,7 @@ draw_panel_vector <- function(
         y0 = unit(coords$y, "npc") - unit(half_dy, "cm"),
         x1 = unit(coords$x, "npc") + unit(half_dx, "cm"),
         y1 = unit(coords$y, "npc") + unit(half_dy, "cm"),
-        gp = grid::gpar(col = coords$colour, fill = coords$colour, lwd = linewidth),
+        gp = grid::gpar(col = coords$colour, fill = coords$colour, lwd = coords$linewidth),
         arrow = arrow
       )
       points_grob <- NULL
@@ -433,7 +432,7 @@ draw_panel_vector <- function(
         x0 = unit(coords$x, "npc"), y0 = unit(coords$y, "npc"),
         x1 = unit(coords$x, "npc") + unit(coords$length * coords$dx, "cm"),
         y1 = unit(coords$y, "npc") + unit(coords$length * coords$dy, "cm"),
-        gp = grid::gpar(col = coords$colour, fill = coords$colour, lwd = linewidth),  # Use mapped fill
+        gp = grid::gpar(col = coords$colour, fill = coords$colour, lwd = coords$linewidth),  # Use mapped fill
         arrow = arrow
       )
       if (tail_point) {
@@ -601,10 +600,6 @@ GeomVector <- ggproto(
 #'
 #' ggplot() +
 #'   geom_vector_field2(fun = efield_maker(), xlim = c(-2, 2), ylim = c(-2, 2)) +
-#'   scale_length_continuous(trans = "log10")
-#'
-#' ggplot() +
-#'   geom_vector_field2(fun = f, xlim = c(-2, 2), ylim = c(-2, 2)) +
 #'   scale_length_continuous(trans = "log10")
 scale_length_continuous <- function(max_range = 0.5, ...) {
 

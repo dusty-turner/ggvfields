@@ -29,6 +29,7 @@
 #' @param tail_point Logical; if `TRUE`, adds a point at the tail of each vector.
 #' @param tail_point.size Numeric; size of the tail point if `tail_point = TRUE`.
 #' @param arrow Arrow specification created by `grid::arrow()`.
+#' @param linewidth Numeric; thickness of the vector lines. Defaults to 2.
 #' @param args A named list of additional arguments to pass to `fun`. For example, if
 #'   your function signature is `function(v, scale = 1)`, you can supply
 #'   `args = list(scale = 2)` to change the `scale` parameter.
@@ -117,6 +118,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
                               ylim = NULL,
                               n = NULL,
                               show.legend = NA,
+                              linewidth = 2,
                               inherit.aes = TRUE) {
 
   # Check if x and y are in the mapping
@@ -152,6 +154,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
       normalize = normalize,
       tail_point = tail_point,
       tail_point.size = tail_point.size,
+      linewidth = linewidth,
       arrow = arrow,
       fun = fun,
       xlim = xlim,
@@ -183,6 +186,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
                               normalize = TRUE,
                               tail_point = FALSE,
                               tail_point.size = 2,
+                              linewidth = 2,
                               arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")) {
   # Default aesthetics: color reflects norm (magnitude) and length defaults to NA
   default_aes <- aes(color = after_stat(norm), length = after_stat(NA))
@@ -210,6 +214,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
       normalize = normalize,
       tail_point = tail_point,
       tail_point.size = tail_point.size,
+      linewidth = linewidth,
       fun = fun,
       xlim = xlim,
       ylim = ylim,

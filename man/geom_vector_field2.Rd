@@ -22,6 +22,7 @@ geom_vector_field2(
   ylim = NULL,
   n = NULL,
   show.legend = NA,
+  linewidth = 2,
   inherit.aes = TRUE
 )
 
@@ -41,6 +42,7 @@ stat_vector_field2(
   xlim = c(-1, 1),
   ylim = c(-1, 1),
   n = 11,
+  linewidth = 2,
   show.legend = NA,
   inherit.aes = TRUE
 )
@@ -127,6 +129,8 @@ vector displacements.}
 \code{FALSE} never includes, and \code{TRUE} always includes.
 It can also be a named logical vector to finely select the aesthetics to
 display.}
+
+\item{linewidth}{Numeric; thickness of the vector lines. Defaults to 2.}
 
 \item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
 rather than combining with them. This is most useful for helper functions

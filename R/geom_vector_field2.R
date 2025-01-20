@@ -54,6 +54,7 @@ geom_vector_field2 <- function(mapping = NULL, data = NULL,
                                ylim = NULL,
                                n = NULL,
                                show.legend = NA,
+                               linewidth = 2,
                                inherit.aes = TRUE) {
 
   # Check if x and y are in the mapping
@@ -93,6 +94,7 @@ geom_vector_field2 <- function(mapping = NULL, data = NULL,
       xlim = xlim,
       ylim = ylim,
       n = n,
+      linewidth = linewidth,
       ...
     )
   )
@@ -113,6 +115,7 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
                                xlim = c(-1, 1),
                                ylim = c(-1, 1),
                                n = 11,
+                               linewidth = 2,
                                show.legend = NA,
                                inherit.aes = TRUE) {
   # Default aesthetics: length maps to norm, and color is left unset (NULL).
@@ -143,6 +146,7 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
       xlim = xlim,
       ylim = ylim,
       n = n,
+      linewidth = linewidth,
       ...
     )
   )

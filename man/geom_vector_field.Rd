@@ -23,6 +23,7 @@ geom_vector_field(
   ylim = NULL,
   n = NULL,
   show.legend = NA,
+  linewidth = 2,
   inherit.aes = TRUE
 )
 
@@ -44,6 +45,7 @@ stat_vector_field(
   normalize = TRUE,
   tail_point = FALSE,
   tail_point.size = 2,
+  linewidth = 2,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 )
 }
@@ -135,6 +137,8 @@ your function signature is \verb{function(v, scale = 1)}, you can supply
 \code{FALSE} never includes, and \code{TRUE} always includes.
 It can also be a named logical vector to finely select the aesthetics to
 display.}
+
+\item{linewidth}{Numeric; thickness of the vector lines. Defaults to 2.}
 
 \item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
 rather than combining with them. This is most useful for helper functions

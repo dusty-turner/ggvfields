@@ -61,7 +61,7 @@ ggplot() +
 # it defaults charge_positions and charges to those above for easy ex usage
 ggplot() +
   geom_vector_field(fun = efield_maker(), xlim = c(-2,2), ylim = c(-2,2)) +
-  scale_color_viridis_c(trans = "log10")
+  scale_color_viridis_c(trans = "sqrt")
 
 
 # electric constant from https://en.wikipedia.org/wiki/Vacuum_permittivity
