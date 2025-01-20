@@ -308,9 +308,13 @@ draw_panel_vector <- function(
       points_grob <- grid::pointsGrob(
         x = unit(coords$x, "npc"),  # The starting point (adjusted by centering)
         y = unit(coords$y, "npc"),
-        pch = 16,  # Solid circle
-        size = unit(tail_point.size, "mm"),
-        gp = grid::gpar(col = coords$colour, fill = coords$fill, alpha = coords$alpha)
+        pch = coords$shape %||% 16,
+        size = unit(coords$size %||% 2, "mm"),
+        gp = grid::gpar(
+          col   = coords$colour,
+          fill  = coords$fill,
+          alpha = coords$alpha
+        )
       )
     }
     if (eval_point) {
@@ -328,9 +332,13 @@ draw_panel_vector <- function(
       eval_points_grob <- grid::pointsGrob(
         x = unit(x_point, "npc"),
         y = unit(y_point, "npc"),
-        pch = 16,  # Solid circle
-        size = unit(2, "mm"),
-        gp = grid::gpar(col = coords$colour, fill = coords$fill)
+        pch = coords$shape %||% 16,
+        size = unit(coords$size %||% 2, "mm"),
+        gp = grid::gpar(
+          col   = coords$colour,
+          fill  = coords$fill,
+          alpha = coords$alpha
+        )
       )
 
     }
@@ -385,7 +393,6 @@ draw_panel_vector <- function(
 
     # Handle centering
     if (center) {
-
       ## this determins if the user has adjusted the length of the arrow away from the default and makes it smaller
       ## if the user has altered the default then leave it alone
       if (!is.null(arrow) && round(grid::convertUnit(arrow$length, "npc", valueOnly = TRUE), 3) == 0.025) {
@@ -413,18 +420,26 @@ draw_panel_vector <- function(
         points_grob <- grid::pointsGrob(
           x = unit(coords$x, "npc") - unit(half_dx, "cm"),  # The starting point (adjusted by centering)
           y = unit(coords$y, "npc") - unit(half_dy, "cm"),
-          pch = 16,  # Solid circle
-          size = unit(2, "mm"),
-          gp = grid::gpar(col = coords$colour, fill = coords$fill)  # Use mapped fill
+          pch = coords$shape %||% 16,
+          size = unit(coords$size %||% 2, "mm"),
+          gp = grid::gpar(
+            col   = coords$colour,
+            fill  = coords$fill,
+            alpha = coords$alpha
+          )
         )
       }
       if (eval_point) {
         eval_points_grob <- grid::pointsGrob(
           x = unit(coords$x, "npc"),
           y = unit(coords$y, "npc"),
-          pch = 16,  # Solid circle
-          size = unit(2, "mm"),
-          gp = grid::gpar(col = coords$colour, fill = coords$fill)  # Use mapped fill
+          pch = coords$shape %||% 16,              # use user’s shape if present
+          size = unit(coords$size %||% 2, "mm"),
+          gp = grid::gpar(
+            col   = coords$colour,
+            fill  = coords$fill,
+            alpha = coords$alpha
+          )
         )
       }
     } else {
@@ -451,18 +466,26 @@ draw_panel_vector <- function(
         points_grob <- grid::pointsGrob(
           x = unit(coords$x, "npc"),  # The starting point (adjusted by centering)
           y = unit(coords$y, "npc"),
-          pch = 16,  # Solid circle
-          size = unit(2, "mm"),
-          gp = grid::gpar(col = coords$colour, fill = coords$fill)  # Use mapped fill
+          pch = coords$shape %||% 16,
+          size = unit(coords$size %||% 2, "mm"),
+          gp = grid::gpar(
+            col   = coords$colour,
+            fill  = coords$fill,
+            alpha = coords$alpha
+          )
         )
       }
       if (eval_point) {
         eval_points_grob <- grid::pointsGrob(
           x = unit(coords$x, "npc"),
           y = unit(coords$y, "npc"),
-          pch = 16,  # Solid circle
-          size = unit(2, "mm"),
-          gp = grid::gpar(col = coords$colour, fill = coords$fill)  # Use mapped fill
+          pch = coords$shape %||% 16,
+          size = unit(coords$size %||% 2, "mm"),
+          gp = grid::gpar(
+            col   = coords$colour,
+            fill  = coords$fill,
+            alpha = coords$alpha
+          )
         )
       }
 
@@ -487,10 +510,22 @@ draw_key_vector <- function(data, params, size) {
   x1 <- rev(x0 + unit(length_value, "cm"))
   y1 <- rev(y0)
 
+  # grid::segmentsGrob(
+  #   x0 = x0, y0 = y0,
+  #   x1 = x1, y1 = y1,
+  #   gp = grid::gpar(col = data$colour, lwd = data$linewidth)
+  # )
   grid::segmentsGrob(
     x0 = x0, y0 = y0,
     x1 = x1, y1 = y1,
-    gp = grid::gpar(col = data$colour, lwd = data$linewidth)
+    gp = grid::gpar(
+      col   = scales::alpha(data$colour, data$alpha),
+      fill  = scales::alpha(data$fill,   data$alpha),
+      lwd   = data$linewidth,
+      lty   = data$linetype
+      # or if your geom uses `size` for line thickness:
+      # lwd = data$size * .pt
+    )
   )
 }
 
@@ -505,7 +540,7 @@ GeomVector <- ggproto(
   default_aes = aes(
     color = "black",
     fill = "black",
-    size = 0.5,
+    size = 2,
     length = 1,
     linewidth = 2,
     linetype = 1,
