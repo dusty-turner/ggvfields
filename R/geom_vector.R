@@ -295,7 +295,7 @@ draw_panel_vector <- function(
     # Now transform the modified data into the coordinate system
     coords <- coord$transform(data, panel_params)
 
-    vector_coords <- coords[coords$norm!=0,] ## only plot vectors that have a norm (norm != 0)
+    vector_coords <- coords[!is.na(coords$norm) & coords$norm != 0,] ## only plot vectors that have a norm (norm != 0)
 
     # Create the vector grob
     vector_grob <- grid::segmentsGrob(
@@ -342,6 +342,7 @@ draw_panel_vector <- function(
     return(grid::grobTree(do.call(grid::gList, grobs)))
 
   } else { ## if length is mapped
+
     # 1. Undo centering if it was applied
     if (center) {
       half_dx <- (data$xend - data$x) / 2
