@@ -26,8 +26,7 @@ geom_vector(
   center = TRUE,
   normalize = TRUE,
   tail_point = FALSE,
-  eval_point = FALSE,
-  tail_point.size = 2
+  eval_point = FALSE
 )
 
 stat_vector(
@@ -43,8 +42,7 @@ stat_vector(
   center = TRUE,
   normalize = TRUE,
   eval_point = FALSE,
-  tail_point = FALSE,
-  tail_point.size = 2
+  tail_point = FALSE
 )
 
 StatVector
@@ -157,9 +155,6 @@ the starting position more clearly.}
 
 \item{eval_point}{Logical; if \code{TRUE}, adds a point at the evaluation end (or midpoint if centered)
 of each vector to mark the target or midpoint position more clearly.}
-
-\item{tail_point.size}{Numeric value indicating the size of the tail point if
-\code{tail_point = TRUE}.}
 
 \item{geom}{The geometric object to use to display the data for this layer.
 When using a \verb{stat_*()} function to construct a layer, the \code{geom} argument

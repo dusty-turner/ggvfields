@@ -15,7 +15,6 @@ geom_vector_field(
   center = TRUE,
   normalize = TRUE,
   tail_point = FALSE,
-  tail_point.size = 2,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
   fun = NULL,
   args = list(),
@@ -44,7 +43,6 @@ stat_vector_field(
   center = TRUE,
   normalize = TRUE,
   tail_point = FALSE,
-  tail_point.size = 2,
   linewidth = 2,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 )
@@ -116,8 +114,6 @@ to use \code{position_jitter()}, give the position as \code{"jitter"}.
 \item{normalize}{Logical; if \code{TRUE}, normalizes vectors before scaling.}
 
 \item{tail_point}{Logical; if \code{TRUE}, adds a point at the tail of each vector.}
-
-\item{tail_point.size}{Numeric; size of the tail point if \code{tail_point = TRUE}.}
 
 \item{arrow}{Arrow specification created by \code{grid::arrow()}.}
 

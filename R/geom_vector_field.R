@@ -27,7 +27,6 @@
 #' @param center Logical; if `TRUE`, centers vectors on their grid points.
 #' @param normalize Logical; if `TRUE`, normalizes vectors before scaling.
 #' @param tail_point Logical; if `TRUE`, adds a point at the tail of each vector.
-#' @param tail_point.size Numeric; size of the tail point if `tail_point = TRUE`.
 #' @param arrow Arrow specification created by `grid::arrow()`.
 #' @param linewidth Numeric; thickness of the vector lines. Defaults to 2.
 #' @param args A named list of additional arguments to pass to `fun`. For example, if
@@ -110,7 +109,6 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
                               center = TRUE,
                               normalize = TRUE,
                               tail_point = FALSE,
-                              tail_point.size = 2,
                               arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
                               fun = NULL,
                               args = list(),
@@ -153,7 +151,6 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
       center = center,
       normalize = normalize,
       tail_point = tail_point,
-      tail_point.size = tail_point.size,
       linewidth = linewidth,
       arrow = arrow,
       fun = fun,
@@ -185,7 +182,6 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
                               center = TRUE,
                               normalize = TRUE,
                               tail_point = FALSE,
-                              tail_point.size = 2,
                               linewidth = 2,
                               arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")) {
   # Default aesthetics: color reflects norm (magnitude) and length defaults to NA
@@ -213,7 +209,6 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
       center = center,
       normalize = normalize,
       tail_point = tail_point,
-      tail_point.size = tail_point.size,
       linewidth = linewidth,
       fun = fun,
       xlim = xlim,

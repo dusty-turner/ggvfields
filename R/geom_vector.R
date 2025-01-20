@@ -22,8 +22,6 @@
 #'   the starting position more clearly.
 #' @param eval_point Logical; if `TRUE`, adds a point at the evaluation end (or midpoint if centered)
 #'   of each vector to mark the target or midpoint position more clearly.
-#' @param tail_point.size Numeric value indicating the size of the tail point if
-#'   `tail_point = TRUE`.
 #' @param arrow Arrow specification for adding arrowheads to vectors, created with
 #'   `grid::arrow()`. Controls arrowhead angle, length, and type.
 #'   Setting `arrow = NULL` will remove arrowheads.
@@ -107,8 +105,7 @@ geom_vector <- function(mapping = NULL, data = NULL,
                         center = TRUE,
                         normalize = TRUE,
                         tail_point = FALSE,
-                        eval_point = FALSE,
-                        tail_point.size = 2) {
+                        eval_point = FALSE) {
 
   if (is.null(mapping)) {
     mapping <- aes()
@@ -132,7 +129,6 @@ geom_vector <- function(mapping = NULL, data = NULL,
       normalize = normalize,
       tail_point = tail_point,
       eval_point = eval_point,
-      tail_point.size = tail_point.size,
       ...
     )
   )
@@ -151,8 +147,7 @@ stat_vector <- function(mapping = NULL, data = NULL,
                         center = TRUE,
                         normalize = TRUE,
                         eval_point = FALSE,
-                        tail_point = FALSE,
-                        tail_point.size = 2) {
+                        tail_point = FALSE) {
 
   mapping <- modifyList(aes(color = after_stat(norm), length = after_stat(NA)), mapping)
 
@@ -170,7 +165,6 @@ stat_vector <- function(mapping = NULL, data = NULL,
       center = center,
       normalize = normalize,
       tail_point = tail_point,
-      tail_point.size = tail_point.size,
       ...
     )
   )
@@ -282,8 +276,7 @@ draw_panel_vector <- function(
     center = TRUE,
     normalize = TRUE,
     eval_point = FALSE,
-    tail_point = FALSE,
-    tail_point.size = 2
+    tail_point = FALSE
 ) {
   ## initialize grobs
   eval_points_grob <- NULL
@@ -510,12 +503,7 @@ draw_key_vector <- function(data, params, size) {
   x1 <- rev(x0 + unit(length_value, "cm"))
   y1 <- rev(y0)
 
-  # grid::segmentsGrob(
-  #   x0 = x0, y0 = y0,
-  #   x1 = x1, y1 = y1,
-  #   gp = grid::gpar(col = data$colour, lwd = data$linewidth)
-  # )
-  grid::segmentsGrob(
+  seg_grob <- grid::segmentsGrob(
     x0 = x0, y0 = y0,
     x1 = x1, y1 = y1,
     gp = grid::gpar(
@@ -523,10 +511,25 @@ draw_key_vector <- function(data, params, size) {
       fill  = scales::alpha(data$fill,   data$alpha),
       lwd   = data$linewidth,
       lty   = data$linetype
-      # or if your geom uses `size` for line thickness:
-      # lwd = data$size * .pt
     )
   )
+
+  point_grob <- NULL
+  if (isTRUE(params$tail_point)) {
+
+    point_grob <- grid::pointsGrob(
+      x = x0,
+      y = y0,
+      pch  = data$shape     %||% 16,
+      size = unit(data$size %||% 2, "mm"),
+      gp   = grid::gpar(
+        col  = scales::alpha(data$colour, data$alpha),
+        fill = scales::alpha(data$fill,   data$alpha)
+      )
+    )
+  }
+
+  grid::grobTree(seg_grob, point_grob)
 }
 
 
