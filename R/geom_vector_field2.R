@@ -66,8 +66,8 @@ geom_vector_field2 <- function(mapping = NULL, data = NULL,
     data <- data.frame(x = NA_real_, y = NA_real_)
   }
 
-  # Default aesthetics: length maps to norm, and color is left unset (NULL).
-  base_mapping <- aes(length = after_stat(norm), color = NULL)
+  # Default aesthetics: length maps to norm, and color is left unset.
+  base_mapping <- aes(length = after_stat(norm))
 
   # Merge user-provided mappings with the base defaults
   if (is.null(mapping)) {
