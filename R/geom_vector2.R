@@ -100,7 +100,7 @@ stat_vector2 <- function(mapping = NULL, data = NULL,
                          eval_point = TRUE,
                          arrow = NULL
                          ) {
-  mapping <- modifyList(aes(length = after_stat(norm), color = NULL), mapping)
+  mapping <- modifyList(aes(length = after_stat(norm)), mapping)
   stat_vector(
     mapping = mapping,
     data = data,

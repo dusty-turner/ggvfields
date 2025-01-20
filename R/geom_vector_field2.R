@@ -119,7 +119,7 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
                                show.legend = NA,
                                inherit.aes = TRUE) {
   # Default aesthetics: length maps to norm, and color is left unset (NULL).
-  base_mapping <- aes(length = after_stat(norm), color = NULL)
+  base_mapping <- aes(length = after_stat(norm))
 
   # Merge user-provided mappings with the base defaults
   if (is.null(mapping)) {
