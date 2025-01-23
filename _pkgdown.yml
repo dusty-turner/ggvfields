@@ -29,6 +29,7 @@ reference:
       - geom_vector_smooth
       - geom_function_2d
       - geom_potential
+      - geom_wiggly_stream
       - ggvfields
       - animation_transition
       - efield

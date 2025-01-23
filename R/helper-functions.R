@@ -841,5 +841,107 @@ gradient_fun <- function(fun) {
   }
 }
 
+matrix_to_df_with_names <- function(mat, col_names = NULL) {
+  # Check if the input is a matrix
+  if (!is.matrix(mat)) stop("Input must be a matrix.")
 
-utils::globalVariables(c("x_lim", "y_lim", "Potential", "fun"))
+  # Convert to a data frame
+  df <- as.data.frame(mat)
+
+  # Set column names if provided
+  if (!is.null(col_names)) {
+    if (length(col_names) != ncol(df)) {
+      stop("`col_names` must have the same length as the number of columns in the matrix.")
+    }
+    names(df) <- col_names
+  }
+
+  return(df)
+}
+
+
+norm <- function(x) sqrt(sum(x^2))
+
+find_midpoint_index <- function(df) {
+  total_length <- max(df$l, na.rm = TRUE)
+  midpoint_length <- total_length / 2
+  midpoint_index <- which(df$l >= midpoint_length)[1]
+
+  midpoint_index
+}
+
+shift_streamline_to_midpoint <- function(df) {
+
+  midpoint_index <- find_midpoint_index(df)
+
+  # midpoint value
+  midpoint_x <- df$x[midpoint_index]
+  midpoint_y <- df$y[midpoint_index]
+
+  # start value
+  start_x <- df$x[1]
+  start_y <- df$y[1]
+
+  # Calculate the shift vector: shift = midpoint - start
+  shift_x <- midpoint_x - start_x
+  shift_y <- midpoint_y - start_y
+
+  # Shift all points so that the midpoint becomes the new start point
+  df$x = df$x - shift_x
+  df$y = df$y - shift_y
+
+  df
+
+}
+
+ode_stepper <- function(u0, dt = .0025, t0 = 0, L = 1, max_it, center = FALSE, method, f_wrapper = f_wrapper()) {
+
+  mat <- data.frame(
+    "t" = t0 + dt*(0:(max_it-1)),
+    "x" = c(u0[1], rep(NA, max_it-1)),
+    "y" = c(u0[2], rep(NA, max_it-1)),
+    "d" = rep(NA, max_it), # dist since last step
+    "l" = c(    0, rep(NA, max_it-1))  # arc length = cumulative dist traveled
+  ) |> as.matrix() # matrices drop when subset
+# print("L")
+# print(L)
+  # "solve" with ode() step by step
+  for(i in 2:max_it) {
+    t <- mat[i-1,"t"]
+    u <- mat[i-1,c("x","y")]
+    # print("t")
+    # print(t)
+    # print("dt")
+    # print(dt)
+    # print("method")
+    # print(method)
+    # print("i")
+    # print(i)
+    # print("max_it")
+    # print(max_it)
+    mat[i,c("x","y")] <- ode(y = u,times = c(t, t+dt), func = f_wrapper, method = method, parms = list(fun = f))[2,-1]
+    # mat[i,c("x","y")] <- ode(u, c(t, t+dt), f_wrapper(), method)[2,-1]
+    mat[i,"d"] <- norm(mat[i,c("x","y")] - mat[i-1,c("x","y")])
+    mat[i,"l"] <- mat[i-1,"l"] + mat[i,"d"]
+    if (mat[i,"l"] >= L) break
+  }
+
+  # return full rows
+
+  df <- matrix_to_df_with_names(mat)
+  attr(df, "init") <- u0
+  df <- df[1:i,]
+  df$max_t <- max(df$t)
+
+  if (center) df <- shift_streamline_to_midpoint(df) else df
+
+  df
+
+}
+
+f_wrapper <- function(scale = 1) {
+  function(t, y, parms, ...) list(scale*f(y))
+}
+
+
+utils::globalVariables(c("x_lim", "y_lim", "Potential", "fun", "f_wrapper", "f"))
