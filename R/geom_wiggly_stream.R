@@ -39,7 +39,13 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(ggplot2)
+#' f <- efield_maker()
+#' f <- function(u) c(-u[2], u[1])
+#' ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#' ggplot() + geom_wigglystream(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = TRUE)
+#' ggplot() +
+#'   geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
+#'   geom_wigglystream(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = TRUE))
 #' }
 #'
 #' @rdname geom_wigglystream
