@@ -862,17 +862,12 @@ matrix_to_df_with_names <- function(mat, col_names = NULL) {
 
 norm <- function(x) sqrt(sum(x^2))
 
-find_midpoint_index <- function(df) {
+shift_streamline_to_midpoint <- function(df) {
+
+  # find arclength midpoint_index
   total_length <- max(df$l, na.rm = TRUE)
   midpoint_length <- total_length / 2
   midpoint_index <- which(df$l >= midpoint_length)[1]
-
-  midpoint_index
-}
-
-shift_streamline_to_midpoint <- function(df) {
-
-  midpoint_index <- find_midpoint_index(df)
 
   # midpoint value
   midpoint_x <- df$x[midpoint_index]
@@ -894,7 +889,43 @@ shift_streamline_to_midpoint <- function(df) {
 
 }
 
-ode_stepper <- function(u0, dt = .0025, t0 = 0, L = 1, max_it, center = FALSE, method, f_wrapper = f_wrapper()) {
+# ode_stepper <- function(u0, dt = .0025, t0 = 0, L = 1, max_it, center = FALSE, method, f_wrapper = f_wrapper()) {
+#
+#   mat <- data.frame(
+#     "t" = t0 + dt*(0:(max_it-1)),
+#     "x" = c(u0[1], rep(NA, max_it-1)),
+#     "y" = c(u0[2], rep(NA, max_it-1)),
+#     "d" = rep(NA, max_it), # dist since last step
+#     "l" = c(    0, rep(NA, max_it-1))  # arc length = cumulative dist traveled
+#   ) |> as.matrix() # matrices drop when subset
+#   for(i in 2:max_it) {
+#     t <- mat[i-1,"t"]
+#     u <- mat[i-1,c("x","y")]
+#     mat[i,c("x","y")] <- ode(y = u,times = c(t, t+dt), func = f_wrapper, method = method, parms = list(fun = f))[2,-1]
+#     mat[i,"d"] <- norm(mat[i,c("x","y")] - mat[i-1,c("x","y")])
+#     mat[i,"l"] <- mat[i-1,"l"] + mat[i,"d"]
+#     if (mat[i,"l"] >= L) break
+#   }
+#
+#   # return full rows
+#
+#   df <- matrix_to_df_with_names(mat)
+#   attr(df, "init") <- u0
+#   df <- df[1:i,]
+#   df$max_t <- max(df$t)
+#
+#   if (center) df <- shift_streamline_to_midpoint(df) else df
+#
+#   df
+#
+# }
+
+f_wrapper <- function(scale = 1) {
+  function(t, y, parms, ...) list(scale*f(y))
+}
+
+
+ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, center = FALSE, method) {
 
   mat <- data.frame(
     "t" = t0 + dt*(0:(max_it-1)),
@@ -903,23 +934,17 @@ ode_stepper <- function(u0, dt = .0025, t0 = 0, L = 1, max_it, center = FALSE, m
     "d" = rep(NA, max_it), # dist since last step
     "l" = c(    0, rep(NA, max_it-1))  # arc length = cumulative dist traveled
   ) |> as.matrix() # matrices drop when subset
-# print("L")
-# print(L)
   # "solve" with ode() step by step
   for(i in 2:max_it) {
     t <- mat[i-1,"t"]
     u <- mat[i-1,c("x","y")]
-    # print("t")
-    # print(t)
-    # print("dt")
-    # print(dt)
-    # print("method")
-    # print(method)
-    # print("i")
-    # print(i)
-    # print("max_it")
-    # print(max_it)
-    mat[i,c("x","y")] <- ode(y = u,times = c(t, t+dt), func = f_wrapper, method = method, parms = list(fun = f))[2,-1]
+    mat[i,c("x","y")] <-
+      ode(y = u,times = c(t, t+dt), func = function(t, state, ...) {
+        x <- state[1]
+        y <- state[2]
+        dxy <- fun(c(x, y))
+        list(dxy)
+      }, method = method, parms = NULL)[2,-1]
     # mat[i,c("x","y")] <- ode(u, c(t, t+dt), f_wrapper(), method)[2,-1]
     mat[i,"d"] <- norm(mat[i,c("x","y")] - mat[i-1,c("x","y")])
     mat[i,"l"] <- mat[i-1,"l"] + mat[i,"d"]
@@ -939,9 +964,4 @@ ode_stepper <- function(u0, dt = .0025, t0 = 0, L = 1, max_it, center = FALSE, m
 
 }
 
-f_wrapper <- function(scale = 1) {
-  function(t, y, parms, ...) list(scale*f(y))
-}
-
-
-utils::globalVariables(c("x_lim", "y_lim", "Potential", "fun", "f_wrapper", "f"))
+# utils::globalVariables(c("x_lim", "y_lim", "Potential", "fun", "f_wrapper", "f"))

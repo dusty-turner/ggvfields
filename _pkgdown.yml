@@ -11,6 +11,8 @@ template:
 reference:
   - title: "Vector Functions"
     contents:
+      - geom_stream
+      - stat_stream
       - geom_vector
       - stat_vector
       - geom_vector2
@@ -29,7 +31,7 @@ reference:
       - geom_vector_smooth
       - geom_function_2d
       - geom_potential
-      - geom_wiggly_stream
+      # - geom_wiggly_stream
       - ggvfields
       - animation_transition
       - efield
