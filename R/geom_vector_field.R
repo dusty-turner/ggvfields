@@ -116,7 +116,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
                               ylim = NULL,
                               n = NULL,
                               show.legend = NA,
-                              linewidth = 2,
+                              linewidth = 1, # consistent with GeomWigglyStream
                               inherit.aes = TRUE) {
 
   # Check if x and y are in the mapping
