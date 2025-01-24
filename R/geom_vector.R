@@ -179,7 +179,9 @@ StatVector <- ggproto(
   # required_aes = character(0), # No required aesthetics to allow flexibility
   default_aes = aes(x = NA, y = NA,
     dx = NA, dy = NA, distance = NA, angle = NA, length = 1,
-    color = "black", fill = "black", linewidth = 2, linetype = 1, alpha = 1
+    color = "black", fill = "black",
+    linewidth = 1, # consistent with GeomWigglyStream
+    linetype = 1, alpha = 1
   ),
 
   compute_group = function(data, scales, center = FALSE, fun = NULL, xlim = NULL, ylim = NULL, n = NULL, args = list(), ...) {
@@ -545,7 +547,7 @@ GeomVector <- ggproto(
     fill = "black",
     size = 2,
     length = 1,
-    linewidth = 2,
+    linewidth = 1, # consistent with GeomWigglyStream
     linetype = 1,
     alpha = 1
   ),
