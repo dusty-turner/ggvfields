@@ -157,15 +157,14 @@ Users can customize the behavior and appearance of the streamlines through vario
 }
 }
 \examples{
-\dontrun{
+
 f <- efield_maker()
 f <- function(u) c(-u[2], u[1])
 ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 ggplot() + geom_wigglystream(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = TRUE)
 ggplot() +
   geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
-  geom_wigglystream(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = TRUE))
-}
+  geom_wigglystream(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = TRUE)
 
 }
 \seealso{
