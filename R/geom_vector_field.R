@@ -1,40 +1,202 @@
 #' Geom Vector Field
 #'
-#' A wrapper around `geom_stream_field` with default parameters for creating vector fields.
+#' `geom_vector_field()` creates a ggplot2 layer that visualizes a vector field by generating
+#' streamlines based on a user-defined function. It leverages the underlying
+#' [StatStreamField] and [GeomStream] to compute and render the streamlines, respectively.
 #'
-#' @param fun A function that defines the vector field. Must return a list with `dx` and `dy`.
-#' @param dt Time step for integration. Default is `1`.
-#' @param L Step size or relevant parameter for stream field calculation. Default is `0.1`.
-#' @param method Numerical integration method. Default is `"euler"`.
-#' @param mapping Aesthetic mappings. Default sets `color` to `NULL`.
-#' @param n Number of streamlines or density parameter. Default is `3`.
-#' @param center Logical indicating whether to center the stream field. Default is `TRUE`.
-#' @param ... Additional arguments passed to `geom_stream_field`.
+#' @param mapping Aesthetic mappings created by [ggplot2::aes()]. By default, it inherits
+#'   aesthetics from the ggplot object. You can override or set specific aesthetics such as
+#'   `color`, `size`, etc.
+#' @param data A data frame or other object, as in [ggplot2::layer()]. If `NULL`, the layer
+#'   uses the plot's data.
+#' @param stat The statistical transformation to use on the data for this layer. Defaults to
+#'   `StatStreamField`.
+#' @param position Position adjustment, either as a string, or the result of a call to a
+#'   position adjustment function. Defaults to `"identity"`.
+#' @param ... Other arguments passed on to [ggplot2::layer()] and the underlying
+#'   [StatStreamField] and [GeomStream]. These are often used to set aesthetics like `color = "red"`
+#'   or `size = 1.5`.
+#' @param na.rm Logical. If `FALSE` (default), removes missing values with a warning.
+#'   If `TRUE`, silently removes missing values.
+#' @param show.legend Logical. Should this layer be included in the legends? `NA`, the default,
+#'   includes it if any aesthetics are mapped. `FALSE` never includes it, and `TRUE` always includes
+#'   it.
+#' @param inherit.aes Logical. If `FALSE`, overrides the default aesthetics, rather than
+#'   combining with them. This is most useful for helper functions that define both data and
+#'   aesthetics, and should not inherit behaviour from the main ggplot call.
+#' @param fun A function that defines the vector field. It should take a numeric vector of
+#'   length 2 (representing \((x, y)\) coordinates) and return a numeric vector of length 2
+#'   \((dx, dy)\) indicating the direction of the vector at that point. **(Required)**
+#' @param xlim Numeric vector of length two. Specifies the limits of the x-axis domain.
+#'   Defaults to `c(-1, 1)`.
+#' @param ylim Numeric vector of length two. Specifies the limits of the y-axis domain.
+#'   Defaults to `c(-1, 1)`.
+#' @param n Integer. Grid resolution specifying the number of seed points along each axis.
+#'   Higher values produce a denser vector field. Defaults to `11`.
+#' @param center Logical. If `TRUE`, centers the seed points around the midpoint of the domain.
+#'   Useful for symmetric flows. Defaults to `TRUE`.
+#' @param normalize Logical; if `TRUE`, normalizes each vector to a unit length before
+#'   applying any scaling. This can help prevent overplotting in dense plots and
+#'   ensures consistent visual representation.
+#' @param arrow A [grid::arrow()] specification to add arrowheads to the streamlines, indicating
+#'   direction. Defaults to a closed arrow with a 30-degree angle and length `0.02` npc.
+#' @param geom The geometric object used to draw the streamline.
 #'
-#' @return A `ggplot2` layer.
+#' @return A ggplot2 **Layer** object that can be added to a plot. It computes the streamlines
+#'   based on the specified vector field function and visualizes them.
+#'
+#' @details
+#' - **Vector Field Function (`fun`)**: The function should encapsulate the behavior of the vector field.
+#'   For example, a rotational field can be defined as `function(u) { c(-u[2], u[1]) }`.
+#' - **Integration Parameters**:
+#'   - `dt`: Time-step size for numerical integration. Smaller values yield more precise streamlines.
+#'   - `L`: Maximum arc length for each streamline. If `NULL`, a default based on grid spacing is used.
+#'   - `method`: Numerical integration method, such as `"euler"` or `"rk4"` (Runge-Kutta 4).
+#' - **Aesthetic Mappings**: Streamline aesthetics like `color`, `size`, and `linetype` can be customized
+#'   via the `mapping` parameter or by setting them directly in the `geom_vector_field` call.
+#'
+#' @section Aesthetics:
+#' `geom_vector_field()` understands the following aesthetics (optional):
+#' - `color`: Color of the streamlines.
+#' - `size`: Thickness of the streamlines.
+#' - `linetype`: Line type of the streamlines.
+#' - `alpha`: Transparency level of the streamlines.
+#'
+#' @examples
+#' # Define a simple rotational vector field function
+#' rotational_field <- function(u) {
+#'   x <- u[1]
+#'   y <- u[2]
+#'   c(-y, x)  # Circular flow around the origin
+#' }
+#'
+#' # Create a ggplot with the vector field using geom_vector_field
+#' ggplot() +
+#'   geom_vector_field(
+#'     fun = rotational_field
+#'     )
+#'
+#'
 #' @export
-geom_vector_field <- function(fun,
-                              dt = 1,
-                              L = 0.1,
-                              method = "euler",
-                              mapping = aes(),
+geom_vector_field <- function(mapping = NULL, data = NULL,
+                              stat = StatStreamField,
+                              position = "identity",
+                              ...,
+                              na.rm = FALSE,
+                              show.legend = TRUE,
+                              inherit.aes = TRUE,
+                              fun,
+                              xlim = c(-1, 1),
+                              ylim = c(-1, 1),
                               n = 11,
                               center = TRUE,
-                              ...) {
-  # validate_fun(fun)
+                              normalize = TRUE,
+                              arrow = grid::arrow(angle = 30,
+                                                  length = unit(0.02, "npc"),
+                                                  type = "closed")
+) {
 
-  if (is.null(mapping$colour) && is.null(mapping$color)) {
-    mapping <- modifyList(mapping, aes(color = NULL))
+  # Define default mapping for geom_vector_field
+  default_mapping <- aes(color = after_stat(norm))
+
+  # Merge user-provided mapping with default mapping
+  # User mapping takes precedence
+  if (!is.null(mapping)) {
+    if (!"color" %in% names(mapping)) {
+      mapping <- modifyList(default_mapping, mapping)
+    }
+  } else {
+    mapping <- default_mapping
   }
 
-  geom_stream_field(
-    fun = fun,
-    dt = dt,
-    L = L,
-    method = method,
+  if (is.null(data)) data <- ensure_nonempty_data(data)
+  n <- ensure_length_two(n)
+
+  layer(
+    stat = stat,
+    geom = GeomStream,
+    data = data,
     mapping = mapping,
-    n = n,
-    center = center,
-    ...
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      fun = fun,
+      xlim = xlim,
+      ylim = ylim,
+      n = n,
+      method = "euler",
+      na.rm = na.rm,
+      dt = 1,
+      L = .1,
+      center = center,
+      normalize = normalize,
+      arrow = arrow,
+      ...
+    )
+  )
+}
+
+#' @rdname geom_vector_field
+#' @export
+#'
+stat_vector_field <- function(mapping = NULL, data = NULL,
+                              stat = StatStreamField,
+                              geom = GeomStream,
+                              position = "identity",
+                              ...,
+                              na.rm = FALSE,
+                              show.legend = TRUE,
+                              inherit.aes = TRUE,
+                              fun,
+                              xlim = c(-1, 1),
+                              ylim = c(-1, 1),
+                              n = 11,
+                              center = TRUE,
+                              normalize = TRUE,
+                              arrow = grid::arrow(angle = 30,
+                                                  length = unit(0.02, "npc"),
+                                                  type = "closed")
+) {
+
+  # Define default mapping for geom_vector_field
+  default_mapping <- aes(color = after_stat(norm))
+
+  # Merge user-provided mapping with default mapping
+  # User mapping takes precedence
+  if (!is.null(mapping)) {
+    if (!"color" %in% names(mapping)) {
+      mapping <- modifyList(default_mapping, mapping)
+    }
+  } else {
+    mapping <- default_mapping
+  }
+
+
+  if (is.null(data)) data <- ensure_nonempty_data(data)
+  n <- ensure_length_two(n)
+
+  layer(
+    stat = stat,
+    geom = geom,
+    data = data,
+    mapping = mapping,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      fun = fun,
+      xlim = xlim,
+      ylim = ylim,
+      n = n,
+      method = "euler",
+      na.rm = na.rm,
+      dt = 1,
+      L = .1,
+      center = center,
+      normalize = normalize,
+      arrow = arrow,
+      ...
+    )
   )
 }
