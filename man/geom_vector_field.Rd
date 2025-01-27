@@ -2,240 +2,39 @@
 % Please edit documentation in R/geom_vector_field.R
 \name{geom_vector_field}
 \alias{geom_vector_field}
-\alias{stat_vector_field}
-\title{Create a Vector Field Plot Layer}
+\title{Geom Vector Field}
 \usage{
 geom_vector_field(
-  mapping = NULL,
-  data = NULL,
-  stat = StatVector,
-  geom = GeomVector,
-  ...,
-  position = "identity",
-  center = TRUE,
-  normalize = TRUE,
-  tail_point = FALSE,
-  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed"),
-  fun = NULL,
-  args = list(),
-  xlim = NULL,
-  ylim = NULL,
-  n = NULL,
-  show.legend = NA,
-  linewidth = 2,
-  inherit.aes = TRUE
-)
-
-stat_vector_field(
-  mapping = NULL,
-  data = NULL,
-  geom = GeomVector,
-  position = "identity",
-  ...,
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  fun = NULL,
-  xlim = c(-1, 1),
-  ylim = c(-1, 1),
-  args = list(),
+  fun,
+  dt = 1,
+  L = 0.1,
+  method = "euler",
+  mapping = aes(),
   n = 11,
   center = TRUE,
-  normalize = TRUE,
-  tail_point = FALSE,
-  linewidth = 2,
-  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
+  ...
 )
 }
 \arguments{
-\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and
-\code{inherit.aes = TRUE} (the default), it is combined with the default mapping
-at the top level of the plot. You must supply \code{mapping} if there is no plot
-mapping.}
+\item{fun}{A function that defines the vector field. Must return a list with \code{dx} and \code{dy}.}
 
-\item{data}{The data to be displayed in this layer. There are three
-options:
+\item{dt}{Time step for integration. Default is \code{1}.}
 
-If \code{NULL}, the default, the data is inherited from the plot
-data as specified in the call to \code{\link[ggplot2:ggplot]{ggplot()}}.
+\item{L}{Step size or relevant parameter for stream field calculation. Default is \code{0.1}.}
 
-A \code{data.frame}, or other object, will override the plot
-data. All objects will be fortified to produce a data frame. See
-\code{\link[ggplot2:fortify]{fortify()}} for which variables will be created.
+\item{method}{Numerical integration method. Default is \code{"euler"}.}
 
-A \code{function} will be called with a single argument,
-the plot data. The return value must be a \code{data.frame}, and
-will be used as the layer data. A \code{function} can be created
-from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
+\item{mapping}{Aesthetic mappings. Default sets \code{color} to \code{NULL}.}
 
-\item{stat}{The statistical transformation to use on the data for this layer.
-When using a \verb{geom_*()} function to construct a layer, the \code{stat}
-argument can be used the override the default coupling between geoms and
-stats. The \code{stat} argument accepts the following:
-\itemize{
-\item A \code{Stat} ggproto subclass, for example \code{StatCount}.
-\item A string naming the stat. To give the stat as a string, strip the
-function name of the \code{stat_} prefix. For example, to use \code{stat_count()},
-give the stat as \code{"count"}.
-\item For more information and other ways to specify the stat, see the
-\link[ggplot2:layer_stats]{layer stat} documentation.
-}}
+\item{n}{Number of streamlines or density parameter. Default is \code{3}.}
 
-\item{geom}{The geometric object to use to display the data for this layer.
-When using a \verb{stat_*()} function to construct a layer, the \code{geom} argument
-can be used to override the default coupling between stats and geoms. The
-\code{geom} argument accepts the following:
-\itemize{
-\item A \code{Geom} ggproto subclass, for example \code{GeomPoint}.
-\item A string naming the geom. To give the geom as a string, strip the
-function name of the \code{geom_} prefix. For example, to use \code{geom_point()},
-give the geom as \code{"point"}.
-\item For more information and other ways to specify the geom, see the
-\link[ggplot2:layer_geoms]{layer geom} documentation.
-}}
+\item{center}{Logical indicating whether to center the stream field. Default is \code{TRUE}.}
 
-\item{...}{Additional arguments passed to \code{layer()}.}
-
-\item{position}{A position adjustment to use on the data for this layer. This
-can be used in various ways, including to prevent overplotting and
-improving the display. The \code{position} argument accepts the following:
-\itemize{
-\item The result of calling a position function, such as \code{position_jitter()}.
-This method allows for passing extra arguments to the position.
-\item A string naming the position adjustment. To give the position as a
-string, strip the function name of the \code{position_} prefix. For example,
-to use \code{position_jitter()}, give the position as \code{"jitter"}.
-\item For more information and other ways to specify the position, see the
-\link[ggplot2:layer_positions]{layer position} documentation.
-}}
-
-\item{center}{Logical; if \code{TRUE}, centers vectors on their grid points.}
-
-\item{normalize}{Logical; if \code{TRUE}, normalizes vectors before scaling.}
-
-\item{tail_point}{Logical; if \code{TRUE}, adds a point at the tail of each vector.}
-
-\item{arrow}{Arrow specification created by \code{grid::arrow()}.}
-
-\item{fun}{A function that takes a vector \verb{(x, y)} and returns \verb{(dx, dy)}, defining
-vector displacements.}
-
-\item{args}{A named list of additional arguments to pass to \code{fun}. For example, if
-your function signature is \verb{function(v, scale = 1)}, you can supply
-\code{args = list(scale = 2)} to change the \code{scale} parameter.}
-
-\item{xlim, ylim}{Numeric vectors of length 2 defining the domain limits on the x/y-axis.}
-
-\item{n}{Integer, the number of grid points along each axis.}
-
-\item{show.legend}{logical. Should this layer be included in the legends?
-\code{NA}, the default, includes if any aesthetics are mapped.
-\code{FALSE} never includes, and \code{TRUE} always includes.
-It can also be a named logical vector to finely select the aesthetics to
-display.}
-
-\item{linewidth}{Numeric; thickness of the vector lines. Defaults to 2.}
-
-\item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
-rather than combining with them. This is most useful for helper functions
-that define both data and aesthetics and shouldn't inherit behaviour from
-the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
-
-\item{na.rm}{If \code{FALSE}, the default, missing values are removed with
-a warning. If \code{TRUE}, missing values are silently removed.}
+\item{...}{Additional arguments passed to \code{geom_stream_field}.}
+}
+\value{
+A \code{ggplot2} layer.
 }
 \description{
-\code{geom_vector_field()} generates a vector field plot layer from a user-defined
-function \code{fun} that computes vector displacements (\code{dx}, \code{dy}) over a specified domain.
-}
-\details{
-\strong{How the Domain is Determined}:
-\itemize{
-\item If you provide \strong{data with \code{aes(x, y)}}, the domain is inferred from the data.
-\item If you also specify \strong{\code{xlim} and \code{ylim}}, they override any domain inferred from the data.
-\item If you do \strong{not provide data}, but supply \strong{\code{fun}, \code{xlim}, and \code{ylim}}, then \code{geom_vector_field()}
-generates its own grid of points within these limits.
-\item If data is provided \strong{without \code{aes(x, y)}} mapped, you must provide \code{xlim} and \code{ylim}
-so the domain can be determined.
-}
-
-\strong{Default Behavior}:
-\itemize{
-\item The \strong{magnitude of each vector (\code{norm}) is mapped to \code{color} by default}, emphasizing vector strength.
-\item \strong{Vector lengths} are scaled to \strong{90\% of the grid spacing}.
-\item \strong{Vectors are normalized to unit length} before scaling. To see original lengths, set \code{normalize = FALSE}.
-\item \strong{Arrowheads} are included by default.
-}
-}
-\section{Computed Variables}{
-
-\describe{
-\item{norm}{\eqn{\sqrt{dx^2 + dy^2}}: Magnitude of the vector.}
-\item{divergence}{\eqn{\frac{\partial f_1}{\partial x} + \frac{\partial f_2}{\partial y}}: Divergence.}
-\item{curl}{\eqn{\frac{\partial f_2}{\partial x} - \frac{\partial f_1}{\partial y}}: Curl.}
-}
-}
-
-\section{Aesthetic mappings}{
-
-\itemize{
-\item \code{norm}, \code{divergence}, and \code{curl} can be mapped with \code{after_stat()}.
-}
-}
-
-\examples{
-
-# Example user-defined vector field function with a small random error
-f <- function(v) {
-  x <- v[1]
-  y <- v[2]
-  c(x + y, y - x)
-}
-
-set.seed(1234)
-n <- 10
-wind_data <- data.frame(
-  lon = rnorm(n),
-  lat = rnorm(n)
-)
-
-# Apply function f to each row to compute dx and dy with error
-wind_data[, c("dx", "dy")] <- t(apply(wind_data[, c("lon", "lat")], 1, f))
-
-### 1. No data provided:
-#    `fun`, `xlim`, and `ylim` define the domain.
-#    The layer generates a grid of points within (-5,5) for x and y.
-ggplot() +
-  geom_vector_field(fun = f, xlim = c(-5, 5), ylim = c(-5, 5))
-
-### 2. With data provided:
-#    Create sample data and compute dx, dy using function f with error.
-# Plot data's own vectors and add a computed vector field
-ggplot(wind_data, aes(x = lon, y = lat)) +
-  geom_vector(aes(dx = dx, dy = dy), color = "black") +
-  geom_vector_field(fun = f)
-
-### 3. With data provided but overriding with xlim and ylim:
-#    Supply `xlim` and `ylim` so the domain is determined by these limits instead of the data.
-ggplot(wind_data) +
-  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy), color = "black", normalize = FALSE) +
-  geom_vector_field(fun = f, xlim = c(-5, 5), ylim = c(-5, 5))
-
-### 4. Passing additional arguments to `fun` using `args`:
-#    Suppose we define a rotation-like field with a tunable scale:
-f_scale <- function(v, scale = 1) {
-  x <- v[1]; y <- v[2]
-  scale * c(-y, x)
-}
-
-#    Now we can pass 'scale' via args = list(scale = 10):
-ggplot() +
-  geom_vector_field(
-    fun = f_scale,
-    xlim = c(-5, 5), ylim = c(-5, 5),
-    args = list(scale = 10), # <- pass scale to fun
-    color = "blue"
-  ) +
-  coord_fixed()
-
+A wrapper around \code{geom_stream_field} with default parameters for creating vector fields.
 }

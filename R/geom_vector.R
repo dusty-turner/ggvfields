@@ -115,7 +115,7 @@ geom_vector <- function(mapping = NULL, data = NULL,
   mapping <- modifyList(aes(color = after_stat(norm), length = after_stat(NA)), mapping)
 
   layer(
-    stat = StatVector,
+    stat = stat,
     geom = GeomVector,
     mapping = mapping,
     data = data,
@@ -178,8 +178,10 @@ StatVector <- ggproto(
   Stat,
   # required_aes = character(0), # No required aesthetics to allow flexibility
   default_aes = aes(x = NA, y = NA,
-    dx = NA, dy = NA, distance = NA, angle = NA, length = 1,
-    color = "black", fill = "black", linewidth = 2, linetype = 1, alpha = 1
+                    dx = NA, dy = NA, distance = NA, angle = NA, length = 1,
+                    color = "black", fill = "black",
+                    linewidth = 1, # consistent with GeomWigglyStream
+                    linetype = 1, alpha = 1
   ),
 
   compute_group = function(data, scales, center = FALSE, fun = NULL, xlim = NULL, ylim = NULL, n = NULL, args = list(), ...) {
@@ -392,7 +394,7 @@ draw_panel_vector <- function(
         arrow$length <- unit(0.015, "npc")
       }
 
-    # non_zero_coords <- coords[coords$norm > .0001,] ## tried to do this to remove 0 length norms but it messes up the legend
+      # non_zero_coords <- coords[coords$norm > .0001,] ## tried to do this to remove 0 length norms but it messes up the legend
 
       vector_grob <- grid::segmentsGrob(
         x0 = unit(coords$x, "npc") - unit(half_dx, "cm"),
@@ -545,7 +547,7 @@ GeomVector <- ggproto(
     fill = "black",
     size = 2,
     length = 1,
-    linewidth = 2,
+    linewidth = 1, # consistent with GeomWigglyStream
     linetype = 1,
     alpha = 1
   ),
@@ -648,9 +650,9 @@ GeomVector <- ggproto(
 #' @export
 #' @examples
 #'
-#' ggplot() +
-#'   geom_vector_field2(fun = efield_maker(), xlim = c(-2, 2), ylim = c(-2, 2)) +
-#'   scale_length_continuous(trans = "log10")
+#' #ggplot() +
+#' #  geom_vector_field2(fun = efield_maker(), xlim = c(-2, 2), ylim = c(-2, 2)) +
+#' #  scale_length_continuous(trans = "log10")
 scale_length_continuous <- function(max_range = 0.5, ...) {
 
   args <- list(...)
