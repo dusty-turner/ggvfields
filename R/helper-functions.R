@@ -896,56 +896,10 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
   df <- df[1:i,]
   df$max_t <- max(df$t)
 
-  # if (center) df <- shift_streamline_to_midpoint(df) else df
-
   df
 
 }
 
-shift_streamline_to_midpoint <- function(df) {
-
-  if (nrow(df) == 2) {
-    # Handle the case with only two points
-    # happens when ploting vectors vs streams
-
-    # Extract start and end coordinates
-    start_x <- df$x[1]
-    start_y <- df$y[1]
-    end_x <- df$x[2]
-    end_y <- df$y[2]
-
-    # Calculate the midpoint as the average of start and end
-    midpoint_x <- (start_x + end_x) / 2
-    midpoint_y <- (start_y + end_y) / 2
-
-  } else {
-    # Handle the case with more than two points
-    # happens when plotting streamlines
-
-    # Find arclength midpoint_index
-    total_length <- max(df$l, na.rm = TRUE)
-    midpoint_length <- total_length / 2
-    midpoint_index <- which(df$l >= midpoint_length)[1]
-
-    # Extract midpoint coordinates
-    midpoint_x <- df$x[midpoint_index]
-    midpoint_y <- df$y[midpoint_index]
-
-    # Extract starting coordinates
-    start_x <- df$x[1]
-    start_y <- df$y[1]
-  }
-
-  # Calculate the shift vector: shift = midpoint - start
-  shift_x <- midpoint_x - start_x
-  shift_y <- midpoint_y - start_y
-
-  # Shift all points so that the midpoint becomes the new start point
-  df$x <- df$x - shift_x
-  df$y <- df$y - shift_y
-
-  return(df)
-}
 
 center_line <- function(data, type) {
 
