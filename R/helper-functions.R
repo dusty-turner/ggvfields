@@ -879,7 +879,7 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
       ode(y = u,times = c(t, t+dt), func = function(t, state, ...) {
         x <- state[1]
         y <- state[2]
-        dxy <- fun(x, y)
+        dxy <- fun(c(x, y))
         list(dxy)
       }, method = method, parms = NULL)[2,-1]
 
