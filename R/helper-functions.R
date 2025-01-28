@@ -983,4 +983,4 @@ shift_streamline_to_midpoint <- function(df) {
   return(df)
 }
 
-utils::globalVariables(c("Potential", "fun", "f"))
+utils::globalVariables(c("Potential", "fun", "f", "l", "max_t"))

@@ -227,10 +227,28 @@ StatStreamField <- ggproto("StatStreamField", Stat,
                                 )
                               }
 
-                              # df |> slice(25:26) |> print()
                                 df$norm <- ave(df$l, df$pt, FUN = max)
 
-                              # print(head(df))
+                              if(center){
+
+                                # df <-
+                                # df |>
+                                # group_split(pt) |> map(shift_streamline_to_midpoint) |>
+                                # bind_rows()
+
+                                # Split the data frame by 'pt'
+                                df_split <- split(df, df$pt)
+
+                                # Apply the function to each group
+                                df_processed <- lapply(df_split, shift_streamline_to_midpoint)
+
+                                # Combine the processed groups back into a single data frame
+                                df <- do.call(rbind, df_processed)
+
+                                # Reset row names
+                                rownames(df) <- NULL
+
+                              }
 
                               df
 
