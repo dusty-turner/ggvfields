@@ -10,7 +10,7 @@
 #' @param data A data frame or other object, as in [ggplot2::layer()]. If `NULL`, the layer
 #'   uses the plot's data.
 #' @param stat The statistical transformation to use on the data for this layer. Defaults to
-#'   `StatStreamField`.
+#'   [`StatStreamField`].
 #' @param position Position adjustment, either as a string, or the result of a call to a
 #'   position adjustment function. Defaults to `"identity"`.
 #' @param ... Other arguments passed on to [ggplot2::layer()] and the underlying

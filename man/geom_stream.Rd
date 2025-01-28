@@ -17,7 +17,6 @@ geom_stream(
   mapping = NULL,
   data = NULL,
   stat = "stream",
-  geom = GeomPath,
   position = "identity",
   ...,
   na.rm = FALSE,
@@ -30,7 +29,6 @@ stat_stream(
   mapping = NULL,
   data = NULL,
   geom = GeomStream,
-  stat = StatStream,
   position = "identity",
   ...,
   na.rm = FALSE,
@@ -64,9 +62,6 @@ give the stat as \code{"count"}.
 \link[ggplot2:layer_stats]{layer stat} documentation.
 }}
 
-\item{geom}{The geometric object used to draw the streamline. Defaults to
-\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
-
 \item{position}{A position adjustment to use on the data for this layer. This
 can be used in various ways, including to prevent overplotting and
 improving the display. The \code{position} argument accepts the following:
@@ -94,6 +89,9 @@ combining with them.}
 
 \item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to place arrowheads
 on the streamline (e.g., to indicate direction).}
+
+\item{geom}{The geometric object used to draw the streamline. Defaults to
+\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
 }
 \value{
 A ggplot2 layer that can be added to a plot to produce a streamline
@@ -130,7 +128,7 @@ points within each group are sorted by \code{t} before drawing.
 \item \code{geom_stream()} is a convenient wrapper for typical usage; it sets
 \code{stat = StatStream} and uses \link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} by default.
 \item \code{stat_stream()} provides direct access to the reordering stat, using
-\link{GeomStream} for drawing. This is useful for advanced customization.
+GeomStream for drawing. This is useful for advanced customization.
 }
 \item \strong{Arrows}: Use the \code{arrow} parameter to indicate direction on each
 streamline. For more details, see \link[grid:arrow]{grid::arrow}.
@@ -156,8 +154,8 @@ streams <- rbind(
   cbind(stream_3, id = 3)
 )
 
-ggplot(streams, aes(x = x, y = y, t = t, group = id)) +
-  geom_stream()
+ggplot(streams) +
+  geom_stream(aes(x = x, y = y, t = t, group = id))
 
 
 }

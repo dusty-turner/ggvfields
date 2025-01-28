@@ -47,7 +47,7 @@
 #'   - `geom_stream()` is a convenient wrapper for typical usage; it sets
 #'     `stat = StatStream` and uses [ggplot2::GeomPath] by default.
 #'   - `stat_stream()` provides direct access to the reordering stat, using
-#'     [GeomStream] for drawing. This is useful for advanced customization.
+#'     GeomStream for drawing. This is useful for advanced customization.
 #' - **Arrows**: Use the `arrow` parameter to indicate direction on each
 #'   streamline. For more details, see [grid::arrow].
 #'
@@ -71,8 +71,8 @@
 #'   cbind(stream_3, id = 3)
 #' )
 #'
-#' ggplot(streams, aes(x = x, y = y, t = t, group = id)) +
-#'   geom_stream()
+#' ggplot(streams) +
+#'   geom_stream(aes(x = x, y = y, t = t, group = id))
 #'
 #'
 #' @seealso
@@ -82,7 +82,7 @@
 #' @rdname geom_stream
 #' @export
 geom_stream <- function(mapping = NULL, data = NULL,
-                        stat = "stream", geom = GeomPath,
+                        stat = "stream",
                         position = "identity",
                         ...,
                         na.rm = FALSE,
@@ -98,7 +98,7 @@ geom_stream <- function(mapping = NULL, data = NULL,
 
   layer(
     stat = stat,
-    geom = geom,
+    geom = GeomPath,
     mapping = mapping,
     data = data,
     position = position,
@@ -115,8 +115,7 @@ geom_stream <- function(mapping = NULL, data = NULL,
 #' @rdname geom_stream
 #' @export
 stat_stream <- function(mapping = NULL, data = NULL,
-                        geom = GeomStream, stat = StatStream,
-                        # geom = "path",
+                        geom = GeomStream,
                         position = "identity",
                         ...,
                         na.rm = FALSE,
@@ -131,7 +130,7 @@ stat_stream <- function(mapping = NULL, data = NULL,
   }
 
   layer(
-    stat = stat,
+    stat = StatStream,
     geom = geom,
     mapping = mapping,
     data = data,
@@ -146,7 +145,7 @@ stat_stream <- function(mapping = NULL, data = NULL,
   )
 }
 
-#' @rdname geom_stream
+#' @name geom_stream
 #' @export
 StatStream <- ggproto("StatStream", Stat,
                       required_aes = c("x", "y", "t"),
@@ -156,11 +155,10 @@ StatStream <- ggproto("StatStream", Stat,
                         if (!"t" %in% names(data)) {
                           stop("StatStream requires a 't' (time) aesthetic for ordering.")
                         }
-
-                        data |> print()
+                        data
                       }
 )
 
-#' @rdname geom_stream
+#' @name geom_stream
 #' @export
 GeomStream <- ggproto("GeomStream", GeomPath)

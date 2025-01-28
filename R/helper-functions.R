@@ -900,7 +900,6 @@ norm <- function(x) sqrt(sum(x^2))
 
 
 ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, method) {
-
   mat <- data.frame(
     "t" = t0 + dt*(0:(max_it-1)),
     "x" = c(u0[1], rep(NA, max_it-1)),
@@ -916,9 +915,10 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
       ode(y = u,times = c(t, t+dt), func = function(t, state, ...) {
         x <- state[1]
         y <- state[2]
-        dxy <- fun(c(x, y))
+        dxy <- fun(x, y)
         list(dxy)
       }, method = method, parms = NULL)[2,-1]
+
     # mat[i,c("x","y")] <- ode(u, c(t, t+dt), f_wrapper(), method)[2,-1]
     mat[i,"d"] <- norm(mat[i,c("x","y")] - mat[i-1,c("x","y")])
     mat[i,"l"] <- mat[i-1,"l"] + mat[i,"d"]

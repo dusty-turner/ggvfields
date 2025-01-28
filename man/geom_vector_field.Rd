@@ -53,7 +53,7 @@ aesthetics from the ggplot object. You can override or set specific aesthetics s
 uses the plot's data.}
 
 \item{stat}{The statistical transformation to use on the data for this layer. Defaults to
-\code{StatStreamField}.}
+\code{\link{StatStreamField}}.}
 
 \item{position}{Position adjustment, either as a string, or the result of a call to a
 position adjustment function. Defaults to \code{"identity"}.}
