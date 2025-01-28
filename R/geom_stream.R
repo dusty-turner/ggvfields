@@ -171,7 +171,8 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                       default_aes = modifyList(GeomPath$default_aes, list(alpha = 1)),
 
                       # Override the draw_panel method
-                      draw_panel = function(data, panel_params, coord, arrow) {
+                      draw_group = function(data, panel_params, coord, arrow) {
+
                         # Transform the data according to the coordinate system
                         coords <- coord$transform(data, panel_params)
 
