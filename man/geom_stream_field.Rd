@@ -24,7 +24,6 @@ geom_stream_field(
   dt = 0.0025,
   L = NULL,
   center = FALSE,
-  normalize = FALSE,
   method = "rk4",
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 )
@@ -46,7 +45,6 @@ stat_stream_field(
   dt = 0.0025,
   L = NULL,
   center = FALSE,
-  normalize = FALSE,
   method = "rk4",
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 )
@@ -138,10 +136,6 @@ from the grid spacing. Default \code{NULL}.}
 
 \item{center}{Logical. If \code{TRUE}, center the seed points around the midpoint
 of the domain (useful for symmetric flows). Default \code{FALSE}.}
-
-\item{normalize}{Logical; if \code{TRUE}, normalizes each vector to a unit length before
-applying any scaling. This can help prevent overplotting in dense plots and
-ensures consistent visual representation.}
 
 \item{method}{Character. Integration method (e.g., \code{"rk4"} for Runge-Kutta 4,
 or \code{"euler"}). Defaults to \code{"rk4"}.}

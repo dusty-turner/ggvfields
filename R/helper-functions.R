@@ -899,7 +899,7 @@ norm <- function(x) sqrt(sum(x^2))
 # }
 
 
-ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, center = FALSE, method) {
+ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, method) {
 
   mat <- data.frame(
     "t" = t0 + dt*(0:(max_it-1)),
@@ -932,7 +932,7 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, cente
   df <- df[1:i,]
   df$max_t <- max(df$t)
 
-  if (center) df <- shift_streamline_to_midpoint(df) else df
+  # if (center) df <- shift_streamline_to_midpoint(df) else df
 
   df
 
