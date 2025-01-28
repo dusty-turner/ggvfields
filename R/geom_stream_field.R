@@ -210,7 +210,7 @@ stat_stream_field <- function(mapping = NULL, data = NULL,
 #' @export
 StatStreamField <- ggproto("StatStreamField", Stat,
 
-                            default_aes = aes(group = after_stat(pt)),
+                            default_aes = aes(group = after_stat(id)),
 
                             compute_group = function(data, scales, fun, xlim, ylim, n, method, max_it = 1000, dt, L, center, ...) {
                               n_grid <- n[1]
@@ -227,25 +227,11 @@ StatStreamField <- ggproto("StatStreamField", Stat,
                                   transform(
                                     # ode_stepper(grid[i,], L = L, center = center, method = method, max_it = max_it, dt = dt, f_wrapper = f_wrapper()),
                                     ode_stepper(u0 = grid[i,], fun = fun, dt = dt, L = L, max_it = max_it, method = method),
-                                    "pt" = i)
+                                    "id" = i)
                                 )
                               }
 
-                              if(center){
-
-                                # Split the data frame by 'pt'
-                                df_split <- split(df, df$pt)
-
-                                # Apply the function to each group
-                                df_processed <- lapply(df_split, shift_streamline_to_midpoint)
-
-                                # Combine the processed groups back into a single data frame
-                                df <- do.call(rbind, df_processed)
-
-                                # Reset row names
-                                rownames(df) <- NULL
-
-                              }
+                              if(center) df <- center_line(df, type = "stream")
 
                               df
 

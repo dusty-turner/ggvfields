@@ -863,42 +863,6 @@ matrix_to_df_with_names <- function(mat, col_names = NULL) {
 norm <- function(x) sqrt(sum(x^2))
 
 
-# ode_stepper <- function(u0, dt = .0025, t0 = 0, L = 1, max_it, center = FALSE, method, f_wrapper = f_wrapper()) {
-#
-#   mat <- data.frame(
-#     "t" = t0 + dt*(0:(max_it-1)),
-#     "x" = c(u0[1], rep(NA, max_it-1)),
-#     "y" = c(u0[2], rep(NA, max_it-1)),
-#     "d" = rep(NA, max_it), # dist since last step
-#     "l" = c(    0, rep(NA, max_it-1))  # arc length = cumulative dist traveled
-#   ) |> as.matrix() # matrices drop when subset
-#   for(i in 2:max_it) {
-#     t <- mat[i-1,"t"]
-#     u <- mat[i-1,c("x","y")]
-#     mat[i,c("x","y")] <- ode(y = u,times = c(t, t+dt), func = f_wrapper, method = method, parms = list(fun = f))[2,-1]
-#     mat[i,"d"] <- norm(mat[i,c("x","y")] - mat[i-1,c("x","y")])
-#     mat[i,"l"] <- mat[i-1,"l"] + mat[i,"d"]
-#     if (mat[i,"l"] >= L) break
-#   }
-#
-#   # return full rows
-#
-#   df <- matrix_to_df_with_names(mat)
-#   attr(df, "init") <- u0
-#   df <- df[1:i,]
-#   df$max_t <- max(df$t)
-#
-#   if (center) df <- shift_streamline_to_midpoint(df) else df
-#
-#   df
-#
-# }
-
-# f_wrapper <- function(scale = 1) {
-#   function(t, y, parms, ...) list(scale*f(y))
-# }
-
-
 ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, method) {
   mat <- data.frame(
     "t" = t0 + dt*(0:(max_it-1)),
@@ -983,4 +947,60 @@ shift_streamline_to_midpoint <- function(df) {
   return(df)
 }
 
+center_line <- function(data, type) {
+
+  if(type == "vector"){
+
+
+  # 1. Create lag_x and lead_x within each 'group' group for 'x'
+  data$lag_x <- ave(data$x, data$group, FUN = function(x) c(NA, head(x, -1)))
+  data$lead_x <- ave(data$x, data$group, FUN = function(x) c(tail(x, -1), NA))
+
+  # Create lag_y and lead_y within each 'group' group for 'y'
+  data$lag_y <- ave(data$y, data$group, FUN = function(y) c(NA, head(y, -1)))
+  data$lead_y <- ave(data$y, data$group, FUN = function(y) c(tail(y, -1), NA))
+
+  # 2. Calculate 'mid_x' and 'mid_y' based on the condition 't == 1'
+  data$mid_x <- ifelse(data$t == 1, (data$x - data$lag_x) / 2, (data$lead_x - data$x) / 2)
+
+  data$mid_y <- ifelse(data$t == 1, (data$y - data$lag_y) / 2, (data$lead_y - data$y) / 2)
+
+  # 3. Update 'x' and 'y' by subtracting 'mid_x' and 'mid_y'
+  data$x <- data$x - data$mid_x
+  data$y <- data$y - data$mid_y
+
+  # 4. Remove temporary columns
+  data$lag_x <- NULL
+  data$lead_x <- NULL
+  data$lag_y <- NULL
+  data$lead_y <- NULL
+  data$mid_x <- NULL
+  data$mid_y <- NULL
+
+  }
+
+  if(type == "stream"){
+
+    # Split the data frame by 'id'
+    data <- split(data, data$id)
+
+    # Apply the function to each group
+    data <- lapply(data, shift_streamline_to_midpoint)
+
+    # Combine the processed groups back into a single data frame
+    data <- do.call(rbind, data)
+
+    # Reset row names
+    rownames(data) <- NULL
+  }
+  # Return the modified data frame
+  data
+
+}
+
+
+
+
 utils::globalVariables(c("Potential", "fun", "f", "l", "max_t"))
+
+

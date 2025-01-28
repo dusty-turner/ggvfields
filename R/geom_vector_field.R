@@ -208,7 +208,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
 #' @export
 StatVectorField <- ggproto("StatVectorField", Stat,
 
-                           default_aes = aes(group = after_stat(pt)),
+                           default_aes = aes(group = after_stat(group)),
 
                            compute_group = function(data, scales, fun, xlim, ylim, n, method, max_it = 1000, dt, L, center, normalize, ...) {
 
@@ -226,21 +226,20 @@ StatVectorField <- ggproto("StatVectorField", Stat,
                                  transform(
                                    # ode_stepper(grid[i,], L = L, center = center, method = method, max_it = max_it, dt = dt, f_wrapper = f_wrapper()),
                                    ode_stepper(grid[i,], fun = fun, dt = dt, L = L, max_it = max_it, method = method),
-                                   "pt" = i)
+                                   "group" = i)
                                )
                              }
 
-                             # df |> slice(25:26) |> print()
-                             df$norm <- ave(df$l, df$pt, FUN = max)
+                             df$norm <- ave(df$l, df$group, FUN = max)
 
                              if(normalize){
                                space_between <- (min(diff(xlim), diff(ylim)) / (n_grid - 1)) * .8
 
-                               # 1. Calculate 'norm' as the maximum of 'l' within each 'pt' group
+                               # 1. Calculate 'norm' as the maximum of 'l' within each 'group' group
 
-                               # 2. Create lagged versions of 'x' and 'y' within each 'pt' group
-                               df$lag_x <- ave(df$x, df$pt, FUN = function(x) c(NA, head(x, -1)))
-                               df$lag_y <- ave(df$y, df$pt, FUN = function(y) c(NA, head(y, -1)))
+                               # 2. Create lagged versions of 'x' and 'y' within each 'group' group
+                               df$lag_x <- ave(df$x, df$group, FUN = function(x) c(NA, head(x, -1)))
+                               df$lag_y <- ave(df$y, df$group, FUN = function(y) c(NA, head(y, -1)))
 
                                # 3. Calculate 'dx' and 'dy'
                                df$dx <- ifelse(df$t == 1, df$x - df$lag_x, 0)
@@ -255,7 +254,7 @@ StatVectorField <- ggproto("StatVectorField", Stat,
                                df$y <- ifelse(df$t == 1, df$lag_y + df$new_dy * space_between, df$y)
 
                                # 6. Calculate 'new_norm'
-                               df$new_norm <- ifelse(df$t == 1, sqrt((df$x - df$lag_x)^2 + (df$y - df$lag_y)^2), 0)
+                               # df$new_norm <- ifelse(df$t == 1, sqrt((df$x - df$lag_x)^2 + (df$y - df$lag_y)^2), 0)
 
                                # Remove temporary columns if no longer needed
                                df$lag_x <- NULL
@@ -266,44 +265,8 @@ StatVectorField <- ggproto("StatVectorField", Stat,
                                df$new_dy <- NULL
 
                              }
-                               if(center){
 
-                                 # df <-
-                                 # df |>
-                                 #   group_by(pt) |>
-                                 #   mutate(mid_x = ifelse(t == 1, (x - lag(x))/2, (lead(x) - x)/2)) |>
-                                 #   mutate(mid_y = ifelse(t == 1, (y - lag(y))/2, (lead(y) - y)/2)) |>
-                                 #   mutate(x = x - mid_x) |>
-                                 #   mutate(y = y - mid_y)
-
-                                 # 1. Create lag_x and lead_x within each 'pt' group
-                                 df$lag_x <- ave(df$x, df$pt, FUN = function(x) c(NA, head(x, -1)))
-                                 df$lead_x <- ave(df$x, df$pt, FUN = function(x) c(tail(x, -1), NA))
-
-                                 df$lag_y <- ave(df$y, df$pt, FUN = function(y) c(NA, head(y, -1)))
-                                 df$lead_y <- ave(df$y, df$pt, FUN = function(y) c(tail(y, -1), NA))
-
-                                 # 2. Calculate 'mid_x' and 'mid_y' based on the condition 't == 1'
-                                 df$mid_x <- ifelse(df$t == 1, (df$x - df$lag_x) / 2, (df$lead_x - df$x) / 2)
-                                 df$mid_y <- ifelse(df$t == 1, (df$y - df$lag_y) / 2, (df$lead_y - df$y) / 2)
-
-                                 # 3. Update 'x' and 'y' by subtracting 'mid_x' and 'mid_y'
-                                 df$x <- df$x - df$mid_x
-                                 df$y <- df$y - df$mid_y
-
-                                 # 4. Remove temporary columns if no longer needed
-                                 df$lag_x <- NULL
-                                 df$lead_x <- NULL
-                                 df$lag_y <- NULL
-                                 df$lead_y <- NULL
-                                 df$mid_x <- NULL
-                                 df$mid_y <- NULL
-
-                               }
-
-
-
-                             # print(head(df))
+                             if(center) df <- center_line(df, type = "vector")
 
                              df
 

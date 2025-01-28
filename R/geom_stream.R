@@ -98,7 +98,7 @@ geom_stream <- function(mapping = NULL, data = NULL,
 
   layer(
     stat = stat,
-    geom = GeomPath,
+    geom = GeomStream,
     mapping = mapping,
     data = data,
     position = position,
@@ -155,10 +155,40 @@ StatStream <- ggproto("StatStream", Stat,
                         if (!"t" %in% names(data)) {
                           stop("StatStream requires a 't' (time) aesthetic for ordering.")
                         }
+
+                        # if(center)
+                          # data <- center_vector(data)
+
                         data
                       }
 )
 
 #' @name geom_stream
 #' @export
-GeomStream <- ggproto("GeomStream", GeomPath)
+# GeomStream <- ggproto("GeomStream", GeomPath)
+GeomStream <- ggproto("GeomStream", GeomPath,
+                      # required_aes = c("x", "y"),  # Specify required aesthetics
+                      default_aes = modifyList(GeomPath$default_aes, list(alpha = 1)),
+
+                      # Override the draw_panel method
+                      draw_panel = function(data, panel_params, coord, arrow) {
+                        # Transform the data according to the coordinate system
+                        coords <- coord$transform(data, panel_params)
+
+                        # Create a pathGrob using the transformed coordinates
+                        grid::polylineGrob(
+                          x = coords$x,
+                          y = coords$y,
+                          id = coords$group,  # Handle grouping for multiple paths
+                          default.units = "native",  # Use native units for scaling
+                          gp = grid::gpar(
+                            col = coords$colour,        # Set line color
+                            fill = coords$colour,
+                            lwd = coords$linewidth,    # Set line width (converted from ggplot2 size)
+                            linetype = coords$linetype, # Set line type
+                            alpha = coords$alpha         # Set transparency
+                          ), arrow = arrow
+                        )
+                      }
+)
+
