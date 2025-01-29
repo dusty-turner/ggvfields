@@ -104,7 +104,7 @@ geom_stream_field <- function(
 ) {
 
   # Define default mapping for geom_vector_field
-  default_mapping <- aes(color = after_stat(max(l)/max_t))
+  default_mapping <- aes(color = after_stat(avg_spd))
 
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
@@ -167,7 +167,7 @@ stat_stream_field <- function(
 ) {
 
   # Define default mapping for geom_vector_field
-  default_mapping <- aes(color = after_stat(max(l)/max_t))
+  default_mapping <- aes( color = after_stat(avg_spd) )
 
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
@@ -212,19 +212,25 @@ stat_stream_field <- function(
 #' @format NULL
 #' @usage NULL
 #' @export
-StatStreamField <- ggproto("StatStreamField", Stat,
+StatStreamField <- ggproto(
+  "StatStreamField",
+  Stat,
   default_aes = aes(group = after_stat(id)),
 
   compute_group = function(data, scales, fun, xlim, ylim, n, method, max_it = 1000, dt, L, center, ...) {
 
     if(is.null(L)) L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * 0.9
 
+    # make grid of points on which to compute streams
     grid <- cbind(
       "x" = rep(seq(xlim[1], xlim[2], length.out = n[1]), times = n[2]),
       "y" = rep(seq(ylim[1], ylim[2], length.out = n[2]), each = n[1])
     )
 
+    # initialize the data frame
     df <- data.frame()
+
+    # iterate computing stream from each point
     for (i in 1:nrow(grid)) {
       df <- rbind(
         df,
@@ -235,6 +241,7 @@ StatStreamField <- ggproto("StatStreamField", Stat,
       )
     }
 
+    # return data frame of streams
     df
 
   }
@@ -278,7 +285,7 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
     # break if ode fails
     if ( any( is.nan(mat[i,c("x","y")]) | is.na(mat[i,c("x","y")]) ) ) {
       df <- mat[1:(i-1),,drop=FALSE] |> matrix_to_df_with_names()
-      df$max_t <- max(df$t)
+      df$avg_spd <- df$l[i-1] / df$t[i-1]
       return( df )
     }
 
@@ -296,7 +303,7 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
   # return full rows
   row.names(mat) <- NULL
   df <- matrix_to_df_with_names(mat[1:i,])
-  df$max_t <- max(df$t)
+  df$avg_spd <- df$l[i] / df$t[i]
   if (center) center_on_point(df, u0) else df
 
 }
@@ -450,17 +457,13 @@ sample_stream <- function(n, data) {
 
 center_on_point <- function(data, point = c(0,0)) {
 
-  # make data frame if someone passes in numeric vector
-  if (is.numeric(point)) {
-    point <- as.data.frame(t(point))
-    names(point) <- c("x","y")
-  }
-
   # compute center
-  center <- stream_center(data)[,c("x","y")]
+  center <- as.numeric( stream_center(data)[,c("x","y")] )
 
   # translate each point in path by center
-  for (i in 1:nrow(data)) data[i,c("x","y")] <- data[i,c("x","y")] - center + point
+  # for (i in 1:nrow(data)) data[i,c("x","y")] <- data[i,c("x","y")] - center + point
+  mat <- as.matrix( data[,c("x","y")] )
+  data[,c("x","y")] <- t( t(mat) - center + point )
 
   # return
   data
