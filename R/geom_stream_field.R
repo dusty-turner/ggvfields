@@ -72,6 +72,8 @@
 #'   c(-x^2 + y - 1, x - y^2 + 1)
 #' }
 #'
+#' f <- function(u) c(3, 1)
+#'
 #' ggplot() +
 #'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 #'
@@ -227,13 +229,11 @@ StatStreamField <- ggproto("StatStreamField", Stat,
       df <- rbind(
         df,
         transform(
-          ode_stepper(u0 = grid[i,], fun = fun, dt = dt, L = L, max_it = max_it, method = method),
+          ode_stepper(grid[i,], fun, dt, 0, L, max_it, method, center),
           "id" = i
         )
       )
     }
-
-    if (center) df <- center_to_point(df)
 
     df
 
@@ -248,7 +248,7 @@ StatStreamField <- ggproto("StatStreamField", Stat,
 
 
 
-ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, method = "lsoda") {
+ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, method = "lsoda", center = FALSE) {
 
   # initialize the data structure, a matrix because it drops on subsetting
   mat <- cbind(
@@ -297,7 +297,7 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
   row.names(mat) <- NULL
   df <- matrix_to_df_with_names(mat[1:i,])
   df$max_t <- max(df$t)
-  df
+  if (center) center_on_point(df, u0) else df
 
 }
 # ode_stepper( c(-1,1), efield_maker() ) |>
@@ -448,7 +448,7 @@ sample_stream <- function(n, data) {
 
 
 
-center_to_point <- function(data, point = stream_center(data)[,c("x","y")]) {
+center_on_point <- function(data, point = c(0,0)) {
 
   # make data frame if someone passes in numeric vector
   if (is.numeric(point)) {
@@ -456,21 +456,35 @@ center_to_point <- function(data, point = stream_center(data)[,c("x","y")]) {
     names(point) <- c("x","y")
   }
 
+  # compute center
+  center <- stream_center(data)[,c("x","y")]
+
   # translate each point in path by center
-  for (i in 1:nrow(data)) data[i,c("x","y")] <- data[i,c("x","y")] - point
+  for (i in 1:nrow(data)) data[i,c("x","y")] <- data[i,c("x","y")] - center + point
 
   # return
   data
 
 }
 # df
-# df |> center_to_point()
+# df |> center_on_point()
 # df |>
 #   ggplot(aes(x, y)) +
 #     geom_path() +
 #     geom_point(data = stream_center(df), color = "firebrick") +
-#     geom_path(data = center_to_point(df), color = "steelblue") +
+#     geom_path(data = center_on_point(df), color = "steelblue") +
 #     coord_equal()
+
+
+
+
+
+
+
+
+
+
+
 
 
 

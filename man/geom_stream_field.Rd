@@ -114,26 +114,27 @@ rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
 the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 
-\item{fun}{A function of two variables, \code{fun(x, y)}, returning a
-two-element vector \eqn{(dx, dy)}. This defines the local "flow" direction
-at any point in the domain.}
+\item{fun}{A function of two variables, \code{fun(x, y)}, returning a two-element
+vector \eqn{(dx, dy)}. This defines the local "flow" direction at any point
+in the domain.}
 
 \item{xlim, ylim}{Numeric vectors of length two specifying the domain limits
 in the \eqn{x}- and \eqn{y}-directions, respectively. Defaults to
 \eqn{c(-1, 1)} for both.}
 
-\item{n}{Integer. Grid resolution (the number of seed points along each axis).
-Defaults to 11, resulting in n x n seed points.}
+\item{n}{Integer. Grid resolution (the number of seed points along each
+axis). Defaults to 11, resulting in n x n seed points.}
 
 \item{max_it}{Integer. Maximum number of integration steps per streamline.
 This controls how far each streamline can propagate. Defaults to 1000.}
 
 \item{dt}{Numeric. Time-step size for integration. Smaller values produce
-more precise streamlines but increase computation time. Default is \code{0.0025}.}
+more precise streamlines but increase computation time. Default is
+\code{0.0025}.}
 
 \item{L}{Numeric. Maximum arc length for each streamline. A streamline stops
-once its length exceeds this value. If \code{NULL}, a suitable default is derived
-from the grid spacing. Default is \code{NULL}.}
+once its length exceeds this value. If \code{NULL}, a suitable default is
+derived from the grid spacing. Default is \code{NULL}.}
 
 \item{center}{Logical. If \code{TRUE}, centers the seed points around the midpoint
 of the streamline. Default is \code{FALSE}.}
@@ -146,7 +147,8 @@ streamline. By default, a closed arrow with a 30-degree angle and a length
 of \code{0.02} npc is used.}
 
 \item{geom}{The geometric object used to draw the streamline. Defaults to
-\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{\link[=geom_stream]{geom_stream()}}, or \link{GeomStream} in \code{\link[=stat_stream]{stat_stream()}}.}
+\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{\link[=geom_stream]{geom_stream()}}, or \link{GeomStream} in
+\code{\link[=stat_stream]{stat_stream()}}.}
 }
 \value{
 A ggplot2 \strong{Layer} object that can be added to a plot. It computes
@@ -154,7 +156,7 @@ the streamlines over the specified domain and draws them, optionally with
 arrowheads, to represent the direction of the flow.
 }
 \description{
-\code{geom_stream_field()} creates a ggplot2 layer that integrates a user-defined
+\code{\link[=geom_stream_field]{geom_stream_field()}} creates a ggplot2 layer that integrates a user-defined
 vector field function \eqn{f(x, y) \to (dx, dy)} over a grid of seed points
 within a specified domain \eqn{(x, y)}, producing streamlines that visualize
 the flow of the vector field. This is useful for visualizing vector fields,
@@ -185,19 +187,24 @@ to \eqn{(dx, dy)}.
 \itemize{
 \item \link{StatStreamField} for the underlying statistical transformation.
 \item \link{GeomStream} for the geometry that renders the resulting paths.
-\item \link[ggplot2:geom_path]{ggplot2::geom_path} as the base geometry on which \code{\link{GeomStream}} is built.
+\item \link[ggplot2:geom_path]{ggplot2::geom_path} as the base geometry on which \link{GeomStream} is built.
 }
 }
 
 \examples{
 # Define a vector field function that returns (dx, dy)
-f <- function(x, y) {
+f <- function(u) {
+  x <- u[1]; y <- u[2]
   c(-x^2 + y - 1, x - y^2 + 1)
 }
-f <- efield_maker()
+
+f <- function(u) c(3, 1)
 
 ggplot() +
-  geom_stream_field(fun = f)
+  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+
+ggplot() +
+  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = TRUE)
 
 }
 \keyword{datasets}
