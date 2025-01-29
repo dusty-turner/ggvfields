@@ -72,13 +72,19 @@
 #'   c(-x^2 + y - 1, x - y^2 + 1)
 #' }
 #'
+#' f <- efield_maker()
+#'
 #' f <- function(u) c(3, 1)
 #'
 #' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
+#'   coord_equal()
 #'
 #' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = TRUE)
+#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = TRUE) +
+#'   coord_equal()
+#'
+#' # should we run +L/2 and then -L/2 in reverse time?
 #'
 #' @name geom_stream_field
 #' @export
