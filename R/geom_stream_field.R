@@ -66,25 +66,106 @@
 #' - [ggplot2::geom_path] as the base geometry on which [GeomStream] is built.
 #'
 #' @examples
-#' # Define a vector field function that returns (dx, dy)
+#'
 #' f <- function(u) {
 #'   x <- u[1]; y <- u[2]
 #'   c(-x^2 + y - 1, x - y^2 + 1)
 #' }
 #'
+#' ggplot() +
+#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#'
+#' f <- function(u) {
+#'   x <- u[1]; y <- u[2]
+#'   c(-y, x)
+#' }
+#'
+#' ggplot() +
+#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#'
+#' ggplot() +
+#'   geom_stream_field(fun = efield_maker(), xlim = c(-2,2), ylim = c(-2,2)) +
+#'   scale_color_viridis_c(trans = "log10") +
+#'   coord_equal()
+#'
+#'
+#'
+#'
+#' # the center argument - should streams originate from grid, or center on them?
+#'
+#' library("patchwork")
+#'
+#' # over the electric field
 #' f <- efield_maker()
 #'
+#' p1 <- ggplot() +
+#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
+#'   scale_color_viridis_c(trans = "log10") +
+#'   coord_equal() + ggtitle("center = TRUE")
+#'
+#' p2 <- ggplot() +
+#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = FALSE) +
+#'   scale_color_viridis_c(trans = "log10") +
+#'   coord_equal() + ggtitle("center = FALSE")
+#'
+#' p1 + p2 + plot_layout(guides = "collect")
+#'
+#'
+#' # now a constant vector field
 #' f <- function(u) c(3, 1)
 #'
-#' ggplot() +
+#' p1 <- ggplot() +
 #'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
-#'   coord_equal()
+#'   coord_equal() + ggtitle("center = TRUE")
+#'
+#' p2 <- ggplot() +
+#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = FALSE) +
+#'   coord_equal() + ggtitle("center = FALSE")
+#'
+#' p1 + p2 + plot_layout(guides = "collect")
+#'
+#'
+#'
+#' # other cool fields from mathematica's streamplot docs
+#' f <- function(u) {
+#'   x <- u[1]; y <- u[2]
+#'   c(-x^2 + y - 1, x - y^2 + 1)
+#' }
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#'
+#' f <- function(u) {
+#'   x <- u[1]; y <- u[2]
+#'   c(y, y*(-x^2 - 2*y^2 + 1) - x)
+#' }
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#'
+#' f <- function(u) {
+#'   x <- u[1]; y <- u[2]
+#'   c(y, x - x^3)
+#' }
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#'
+#' f <- function(u) {
+#'   x <- u[1]; y <- u[2]
+#'   c(x^2, -y)
+#' }
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#'
+#'
+#'
+#' # adding trails - is this broken?
+#' f <- function(u) {
+#'   x <- u[1]; y <- u[2]
+#'   c(y, y*(-x^2 - 2*y^2 + 1) - x)
+#' }
+#'
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 #'
 #' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = TRUE) +
-#'   coord_equal()
+#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), aes(alpha = after_stat(t))) +
+#'   scale_alpha_continuous(range = c(0, 1))
 #'
-#' # should we run +L/2 and then -L/2 in reverse time?
+#'
 #'
 #' @name geom_stream_field
 #' @export
@@ -104,7 +185,7 @@ geom_stream_field <- function(
   max_it = 1000,
   dt = .0025,
   L = NULL,
-  center = FALSE,
+  center = TRUE,
   method = "rk4",
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
@@ -167,7 +248,7 @@ stat_stream_field <- function(
   max_it = 1000,
   dt = .0025,
   L = NULL,
-  center = FALSE,
+  center = TRUE,
   method = "rk4",
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
@@ -263,6 +344,33 @@ StatStreamField <- ggproto(
 
 ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, method = "lsoda", center = FALSE) {
 
+  # concept: if center = TRUE, the t's are shifted 1:5 -> -2:2 or 0:6 -> -2:3
+  # the implementation simply runs ode_stepper on the negative of the function
+  if (center) {
+    # define a few helpers
+    neg_fun <- function(u) -fun(u)
+    flip <- function(df) df[nrow(df):1,]
+
+    # solve in both directions
+    df_negative <- ode_stepper(u0, neg_fun, dt, t0, L/2, max_it, method, center = FALSE)
+    df_negative$t <- -df_negative$t
+    df_positive <- ode_stepper(u0,     fun, dt, t0, L/2, max_it, method, center = FALSE)
+
+    # combine the datasets
+    df <- rbind( flip(df_negative[-1,]), df_positive )
+
+    # shift lengths, recompute distances, arc length, avg speed
+    n_neg <- nrow(df_negative) - 1
+    n_pos <- nrow(df_positive)
+    n <- nrow(df)
+    df$d <- c(NA, df$d[1:n_neg], df_positive$d[-1])
+    df$l <- c(0, cumsum(df$d[-1]))
+    df$avg_spd <- df$l[n] / (df$t[n] - df$t[1])
+
+    # return
+    return(df)
+  }
+
   # initialize the data structure, a matrix because it drops on subsetting
   mat <- cbind(
     "t" = t0 + dt*(0:(max_it-1)),
@@ -283,7 +391,7 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
     mat[i,c("x","y")] <- ode(
            "y" = u,
        "times" = c(t, t + dt),
-        "func" = function(t, y, parms = NULL, ...) list(f(y)),
+        "func" = function(t, y, parms = NULL, ...) list(fun(y)),
       "method" = method,
        "parms" = NULL
     )[2,c("x","y")]
@@ -310,7 +418,8 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
   row.names(mat) <- NULL
   df <- matrix_to_df_with_names(mat[1:i,])
   df$avg_spd <- df$l[i] / df$t[i]
-  if (center) center_on_point(df, u0) else df
+  # if (center) center_on_point(df, u0) else df # this is for translation centering
+  df
 
 }
 # ode_stepper( c(-1,1), efield_maker() ) |>
@@ -483,70 +592,5 @@ center_on_point <- function(data, point = c(0,0)) {
 #     geom_point(data = stream_center(df), color = "firebrick") +
 #     geom_path(data = center_on_point(df), color = "steelblue") +
 #     coord_equal()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# center_line <- function(data, type) {
-#
-#   if(type == "vector"){
-#
-#     # 1. Create lag_x and lead_x within each 'group' group for 'x'
-#     data$lag_x <- ave(data$x, data$group, FUN = function(x) c(NA, head(x, -1)))
-#     data$lead_x <- ave(data$x, data$group, FUN = function(x) c(tail(x, -1), NA))
-#
-#     # Create lag_y and lead_y within each 'group' group for 'y'
-#     data$lag_y <- ave(data$y, data$group, FUN = function(y) c(NA, head(y, -1)))
-#     data$lead_y <- ave(data$y, data$group, FUN = function(y) c(tail(y, -1), NA))
-#
-#     # 2. Calculate 'mid_x' and 'mid_y' based on the condition 't == 1'
-#     data$mid_x <- ifelse(data$t == 1, (data$x - data$lag_x) / 2, (data$lead_x - data$x) / 2)
-#
-#     data$mid_y <- ifelse(data$t == 1, (data$y - data$lag_y) / 2, (data$lead_y - data$y) / 2)
-#
-#     # 3. Update 'x' and 'y' by subtracting 'mid_x' and 'mid_y'
-#     data$x <- data$x - data$mid_x
-#     data$y <- data$y - data$mid_y
-#
-#     # 4. Remove temporary columns
-#     data$lag_x <- NULL
-#     data$lead_x <- NULL
-#     data$lag_y <- NULL
-#     data$lead_y <- NULL
-#     data$mid_x <- NULL
-#     data$mid_y <- NULL
-#
-#   }
-#
-#   if(type == "stream"){
-#
-#     # Split the data frame by 'id'
-#     data <- split(data, data$id)
-#
-#     # Apply the function to each group
-#     data <- lapply(data, shift_streamline_to_midpoint)
-#
-#     # Combine the processed groups back into a single data frame
-#     data <- do.call(rbind, data)
-#
-#     # Reset row names
-#     rownames(data) <- NULL
-#   }
-#   # Return the modified data frame
-#   data
-#
-# }
 
 
