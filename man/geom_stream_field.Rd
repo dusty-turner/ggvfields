@@ -23,7 +23,7 @@ geom_stream_field(
   max_it = 1000,
   dt = 0.0025,
   L = NULL,
-  center = FALSE,
+  center = TRUE,
   method = "rk4",
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 )
@@ -44,7 +44,7 @@ stat_stream_field(
   max_it = 1000,
   dt = 0.0025,
   L = NULL,
-  center = FALSE,
+  center = TRUE,
   method = "rk4",
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 )
@@ -192,25 +192,106 @@ to \eqn{(dx, dy)}.
 }
 
 \examples{
-# Define a vector field function that returns (dx, dy)
+
 f <- function(u) {
   x <- u[1]; y <- u[2]
   c(-x^2 + y - 1, x - y^2 + 1)
 }
 
+ggplot() +
+  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+
+f <- function(u) {
+  x <- u[1]; y <- u[2]
+  c(-y, x)
+}
+
+ggplot() +
+  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+
+ggplot() +
+  geom_stream_field(fun = efield_maker(), xlim = c(-2,2), ylim = c(-2,2)) +
+  scale_color_viridis_c(trans = "log10") +
+  coord_equal()
+
+
+
+
+# the center argument - should streams originate from grid, or center on them?
+
+library("patchwork")
+
+# over the electric field
 f <- efield_maker()
 
+p1 <- ggplot() +
+  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
+  scale_color_viridis_c(trans = "log10") +
+  coord_equal() + ggtitle("center = TRUE")
+
+p2 <- ggplot() +
+  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = FALSE) +
+  scale_color_viridis_c(trans = "log10") +
+  coord_equal() + ggtitle("center = FALSE")
+
+p1 + p2 + plot_layout(guides = "collect")
+
+
+# now a constant vector field
 f <- function(u) c(3, 1)
 
-ggplot() +
+p1 <- ggplot() +
   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
-  coord_equal()
+  coord_equal() + ggtitle("center = TRUE")
+
+p2 <- ggplot() +
+  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = FALSE) +
+  coord_equal() + ggtitle("center = FALSE")
+
+p1 + p2 + plot_layout(guides = "collect")
+
+
+
+# other cool fields from mathematica's streamplot docs
+f <- function(u) {
+  x <- u[1]; y <- u[2]
+  c(-x^2 + y - 1, x - y^2 + 1)
+}
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+
+f <- function(u) {
+  x <- u[1]; y <- u[2]
+  c(y, y*(-x^2 - 2*y^2 + 1) - x)
+}
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+
+f <- function(u) {
+  x <- u[1]; y <- u[2]
+  c(y, x - x^3)
+}
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+
+f <- function(u) {
+  x <- u[1]; y <- u[2]
+  c(x^2, -y)
+}
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+
+
+
+# adding trails - is this broken?
+f <- function(u) {
+  x <- u[1]; y <- u[2]
+  c(y, y*(-x^2 - 2*y^2 + 1) - x)
+}
+
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 
 ggplot() +
-  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = TRUE) +
-  coord_equal()
+  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), aes(alpha = after_stat(t))) +
+  scale_alpha_continuous(range = c(0, 1))
 
-# should we run +L/2 and then -L/2 in reverse time?
+
 
 }
 \keyword{datasets}
