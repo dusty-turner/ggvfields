@@ -327,17 +327,21 @@ StatStreamField <- ggproto(
     if(normalize == "stream") {
       L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * 0.9
     } else if(normalize == "vector") {
-      L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * 0.8
+      L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * .9
+      # if(center) L <- L # for some reason centering a vector doubles the length in the process: fix later
       if(center) L <- L/2 # for some reason centering a vector doubles the length in the process: fix later
     }
     else if(!normalize) L <- (min(diff(xlim), diff(ylim))) / 2
 
     if (normalize == "vector") {
       # Calculate dt for each grid point
-      dt <- L / apply(grid, 1, function(v) sqrt(sum(f(v) ^ 2)))
+      norms <- apply(grid, 1, function(v) sqrt(sum(fun(v) ^ 2)))
+      dt <- L / norms
 
       # Replace infinite dt values with 0
       dt[is.infinite(dt)] <- 0
+
+
     }
 
     # initialize the data frame
@@ -345,7 +349,6 @@ StatStreamField <- ggproto(
 
     # iterate computing stream from each point
     for (i in 1:nrow(grid)) {
-
       df <- rbind(
         df,
         transform(

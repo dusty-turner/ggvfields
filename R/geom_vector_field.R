@@ -205,12 +205,12 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
   )
 }
 
-#'
-#' #' @rdname geom_vector_field
-#' #' @format NULL
-#' #' @usage NULL
-#' #' @export
-#' StatVectorField <- ggproto("StatVectorField", Stat,
+#' @rdname geom_vector_field
+#' @format NULL
+#' @usage NULL
+#' @export
+# StatVectorField <- StatStreamField
+# StatVectorField <- ggproto("StatVectorField", Stat,
 #'
 #'                            default_aes = aes(group = after_stat(group)),
 #'

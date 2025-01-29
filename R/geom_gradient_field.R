@@ -94,15 +94,15 @@ geom_gradient_field <- function(mapping = NULL, data = NULL,
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
 
-  # default_mapping <- aes(color = after_stat(norm))
-  #
-  # if (!is.null(mapping)) {
-  #   if (!"color" %in% names(mapping)) {
-  #     mapping <- modifyList(default_mapping, mapping)
-  #   }
-  # } else {
-  #   mapping <- default_mapping
-  # }
+  default_mapping <- aes(color = after_stat(norm))
+
+  if (!is.null(mapping)) {
+    if (!"color" %in% names(mapping)) {
+      mapping <- modifyList(default_mapping, mapping)
+    }
+  } else {
+    mapping <- default_mapping
+  }
 
   if (missing(fun) || !is.function(fun)) {
     stop("Please provide a valid scalar function 'fun' that takes a numeric vector (x, y) and returns a single numeric value.")
@@ -114,6 +114,7 @@ geom_gradient_field <- function(mapping = NULL, data = NULL,
     }
     numDeriv::grad(func = fun, x = v)
   }
+  if(normalize) normalize <- "vector"
 
   layer(
     stat = stat,
@@ -131,7 +132,8 @@ geom_gradient_field <- function(mapping = NULL, data = NULL,
       method = "euler",
       na.rm = na.rm,
       dt = 1,
-      L = 0.1,
+      max_it = 2,
+      # L = 0.1,
       center = center,
       normalize = normalize,
       arrow = arrow,
@@ -163,15 +165,15 @@ stat_gradient_field <- function(mapping = NULL, data = NULL,
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
 
-  # default_mapping <- aes(color = after_stat(norm))
-  #
-  # if (!is.null(mapping)) {
-  #   if (!"color" %in% names(mapping)) {
-  #     mapping <- modifyList(default_mapping, mapping)
-  #   }
-  # } else {
-  #   mapping <- default_mapping
-  # }
+  default_mapping <- aes(color = after_stat(norm))
+
+  if (!is.null(mapping)) {
+    if (!"color" %in% names(mapping)) {
+      mapping <- modifyList(default_mapping, mapping)
+    }
+  } else {
+    mapping <- default_mapping
+  }
 
   if (missing(fun) || !is.function(fun)) {
     stop("Please provide a valid scalar function 'fun' that takes a numeric vector (x, y) and returns a single numeric value.")
@@ -200,7 +202,7 @@ stat_gradient_field <- function(mapping = NULL, data = NULL,
       method = "euler",
       na.rm = na.rm,
       dt = 1,
-      L = 0.1,
+      # L = 0.1,
       center = center,
       normalize = normalize,
       arrow = arrow,
