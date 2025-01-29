@@ -35,9 +35,9 @@
 #'   Higher values produce a denser vector field. Defaults to `11`.
 #' @param center Logical. If `TRUE`, centers the seed points around the midpoint of the domain.
 #'   Useful for symmetric flows. Defaults to `TRUE`.
-#' @param normalize Logical; if `TRUE`, normalizes each vector to a unit length before
-#'   applying any scaling. This can help prevent overplotting in dense plots and
-#'   ensures consistent visual representation.
+#' @param normalize Logical. If set to TRUE stream lengths are normalized
+#' based on grid spacing. If set to `FALSE`, a default arc length is used.
+#' Default is `TRUE`.
 #' @param arrow A [grid::arrow()] specification to add arrowheads to the streamlines, indicating
 #'   direction. Defaults to a closed arrow with a 30-degree angle and length `0.02` npc.
 #' @param geom The geometric object used to draw the streamline.
@@ -90,7 +90,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
                               ylim = c(-1, 1),
                               n = 11,
                               center = TRUE,
-                              # normalize = TRUE,
+                              normalize = TRUE,
                               arrow = grid::arrow(angle = 30,
                                                   length = unit(0.02, "npc"),
                                                   type = "closed")
@@ -111,6 +111,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
+  if(normalize) normalize <- "vector"
 
   layer(
     stat = stat,
@@ -128,9 +129,10 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
       method = "euler",
       na.rm = na.rm,
       dt = 1,
-      L = .1,
+      # L = .1,
+      max_it = 2,
       center = center,
-      # normalize = normalize,
+      normalize = normalize,
       arrow = arrow,
       ...
     )
@@ -153,7 +155,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
                               ylim = c(-1, 1),
                               n = 11,
                               center = TRUE,
-                              # normalize = TRUE,
+                              normalize = TRUE,
                               arrow = grid::arrow(angle = 30,
                                                   length = unit(0.02, "npc"),
                                                   type = "closed")
@@ -175,6 +177,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
+  if(normalize) normalize <- "vector"
 
   layer(
     stat = stat,
@@ -193,8 +196,9 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
       na.rm = na.rm,
       dt = 1,
       L = .1,
+      max_it = 2,
       center = center,
-      # normalize = normalize,
+      normalize = normalize,
       arrow = arrow,
       ...
     )

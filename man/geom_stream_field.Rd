@@ -24,6 +24,7 @@ geom_stream_field(
   dt = 0.0025,
   L = NULL,
   center = TRUE,
+  normalize = TRUE,
   method = "rk4",
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 )
@@ -45,6 +46,7 @@ stat_stream_field(
   dt = 0.0025,
   L = NULL,
   center = TRUE,
+  normalize = TRUE,
   method = "rk4",
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 )
@@ -139,6 +141,10 @@ derived from the grid spacing. Default is \code{NULL}.}
 \item{center}{Logical. If \code{TRUE}, centers the seed points around the midpoint
 of the streamline. Default is \code{FALSE}.}
 
+\item{normalize}{Logical. If set to TRUE stream lengths are normalized
+based on grid spacing. If set to \code{FALSE}, a default arc length is used.
+Default is \code{TRUE}.}
+
 \item{method}{Character. Integration method, e.g., \code{"rk4"} for Runge-Kutta 4
 or \code{"euler"} for Euler's method. Defaults to \code{"rk4"}.}
 
@@ -219,7 +225,7 @@ ggplot() +
 
 # the center argument - should streams originate from grid, or center on them?
 
-library("patchwork")
+# library("patchwork")
 
 # over the electric field
 f <- efield_maker()
@@ -234,7 +240,7 @@ p2 <- ggplot() +
   scale_color_viridis_c(trans = "log10") +
   coord_equal() + ggtitle("center = FALSE")
 
-p1 + p2 + plot_layout(guides = "collect")
+# p1 + p2 + plot_layout(guides = "collect")
 
 
 # now a constant vector field
@@ -248,7 +254,7 @@ p2 <- ggplot() +
   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = FALSE) +
   coord_equal() + ggtitle("center = FALSE")
 
-p1 + p2 + plot_layout(guides = "collect")
+# p1 + p2 + plot_layout(guides = "collect")
 
 
 

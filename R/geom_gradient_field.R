@@ -9,7 +9,7 @@
 #'   `color`, `size`, `linetype`, etc., to variables computed by the stat.
 #' @param data A data frame or other object, as in [ggplot2::layer()]. If `NULL`, the layer
 #'   uses the plot's data.
-#' @param stat The statistical transformation to use on the data for this layer. Default is [`StatVectorField`].
+#' @param stat The statistical transformation to use on the data for this layer. Default is [`StatStreamField`].
 #' @param geom The geometric object to use to display the data. Defaults to [GeomStream].
 #' @param position Position adjustment, either as a string, or the result of a call to a
 #'   position adjustment function. Defaults to `"identity"`.
@@ -74,7 +74,8 @@
 #'
 #' @export
 geom_gradient_field <- function(mapping = NULL, data = NULL,
-                                stat = StatVectorField,
+                                stat = StatStreamField,
+                                # stat = StatVectorField,
                                 position = "identity",
                                 ...,
                                 na.rm = FALSE,
@@ -93,15 +94,15 @@ geom_gradient_field <- function(mapping = NULL, data = NULL,
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
 
-  default_mapping <- aes(color = after_stat(norm))
-
-  if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) {
-      mapping <- modifyList(default_mapping, mapping)
-    }
-  } else {
-    mapping <- default_mapping
-  }
+  # default_mapping <- aes(color = after_stat(norm))
+  #
+  # if (!is.null(mapping)) {
+  #   if (!"color" %in% names(mapping)) {
+  #     mapping <- modifyList(default_mapping, mapping)
+  #   }
+  # } else {
+  #   mapping <- default_mapping
+  # }
 
   if (missing(fun) || !is.function(fun)) {
     stop("Please provide a valid scalar function 'fun' that takes a numeric vector (x, y) and returns a single numeric value.")
@@ -162,15 +163,15 @@ stat_gradient_field <- function(mapping = NULL, data = NULL,
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
 
-  default_mapping <- aes(color = after_stat(norm))
-
-  if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) {
-      mapping <- modifyList(default_mapping, mapping)
-    }
-  } else {
-    mapping <- default_mapping
-  }
+  # default_mapping <- aes(color = after_stat(norm))
+  #
+  # if (!is.null(mapping)) {
+  #   if (!"color" %in% names(mapping)) {
+  #     mapping <- modifyList(default_mapping, mapping)
+  #   }
+  # } else {
+  #   mapping <- default_mapping
+  # }
 
   if (missing(fun) || !is.function(fun)) {
     stop("Please provide a valid scalar function 'fun' that takes a numeric vector (x, y) and returns a single numeric value.")
@@ -184,7 +185,7 @@ stat_gradient_field <- function(mapping = NULL, data = NULL,
   }
 
   layer(
-    stat = StatVectorField,
+    stat = StatStreamField,
     geom = geom,
     data = data,
     mapping = mapping,
