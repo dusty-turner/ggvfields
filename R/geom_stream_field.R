@@ -353,6 +353,7 @@ StatStreamField <- ggproto(
           "id" = i
         )
       )
+
     }
 
     # return data frame of streams
@@ -397,6 +398,8 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
     # return
     return(df)
   }
+
+  norm_fu0 <- norm(fun(u0))
 
   # initialize the data structure, a matrix because it drops on subsetting
   mat <- cbind(
@@ -445,6 +448,7 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
   row.names(mat) <- NULL
   df <- matrix_to_df_with_names(mat[1:i,])
   df$avg_spd <- df$l[i] / df$t[i]
+  df$norm <- norm_fu0
   # if (center) center_on_point(df, u0) else df # this is for translation centering
   df
 
@@ -597,20 +601,20 @@ parameterization <- function(data) {
 
 
 
-center_on_point <- function(data, point = c(0,0)) {
-
-  # compute center
-  center <- as.numeric( stream_center(data)[,c("x","y")] )
-
-  # translate each point in path by center
-  # for (i in 1:nrow(data)) data[i,c("x","y")] <- data[i,c("x","y")] - center + point
-  mat <- as.matrix( data[,c("x","y")] )
-  data[,c("x","y")] <- t( t(mat) - center + point )
-
-  # return
-  data
-
-}
+# center_on_point <- function(data, point = c(0,0)) {
+#
+#   # compute center
+#   center <- as.numeric( stream_center(data)[,c("x","y")] )
+#
+#   # translate each point in path by center
+#   # for (i in 1:nrow(data)) data[i,c("x","y")] <- data[i,c("x","y")] - center + point
+#   mat <- as.matrix( data[,c("x","y")] )
+#   data[,c("x","y")] <- t( t(mat) - center + point )
+#
+#   # return
+#   data
+#
+# }
 # df
 # df |> center_on_point()
 # df |>
