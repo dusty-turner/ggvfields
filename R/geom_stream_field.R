@@ -1,6 +1,6 @@
 #' Create a Stream Field Layer in ggplot2
 #'
-#' `geom_stream_field()` creates a ggplot2 layer that integrates a user-defined
+#' [geom_stream_field()] creates a ggplot2 layer that integrates a user-defined
 #' vector field function \eqn{f(x, y) \to (dx, dy)} over a grid of seed points
 #' within a specified domain \eqn{(x, y)}, producing streamlines that visualize
 #' the flow of the vector field. This is useful for visualizing vector fields,
@@ -9,21 +9,22 @@
 #'
 #' @inheritParams ggplot2::geom_path
 #'
-#' @param fun A function of two variables, `fun(x, y)`, returning a
-#'   two-element vector \eqn{(dx, dy)}. This defines the local "flow" direction
-#'   at any point in the domain.
+#' @param fun A function of two variables, `fun(x, y)`, returning a two-element
+#'   vector \eqn{(dx, dy)}. This defines the local "flow" direction at any point
+#'   in the domain.
 #' @param xlim,ylim Numeric vectors of length two specifying the domain limits
 #'   in the \eqn{x}- and \eqn{y}-directions, respectively. Defaults to
 #'   \eqn{c(-1, 1)} for both.
-#' @param n Integer. Grid resolution (the number of seed points along each axis).
-#'   Defaults to 11, resulting in n x n seed points.
+#' @param n Integer. Grid resolution (the number of seed points along each
+#'   axis). Defaults to 11, resulting in n x n seed points.
 #' @param max_it Integer. Maximum number of integration steps per streamline.
 #'   This controls how far each streamline can propagate. Defaults to 1000.
 #' @param dt Numeric. Time-step size for integration. Smaller values produce
-#'   more precise streamlines but increase computation time. Default is `0.0025`.
+#'   more precise streamlines but increase computation time. Default is
+#'   `0.0025`.
 #' @param L Numeric. Maximum arc length for each streamline. A streamline stops
-#'   once its length exceeds this value. If `NULL`, a suitable default is derived
-#'   from the grid spacing. Default is `NULL`.
+#'   once its length exceeds this value. If `NULL`, a suitable default is
+#'   derived from the grid spacing. Default is `NULL`.
 #' @param center Logical. If `TRUE`, centers the seed points around the midpoint
 #'   of the streamline. Default is `FALSE`.
 #' @param method Character. Integration method, e.g., `"rk4"` for Runge-Kutta 4
@@ -32,7 +33,8 @@
 #'   streamline. By default, a closed arrow with a 30-degree angle and a length
 #'   of `0.02` npc is used.
 #' @param geom The geometric object used to draw the streamline. Defaults to
-#'   [ggplot2::GeomPath] in [`geom_stream()`], or [GeomStream] in [`stat_stream()`].
+#'   [ggplot2::GeomPath] in [`geom_stream()`], or [GeomStream] in
+#'   [`stat_stream()`].
 #' @param ... Other arguments passed to [ggplot2::layer()] and the underlying
 #'   geometry/stat. These are often used to set aesthetics like `color = "red"`
 #'   or `size = 1.5`.
@@ -61,39 +63,42 @@
 #' @section See Also:
 #' - [StatStreamField] for the underlying statistical transformation.
 #' - [GeomStream] for the geometry that renders the resulting paths.
-#' - [ggplot2::geom_path] as the base geometry on which [`GeomStream`] is built.
+#' - [ggplot2::geom_path] as the base geometry on which [GeomStream] is built.
 #'
 #' @examples
 #' # Define a vector field function that returns (dx, dy)
-#' f <- function(x, y) {
+#' f <- function(u) {
+#'   x <- u[1]; y <- u[2]
 #'   c(-x^2 + y - 1, x - y^2 + 1)
 #' }
 #'
 #' ggplot() +
-#'   geom_stream_field(fun = f)
+#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#'
+#' ggplot() +
+#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = TRUE)
 #'
 #' @name geom_stream_field
 #' @export
-
-geom_stream_field <- function(mapping = NULL, data = NULL,
-                              stat = StatStreamField,
-                              position = "identity",
-                              ...,
-                              na.rm = FALSE,
-                              show.legend = TRUE,
-                              inherit.aes = TRUE,
-                              fun,
-                              xlim = c(-1, 1),
-                              ylim = c(-1, 1),
-                              n = 11,
-                              max_it = 1000,
-                              dt = .0025,
-                              L = NULL,
-                              center = FALSE,
-                              method = "rk4",
-                              arrow = grid::arrow(angle = 30,
-                                                  length = unit(0.02, "npc"),
-                                                  type = "closed")
+geom_stream_field <- function(
+  mapping = NULL,
+  data = NULL,
+  stat = StatStreamField,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = TRUE,
+  inherit.aes = TRUE,
+  fun,
+  xlim = c(-1, 1),
+  ylim = c(-1, 1),
+  n = 11,
+  max_it = 1000,
+  dt = .0025,
+  L = NULL,
+  center = FALSE,
+  method = "rk4",
+  arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
 
   # Define default mapping for geom_vector_field
@@ -102,9 +107,7 @@ geom_stream_field <- function(mapping = NULL, data = NULL,
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
   if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) {
-      mapping <- modifyList(default_mapping, mapping)
-    }
+    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
   } else {
     mapping <- default_mapping
   }
@@ -140,26 +143,25 @@ geom_stream_field <- function(mapping = NULL, data = NULL,
 
 #' @rdname geom_stream_field
 #' @export
-# Stat function for stream plot computation
-stat_stream_field <- function(mapping = NULL, data = NULL,
-                              geom = GeomStream,
-                              position = "identity",
-                              ...,
-                              na.rm = FALSE,
-                              show.legend = TRUE,
-                              inherit.aes = TRUE,
-                              fun,
-                              xlim = c(-1, 1),
-                              ylim = c(-1, 1),
-                              n = 11,
-                              max_it = 1000,
-                              dt = .0025,
-                              L = NULL,
-                              center = FALSE,
-                              method = "rk4",
-                              arrow = grid::arrow(angle = 30,
-                                                  length = unit(0.02, "npc"),
-                                                  type = "closed")
+stat_stream_field <- function(
+  mapping = NULL,
+  data = NULL,
+  geom = GeomStream,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = TRUE,
+  inherit.aes = TRUE,
+  fun,
+  xlim = c(-1, 1),
+  ylim = c(-1, 1),
+  n = 11,
+  max_it = 1000,
+  dt = .0025,
+  L = NULL,
+  center = FALSE,
+  method = "rk4",
+  arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
 
   # Define default mapping for geom_vector_field
@@ -209,33 +211,319 @@ stat_stream_field <- function(mapping = NULL, data = NULL,
 #' @usage NULL
 #' @export
 StatStreamField <- ggproto("StatStreamField", Stat,
+  default_aes = aes(group = after_stat(id)),
 
-                            default_aes = aes(group = after_stat(id)),
+  compute_group = function(data, scales, fun, xlim, ylim, n, method, max_it = 1000, dt, L, center, ...) {
 
-                            compute_group = function(data, scales, fun, xlim, ylim, n, method, max_it = 1000, dt, L, center, ...) {
-                              n_grid <- n[1]
+    if(is.null(L)) L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * 0.9
 
-                              if(is.null(L)) L <- (min(diff(xlim), diff(ylim)) / (n_grid - 1)) * 0.9
+    grid <- cbind(
+      "x" = rep(seq(xlim[1], xlim[2], length.out = n[1]), times = n[2]),
+      "y" = rep(seq(ylim[1], ylim[2], length.out = n[2]), each = n[1])
+    )
 
-                              grid <- expand.grid(x = seq(xlim[1],xlim[2],len=n_grid), y = seq(ylim[1],ylim[2],len=n_grid) ) |> as.matrix()
-                              df <- data.frame()
+    df <- data.frame()
+    for (i in 1:nrow(grid)) {
+      df <- rbind(
+        df,
+        transform(
+          ode_stepper(u0 = grid[i,], fun = fun, dt = dt, L = L, max_it = max_it, method = method),
+          "id" = i
+        )
+      )
+    }
 
+    if (center) df <- center_to_point(df)
 
-                              for (i in 1:nrow(grid)) {
-                                df <- rbind(
-                                  df,
-                                  transform(
-                                    # ode_stepper(grid[i,], L = L, center = center, method = method, max_it = max_it, dt = dt, f_wrapper = f_wrapper()),
-                                    ode_stepper(u0 = grid[i,], fun = fun, dt = dt, L = L, max_it = max_it, method = method),
-                                    "id" = i)
-                                )
-                              }
+    df
 
-                              if(center) df <- center_line(df, type = "stream")
-
-                              df
-
-                            }
+  }
 )
+
+
+
+
+
+
+
+
+
+ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, method = "lsoda") {
+
+  # initialize the data structure, a matrix because it drops on subsetting
+  mat <- cbind(
+    "t" = t0 + dt*(0:(max_it-1)),
+    "x" = c(u0[1], rep(NA, max_it-1)),
+    "y" = c(u0[2], rep(NA, max_it-1)),
+    "d" = rep(NA, max_it),             # dist since last step
+    "l" = c(    0, rep(NA, max_it-1))  # arc length = cumulative dist traveled
+  )
+
+  # "solve" with ode() step by step
+  for(i in 2:max_it) {
+
+    # get "current" t and u = (x,y)
+    t <- mat[i-1,"t"]
+    u <- mat[i-1,c("x","y")]
+
+    # compute next u = (x,y). all t's were computed in advance
+    mat[i,c("x","y")] <- ode(
+           "y" = u,
+       "times" = c(t, t + dt),
+        "func" = function(t, y, parms = NULL, ...) list(f(y)),
+      "method" = method,
+       "parms" = NULL
+    )[2,c("x","y")]
+
+    # break if ode fails
+    if ( any( is.nan(mat[i,c("x","y")]) | is.na(mat[i,c("x","y")]) ) ) {
+      df <- mat[1:(i-1),,drop=FALSE] |> matrix_to_df_with_names()
+      df$max_t <- max(df$t)
+      return( df )
+    }
+
+    # compute distance traversed in that step
+    mat[i,"d"] <- norm(mat[i,c("x","y")] - mat[i-1,c("x","y")])
+
+    # update length of curve
+    mat[i,"l"] <- mat[i-1,"l"] + mat[i,"d"]
+
+    # stop if curve has exceeded max length
+    if (mat[i,"l"] >= L) break
+
+  }
+
+  # return full rows
+  row.names(mat) <- NULL
+  df <- matrix_to_df_with_names(mat[1:i,])
+  df$max_t <- max(df$t)
+  df
+
+}
+# ode_stepper( c(-1,1), efield_maker() ) |>
+#   str()
+#
+# ode_stepper( c(-1,1), efield_maker() ) |>
+#   ggplot(aes(x, y)) +
+#     geom_path(aes(color = t))
+#
+# ode_stepper( c(-1,1), efield_maker() ) |>
+#   ggplot(aes(x, y)) +
+#   geom_path(aes(color = l))
+#
+# ode_stepper( c(-1,1), efield_maker(), L = 3 ) |>
+#   ggplot(aes(x, y)) +
+#   geom_path(aes(color = l))
+
+
+
+
+
+crop_stream_length <- function(data, L) {
+  # data is assumed to have columns t, x, y, d, l
+  # data is assumed to be ordered by t, but if you need to ensure this you
+  # can uncomment the below
+  # data <- data[order(data$t),]
+
+  # determine number of points in the path
+  n <- nrow(data)
+
+  # return data if length >= arc length of data
+  # NOTE: this will need to change in the future, presumably to extent last seg
+  if (L >= data$l[n]) return( data )
+
+  # find index of first point overshooting desired length
+  i <- min( which( data$l > L ) )
+
+  # discard all the points past the first crossing
+  data <- data[1:i,]
+
+  # essentially we want data[1:(i-1),] plus another point on the line segment
+  # between data[i-1,] and data[i,]. the length of that line should be enough
+  # to get the total polyline length to L
+  almost_L <- data$l[i-1]
+  length_needed <- L - almost_L
+  v <- data[i,c("x","y")] - data[i-1,c("x","y")]
+  nv <- norm(v)
+  m <- length_needed/nv
+  data[i,c("x","y")] <- data[i-1,c("x","y")] + m * v
+
+  # now to update t, d, and l
+  data[i,"d"] <- length_needed
+  data[i,"l"] <- L
+  data[i,"t"] <- with(data, t[i-1] + m*(t[i]-t[i-1]))
+
+  # return data
+  data
+
+}
+# N <- 20 # set this to 2 to a single vector
+# s <- seq(0, 1, length.out = N+1)[-(N+1)]
+# df <- data.frame(
+#   "t" = s,
+#   "x" = cos(2*pi*s),
+#   "y" = sin(2*pi*s)
+# )
+# seg_lengths <- apply(df[2:N,c("x","y")] - df[1:(N-1),c("x","y")], 1, norm)
+# df$d <- c(0, seg_lengths)
+# df$l <- cumsum(df$d) # note that last is ~ 2*pi, which is good
+#
+# df |>
+#   ggplot(aes(x,y)) +
+#     geom_path(aes(color = l)) +
+#     coord_equal(xlim = c(-1,1), ylim = c(-1,1))
+#
+# df |>
+#   crop_stream_length(pi) |>
+#   ggplot(aes(x,y)) +
+#     geom_path(aes(color = l)) +
+#     coord_equal(xlim = c(-1,1), ylim = c(-1,1))
+
+
+
+
+stream_length <- function(data) {
+
+  # data is assumed to have columns t, x, y
+  data <- data[order(data$t),]
+
+  # discard any columns other than x and y
+  data <- data[,c("x","y")]
+
+  # find length of path
+  n <- nrow(data)
+  apply(data[2:n,] - data[1:(n-1),], 1, norm) |> sum()
+
+}
+# df |> stream_length() # should match last l; does
+# df |> crop_stream_length(pi) |> stream_length() # should match pi and new last l; does
+
+
+
+
+stream_center <- function(data) {
+  L <- stream_length(data)
+  data <- crop_stream_length(data, L/2)
+  data[nrow(data),]
+}
+# df |> stream_length()
+# df |> stream_center()
+# df |>
+#   ggplot(aes(x, y)) +
+#     geom_path() +
+#     geom_point(data = stream_center(df), color = "firebrick")
+
+
+
+
+parameterization <- function(data) {
+  fx <- with(data, approxfun(t,x))
+  fy <- with(data, approxfun(t,y))
+  function(t) {
+    n <- length(t)
+    df <- cbind("x" = fx(t), "y" = fy(t)) |> matrix_to_df_with_names()
+    df$d <- c(0, apply(df[2:n,] - df[1:(n-1),], 1, norm))
+    df$l <- cumsum(df$d)
+    df$t <- t
+    df[,c("t","x","y","d","l")]
+  }
+}
+# random_ts <- runif(50, min = min(df$t), max = max(df$t))
+# parameterization(df)( random_ts )
+
+
+
+
+sample_stream <- function(n, data) {
+  random_ts <- runif(n, min = min(data$t), max = max(data$t))
+  parameterization(df)( random_ts )
+}
+# df |>
+#   ggplot(aes(x, y)) +
+#     geom_path() +
+#     geom_point(data = stream_center(df), color = "firebrick") +
+#     geom_point(data = sample_stream(20, df), color = "steelblue") +
+#     coord_equal()
+
+
+
+
+center_to_point <- function(data, point = stream_center(data)[,c("x","y")]) {
+
+  # make data frame if someone passes in numeric vector
+  if (is.numeric(point)) {
+    point <- as.data.frame(t(point))
+    names(point) <- c("x","y")
+  }
+
+  # translate each point in path by center
+  for (i in 1:nrow(data)) data[i,c("x","y")] <- data[i,c("x","y")] - point
+
+  # return
+  data
+
+}
+# df
+# df |> center_to_point()
+# df |>
+#   ggplot(aes(x, y)) +
+#     geom_path() +
+#     geom_point(data = stream_center(df), color = "firebrick") +
+#     geom_path(data = center_to_point(df), color = "steelblue") +
+#     coord_equal()
+
+
+
+
+
+# center_line <- function(data, type) {
+#
+#   if(type == "vector"){
+#
+#     # 1. Create lag_x and lead_x within each 'group' group for 'x'
+#     data$lag_x <- ave(data$x, data$group, FUN = function(x) c(NA, head(x, -1)))
+#     data$lead_x <- ave(data$x, data$group, FUN = function(x) c(tail(x, -1), NA))
+#
+#     # Create lag_y and lead_y within each 'group' group for 'y'
+#     data$lag_y <- ave(data$y, data$group, FUN = function(y) c(NA, head(y, -1)))
+#     data$lead_y <- ave(data$y, data$group, FUN = function(y) c(tail(y, -1), NA))
+#
+#     # 2. Calculate 'mid_x' and 'mid_y' based on the condition 't == 1'
+#     data$mid_x <- ifelse(data$t == 1, (data$x - data$lag_x) / 2, (data$lead_x - data$x) / 2)
+#
+#     data$mid_y <- ifelse(data$t == 1, (data$y - data$lag_y) / 2, (data$lead_y - data$y) / 2)
+#
+#     # 3. Update 'x' and 'y' by subtracting 'mid_x' and 'mid_y'
+#     data$x <- data$x - data$mid_x
+#     data$y <- data$y - data$mid_y
+#
+#     # 4. Remove temporary columns
+#     data$lag_x <- NULL
+#     data$lead_x <- NULL
+#     data$lag_y <- NULL
+#     data$lead_y <- NULL
+#     data$mid_x <- NULL
+#     data$mid_y <- NULL
+#
+#   }
+#
+#   if(type == "stream"){
+#
+#     # Split the data frame by 'id'
+#     data <- split(data, data$id)
+#
+#     # Apply the function to each group
+#     data <- lapply(data, shift_streamline_to_midpoint)
+#
+#     # Combine the processed groups back into a single data frame
+#     data <- do.call(rbind, data)
+#
+#     # Reset row names
+#     rownames(data) <- NULL
+#   }
+#   # Return the modified data frame
+#   data
+#
+# }
 
 

@@ -194,6 +194,7 @@ to \eqn{(dx, dy)}.
 f <- function(x, y) {
   c(-x^2 + y - 1, x - y^2 + 1)
 }
+f <- efield_maker()
 
 ggplot() +
   geom_stream_field(fun = f)

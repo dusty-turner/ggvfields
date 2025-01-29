@@ -10,7 +10,7 @@
 \format{
 An object of class \code{StatStream} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
 
-An object of class \code{GeomStream} (inherits from \code{GeomPath}, \code{Geom}, \code{ggproto}, \code{gg}) of length 1.
+An object of class \code{GeomStream} (inherits from \code{GeomPath}, \code{Geom}, \code{ggproto}, \code{gg}) of length 3.
 }
 \usage{
 geom_stream(
