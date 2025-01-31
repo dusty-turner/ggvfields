@@ -280,6 +280,7 @@ draw_panel_vector <- function(
     eval_point = FALSE,
     tail_point = FALSE
 ) {
+
   ## initialize grobs
   eval_points_grob <- NULL
   points_grob <- NULL
@@ -357,21 +358,21 @@ draw_panel_vector <- function(
       data$yend <- data$yend + half_dy
     }
 
-    # 2. Undo the length scaling
-    data$dx <- data$xend - data$x  # Calculate dx from x and xend
-    data$dy <- data$yend - data$y  # Calculate dy from y and yend
-
-    # Normalize dx and dy (undoing the length scaling)
-    norms <- sqrt(data$dx^2 + data$dy^2)
-    norms[norms == 0] <- 1  # Avoid division by zero
-
-    ## properly scale min vector length
-    length_range <- range(norms)
-
-    data$length[data$length == 0] <- length_range[1]/length_range[2]/5
-
-    data$dx <- data$dx / data$length / .01  # Undo the multiplication by length
-    data$dy <- data$dy / data$length / .01  # Undo the multiplication by length
+#     # 2. Undo the length scaling
+#     data$dx <- data$xend - data$x  # Calculate dx from x and xend
+#     data$dy <- data$yend - data$y  # Calculate dy from y and yend
+#
+#
+#     # Normalize dx and dy (undoing the length scaling)
+#     norms <- sqrt(data$dx^2 + data$dy^2)
+#     norms[norms == 0] <- 1  # Avoid division by zero
+#     ## properly scale min vector length
+#     length_range <- range(norms)
+#
+# #     # data$length[data$length == 0] <- length_range[1]/length_range[2]/5
+#
+#     data$dx <- data$dx / data$length / .01  # Undo the multiplication by length
+#     data$dy <- data$dy / data$length / .01  # Undo the multiplication by length
 
     # Transform data into the coordinate system
 
@@ -438,16 +439,32 @@ draw_panel_vector <- function(
         )
       }
     } else {
+      print("data before segmentsgrob")
+      print(coords)
 
       ## this determines if the user has adjusted the length of the arrow away from the default and makes it smaller
       ## if the user has altered the default then leave it alone
       if (!is.null(arrow) && round(grid::convertUnit(arrow$length, "npc", valueOnly = TRUE), 3) == 0.025) {
         arrow$length <- unit(0.015, "npc")
       }
+
+      x0 <- unit(coords$x, "npc")
+      y0 <- unit(coords$y, "npc")
+      x1 <- unit(coords$x, "npc") + unit(coords$length * coords$dx, "cm")
+      y1 <- unit(coords$y, "npc") + unit(coords$length * coords$dy, "cm")
+      print(x0)
+      print(x1)
+      print(y0)
+      print(y1)
+
       vector_grob <- grid::segmentsGrob(
-        x0 = unit(coords$x, "npc"), y0 = unit(coords$y, "npc"),
-        x1 = unit(coords$x, "npc") + unit(coords$length * coords$dx, "cm"),
-        y1 = unit(coords$y, "npc") + unit(coords$length * coords$dy, "cm"),
+        x0 = x0,
+        y0 = y0,
+        # x0 = unit(coords$x, "npc"), y0 = unit(coords$y, "npc"),
+        x1 = x1,
+        y1 = y1,
+        # x1 = unit(coords$x, "npc") + unit(coords$length * coords$dx, "cm"),
+        # y1 = unit(coords$y, "npc") + unit(coords$length * coords$dy, "cm"),
         gp = grid::gpar(
           col   = coords$colour,
           fill  = coords$fill,
@@ -496,7 +513,8 @@ draw_panel_vector <- function(
 
 #' @keywords internal
 draw_key_vector <- function(data, params, size) {
-
+#   print("draw_key_vector")
+# print(data)
   # x0 <- unit(0.1, "npc")
   x0 <- unit(0.05, "npc")
   y0 <- unit(0.5, "npc")
@@ -555,7 +573,6 @@ GeomVector <- ggproto(
   setup_data = function(data, params) {
     if (!"length" %in% colnames(data) || all(is.na(data$length))) {
       # if (is.na(data$length[1])) {
-
       # Normalize dx and dy to unit vectors if normalize is TRUE
 
       if (params$normalize) {
@@ -600,7 +617,6 @@ GeomVector <- ggproto(
 
     } else {
       # If length aesthetic is mapped
-
       # 1. Normalize dx and dy to unit vectors (like in draw_panel)
       norms <- sqrt(data$dx ^ 2 + data$dy ^ 2)
       norms[norms == 0] <- 1  # Avoid division by zero
@@ -626,6 +642,7 @@ GeomVector <- ggproto(
         data$xend <- data$xend - half_dx
         data$yend <- data$yend - half_dy
       }
+
 
     }
 
@@ -653,34 +670,34 @@ GeomVector <- ggproto(
 #' #ggplot() +
 #' #  geom_vector_field2(fun = efield_maker(), xlim = c(-2, 2), ylim = c(-2, 2)) +
 #' #  scale_length_continuous(trans = "log10")
-scale_length_continuous <- function(max_range = 0.5, ...) {
-
-  args <- list(...)
-
-  if (any(grepl("trans|transform", names(args), ignore.case = TRUE))) {
-    cli::cli_warn(c(
-      "!" = "Applying a log style transformation with {.fn scale_length_continuous} may yield negative length values for norms below 1.",
-      ">" = "This may potentially reverse the direction of the vector(s)."
-    ))
-  }
-
-  scale <- continuous_scale(
-    aesthetics = "length",
-    palette = scales::rescale_pal(range = c(0, max_range)),
-    ...
-  )
-
-  # Return only the scale if max_range is at its default value
-  if (max_range <= 0.5) {
-    return(scale)
-  }
-
-  # For larger max_range, combine scale with theme modification
-  adjusted_width <- unit(max(0.5, max_range * 1.1), "cm")
-
-  list(
-    scale,
-    theme(legend.key.width = adjusted_width)
-  )
-}
-
+# scale_length_continuous <- function(max_range = 0.5, ...) {
+#
+#   args <- list(...)
+#
+#   if (any(grepl("trans|transform", names(args), ignore.case = TRUE))) {
+#     cli::cli_warn(c(
+#       "!" = "Applying a log style transformation with {.fn scale_length_continuous} may yield negative length values for norms below 1.",
+#       ">" = "This may potentially reverse the direction of the vector(s)."
+#     ))
+#   }
+#
+#   scale <- continuous_scale(
+#     aesthetics = "length",
+#     palette = scales::rescale_pal(range = c(.01, max_range)),
+#     ...
+#   )
+#
+#   # Return only the scale if max_range is at its default value
+#   if (max_range <= 0.5) {
+#     return(scale)
+#   }
+#
+#   # For larger max_range, combine scale with theme modification
+#   adjusted_width <- unit(max(0.5, max_range * 1.1), "cm")
+#
+#   list(
+#     scale,
+#     theme(legend.key.width = adjusted_width)
+#   )
+# }
+#

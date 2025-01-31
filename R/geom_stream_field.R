@@ -359,6 +359,7 @@ StatStreamField <- ggproto(
 
     }
 
+    print(head(df))
     # return data frame of streams
     df
 
@@ -452,6 +453,7 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
   df <- matrix_to_df_with_names(mat[1:i,])
   df$avg_spd <- df$l[i] / df$t[i]
   df$norm <- norm_fu0
+  df$length <- df$norm
   # if (center) center_on_point(df, u0) else df # this is for translation centering
   df
 
@@ -572,18 +574,19 @@ stream_center <- function(data) {
 
 
 
-parameterization <- function(data) {
-  fx <- with(data, approxfun(t,x))
-  fy <- with(data, approxfun(t,y))
-  function(t) {
-    n <- length(t)
-    df <- cbind("x" = fx(t), "y" = fy(t)) |> matrix_to_df_with_names()
-    df$d <- c(0, apply(df[2:n,] - df[1:(n-1),], 1, norm))
-    df$l <- cumsum(df$d)
-    df$t <- t
-    df[,c("t","x","y","d","l")]
-  }
-}
+# parameterization <- function(data) {
+#   fx <- with(data, approxfun(t,x))
+#   fy <- with(data, approxfun(t,y))
+#   function(t) {
+#     n <- length(t)
+#     df <- cbind("x" = fx(t), "y" = fy(t)) |> matrix_to_df_with_names()
+#     df$d <- c(0, apply(df[2:n,] - df[1:(n-1),], 1, norm))
+#     df$l <- cumsum(df$d)
+#     df$t <- t
+#     df[,c("t","x","y","d","l")]
+#   }
+# }
+
 # random_ts <- runif(50, min = min(df$t), max = max(df$t))
 # parameterization(df)( random_ts )
 
