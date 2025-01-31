@@ -170,7 +170,7 @@ StatStream <- ggproto("StatStream", Stat,
 
 #' @keywords internal
 draw_key_length <- function(data, params, size) {
-print("key")
+  message("data in key")
   print(data)
   # x0 <- unit(0.1, "npc")
   x0 <- unit(0.05, "npc")
@@ -204,21 +204,19 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                       default_aes = modifyList(GeomPath$default_aes, list(alpha = 1, length = NA_real_)),
 
                       setup_data = function(data, params){
+                        # Only do the transformation if 'length' is mapped
                         if ("length" %in% colnames(data)) {
-                        print("beginning of setup data geom_stream")
-print(data |> head())
-                          data$original_length <- data$length
+                          message("beginning of setup_data geom_stream")
+                          print(head(data))
 
-                          ##### here goes nothing below
-
-                          # Initialize vectors to store transformed coordinates
+                          # Initialize new_x, new_y for final coordinates
                           new_x <- data$x
                           new_y <- data$y
 
                           # Get unique groups
                           unique_groups <- unique(data$group)
 
-                          # Loop through each group to calculate new coordinates for t = 2
+                          # Loop through each group to transform coordinates
                           for (g in unique_groups) {
                             # Subset data for the current group
                             group_data <- data[data$group == g, ]
@@ -227,32 +225,19 @@ print(data |> head())
                             first_point <- group_data[group_data$t == 0, ]
                             second_point <- group_data[group_data$t == 1, ]
 
-                            # Calculate differences
+                            # Calculate differences in data space
                             dx <- second_point$x - first_point$x
                             dy <- second_point$y - first_point$y
-print(dx)
-print(dy)
-                            # Original distance
-                            orig_dist <- second_point$original_length
 
-print(orig_dist)
-                            # Desired length
-                            desired_length <- second_point$length
-print(desired_length)
-                            # Handle zero original distance to avoid division by zero
-                            unit_dx <- dx / orig_dist
-                            unit_dy <- dy / orig_dist
+                              trans_dx <- dx * .01
+                              trans_dy <- dy * .01
 
-                            # Calculate transformed differences
-                            trans_dx <- unit_dx * desired_length * .01
-                            trans_dy <- unit_dy * desired_length * .01
-
-                            # Compute new coordinates
+                            # Compute new coordinates for the second point
                             new_x_val <- first_point$x + trans_dx
                             new_y_val <- first_point$y + trans_dy
-                            # Update the new_x and new_y vectors
-                            idx <- which(data$group == g & data$t == 1)
 
+                            # Update the vectors for the final data
+                            idx <- which(data$group == g & data$t == 1)
                             new_x[idx] <- new_x_val
                             new_y[idx] <- new_y_val
                           }
@@ -262,12 +247,12 @@ print(desired_length)
                           data_transformed$x <- new_x
                           data_transformed$y <- new_y
 
-                          # Display Transformed data
+                          message("end of setup_data geom_stream")
+                          print(head(data_transformed))
 
                           data <- data_transformed
                         }
-print("end of setup data")
-print(data |> head())
+
                         data
 
 
@@ -276,10 +261,15 @@ print(data |> head())
                       # Override the draw_group method
                       draw_panel = function(data, panel_params, coord, arrow) {
 # print(data)
+                          message("data at beginning of draw_panel")
+                          print(data)
                        # Transform the data according to the coordinate system
                         coords <- coord$transform(data, panel_params)
 
                         if (all(!is.na(data$length))) {
+
+                          message("coords at beginning of draw_panel")
+                          print(coords)
 
                           coords$dx <- 0
                           coords$dy <- 0
@@ -295,7 +285,7 @@ print(data |> head())
                               coords$dy[idx[2]] <- coords$y[idx[2]] - coords$y[idx[1]]
                             }
                           }
-                          # print(coords)
+                          print(coords)
 
                           norms <- sqrt(coords$dx^2 + coords$dy^2)
                           # norms[norms == 0] <- 1  # Avoid division by zero
@@ -319,7 +309,9 @@ print(data |> head())
                           coords$y <- coords$new_y
                         }
 
-                        print(head(coords))
+                        message("coords at end draw_panel")
+                        print(coords)
+
 
                         # Create a pathGrob using the transformed coordinates
                         grid::polylineGrob(
