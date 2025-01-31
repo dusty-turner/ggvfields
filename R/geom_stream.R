@@ -149,6 +149,11 @@ stat_stream <- function(mapping = NULL, data = NULL,
 #' @export
 StatStream <- ggproto("StatStream", Stat,
                       required_aes = c("x", "y", "t"),
+
+                      default_aes = aes(x = NA, y = NA, length = 1,
+                                        color = "black", fill = "black",
+                                        linewidth = 1,
+                                        linetype = 1, alpha = 1),
                       # No need to specify group here; grouping is handled via 'group' aesthetic
                       compute_group = function(data, scales, ...) {
                         # Ensure the data is ordered by the temporal variable 't'
@@ -157,20 +162,16 @@ StatStream <- ggproto("StatStream", Stat,
                         }
 
 
-                        data$length <- sqrt((diff(range(data$x)))^2 + (diff(range(data$y)))^2)
+                        data$norm <- sqrt((diff(range(data$x)))^2 + (diff(range(data$y)))^2)
 
-                        # if(center)
-                          # data <- center_vector(data)
                         data
                       }
 )
 
 #' @keywords internal
 draw_key_length <- function(data, params, size) {
-  # data$length <- scales::rescale(x = data$length, to = c(min(data$length),7))
-  # print("draw_key_length")
-  # print(data)
-
+print("key")
+  print(data)
   # x0 <- unit(0.1, "npc")
   x0 <- unit(0.05, "npc")
   y0 <- unit(0.5, "npc")
@@ -198,71 +199,75 @@ draw_key_length <- function(data, params, size) {
 
 #' @name geom_stream
 #' @export
-# GeomStream <- ggproto("GeomStream", GeomPath)
 GeomStream <- ggproto("GeomStream", GeomPath,
                       # required_aes = c("x", "y"),  # Specify required aesthetics
-                      default_aes = modifyList(GeomPath$default_aes, list(alpha = 1, length = after_stat(1))),
+                      default_aes = modifyList(GeomPath$default_aes, list(alpha = 1, length = NA_real_)),
 
                       setup_data = function(data, params){
+                        if ("length" %in% colnames(data)) {
+                        print("beginning of setup data geom_stream")
+print(data |> head())
+                          data$original_length <- data$length
 
+                          ##### here goes nothing below
 
-                        data$original_length <- data$length
+                          # Initialize vectors to store transformed coordinates
+                          new_x <- data$x
+                          new_y <- data$y
 
-                        ##### here goes nothing below
+                          # Get unique groups
+                          unique_groups <- unique(data$group)
 
-                        # Initialize vectors to store transformed coordinates
-                        new_x <- data$x
-                        new_y <- data$y
+                          # Loop through each group to calculate new coordinates for t = 2
+                          for (g in unique_groups) {
+                            # Subset data for the current group
+                            group_data <- data[data$group == g, ]
 
-                        # Get unique groups
-                        unique_groups <- unique(data$group)
+                            # Identify first and second points
+                            first_point <- group_data[group_data$t == 0, ]
+                            second_point <- group_data[group_data$t == 1, ]
 
-                        # Loop through each group to calculate new coordinates for t = 2
-                        for (g in unique_groups) {
-                          # Subset data for the current group
-                          group_data <- data[data$group == g, ]
+                            # Calculate differences
+                            dx <- second_point$x - first_point$x
+                            dy <- second_point$y - first_point$y
+print(dx)
+print(dy)
+                            # Original distance
+                            orig_dist <- second_point$original_length
 
-                          # Identify first and second points
-                          first_point <- group_data[group_data$t == 1, ]
-                          second_point <- group_data[group_data$t == 2, ]
+print(orig_dist)
+                            # Desired length
+                            desired_length <- second_point$length
+print(desired_length)
+                            # Handle zero original distance to avoid division by zero
+                            unit_dx <- dx / orig_dist
+                            unit_dy <- dy / orig_dist
 
-                          # Calculate differences
-                          dx <- second_point$x - first_point$x
-                          dy <- second_point$y - first_point$y
+                            # Calculate transformed differences
+                            trans_dx <- unit_dx * desired_length * .01
+                            trans_dy <- unit_dy * desired_length * .01
 
-                          # Original distance
-                          orig_dist <- second_point$original_length
+                            # Compute new coordinates
+                            new_x_val <- first_point$x + trans_dx
+                            new_y_val <- first_point$y + trans_dy
+                            # Update the new_x and new_y vectors
+                            idx <- which(data$group == g & data$t == 1)
 
+                            new_x[idx] <- new_x_val
+                            new_y[idx] <- new_y_val
+                          }
 
-                          # Desired length
-                          desired_length <- second_point$length
+                          # Create the transformed data frame
+                          data_transformed <- data
+                          data_transformed$x <- new_x
+                          data_transformed$y <- new_y
 
-                          # Handle zero original distance to avoid division by zero
-                          unit_dx <- dx / orig_dist
-                          unit_dy <- dy / orig_dist
+                          # Display Transformed data
 
-                          # Calculate transformed differences
-                          trans_dx <- unit_dx * desired_length * .01
-                          trans_dy <- unit_dy * desired_length * .01
-
-                          # Compute new coordinates
-                          new_x_val <- first_point$x + trans_dx
-                          new_y_val <- first_point$y + trans_dy
-
-                          # Update the new_x and new_y vectors
-                          idx <- which(data$group == g & data$t == 2)
-                          new_x[idx] <- new_x_val
-                          new_y[idx] <- new_y_val
+                          data <- data_transformed
                         }
-
-                        # Create the transformed data frame
-                        data_transformed <- data
-                        data_transformed$x <- new_x
-                        data_transformed$y <- new_y
-
-                        # Display Transformed data
-
-                        data <- data_transformed
+print("end of setup data")
+print(data |> head())
                         data
 
 
@@ -270,74 +275,56 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 
                       # Override the draw_group method
                       draw_panel = function(data, panel_params, coord, arrow) {
-
+# print(data)
                        # Transform the data according to the coordinate system
                         coords <- coord$transform(data, panel_params)
 
-                        ##### here goes nothing above
+                        if (all(!is.na(data$length))) {
 
-                        coords$dx <- 0
-                        coords$dy <- 0
+                          coords$dx <- 0
+                          coords$dy <- 0
 
-                        # 2) For each group (which has exactly 2 rows),
-                        #    set dx, dy in the second row based on
-                        #    (second x - first x), (second y - first y)
-                        unique_groups <- unique(coords$group)
-                        for(g in unique_groups) {
-                          idx <- which(coords$group == g)
-                          if (length(idx) == 2) {
-                            coords$dx[idx[2]] <- coords$x[idx[2]] - coords$x[idx[1]]
-                            coords$dy[idx[2]] <- coords$y[idx[2]] - coords$y[idx[1]]
+                          # 2) For each group (which has exactly 2 rows),
+                          #    set dx, dy in the second row based on
+                          #    (second x - first x), (second y - first y)
+                          unique_groups <- unique(coords$group)
+                          for(g in unique_groups) {
+                            idx <- which(coords$group == g)
+                            if (length(idx) == 2) {
+                              coords$dx[idx[2]] <- coords$x[idx[2]] - coords$x[idx[1]]
+                              coords$dy[idx[2]] <- coords$y[idx[2]] - coords$y[idx[1]]
+                            }
                           }
+                          # print(coords)
+
+                          norms <- sqrt(coords$dx^2 + coords$dy^2)
+                          # norms[norms == 0] <- 1  # Avoid division by zero
+                          coords$dx <- coords$dx / norms
+                          coords$dy <- coords$dy / norms
+
+                          coords$dx <- ifelse(is.nan(coords$dx), 0, coords$dx)
+                          coords$dy <- ifelse(is.nan(coords$dy), 0, coords$dy)
+
+                          # 3) Create new_x, new_y with the same offset logic
+                          #    as segmentsGrob: x1 = x0 + length*dx in cm, etc.
+
+                          coords$lag_x <- ifelse(coords$t == 2, c(NA, head(coords$x, -1)), coords$x)
+                          coords$lag_y <- ifelse(coords$t == 2, c(NA, head(coords$y, -1)), coords$y)
+
+
+                          coords$new_x <- grid::unit(coords$lag_x, "npc") + grid::unit(coords$length * coords$dx, "cm")
+                          coords$new_y <- grid::unit(coords$lag_y, "npc") + grid::unit(coords$length * coords$dy, "cm")
+
+                          coords$x <- coords$new_x
+                          coords$y <- coords$new_y
                         }
-                        # print(coords)
 
-                        norms <- sqrt(coords$dx^2 + coords$dy^2)
-                        # norms[norms == 0] <- 1  # Avoid division by zero
-                        coords$dx <- coords$dx / norms
-                        coords$dy <- coords$dy / norms
-
-                        coords$dx <- ifelse(is.nan(coords$dx), 0, coords$dx)
-                        coords$dy <- ifelse(is.nan(coords$dy), 0, coords$dy)
-
-
-                        print("data before polylinegrob")
-                        print(coords)
-
-
-                        # coords$new_x <- ifelse(
-                        #   coords$t == 2,
-                        #   grid::unit(coords$x, "npc") + grid::unit(coords$length * coords$dx, "cm"),
-                        #   grid::unit(coords$x, "npc") + grid::unit(coords$length * coords$dx, "cm")
-                        # )
-                        # coords$new_x <- ifelse(
-                        #   coords$t == 2,
-                        #   grid::unit(lead(coords$x), "npc") + grid::unit(coords$length * coords$dx, "cm"),
-                        #   grid::unit(coords$x, "npc") + grid::unit(coords$length * coords$dx, "cm")
-                        # )
-
-
-                        # 3) Create new_x, new_y with the same offset logic
-                        #    as segmentsGrob: x1 = x0 + length*dx in cm, etc.
-
-                        coords$lag_x <- ifelse(coords$t == 2, lag(coords$x), coords$x)
-                        coords$lag_y <- ifelse(coords$t == 2, lag(coords$y), coords$y)
-
-
-
-
-                        coords$new_x <- grid::unit(coords$lag_x, "npc") + grid::unit(coords$length * coords$dx, "cm")
-                        # coords$new_x <- grid::unit(coords$x, "npc") + grid::unit(coords$length * coords$dx, "cm")
-                        coords$new_y <- grid::unit(coords$lag_y, "npc") + grid::unit(coords$length * coords$dy, "cm")
-
-                        # Result
-
-                        print(coords)
+                        print(head(coords))
 
                         # Create a pathGrob using the transformed coordinates
                         grid::polylineGrob(
-                          x = coords$new_x,
-                          y = coords$new_y,
+                          x = coords$x,
+                          y = coords$y,
                           id = coords$group,  # Handle grouping for multiple paths
                           default.units = "native",  # Use native units for scaling
                           gp = grid::gpar(
@@ -349,59 +336,11 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                           ), arrow = arrow
                         )
 
-                        # grid::segmentsGrob(
-                        #   x0 = unit(coords$x, "npc"), y0 = unit(coords$y, "npc"),
-                        #   x1 = unit(coords$x, "npc") + unit(coords$length * coords$dx, "cm"),
-                        #   y1 = unit(coords$y, "npc") + unit(coords$length * coords$dy, "cm"),
-                        #   gp = grid::gpar(
-                        #     col   = coords$colour,
-                        #     fill  = coords$fill,
-                        #     alpha = coords$alpha,
-                        #     lty   = coords$linetype,  # user’s mapped linetype
-                        #     lwd   = coords$linewidth  # user’s mapped thickness
-                        #   ),
-                        #   arrow = arrow
-                        # )
-
-
                       },
                       draw_key = draw_key_length
 )
 
-#' Create a Continuous Scale for Vector Length
-#'
-#' [scale_length_continuous()] provides a continuous scale for controlling the
-#' length aesthetic in a ggplot. This is particularly useful when working with
-#' vector plots where vector lengths are mapped to a continuous scale.
-#'
-#' @param max_range The maximum value to which the input is rescaled. Numeric
-#'   scalar specifying the upper bound of the output range. Should be between 0
-#'   and 1.
-#' @param ... Other arguments passed to [continuous_scale()].
-#' @export
-#' @examples
-#'
-#' #ggplot() +
-#' #  geom_vector_field2(fun = efield_maker(), xlim = c(-2, 2), ylim = c(-2, 2)) +
-#' #  scale_length_continuous(trans = "log10")
-# scale_length_continuous <- function(max_range = 0.5, ...) {
-#
-# args <- list(...)
-#
-# if (any(grepl("trans|transform", names(args), ignore.case = TRUE))) {
-#   cli::cli_warn(c(
-#     "!" = "Applying a log style transformation with {.fn scale_length_continuous} may yield negative length values for norms below 1.",
-#     ">" = "This may potentially reverse the direction of the vector(s)."
-#   ))
-# }
-#
-# continuous_scale(
-#   aesthetics = "length",
-#   palette = scales::rescale_pal(range = c(.01, max_range)),
-#   ...
-# )
-#
-# }
+
 scale_length_continuous <- function(max_range = 0.5, ...) {
 
   args <- list(...)

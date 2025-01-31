@@ -327,7 +327,7 @@ StatStreamField <- ggproto(
     if(normalize == "stream") {
       L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * 0.9
     } else if(normalize == "vector") {
-      L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * .9
+      L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * 0.8
       # if(center) L <- L # for some reason centering a vector doubles the length in the process: fix later
       if(center) L <- L/2 # for some reason centering a vector doubles the length in the process: fix later
     }
@@ -358,11 +358,11 @@ StatStreamField <- ggproto(
       )
 
     }
-
+    print("end of stat geom_stream_field")
     print(head(df))
     # return data frame of streams
-    df
 
+    df
   }
 )
 
@@ -453,7 +453,7 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
   df <- matrix_to_df_with_names(mat[1:i,])
   df$avg_spd <- df$l[i] / df$t[i]
   df$norm <- norm_fu0
-  df$length <- df$norm
+  # df$length <- df$norm
   # if (center) center_on_point(df, u0) else df # this is for translation centering
   df
 
