@@ -182,6 +182,8 @@ draw_key_length <- function(data, params, size) {
   x1 <- rev(x0 + unit(length_value, "cm"))
   y1 <- rev(y0)
 
+  print(x1)
+
   grid::segmentsGrob(
     x0 = x0, y0 = y0,
     x1 = x1, y1 = y1,
@@ -260,7 +262,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 
                       # Override the draw_group method
                       draw_panel = function(data, panel_params, coord, arrow) {
-# print(data)
+
                           message("data at beginning of draw_panel")
                           print(data)
                        # Transform the data according to the coordinate system
@@ -271,43 +273,42 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                           message("coords at beginning of draw_panel")
                           print(coords)
 
-                          coords$dx <- 0
-                          coords$dy <- 0
-
-                          # 2) For each group (which has exactly 2 rows),
-                          #    set dx, dy in the second row based on
-                          #    (second x - first x), (second y - first y)
                           unique_groups <- unique(coords$group)
+
+                          coords$new_x <- NA
+                          coords$new_y <- NA
+
+                          temp <- NA
+
                           for(g in unique_groups) {
                             idx <- which(coords$group == g)
-                            if (length(idx) == 2) {
-                              coords$dx[idx[2]] <- coords$x[idx[2]] - coords$x[idx[1]]
-                              coords$dy[idx[2]] <- coords$y[idx[2]] - coords$y[idx[1]]
-                            }
+
+                            x1 <- coords$x[idx[1]]
+                            y1 <- coords$y[idx[1]]
+                            x2 <- coords$x[idx[2]]
+                            y2 <- coords$y[idx[2]]
+
+                              dx <- coords$x[idx[2]] - coords$x[idx[1]]
+                              dy <- coords$y[idx[2]] - coords$y[idx[1]]
+
+                              dist <- sqrt(dx^2 + dy^2)
+
+                              angle <- atan2(dy, dx)
+
+                              # Desired length in cm, from the second row's 'length'
+                              desired_length <- coords$length[idx[2]]
+
+
+                              coords$offset_x[idx[1]] <- 0
+                              coords$offset_x[idx[2]] <- desired_length * cos(angle)
+
+                              coords$offset_y[idx[1]] <- 0
+                              coords$offset_y[idx[2]] <- desired_length * sin(angle)
+
                           }
-                          print(coords)
 
-                          norms <- sqrt(coords$dx^2 + coords$dy^2)
-                          # norms[norms == 0] <- 1  # Avoid division by zero
-                          coords$dx <- coords$dx / norms
-                          coords$dy <- coords$dy / norms
-
-                          coords$dx <- ifelse(is.nan(coords$dx), 0, coords$dx)
-                          coords$dy <- ifelse(is.nan(coords$dy), 0, coords$dy)
-
-                          # 3) Create new_x, new_y with the same offset logic
-                          #    as segmentsGrob: x1 = x0 + length*dx in cm, etc.
-
-                          coords$lag_x <- ifelse(coords$t == 2, c(NA, head(coords$x, -1)), coords$x)
-                          coords$lag_y <- ifelse(coords$t == 2, c(NA, head(coords$y, -1)), coords$y)
-
-
-                          coords$new_x <- grid::unit(coords$lag_x, "npc") + grid::unit(coords$length * coords$dx, "cm")
-                          coords$new_y <- grid::unit(coords$lag_y, "npc") + grid::unit(coords$length * coords$dy, "cm")
-
-                          coords$x <- coords$new_x
-                          coords$y <- coords$new_y
                         }
+print(coords)
 
                         message("coords at end draw_panel")
                         print(coords)
@@ -315,8 +316,10 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 
                         # Create a pathGrob using the transformed coordinates
                         grid::polylineGrob(
-                          x = coords$x,
-                          y = coords$y,
+                          x = grid::unit(coords$x, "npc") + grid::unit(coords$offset_x, "cm"),
+                          y = grid::unit(coords$y, "npc") + grid::unit(coords$offset_y, "cm"),
+                          # x = coords$x,
+                          # y = coords$y,
                           id = coords$group,  # Handle grouping for multiple paths
                           default.units = "native",  # Use native units for scaling
                           gp = grid::gpar(
