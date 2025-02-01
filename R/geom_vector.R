@@ -66,6 +66,7 @@
 #' - `norm`: The magnitude of each vector, \eqn{\sqrt{dx^2 + dy^2}}.
 #'
 #' @examples
+#' \dontrun{
 #' set.seed(1234)
 #' n <- 10
 #' wind_data <- data.frame(
@@ -91,7 +92,9 @@
 #'
 #' # Manually map length to norm
 #' ggplot(wind_data) +
-#'   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)))
+#'   geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy,
+#'   length = after_stat(norm)))
+#'   }
 #'
 #' @rdname geom_vector
 #' @export

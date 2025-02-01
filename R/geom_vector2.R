@@ -29,6 +29,7 @@
 #' @return A ggplot2 layer that can be added to a ggplot object.
 #'
 #' @examples
+#' \dontrun{
 #' set.seed(1234)
 #' n <- 10
 #' wind_data <- data.frame(
@@ -46,6 +47,7 @@
 #' # Example with Polar Coordinates
 #' ggplot(wind_data) +
 #'   geom_vector2(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd))
+#'   }
 #'
 #' @seealso
 #' Use [geom_vector()] if you prefer to map vector magnitude to color rather than length.

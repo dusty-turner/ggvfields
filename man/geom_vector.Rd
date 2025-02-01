@@ -236,6 +236,7 @@ to its color, providing a visual cue of vector strength.
 }
 
 \examples{
+\dontrun{
 set.seed(1234)
 n <- 10
 wind_data <- data.frame(
@@ -261,7 +262,9 @@ ggplot(wind_data) +
 
 # Manually map length to norm
 ggplot(wind_data) +
-  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy, length = after_stat(norm)))
+  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy,
+  length = after_stat(norm)))
+  }
 
 }
 \keyword{datasets}

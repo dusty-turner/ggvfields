@@ -18,9 +18,3 @@ and 1.}
 length aesthetic in a ggplot. This is particularly useful when working with
 vector plots where vector lengths are mapped to a continuous scale.
 }
-\examples{
-
-#ggplot() +
-#  geom_vector_field2(fun = efield_maker(), xlim = c(-2, 2), ylim = c(-2, 2)) +
-#  scale_length_continuous(trans = "log10")
-}

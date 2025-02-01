@@ -358,8 +358,8 @@ StatStreamField <- ggproto(
       )
 
     }
-    print("end of stat geom_stream_field")
-    print(head(df))
+    # print("end of stat geom_stream_field")
+    # print(head(df))
     # return data frame of streams
 
     df

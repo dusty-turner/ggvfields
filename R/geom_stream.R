@@ -53,17 +53,23 @@
 #'
 #'
 #' @examples
-#' stream_1 <- data.frame(x = -5:4)
-#' stream_1$t <- seq_len(nrow(stream_1))
-#' stream_1$y <- stream_1$x^2 + 5
+#' stream_1 <- data.frame(
+#'   x = c(0, 3),
+#'   y = c(0, 0),
+#'   t = 0:1
+#' )
 #'
-#' stream_2 <- data.frame(x = -4:5)
-#' stream_2$t <- seq_len(nrow(stream_2))
-#' stream_2$y <- sqrt(stream_2$x + 5) - 5
+#' stream_2 <- data.frame(
+#'   x = c(1, 1),
+#'   y = c(1, 5),
+#'   t = 0:1
+#' )
 #'
-#' stream_3 <- data.frame(x = 10:0)
-#' stream_3$t <- seq_len(nrow(stream_3))
-#' stream_3$y <- stream_3$x + stream_3$x^0.9
+#' stream_3 <- data.frame(
+#'   x = c(2, 5),
+#'   y = c(2, 6),
+#'   t = 0:1
+#' )
 #'
 #' streams <- rbind(
 #'   cbind(stream_1, id = 1),
@@ -82,7 +88,7 @@
 #' @rdname geom_stream
 #' @export
 geom_stream <- function(mapping = NULL, data = NULL,
-                        stat = "stream",
+                        stat = StatStream,
                         position = "identity",
                         ...,
                         na.rm = FALSE,
@@ -162,6 +168,7 @@ StatStream <- ggproto("StatStream", Stat,
                         }
 
 
+
                         data$norm <- sqrt((diff(range(data$x)))^2 + (diff(range(data$y)))^2)
 
                         data
@@ -170,8 +177,8 @@ StatStream <- ggproto("StatStream", Stat,
 
 #' @keywords internal
 draw_key_length <- function(data, params, size) {
-  message("data in key")
-  print(data)
+  # message("data in key")
+  # print(data)
   # x0 <- unit(0.1, "npc")
   x0 <- unit(0.05, "npc")
   y0 <- unit(0.5, "npc")
@@ -182,7 +189,7 @@ draw_key_length <- function(data, params, size) {
   x1 <- rev(x0 + unit(length_value, "cm"))
   y1 <- rev(y0)
 
-  print(x1)
+  # print(x1)
 
   grid::segmentsGrob(
     x0 = x0, y0 = y0,
@@ -203,85 +210,58 @@ draw_key_length <- function(data, params, size) {
 #' @export
 GeomStream <- ggproto("GeomStream", GeomPath,
                       # required_aes = c("x", "y"),  # Specify required aesthetics
-                      default_aes = modifyList(GeomPath$default_aes, list(alpha = 1, length = NA_real_)),
+                      default_aes = modifyList(GeomPath$default_aes, list(alpha = 1, length = after_stat(NA_real_))),
 
                       setup_data = function(data, params){
-                        # Only do the transformation if 'length' is mapped
-                        if ("length" %in% colnames(data)) {
-                          message("beginning of setup_data geom_stream")
-                          print(head(data))
 
-                          # Initialize new_x, new_y for final coordinates
-                          new_x <- data$x
-                          new_y <- data$y
-
-                          # Get unique groups
+                        ## Remove rows if there are more than 2 rows in a group
+                        if (all(!is.na(data$length))) {
                           unique_groups <- unique(data$group)
 
-                          # Loop through each group to transform coordinates
-                          for (g in unique_groups) {
-                            # Subset data for the current group
-                            group_data <- data[data$group == g, ]
+                          keep <- rep(FALSE, nrow(data))
 
-                            # Identify first and second points
-                            first_point <- group_data[group_data$t == 0, ]
-                            second_point <- group_data[group_data$t == 1, ]
+                          # Loop over each unique group to mark the first and last rows to keep
+                          for (g in unique(data$group)) {
+                            idx <- which(data$group == g)
 
-                            # Calculate differences in data space
-                            dx <- second_point$x - first_point$x
-                            dy <- second_point$y - first_point$y
-
-                              trans_dx <- dx * .01
-                              trans_dy <- dy * .01
-
-                            # Compute new coordinates for the second point
-                            new_x_val <- first_point$x + trans_dx
-                            new_y_val <- first_point$y + trans_dy
-
-                            # Update the vectors for the final data
-                            idx <- which(data$group == g & data$t == 1)
-                            new_x[idx] <- new_x_val
-                            new_y[idx] <- new_y_val
+                            if (length(idx) >= 2) {
+                              # Mark first and last rows
+                              keep[idx[1]] <- TRUE
+                              keep[idx[length(idx)]] <- TRUE
+                            } else {
+                              # If there's only one row, decide if you want to keep it.
+                              keep[idx] <- TRUE
+                            }
                           }
 
-                          # Create the transformed data frame
-                          data_transformed <- data
-                          data_transformed$x <- new_x
-                          data_transformed$y <- new_y
+                          # Subset the data frame
+                          data <- data[keep, ]
 
-                          message("end of setup_data geom_stream")
-                          print(head(data_transformed))
-
-                          data <- data_transformed
                         }
 
                         data
-
 
                       },
 
                       # Override the draw_group method
                       draw_panel = function(data, panel_params, coord, arrow) {
 
-                          message("data at beginning of draw_panel")
-                          print(data)
+                          # message("data at beginning of draw_panel")
+                          # print(data)
                        # Transform the data according to the coordinate system
                         coords <- coord$transform(data, panel_params)
-
+                        coords$offset_x <- 0
+                        coords$offset_y <- 0
                         if (all(!is.na(data$length))) {
 
-                          message("coords at beginning of draw_panel")
-                          print(coords)
+                          # message("coords at beginning of draw_panel")
+                          # print(coords)
 
                           unique_groups <- unique(coords$group)
 
-                          coords$new_x <- NA
-                          coords$new_y <- NA
-
-                          temp <- NA
-
-                          for(g in unique_groups) {
+                         for(g in unique_groups) {
                             idx <- which(coords$group == g)
+
 
                             x1 <- coords$x[idx[1]]
                             y1 <- coords$y[idx[1]]
@@ -298,6 +278,8 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                               # Desired length in cm, from the second row's 'length'
                               desired_length <- coords$length[idx[2]]
 
+                              coords$x[idx[2]] <- coords$x[idx[1]]
+                              coords$y[idx[2]] <- coords$y[idx[1]]
 
                               coords$offset_x[idx[1]] <- 0
                               coords$offset_x[idx[2]] <- desired_length * cos(angle)
@@ -308,10 +290,10 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                           }
 
                         }
-print(coords)
 
-                        message("coords at end draw_panel")
-                        print(coords)
+
+                        # message("coords at end draw_panel")
+                        # print(coords)
 
 
                         # Create a pathGrob using the transformed coordinates
@@ -336,6 +318,18 @@ print(coords)
 )
 
 
+
+#' Create a Continuous Scale for Vector Length
+#'
+#' [scale_length_continuous()] provides a continuous scale for controlling the
+#' length aesthetic in a ggplot. This is particularly useful when working with
+#' vector plots where vector lengths are mapped to a continuous scale.
+#'
+#' @param max_range The maximum value to which the input is rescaled. Numeric
+#'   scalar specifying the upper bound of the output range. Should be between 0
+#'   and 1.
+#' @param ... Other arguments passed to [continuous_scale()].
+#' @export
 scale_length_continuous <- function(max_range = 0.5, ...) {
 
   args <- list(...)
@@ -354,19 +348,18 @@ scale_length_continuous <- function(max_range = 0.5, ...) {
   )
 
   # Return only the scale if max_range is at its default value
-  # if (max_range <= 0.5) {
-  #   return(scale)
-  # }
+  if (max_range <= 0.5) {
+    return(scale)
+  }
 
   # For larger max_range, combine scale with theme modification
   adjusted_width <- unit(max(0.5, max_range * 1.1), "cm")
 
-  # adjusted_width <- unit(10, "cm")
-
-
-    # scale
+    scale <-
   list(
     scale,
     theme(legend.key.width = adjusted_width)
   )
+  scale
 }
+

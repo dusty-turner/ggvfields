@@ -143,6 +143,7 @@ The \code{arrow} parameter is set to \code{NULL} by default, allowing users to s
 arrow types if desired.
 }
 \examples{
+\dontrun{
 set.seed(1234)
 n <- 10
 wind_data <- data.frame(
@@ -160,6 +161,7 @@ ggplot(wind_data) +
 # Example with Polar Coordinates
 ggplot(wind_data) +
   geom_vector2(aes(x = lon, y = lat, angle = wind_dir, distance = wind_spd))
+  }
 
 }
 \seealso{
