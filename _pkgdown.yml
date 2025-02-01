@@ -15,14 +15,14 @@ reference:
       - stat_stream
       - geom_stream_field
       - stat_stream_field
-      # - geom_vector # will be removed
-      # - stat_vector # will be removed
+      - geom_vector # will be removed
+      - stat_vector # will be removed
       # - geom_vector2 # will be replaced
       # - stat_vector2 # will be replaced
       - geom_vector_field
       - stat_vector_field
-      # - geom_vector_field2 # will be replaced
-      # - stat_vector_field2 # will be replaced
+      - geom_vector_field2 # will be replaced
+      - stat_vector_field2 # will be replaced
       - geom_gradient_field
       - stat_gradient_field
       # - geom_gradient_field2 # will be replaced

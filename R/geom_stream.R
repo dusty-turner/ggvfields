@@ -177,9 +177,7 @@ StatStream <- ggproto("StatStream", Stat,
 
 #' @keywords internal
 draw_key_length <- function(data, params, size) {
-  # message("data in key")
-  # print(data)
-  # x0 <- unit(0.1, "npc")
+
   x0 <- unit(0.05, "npc")
   y0 <- unit(0.5, "npc")
 
@@ -188,8 +186,6 @@ draw_key_length <- function(data, params, size) {
   # y1 <- y0
   x1 <- rev(x0 + unit(length_value, "cm"))
   y1 <- rev(y0)
-
-  # print(x1)
 
   grid::segmentsGrob(
     x0 = x0, y0 = y0,
@@ -213,6 +209,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                       default_aes = modifyList(GeomPath$default_aes, list(alpha = 1, length = after_stat(NA_real_))),
 
                       setup_data = function(data, params){
+
 
                         ## Remove rows if there are more than 2 rows in a group
                         if (all(!is.na(data$length))) {
@@ -246,16 +243,11 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                       # Override the draw_group method
                       draw_panel = function(data, panel_params, coord, arrow) {
 
-                          # message("data at beginning of draw_panel")
-                          # print(data)
-                       # Transform the data according to the coordinate system
+                        # Transform the data according to the coordinate system
                         coords <- coord$transform(data, panel_params)
                         coords$offset_x <- 0
                         coords$offset_y <- 0
                         if (all(!is.na(data$length))) {
-
-                          # message("coords at beginning of draw_panel")
-                          # print(coords)
 
                           unique_groups <- unique(coords$group)
 
@@ -290,11 +282,6 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                           }
 
                         }
-
-
-                        # message("coords at end draw_panel")
-                        # print(coords)
-
 
                         # Create a pathGrob using the transformed coordinates
                         grid::polylineGrob(
