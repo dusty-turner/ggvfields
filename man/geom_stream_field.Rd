@@ -7,28 +7,6 @@
 \alias{StatStreamField}
 \title{Create a Stream Field Layer in ggplot2}
 \usage{
-geom_stream_field(
-  mapping = NULL,
-  data = NULL,
-  stat = StatStreamField,
-  position = "identity",
-  ...,
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  fun,
-  xlim = c(-1, 1),
-  ylim = c(-1, 1),
-  n = 11,
-  max_it = 1000,
-  dt = 0.0025,
-  L = NULL,
-  center = TRUE,
-  normalize = TRUE,
-  method = "rk4",
-  arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
-)
-
 stat_stream_field(
   mapping = NULL,
   data = NULL,
@@ -47,6 +25,7 @@ stat_stream_field(
   L = NULL,
   center = TRUE,
   normalize = TRUE,
+  tail_point = FALSE,
   method = "rk4",
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 )
@@ -72,18 +51,7 @@ the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
-\item{stat}{The statistical transformation to use on the data for this layer.
-When using a \verb{geom_*()} function to construct a layer, the \code{stat}
-argument can be used the override the default coupling between geoms and
-stats. The \code{stat} argument accepts the following:
-\itemize{
-\item A \code{Stat} ggproto subclass, for example \code{StatCount}.
-\item A string naming the stat. To give the stat as a string, strip the
-function name of the \code{stat_} prefix. For example, to use \code{stat_count()},
-give the stat as \code{"count"}.
-\item For more information and other ways to specify the stat, see the
-\link[ggplot2:layer_stats]{layer stat} documentation.
-}}
+\item{geom}{The geometric object used to draw the streamline. Defaults to \link{GeomStream}.}
 
 \item{position}{A position adjustment to use on the data for this layer. This
 can be used in various ways, including to prevent overplotting and
@@ -98,9 +66,7 @@ to use \code{position_jitter()}, give the position as \code{"jitter"}.
 \link[ggplot2:layer_positions]{layer position} documentation.
 }}
 
-\item{...}{Other arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}} and the underlying
-geometry/stat. These are often used to set aesthetics like \code{color = "red"}
-or \code{size = 1.5}.}
+\item{...}{Other arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}} and the underlying geometry/stat.}
 
 \item{na.rm}{If \code{FALSE}, the default, missing values are removed with
 a warning. If \code{TRUE}, missing values are silently removed.}
@@ -125,7 +91,7 @@ in the \eqn{x}- and \eqn{y}-directions, respectively. Defaults to
 \eqn{c(-1, 1)} for both.}
 
 \item{n}{Integer. Grid resolution (the number of seed points along each
-axis). Defaults to 11, resulting in n x n seed points.}
+axis). Defaults to 11, resulting in an \eqn{n \times n} grid of seed points.}
 
 \item{max_it}{Integer. Maximum number of integration steps per streamline.
 This controls how far each streamline can propagate. Defaults to 1000.}
@@ -138,28 +104,32 @@ more precise streamlines but increase computation time. Default is
 once its length exceeds this value. If \code{NULL}, a suitable default is
 derived from the grid spacing. Default is \code{NULL}.}
 
-\item{center}{Logical. If \code{TRUE}, centers the seed points around the midpoint
-of the streamline. Default is \code{FALSE}.}
+\item{center}{Logical. If \code{TRUE}, centers the seed points or the resulting streamlines
+so that the original (x, y) becomes the midpoint. Default is \code{TRUE}.}
 
-\item{normalize}{Logical. If set to TRUE stream lengths are normalized
-based on grid spacing. If set to \code{FALSE}, a default arc length is used.
-Default is \code{TRUE}.}
+\item{normalize}{Logical. If \code{TRUE}, stream lengths are normalized based on grid spacing.
+If \code{FALSE}, a default arc length is used. Default is \code{TRUE}.}
+
+\item{tail_point}{Logical. If \code{TRUE}, a point is drawn at the tail (i.e. the
+starting point) of each streamline. This can help to indicate the origin of the
+computed path. Default is \code{FALSE}.}
 
 \item{method}{Character. Integration method, e.g., \code{"rk4"} for Runge-Kutta 4
 or \code{"euler"} for Euler's method. Defaults to \code{"rk4"}.}
 
 \item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification for adding arrowheads to each
-streamline. By default, a closed arrow with a 30-degree angle and a length
-of \code{0.02} npc is used.}
+streamline. By default, a closed arrow with a 30° angle and a length of
+\code{0.02} npc is used.}
 
-\item{geom}{The geometric object used to draw the streamline. Defaults to
-\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{\link[=geom_stream]{geom_stream()}}, or \link{GeomStream} in
-\code{\link[=stat_stream]{stat_stream()}}.}
+\item{eval_point}{Logical. If \code{TRUE}, a point is drawn at the evaluation point,
+which corresponds to the original untransformed seed point prior to any centering
+or normalization. This allows for comparison between the original and the
+transformed positions. Default is \code{FALSE}.}
 }
 \value{
-A ggplot2 \strong{Layer} object that can be added to a plot. It computes
-the streamlines over the specified domain and draws them, optionally with
-arrowheads, to represent the direction of the flow.
+A ggplot2 layer that computes the streamlines over the specified domain
+and draws them, optionally with arrowheads and with points at the tail and/or
+evaluation positions.
 }
 \description{
 \code{\link[=geom_stream_field]{geom_stream_field()}} creates a ggplot2 layer that integrates a user-defined
@@ -170,23 +140,11 @@ flow patterns, or trajectories in a variety of contexts such as fluid flows
 or gradient fields.
 }
 \details{
-\itemize{
-\item \strong{Domain & Grid}: The domain of the vector field is defined by \code{xlim} and
-\code{ylim}. A regular 2D grid of \eqn{(x, y)} seed points is placed within this
-domain, and optionally centered if \code{center = TRUE}.
-\item \strong{Integration}: Streamlines are generated by numerically integrating the
-vector field defined by \code{fun(x, y)} using the specified \code{method}. The
-integration is controlled by parameters such as \code{dt} (time step), \code{max_it}
-(maximum steps), and \code{L} (maximum arc length).
-\item \strong{Visualization}: The resulting streamline coordinates are passed to the
-specified geometry (default: \link{GeomStream}) for visualization. This allows
-for customization of the streamline aesthetics, including color, size, and
-arrowheads.
-}
-
-This approach can be used to visualize a wide range of phenomena, including
-fluid flows, electromagnetic fields, or any continuous mapping from \eqn{(x, y)}
-to \eqn{(dx, dy)}.
+The streamlines are generated by numerically integrating the vector field defined by
+\code{fun(x, y)}. The computed streamlines are then passed to \link{GeomStream} for rendering.
+When \code{tail_point = TRUE}, a point is drawn at the start of each streamline. When
+\code{eval_point = TRUE}, a point is drawn at the original (untransformed) seed point,
+allowing you to see the location before centering or normalization is applied.
 }
 \section{See Also}{
 
@@ -198,106 +156,22 @@ to \eqn{(dx, dy)}.
 }
 
 \examples{
-
-f <- function(u) {
-  x <- u[1]; y <- u[2]
-  c(-x^2 + y - 1, x - y^2 + 1)
-}
-
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-
-f <- function(u) {
-  x <- u[1]; y <- u[2]
+# Define a simple rotational vector field function
+rotational_field <- function(u) {
+  x <- u[1]
+  y <- u[2]
   c(-y, x)
 }
 
+# Create a stream field layer with tail points
 ggplot() +
-  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+  geom_stream_field(fun = rotational_field, xlim = c(-2, 2), ylim = c(-2, 2),
+                    tail_point = TRUE)
 
+# Create a stream field layer with evaluation points
 ggplot() +
-  geom_stream_field(fun = efield_maker(), xlim = c(-2,2), ylim = c(-2,2)) +
-  scale_color_viridis_c(trans = "log10") +
-  coord_equal()
-
-
-
-
-# the center argument - should streams originate from grid, or center on them?
-
-# library("patchwork")
-
-# over the electric field
-f <- efield_maker()
-
-p1 <- ggplot() +
-  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
-  scale_color_viridis_c(trans = "log10") +
-  coord_equal() + ggtitle("center = TRUE")
-
-p2 <- ggplot() +
-  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = FALSE) +
-  scale_color_viridis_c(trans = "log10") +
-  coord_equal() + ggtitle("center = FALSE")
-
-# p1 + p2 + plot_layout(guides = "collect")
-
-
-# now a constant vector field
-f <- function(u) c(3, 1)
-
-p1 <- ggplot() +
-  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
-  coord_equal() + ggtitle("center = TRUE")
-
-p2 <- ggplot() +
-  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = FALSE) +
-  coord_equal() + ggtitle("center = FALSE")
-
-# p1 + p2 + plot_layout(guides = "collect")
-
-
-
-# other cool fields from mathematica's streamplot docs
-f <- function(u) {
-  x <- u[1]; y <- u[2]
-  c(-x^2 + y - 1, x - y^2 + 1)
-}
-ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-
-f <- function(u) {
-  x <- u[1]; y <- u[2]
-  c(y, y*(-x^2 - 2*y^2 + 1) - x)
-}
-ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-
-f <- function(u) {
-  x <- u[1]; y <- u[2]
-  c(y, x - x^3)
-}
-ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-
-f <- function(u) {
-  x <- u[1]; y <- u[2]
-  c(x^2, -y)
-}
-ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-
-
-
-# adding trails - is this broken?
-f <- function(u) {
-  x <- u[1]; y <- u[2]
-  c(y, y*(-x^2 - 2*y^2 + 1) - x)
-}
-
-ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), aes(alpha = after_stat(t))) +
-  scale_alpha_continuous(range = c(0, 1))
-
-
+  geom_stream_field(fun = rotational_field, xlim = c(-2, 2), ylim = c(-2, 2),
+                    eval_point = TRUE)
 
 }
 \keyword{datasets}

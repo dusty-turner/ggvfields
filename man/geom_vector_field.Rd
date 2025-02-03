@@ -3,26 +3,10 @@
 \name{geom_vector_field}
 \alias{geom_vector_field}
 \alias{stat_vector_field}
-\title{Geom Vector Field}
+\alias{geom_vector_field2}
+\alias{stat_vector_field2}
+\title{Vector Field Layers for ggplot2}
 \usage{
-geom_vector_field(
-  mapping = NULL,
-  data = NULL,
-  stat = StatStreamField,
-  position = "identity",
-  ...,
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  fun,
-  xlim = c(-1, 1),
-  ylim = c(-1, 1),
-  n = 11,
-  center = TRUE,
-  normalize = TRUE,
-  arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
-)
-
 stat_vector_field(
   mapping = NULL,
   data = NULL,
@@ -39,41 +23,74 @@ stat_vector_field(
   n = 11,
   center = TRUE,
   normalize = TRUE,
+  tail_point = FALSE,
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
+)
+
+geom_vector_field2(
+  mapping = NULL,
+  data = NULL,
+  stat = StatStreamField,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = TRUE,
+  inherit.aes = TRUE,
+  fun,
+  xlim = c(-1, 1),
+  ylim = c(-1, 1),
+  n = 11,
+  center = FALSE,
+  normalize = TRUE,
+  tail_point = TRUE,
+  arrow = NULL
+)
+
+stat_vector_field2(
+  mapping = NULL,
+  data = NULL,
+  geom = GeomStream,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = TRUE,
+  inherit.aes = TRUE,
+  fun,
+  xlim = c(-1, 1),
+  ylim = c(-1, 1),
+  n = 11,
+  center = FALSE,
+  normalize = TRUE,
+  tail_point = TRUE,
+  arrow = NULL
 )
 }
 \arguments{
-\item{mapping}{Aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}. By default, it inherits
-aesthetics from the ggplot object. You can override or set specific aesthetics such as
-\code{color}, \code{size}, etc.}
+\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}. Additional aesthetics such as
+\code{color}, \code{size}, \code{linetype}, and \code{alpha} can be defined. In geom_vector_field, the default mapping
+includes \code{color = after_stat(norm)}, whereas in geom_vector_field2 the default mapping includes
+\code{length = after_stat(norm)}.}
 
-\item{data}{A data frame or other object, as in \code{\link[ggplot2:layer]{ggplot2::layer()}}. If \code{NULL}, the layer
-uses the plot's data.}
+\item{data}{A data frame containing the input data.}
 
-\item{stat}{The statistical transformation to use on the data for this layer. Defaults to
-\code{\link{StatStreamField}}.}
+\item{stat}{The statistical transformation to use on the data for this layer. Defaults to \link{StatStreamField}.}
 
-\item{position}{Position adjustment, either as a string, or the result of a call to a
-position adjustment function. Defaults to \code{"identity"}.}
+\item{geom}{The geometric object used to draw the streamline. Defaults to
+\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
 
-\item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{ggplot2::layer()}} and the underlying
-\link{StatStreamField} and \link{GeomStream}. These are often used to set aesthetics like \code{color = "red"}
-or \code{size = 1.5}.}
+\item{position}{Position adjustment, either as a string or the result of a call to a position adjustment function.}
 
-\item{na.rm}{Logical. If \code{FALSE} (default), removes missing values with a warning.
-If \code{TRUE}, silently removes missing values.}
+\item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
-\item{show.legend}{Logical. Should this layer be included in the legends? \code{NA}, the default,
-includes it if any aesthetics are mapped. \code{FALSE} never includes it, and \code{TRUE} always includes
-it.}
+\item{na.rm}{Logical. If \code{FALSE} (the default), missing values are removed with a warning.}
 
-\item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics, rather than
-combining with them. This is most useful for helper functions that define both data and
-aesthetics, and should not inherit behaviour from the main ggplot call.}
+\item{show.legend}{Logical. Should this layer be included in the legends?}
 
-\item{fun}{A function that defines the vector field. It should take a numeric vector of
-length 2 (representing \((x, y)\) coordinates) and return a numeric vector of length 2
-\((dx, dy)\) indicating the direction of the vector at that point. \strong{(Required)}}
+\item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics rather than combining with them.}
+
+\item{fun}{A function that defines the vector field. It should take a numeric vector of length 2
+(representing \eqn{(x, y)}) and return a numeric vector of length 2 (representing \eqn{(dx, dy)}).
+\strong{(Required)}}
 
 \item{xlim}{Numeric vector of length two. Specifies the limits of the x-axis domain.
 Defaults to \code{c(-1, 1)}.}
@@ -84,65 +101,50 @@ Defaults to \code{c(-1, 1)}.}
 \item{n}{Integer. Grid resolution specifying the number of seed points along each axis.
 Higher values produce a denser vector field. Defaults to \code{11}.}
 
-\item{center}{Logical. If \code{TRUE}, centers the seed points around the midpoint of the domain.
-Useful for symmetric flows. Defaults to \code{TRUE}.}
+\item{center}{Logical. If \code{TRUE}, centers the seed points or the vectors so that the original (x, y)
+becomes the midpoint. Defaults differ between the variants.}
 
-\item{normalize}{Logical. If set to TRUE stream lengths are normalized
-based on grid spacing. If set to \code{FALSE}, a default arc length is used.
-Default is \code{TRUE}.}
+\item{normalize}{Logical. If \code{TRUE}, stream lengths are normalized based on grid spacing.
+If \code{FALSE}, a default arc length is used. (Default is \code{TRUE}; if \code{TRUE}, it is converted internally to \code{"vector"}.)}
 
-\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the streamlines, indicating
-direction. Defaults to a closed arrow with a 30-degree angle and length \code{0.02} npc.}
+\item{tail_point}{Logical. If \code{TRUE}, a point is drawn at the tail of each streamline.}
 
-\item{geom}{The geometric object used to draw the streamline.}
+\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the streamlines. In geom_vector_field,
+the default is a closed arrow with a 30° angle and length \code{0.02} npc; in geom_vector_field2 the default is \code{NULL}.}
 }
 \value{
-A ggplot2 \strong{Layer} object that can be added to a plot. It computes the streamlines
-based on the specified vector field function and visualizes them.
+A ggplot2 layer that computes and plots a vector field using streamlines.
 }
 \description{
-\code{geom_vector_field()} creates a ggplot2 layer that visualizes a vector field by generating
-streamlines based on a user-defined function. It leverages the underlying
-\link{StatStreamField} and \link{GeomStream} to compute and render the streamlines, respectively.
+These functions provide convenient ggplot2 layers for drawing vector fields using streamlines.
 }
 \details{
-\itemize{
-\item \strong{Vector Field Function (\code{fun})}: The function should encapsulate the behavior of the vector field.
-For example, a rotational field can be defined as \code{function(u) { c(-u[2], u[1]) }}.
-\item \strong{Integration Parameters}:
-\itemize{
-\item \code{dt}: Time-step size for numerical integration. Smaller values yield more precise streamlines.
-\item \code{L}: Maximum arc length for each streamline. If \code{NULL}, a default based on grid spacing is used.
-\item \code{method}: Numerical integration method, such as \code{"euler"} or \code{"rk4"} (Runge-Kutta 4).
-}
-\item \strong{Aesthetic Mappings}: Streamline aesthetics like \code{color}, \code{size}, and \code{linetype} can be customized
-via the \code{mapping} parameter or by setting them directly in the \code{geom_vector_field} call.
-}
-}
-\section{Aesthetics}{
+A user-defined function (\code{fun}) specifies the behavior of the vector field by taking a numeric
+vector of length 2 (representing \eqn{(x, y)}) and returning a numeric vector of length 2
+(representing \eqn{(dx, dy)}). The underlying \link{StatStreamField} computes the streamlines based on
+the vector field function, and \link{GeomStream} renders them.
 
-\code{geom_vector_field()} understands the following aesthetics (optional):
+Two variants are provided:
 \itemize{
-\item \code{color}: Color of the streamlines.
-\item \code{size}: Thickness of the streamlines.
-\item \code{linetype}: Line type of the streamlines.
-\item \code{alpha}: Transparency level of the streamlines.
+\item \strong{geom_vector_field()} uses a default mapping that sets \code{color = after_stat(norm)}.
+\item \strong{geom_vector_field2()} uses a default mapping that sets \code{length = after_stat(norm)} (with \code{color}
+unmapped by default).
 }
 }
-
 \examples{
 # Define a simple rotational vector field function
 rotational_field <- function(u) {
   x <- u[1]
   y <- u[2]
-  c(-y, x)  # Circular flow around the origin
+  c(-y, x)
 }
 
-# Create a ggplot with the vector field using geom_vector_field
+# Using geom_vector_field()
 ggplot() +
-  geom_vector_field(
-    fun = rotational_field
-    )
+  geom_vector_field(fun = rotational_field)
 
+# Using geom_vector_field2()
+ggplot() +
+  geom_vector_field2(fun = rotational_field)
 
 }

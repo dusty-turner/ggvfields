@@ -158,8 +158,8 @@ StatStream <- ggproto("StatStream", Stat,
 
                       default_aes = aes(x = NA, y = NA, length = 1,
                                         color = "black", fill = "black",
-                                        linewidth = 1,
-                                        linetype = 1, alpha = 1),
+                                        linewidth = 1, linetype = 1, alpha = 1
+                                        ),
                       # No need to specify group here; grouping is handled via 'group' aesthetic
                       compute_group = function(data, scales, ...) {
                         # Ensure the data is ordered by the temporal variable 't'
@@ -238,12 +238,21 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                       },
 
                       # Override the draw_group method
-                      draw_panel = function(data, panel_params, coord, arrow) {
+                      draw_panel = function(data, panel_params, coord, tail_point = FALSE, eval_point = FALSE, arrow) {
 
+                        # coords preparation
                         # Transform the data according to the coordinate system
                         coords <- coord$transform(data, panel_params)
 
+                        # used for tail_point
                         orig_coords <- coords
+
+                        # used for eval_point
+                        data_for_eval_coords <- data
+                        data_for_eval_coords$x <- data_for_eval_coords$x_original
+                        data_for_eval_coords$y <- data_for_eval_coords$y_original
+                        coords_for_eval_point <- coord$transform(data_for_eval_coords, panel_params)
+
 
                         coords$offset_x <- 0
                         coords$offset_y <- 0
@@ -283,12 +292,15 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 
                         }
 
+                        grobs <- list()
+                        stream_grob <- grid::nullGrob()
+                        tail_point_grob <- grid::nullGrob()
+                        eval_point_grob <- grid::nullGrob()
+
                         # Create a pathGrob using the transformed coordinates
-                        line_grob <- grid::polylineGrob(
+                        stream_grob <- grid::polylineGrob(
                           x = grid::unit(coords$x, "npc") + grid::unit(coords$offset_x, "cm"),
                           y = grid::unit(coords$y, "npc") + grid::unit(coords$offset_y, "cm"),
-                          # x = coords$x,
-                          # y = coords$y,
                           id = coords$group,  # Handle grouping for multiple paths
                           default.units = "native",  # Use native units for scaling
                           gp = grid::gpar(
@@ -300,21 +312,41 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                           ), arrow = arrow
                         )
 
-                        first_coords <- orig_coords[!duplicated(orig_coords$group), ]
 
-                        point_grob <- grid::pointsGrob(
-                          x = grid::unit(first_coords$x, "npc"),
-                          y = grid::unit(first_coords$y, "npc"),
-                          pch = 16,  # solid circle; change as needed
-                          size = unit(coords$size %||% 2, "mm"),
-                          gp = grid::gpar(
-                            col = first_coords$colour,
-                            alpha = first_coords$alpha
+                        if (tail_point) {
+
+                          first_coords <- orig_coords[!duplicated(orig_coords$group),]
+
+                          tail_point_grob <- grid::pointsGrob(
+                            x = grid::unit(first_coords$x, "npc"),
+                            y = grid::unit(first_coords$y, "npc"),
+                            pch = 16,
+                            # solid circle; change as needed
+                            size = unit(coords$size %||% 2, "mm"),
+                            gp = grid::gpar(col = first_coords$colour,
+                                            alpha = first_coords$alpha)
                           )
-                        )
+                        }
+
+                        if (eval_point) {
+
+                          first_coords_for_eval_point <- coords_for_eval_point[!duplicated(coords_for_eval_point$group),]
+
+                          eval_point_grob <- grid::pointsGrob(
+                            x = grid::unit(first_coords_for_eval_point$x, "npc"),
+                            y = grid::unit(first_coords_for_eval_point$y, "npc"),
+                            pch = 16,
+                            # solid circle; change as needed
+                            size = unit(coords$size %||% 2, "mm"),
+                            gp = grid::gpar(col = first_coords_for_eval_point$colour,
+                                            alpha = first_coords_for_eval_point$alpha)
+                          )
+                        }
 
                         # Combine the line and points grobs so that both are drawn.
-                        grid::grobTree(line_grob, point_grob)
+                        grobs <- list(stream_grob, tail_point_grob, eval_point_grob)
+                        grobs <- Filter(Negate(is.null), grobs)  # Remove NULL entries
+                        return(grid::grobTree(do.call(grid::gList, grobs)))
 
                       },
                       draw_key = draw_key_length

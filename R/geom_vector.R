@@ -91,6 +91,8 @@ geom_vector <- function(mapping = NULL, data = NULL,
                         inherit.aes = TRUE,
                         center = FALSE,
                         normalize = FALSE,
+                        tail_point = FALSE,
+                        eval_point = FALSE,
                         arrow = grid::arrow(angle = 25,
                                             length = unit(0.025, "npc"),
                                             type = "closed")
@@ -117,6 +119,8 @@ geom_vector <- function(mapping = NULL, data = NULL,
       arrow = arrow,
       center = center,
       normalize = normalize,
+      tail_point = tail_point,
+      eval_point = eval_point,
       ...
     )
   )
@@ -133,6 +137,8 @@ stat_vector <- function(mapping = NULL, data = NULL,
                         inherit.aes = TRUE,
                         center = FALSE,
                         normalize = FALSE,
+                        tail_point = FALSE,
+                        eval_point = FALSE,
                         arrow = grid::arrow(angle = 25,
                                             length = unit(0.025, "npc"),
                                             type = "closed")
@@ -151,6 +157,8 @@ stat_vector <- function(mapping = NULL, data = NULL,
       arrow = arrow,
       center = center,
       normalize = normalize,
+      tail_point = tail_point,
+      eval_point = eval_point,
       ...
     )
   )
@@ -166,6 +174,9 @@ StatVector <- ggproto("StatVector", Stat,
                       compute_group = function(data, scales, center, normalize, ...) {
 
                         n <- nrow(data)
+
+                        data$x_original <- data$x
+                        data$y_original <- data$y
 
                         data$norm <- sqrt((data$xend-data$x)^2+(data$yend-data$y)^2)
 
@@ -204,6 +215,7 @@ StatVector <- ggproto("StatVector", Stat,
                         data_start$yend <- NA_real_
                         data_end$xend <- NA_real_
                         data_end$yend <- NA_real_
+
                         if("angle" %in% names(data_start)) data_start$angle <- NA_real_
                         if("distance" %in% names(data_start)) data_start$distance <- NA_real_
                         if("angle" %in% names(data_end)) data_end$angle <- NA_real_
@@ -212,6 +224,7 @@ StatVector <- ggproto("StatVector", Stat,
                         interleaved <- combined[c(rbind(seq_len(n), seq_len(n) + n)), ]
                         rownames(interleaved) <- NULL
                         interleaved$group <- rep(seq_len(n), each = 2)
+
                         interleaved
                       }
 )

@@ -22,6 +22,8 @@ stat_vector(
   inherit.aes = TRUE,
   center = FALSE,
   normalize = FALSE,
+  tail_point = FALSE,
+  eval_point = FALSE,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 )
 
