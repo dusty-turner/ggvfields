@@ -179,7 +179,7 @@ geom_stream_field <- function(
   position = "identity",
   ...,
   na.rm = FALSE,
-  show.legend = TRUE,
+  show.legend = NA,
   inherit.aes = TRUE,
   fun,
   xlim = c(-1, 1),
@@ -246,7 +246,7 @@ stat_stream_field <- function(
   position = "identity",
   ...,
   na.rm = FALSE,
-  show.legend = TRUE,
+  show.legend = NA,
   inherit.aes = TRUE,
   fun,
   xlim = c(-1, 1),
@@ -358,8 +358,8 @@ StatStreamField <- ggproto(
       )
 
     }
-    print("end of stat geom_stream_field")
-    print(head(df))
+    # print("end of stat geom_stream_field")
+    # print(head(df))
     # return data frame of streams
 
     df
