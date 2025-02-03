@@ -381,6 +381,8 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
   )
 
   # "solve" with ode() step by step
+  # note: this iteration might be faster if you don't reference columns by
+  # character, but by index: t=1, x=2, y=3, d=4, l=5
   for(i in 2:max_it) {
 
     # get "current" t and u = (x,y)
@@ -409,16 +411,32 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
     # update length of curve
     mat[i,"l"] <- mat[i-1,"l"] + mat[i,"d"]
 
-    # stop if curve has exceeded max length
-    if (mat[i,"l"] >= L) break
+    # if curve has exceeded max length, crop and break
+    # note: actual length, once exceeding L, is probably slightly larger; this part fixes that
+    if (mat[i,"l"] >= L) {
+
+      # compute how much of last vector is needed to make L
+      length_up_to_last_point <- mat[i-1,"l"]
+      length_needed_from_last_point <- L - length_up_to_last_point
+      m <- length_needed_from_last_point / mat[i,"d"]
+
+      # revise last point and related statistics and break
+      mat[i,c("x","y")] <- mat[i-1,c("x","y")] + m * (mat[i,c("x","y")] - mat[i-1,c("x","y")])
+      mat[i,"t"] <- mat[i-1,"t"] + m*(mat[i,"t"] - mat[i-1,"t"]) # more extensible than dt
+      mat[i,"d"] <- norm(mat[i,c("x","y")] - mat[i-1,c("x","y")])
+      mat[i,"l"] <- mat[i-1,"l"] + mat[i,"d"] # = L
+      break
+    }
 
   }
 
-  # return full rows
+  # convert to data frame
   row.names(mat) <- NULL
   df <- matrix_to_df_with_names(mat[1:i,])
   df$avg_spd <- df$l[i] / df$t[i]
   # if (center) center_on_point(df, u0) else df # this is for translation centering
+
+  # return
   df
 
 }
