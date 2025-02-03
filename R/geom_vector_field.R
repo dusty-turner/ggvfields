@@ -35,9 +35,9 @@
 #'   Higher values produce a denser vector field. Defaults to `11`.
 #' @param center Logical. If `TRUE`, centers the seed points around the midpoint of the domain.
 #'   Useful for symmetric flows. Defaults to `TRUE`.
-#' @param normalize Logical; if `TRUE`, normalizes each vector to a unit length before
-#'   applying any scaling. This can help prevent overplotting in dense plots and
-#'   ensures consistent visual representation.
+#' @param normalize Logical. If set to TRUE stream lengths are normalized
+#' based on grid spacing. If set to `FALSE`, a default arc length is used.
+#' Default is `TRUE`.
 #' @param arrow A [grid::arrow()] specification to add arrowheads to the streamlines, indicating
 #'   direction. Defaults to a closed arrow with a 30-degree angle and length `0.02` npc.
 #' @param geom The geometric object used to draw the streamline.
@@ -79,11 +79,11 @@
 #'
 #' @export
 geom_vector_field <- function(mapping = NULL, data = NULL,
-                              stat = StatVectorField,
+                              stat = StatStreamField,
                               position = "identity",
                               ...,
                               na.rm = FALSE,
-                              show.legend = TRUE,
+                              show.legend = NA,
                               inherit.aes = TRUE,
                               fun,
                               xlim = c(-1, 1),
@@ -111,6 +111,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
+  if(normalize) normalize <- "vector"
 
   layer(
     stat = stat,
@@ -128,7 +129,8 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
       method = "euler",
       na.rm = na.rm,
       dt = 1,
-      L = .1,
+      # L = .1,
+      max_it = 2,
       center = center,
       normalize = normalize,
       arrow = arrow,
@@ -141,12 +143,12 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
 #' @export
 #'
 stat_vector_field <- function(mapping = NULL, data = NULL,
-                              stat = StatVectorField,
+                              stat = StatStreamField,
                               geom = GeomStream,
                               position = "identity",
                               ...,
                               na.rm = FALSE,
-                              show.legend = TRUE,
+                              show.legend = NA,
                               inherit.aes = TRUE,
                               fun,
                               xlim = c(-1, 1),
@@ -175,6 +177,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
+  if(normalize) normalize <- "vector"
 
   layer(
     stat = stat,
@@ -193,6 +196,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
       na.rm = na.rm,
       dt = 1,
       L = .1,
+      max_it = 2,
       center = center,
       normalize = normalize,
       arrow = arrow,
@@ -202,73 +206,3 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
 }
 
 
-#' @rdname geom_vector_field
-#' @format NULL
-#' @usage NULL
-#' @export
-StatVectorField <- ggproto("StatVectorField", Stat,
-
-                           default_aes = aes(group = after_stat(group)),
-
-                           compute_group = function(data, scales, fun, xlim, ylim, n, method, max_it = 1000, dt, L, center, normalize, ...) {
-
-                             n_grid <- n[1]
-
-                             if(is.null(L)) L <- (min(diff(xlim), diff(ylim)) / (n_grid - 1)) * 0.9
-
-                             grid <- expand.grid(x = seq(xlim[1],xlim[2],len=n_grid), y = seq(ylim[1],ylim[2],len=n_grid) ) |> as.matrix()
-                             df <- data.frame()
-
-
-                             for (i in 1:nrow(grid)) {
-                               df <- rbind(
-                                 df,
-                                 transform(
-                                   # ode_stepper(grid[i,], L = L, center = center, method = method, max_it = max_it, dt = dt, f_wrapper = f_wrapper()),
-                                   ode_stepper(grid[i,], fun = fun, dt = dt, L = L, max_it = max_it, method = method),
-                                   "group" = i)
-                               )
-                             }
-
-                             df$norm <- ave(df$l, df$group, FUN = max)
-
-                             if(normalize){
-                               space_between <- (min(diff(xlim), diff(ylim)) / (n_grid - 1)) * .8
-
-                               # 1. Calculate 'norm' as the maximum of 'l' within each 'group' group
-
-                               # 2. Create lagged versions of 'x' and 'y' within each 'group' group
-                               df$lag_x <- ave(df$x, df$group, FUN = function(x) c(NA, head(x, -1)))
-                               df$lag_y <- ave(df$y, df$group, FUN = function(y) c(NA, head(y, -1)))
-
-                               # 3. Calculate 'dx' and 'dy'
-                               df$dx <- ifelse(df$t == 1, df$x - df$lag_x, 0)
-                               df$dy <- ifelse(df$t == 1, df$y - df$lag_y, 0)
-
-                               # 4. Calculate 'new_dx' and 'new_dy'
-                               df$new_dx <- df$dx / df$norm
-                               df$new_dy <- df$dy / df$norm
-
-                               # 5. Update 'x' and 'y' based on the conditions
-                               df$x <- ifelse(df$t == 1, df$lag_x + df$new_dx * space_between, df$x)
-                               df$y <- ifelse(df$t == 1, df$lag_y + df$new_dy * space_between, df$y)
-
-                               # 6. Calculate 'new_norm'
-                               # df$new_norm <- ifelse(df$t == 1, sqrt((df$x - df$lag_x)^2 + (df$y - df$lag_y)^2), 0)
-
-                               # Remove temporary columns if no longer needed
-                               df$lag_x <- NULL
-                               df$lag_y <- NULL
-                               df$dx <- NULL
-                               df$dy <- NULL
-                               df$new_dx <- NULL
-                               df$new_dy <- NULL
-
-                             }
-
-                             if(center) df <- center_line(df, type = "vector")
-
-                             df
-
-                           }
-)

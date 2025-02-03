@@ -8,15 +8,15 @@
 \alias{GeomStream}
 \title{Create a Streamline Plot Layer in ggplot2}
 \format{
-An object of class \code{StatStream} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
+An object of class \code{StatStream} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
 
-An object of class \code{GeomStream} (inherits from \code{GeomPath}, \code{Geom}, \code{ggproto}, \code{gg}) of length 3.
+An object of class \code{GeomStream} (inherits from \code{GeomPath}, \code{Geom}, \code{ggproto}, \code{gg}) of length 5.
 }
 \usage{
 geom_stream(
   mapping = NULL,
   data = NULL,
-  stat = "stream",
+  stat = StatStream,
   position = "identity",
   ...,
   na.rm = FALSE,
@@ -136,17 +136,23 @@ streamline. For more details, see \link[grid:arrow]{grid::arrow}.
 }
 
 \examples{
-stream_1 <- data.frame(x = -5:4)
-stream_1$t <- seq_len(nrow(stream_1))
-stream_1$y <- stream_1$x^2 + 5
+stream_1 <- data.frame(
+  x = c(0, 3),
+  y = c(0, 0),
+  t = 0:1
+)
 
-stream_2 <- data.frame(x = -4:5)
-stream_2$t <- seq_len(nrow(stream_2))
-stream_2$y <- sqrt(stream_2$x + 5) - 5
+stream_2 <- data.frame(
+  x = c(1, 1),
+  y = c(1, 5),
+  t = 0:1
+)
 
-stream_3 <- data.frame(x = 10:0)
-stream_3$t <- seq_len(nrow(stream_3))
-stream_3$y <- stream_3$x + stream_3$x^0.9
+stream_3 <- data.frame(
+  x = c(2, 5),
+  y = c(2, 6),
+  t = 0:1
+)
 
 streams <- rbind(
   cbind(stream_1, id = 1),

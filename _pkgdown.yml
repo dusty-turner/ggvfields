@@ -15,19 +15,26 @@ reference:
       - stat_stream
       - geom_stream_field
       - stat_stream_field
+<<<<<<< HEAD
+      - geom_vector
+      - stat_vector
+      - geom_vector2
+      - stat_vector2
+=======
       - geom_vector # will be removed
       - stat_vector # will be removed
-      - geom_vector2 # will be replaced
-      - stat_vector2 # will be replaced
+      # - geom_vector2 # will be replaced
+      # - stat_vector2 # will be replaced
+>>>>>>> 1700b12ce84a6521d386f2a8397a35b4ab240f51
       - geom_vector_field
       - stat_vector_field
-      # - geom_vector_field2 # will be replaced
-      # - stat_vector_field2 # will be replaced
+      - geom_vector_field2 # will be replaced
+      - stat_vector_field2 # will be replaced
       - geom_gradient_field
       - stat_gradient_field
       # - geom_gradient_field2 # will be replaced
       # - stat_gradient_field2 # will be replaced
-      # - scale_length_continuous # will be removed
+      - scale_length_continuous
       - geom_flow
       - geom_streamplot
       - geom_vector_smooth

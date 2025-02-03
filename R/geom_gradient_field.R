@@ -9,7 +9,7 @@
 #'   `color`, `size`, `linetype`, etc., to variables computed by the stat.
 #' @param data A data frame or other object, as in [ggplot2::layer()]. If `NULL`, the layer
 #'   uses the plot's data.
-#' @param stat The statistical transformation to use on the data for this layer. Default is [`StatVectorField`].
+#' @param stat The statistical transformation to use on the data for this layer. Default is [`StatStreamField`].
 #' @param geom The geometric object to use to display the data. Defaults to [GeomStream].
 #' @param position Position adjustment, either as a string, or the result of a call to a
 #'   position adjustment function. Defaults to `"identity"`.
@@ -74,7 +74,8 @@
 #'
 #' @export
 geom_gradient_field <- function(mapping = NULL, data = NULL,
-                                stat = StatVectorField,
+                                stat = StatStreamField,
+                                # stat = StatVectorField,
                                 position = "identity",
                                 ...,
                                 na.rm = FALSE,
@@ -113,6 +114,7 @@ geom_gradient_field <- function(mapping = NULL, data = NULL,
     }
     numDeriv::grad(func = fun, x = v)
   }
+  if(normalize) normalize <- "vector"
 
   layer(
     stat = stat,
@@ -130,7 +132,8 @@ geom_gradient_field <- function(mapping = NULL, data = NULL,
       method = "euler",
       na.rm = na.rm,
       dt = 1,
-      L = 0.1,
+      max_it = 2,
+      # L = 0.1,
       center = center,
       normalize = normalize,
       arrow = arrow,
@@ -184,7 +187,7 @@ stat_gradient_field <- function(mapping = NULL, data = NULL,
   }
 
   layer(
-    stat = StatVectorField,
+    stat = StatStreamField,
     geom = geom,
     data = data,
     mapping = mapping,
@@ -199,7 +202,7 @@ stat_gradient_field <- function(mapping = NULL, data = NULL,
       method = "euler",
       na.rm = na.rm,
       dt = 1,
-      L = 0.1,
+      # L = 0.1,
       center = center,
       normalize = normalize,
       arrow = arrow,

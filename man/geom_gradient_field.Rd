@@ -8,7 +8,7 @@
 geom_gradient_field(
   mapping = NULL,
   data = NULL,
-  stat = StatVectorField,
+  stat = StatStreamField,
   position = "identity",
   ...,
   na.rm = FALSE,
@@ -48,7 +48,7 @@ stat_gradient_field(
 \item{data}{A data frame or other object, as in \code{\link[ggplot2:layer]{ggplot2::layer()}}. If \code{NULL}, the layer
 uses the plot's data.}
 
-\item{stat}{The statistical transformation to use on the data for this layer. Default is \code{\link{StatVectorField}}.}
+\item{stat}{The statistical transformation to use on the data for this layer. Default is \code{\link{StatStreamField}}.}
 
 \item{position}{Position adjustment, either as a string, or the result of a call to a
 position adjustment function. Defaults to \code{"identity"}.}

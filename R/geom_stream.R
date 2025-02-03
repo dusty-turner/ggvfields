@@ -53,17 +53,23 @@
 #'
 #'
 #' @examples
-#' stream_1 <- data.frame(x = -5:4)
-#' stream_1$t <- seq_len(nrow(stream_1))
-#' stream_1$y <- stream_1$x^2 + 5
+#' stream_1 <- data.frame(
+#'   x = c(0, 3),
+#'   y = c(0, 0),
+#'   t = 0:1
+#' )
 #'
-#' stream_2 <- data.frame(x = -4:5)
-#' stream_2$t <- seq_len(nrow(stream_2))
-#' stream_2$y <- sqrt(stream_2$x + 5) - 5
+#' stream_2 <- data.frame(
+#'   x = c(1, 1),
+#'   y = c(1, 5),
+#'   t = 0:1
+#' )
 #'
-#' stream_3 <- data.frame(x = 10:0)
-#' stream_3$t <- seq_len(nrow(stream_3))
-#' stream_3$y <- stream_3$x + stream_3$x^0.9
+#' stream_3 <- data.frame(
+#'   x = c(2, 5),
+#'   y = c(2, 6),
+#'   t = 0:1
+#' )
 #'
 #' streams <- rbind(
 #'   cbind(stream_1, id = 1),
@@ -82,7 +88,7 @@
 #' @rdname geom_stream
 #' @export
 geom_stream <- function(mapping = NULL, data = NULL,
-                        stat = "stream",
+                        stat = StatStream,
                         position = "identity",
                         ...,
                         na.rm = FALSE,
@@ -149,6 +155,11 @@ stat_stream <- function(mapping = NULL, data = NULL,
 #' @export
 StatStream <- ggproto("StatStream", Stat,
                       required_aes = c("x", "y", "t"),
+
+                      default_aes = aes(x = NA, y = NA, length = 1,
+                                        color = "black", fill = "black",
+                                        linewidth = 1,
+                                        linetype = 1, alpha = 1),
                       # No need to specify group here; grouping is handled via 'group' aesthetic
                       compute_group = function(data, scales, ...) {
                         # Ensure the data is ordered by the temporal variable 't'
@@ -156,30 +167,128 @@ StatStream <- ggproto("StatStream", Stat,
                           stop("StatStream requires a 't' (time) aesthetic for ordering.")
                         }
 
-                        # if(center)
-                          # data <- center_vector(data)
+                        data$norm <- sqrt((diff(range(data$x)))^2 + (diff(range(data$y)))^2)
 
                         data
                       }
 )
 
+#' @keywords internal
+draw_key_length <- function(data, params, size) {
+
+  x0 <- unit(0.05, "npc")
+  y0 <- unit(0.5, "npc")
+
+  length_value <- data$length
+  # x1 <- x0 + unit(length_value, "cm")
+  # y1 <- y0
+  x1 <- rev(x0 + unit(length_value, "cm"))
+  y1 <- rev(y0)
+
+  grid::segmentsGrob(
+    x0 = x0, y0 = y0,
+    x1 = x1, y1 = y1,
+    gp = grid::gpar(
+      col   = scales::alpha(data$colour, data$alpha),
+      lwd   = data$linewidth,
+      lty   = data$linetype
+    )
+  )
+
+}
+
+
+
 #' @name geom_stream
 #' @export
-# GeomStream <- ggproto("GeomStream", GeomPath)
 GeomStream <- ggproto("GeomStream", GeomPath,
                       # required_aes = c("x", "y"),  # Specify required aesthetics
-                      default_aes = modifyList(GeomPath$default_aes, list(alpha = 1)),
+                      default_aes = modifyList(GeomPath$default_aes, list(alpha = 1, length = after_stat(NA_real_))),
 
-                      # Override the draw_panel method
-                      draw_group = function(data, panel_params, coord, arrow) {
+                      setup_data = function(data, params){
+
+
+                        ## Remove rows if there are more than 2 rows in a group
+                        if (all(!is.na(data$length))) {
+                          unique_groups <- unique(data$group)
+
+                          keep <- rep(FALSE, nrow(data))
+
+                          # Loop over each unique group to mark the first and last rows to keep
+                          for (g in unique(data$group)) {
+                            idx <- which(data$group == g)
+
+                            if (length(idx) >= 2) {
+                              # Mark first and last rows
+                              keep[idx[1]] <- TRUE
+                              keep[idx[length(idx)]] <- TRUE
+                            } else {
+                              # If there's only one row, decide if you want to keep it.
+                              keep[idx] <- TRUE
+                            }
+                          }
+
+                          # Subset the data frame
+                          data <- data[keep, ]
+
+                        }
+
+                        data
+
+                      },
+
+                      # Override the draw_group method
+                      draw_panel = function(data, panel_params, coord, arrow) {
 
                         # Transform the data according to the coordinate system
                         coords <- coord$transform(data, panel_params)
 
+                        orig_coords <- coords
+
+                        coords$offset_x <- 0
+                        coords$offset_y <- 0
+                        if (all(!is.na(data$length))) {
+
+                          unique_groups <- unique(coords$group)
+
+                         for(g in unique_groups) {
+                            idx <- which(coords$group == g)
+
+
+                            x1 <- coords$x[idx[1]]
+                            y1 <- coords$y[idx[1]]
+                            x2 <- coords$x[idx[2]]
+                            y2 <- coords$y[idx[2]]
+
+                              dx <- coords$x[idx[2]] - coords$x[idx[1]]
+                              dy <- coords$y[idx[2]] - coords$y[idx[1]]
+
+                              dist <- sqrt(dx^2 + dy^2)
+
+                              angle <- atan2(dy, dx)
+
+                              # Desired length in cm, from the second row's 'length'
+                              desired_length <- coords$length[idx[2]]
+
+                              coords$x[idx[2]] <- coords$x[idx[1]]
+                              coords$y[idx[2]] <- coords$y[idx[1]]
+
+                              coords$offset_x[idx[1]] <- 0
+                              coords$offset_x[idx[2]] <- desired_length * cos(angle)
+
+                              coords$offset_y[idx[1]] <- 0
+                              coords$offset_y[idx[2]] <- desired_length * sin(angle)
+
+                          }
+
+                        }
+
                         # Create a pathGrob using the transformed coordinates
-                        grid::polylineGrob(
-                          x = coords$x,
-                          y = coords$y,
+                        line_grob <- grid::polylineGrob(
+                          x = grid::unit(coords$x, "npc") + grid::unit(coords$offset_x, "cm"),
+                          y = grid::unit(coords$y, "npc") + grid::unit(coords$offset_y, "cm"),
+                          # x = coords$x,
+                          # y = coords$y,
                           id = coords$group,  # Handle grouping for multiple paths
                           default.units = "native",  # Use native units for scaling
                           gp = grid::gpar(
@@ -190,6 +299,70 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                             alpha = coords$alpha         # Set transparency
                           ), arrow = arrow
                         )
-                      }
+
+                        first_coords <- orig_coords[!duplicated(orig_coords$group), ]
+
+                        point_grob <- grid::pointsGrob(
+                          x = grid::unit(first_coords$x, "npc"),
+                          y = grid::unit(first_coords$y, "npc"),
+                          pch = 16,  # solid circle; change as needed
+                          size = unit(coords$size %||% 2, "mm"),
+                          gp = grid::gpar(
+                            col = first_coords$colour,
+                            alpha = first_coords$alpha
+                          )
+                        )
+
+                        # Combine the line and points grobs so that both are drawn.
+                        grid::grobTree(line_grob, point_grob)
+
+                      },
+                      draw_key = draw_key_length
 )
+
+
+
+#' Create a Continuous Scale for Vector Length
+#'
+#' [scale_length_continuous()] provides a continuous scale for controlling the
+#' length aesthetic in a ggplot. This is particularly useful when working with
+#' vector plots where vector lengths are mapped to a continuous scale.
+#'
+#' @param max_range The maximum value to which the input is rescaled. Numeric
+#'   scalar specifying the upper bound of the output range. Should be between 0
+#'   and 1.
+#' @param ... Other arguments passed to [continuous_scale()].
+#' @export
+scale_length_continuous <- function(max_range = 0.5, ...) {
+
+  args <- list(...)
+
+  if (any(grepl("trans|transform", names(args), ignore.case = TRUE))) {
+    cli::cli_warn(c(
+      "!" = "Applying a log style transformation with {.fn scale_length_continuous} may yield negative length values for norms below 1.",
+      ">" = "This may potentially reverse the direction of the vector(s)."
+    ))
+  }
+
+  scale <- continuous_scale(
+    aesthetics = "length",
+    palette = scales::rescale_pal(range = c(.05, max_range)),
+    ...
+  )
+
+  # Return only the scale if max_range is at its default value
+  if (max_range <= 0.5) {
+    return(scale)
+  }
+
+  # For larger max_range, combine scale with theme modification
+  adjusted_width <- unit(max(0.5, max_range * 1.1), "cm")
+
+    scale <-
+  list(
+    scale,
+    theme(legend.key.width = adjusted_width)
+  )
+  scale
+}
 

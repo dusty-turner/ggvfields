@@ -865,6 +865,6 @@ norm <- function(x) sqrt(sum(x^2))
 
 
 
-utils::globalVariables(c("Potential", "fun", "f", "l", "max_t"))
+utils::globalVariables(c("Potential", "fun", "f", "l", "max_t", "avg_spd"))
 
 

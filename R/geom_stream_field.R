@@ -27,6 +27,9 @@
 #'   derived from the grid spacing. Default is `NULL`.
 #' @param center Logical. If `TRUE`, centers the seed points around the midpoint
 #'   of the streamline. Default is `FALSE`.
+#' @param normalize Logical. If set to TRUE stream lengths are normalized
+#' based on grid spacing. If set to `FALSE`, a default arc length is used.
+#' Default is `TRUE`.
 #' @param method Character. Integration method, e.g., `"rk4"` for Runge-Kutta 4
 #'   or `"euler"` for Euler's method. Defaults to `"rk4"`.
 #' @param arrow A [grid::arrow()] specification for adding arrowheads to each
@@ -93,7 +96,7 @@
 #'
 #' # the center argument - should streams originate from grid, or center on them?
 #'
-#' library("patchwork")
+#' # library("patchwork")
 #'
 #' # over the electric field
 #' f <- efield_maker()
@@ -108,7 +111,7 @@
 #'   scale_color_viridis_c(trans = "log10") +
 #'   coord_equal() + ggtitle("center = FALSE")
 #'
-#' p1 + p2 + plot_layout(guides = "collect")
+#' # p1 + p2 + plot_layout(guides = "collect")
 #'
 #'
 #' # now a constant vector field
@@ -122,7 +125,7 @@
 #'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), center = FALSE) +
 #'   coord_equal() + ggtitle("center = FALSE")
 #'
-#' p1 + p2 + plot_layout(guides = "collect")
+#' # p1 + p2 + plot_layout(guides = "collect")
 #'
 #'
 #'
@@ -176,7 +179,7 @@ geom_stream_field <- function(
   position = "identity",
   ...,
   na.rm = FALSE,
-  show.legend = TRUE,
+  show.legend = NA,
   inherit.aes = TRUE,
   fun,
   xlim = c(-1, 1),
@@ -186,6 +189,7 @@ geom_stream_field <- function(
   dt = .0025,
   L = NULL,
   center = TRUE,
+  normalize = TRUE,
   method = "rk4",
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
@@ -203,6 +207,8 @@ geom_stream_field <- function(
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
+
+  if(normalize) normalize <- "stream"
 
   layer(
     stat = stat,
@@ -223,6 +229,7 @@ geom_stream_field <- function(
       dt = dt,
       L = L,
       center = center,
+      normalize = normalize,
       arrow = arrow,
       ...
     )
@@ -239,7 +246,7 @@ stat_stream_field <- function(
   position = "identity",
   ...,
   na.rm = FALSE,
-  show.legend = TRUE,
+  show.legend = NA,
   inherit.aes = TRUE,
   fun,
   xlim = c(-1, 1),
@@ -249,6 +256,7 @@ stat_stream_field <- function(
   dt = .0025,
   L = NULL,
   center = TRUE,
+  normalize = TRUE,
   method = "rk4",
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
@@ -268,6 +276,7 @@ stat_stream_field <- function(
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
+  if(normalize) normalize <- "stream"
 
   layer(
     stat = StatStreamField,
@@ -288,6 +297,7 @@ stat_stream_field <- function(
       dt = dt,
       L = L,
       center = center,
+      normalize = normalize,
       arrow = arrow,
       ...
     )
@@ -304,15 +314,35 @@ StatStreamField <- ggproto(
   Stat,
   default_aes = aes(group = after_stat(id)),
 
-  compute_group = function(data, scales, fun, xlim, ylim, n, method, max_it = 1000, dt, L, center, ...) {
-
-    if(is.null(L)) L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * 0.9
+  compute_group = function(data, scales, fun, xlim, ylim, n, method, max_it = 1000, dt, L = NULL, center, normalize, ...) {
 
     # make grid of points on which to compute streams
     grid <- cbind(
       "x" = rep(seq(xlim[1], xlim[2], length.out = n[1]), times = n[2]),
       "y" = rep(seq(ylim[1], ylim[2], length.out = n[2]), each = n[1])
     )
+
+    dt <- rep(dt, nrow(grid))
+
+    if(normalize == "stream") {
+      L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * 0.9
+    } else if(normalize == "vector") {
+      L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * 0.8
+      # if(center) L <- L # for some reason centering a vector doubles the length in the process: fix later
+      if(center) L <- L/2 # for some reason centering a vector doubles the length in the process: fix later
+    }
+    else if(!normalize) L <- (min(diff(xlim), diff(ylim))) / 2
+
+    if (normalize == "vector") {
+      # Calculate dt for each grid point
+      norms <- apply(grid, 1, function(v) sqrt(sum(fun(v) ^ 2)))
+      dt <- L / norms
+
+      # Replace infinite dt values with 0
+      dt[is.infinite(dt)] <- 0
+
+
+    }
 
     # initialize the data frame
     df <- data.frame()
@@ -322,15 +352,17 @@ StatStreamField <- ggproto(
       df <- rbind(
         df,
         transform(
-          ode_stepper(grid[i,], fun, dt, 0, L, max_it, method, center),
+          ode_stepper(grid[i,], fun, dt[i], 0, L, max_it, method, center),
           "id" = i
         )
       )
+
     }
-
+    # print("end of stat geom_stream_field")
+    # print(head(df))
     # return data frame of streams
-    df
 
+    df
   }
 )
 
@@ -370,6 +402,8 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
     # return
     return(df)
   }
+
+  norm_fu0 <- norm(fun(u0))
 
   # initialize the data structure, a matrix because it drops on subsetting
   mat <- cbind(
@@ -434,6 +468,8 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
   row.names(mat) <- NULL
   df <- matrix_to_df_with_names(mat[1:i,])
   df$avg_spd <- df$l[i] / df$t[i]
+  df$norm <- norm_fu0
+  # df$length <- df$norm
   # if (center) center_on_point(df, u0) else df # this is for translation centering
 
   # return
@@ -556,28 +592,29 @@ stream_center <- function(data) {
 
 
 
-parameterization <- function(data) {
-  fx <- with(data, approxfun(t,x))
-  fy <- with(data, approxfun(t,y))
-  function(t) {
-    n <- length(t)
-    df <- cbind("x" = fx(t), "y" = fy(t)) |> matrix_to_df_with_names()
-    df$d <- c(0, apply(df[2:n,] - df[1:(n-1),], 1, norm))
-    df$l <- cumsum(df$d)
-    df$t <- t
-    df[,c("t","x","y","d","l")]
-  }
-}
+# parameterization <- function(data) {
+#   fx <- with(data, approxfun(t,x))
+#   fy <- with(data, approxfun(t,y))
+#   function(t) {
+#     n <- length(t)
+#     df <- cbind("x" = fx(t), "y" = fy(t)) |> matrix_to_df_with_names()
+#     df$d <- c(0, apply(df[2:n,] - df[1:(n-1),], 1, norm))
+#     df$l <- cumsum(df$d)
+#     df$t <- t
+#     df[,c("t","x","y","d","l")]
+#   }
+# }
+
 # random_ts <- runif(50, min = min(df$t), max = max(df$t))
 # parameterization(df)( random_ts )
 
 
 
 
-sample_stream <- function(n, data) {
-  random_ts <- runif(n, min = min(data$t), max = max(data$t))
-  parameterization(df)( random_ts )
-}
+# sample_stream <- function(n, data) {
+#   random_ts <- runif(n, min = min(data$t), max = max(data$t))
+#   parameterization(df)( random_ts )
+# }
 # df |>
 #   ggplot(aes(x, y)) +
 #     geom_path() +
@@ -588,20 +625,20 @@ sample_stream <- function(n, data) {
 
 
 
-center_on_point <- function(data, point = c(0,0)) {
-
-  # compute center
-  center <- as.numeric( stream_center(data)[,c("x","y")] )
-
-  # translate each point in path by center
-  # for (i in 1:nrow(data)) data[i,c("x","y")] <- data[i,c("x","y")] - center + point
-  mat <- as.matrix( data[,c("x","y")] )
-  data[,c("x","y")] <- t( t(mat) - center + point )
-
-  # return
-  data
-
-}
+# center_on_point <- function(data, point = c(0,0)) {
+#
+#   # compute center
+#   center <- as.numeric( stream_center(data)[,c("x","y")] )
+#
+#   # translate each point in path by center
+#   # for (i in 1:nrow(data)) data[i,c("x","y")] <- data[i,c("x","y")] - center + point
+#   mat <- as.matrix( data[,c("x","y")] )
+#   data[,c("x","y")] <- t( t(mat) - center + point )
+#
+#   # return
+#   data
+#
+# }
 # df
 # df |> center_on_point()
 # df |>
