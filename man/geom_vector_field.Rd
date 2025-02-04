@@ -24,6 +24,7 @@ stat_vector_field(
   center = TRUE,
   normalize = TRUE,
   tail_point = FALSE,
+  eval_point = FALSE,
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 )
 
@@ -43,6 +44,7 @@ geom_vector_field2(
   center = FALSE,
   normalize = TRUE,
   tail_point = TRUE,
+  eval_point = FALSE,
   arrow = NULL
 )
 
@@ -62,67 +64,85 @@ stat_vector_field2(
   center = FALSE,
   normalize = TRUE,
   tail_point = TRUE,
+  eval_point = FALSE,
   arrow = NULL
 )
 }
 \arguments{
-\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}. Additional aesthetics such as
-\code{color}, \code{size}, \code{linetype}, and \code{alpha} can be defined. In geom_vector_field, the default mapping
-includes \code{color = after_stat(norm)}, whereas in geom_vector_field2 the default mapping includes
-\code{length = after_stat(norm)}.}
+\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
+Additional aesthetics such as \code{color}, \code{size}, \code{linetype}, and \code{alpha} can
+be defined. In geom_vector_field, the default mapping includes \code{color = after_stat(norm)}, whereas in geom_vector_field2 the default mapping
+includes \code{length = after_stat(norm)}.}
 
 \item{data}{A data frame containing the input data.}
 
-\item{stat}{The statistical transformation to use on the data for this layer. Defaults to \link{StatStreamField}.}
+\item{stat}{The statistical transformation to use on the data for this layer.
+Defaults to \link{StatStreamField}.}
 
 \item{geom}{The geometric object used to draw the streamline. Defaults to
 \link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
 
-\item{position}{Position adjustment, either as a string or the result of a call to a position adjustment function.}
+\item{position}{Position adjustment, either as a string or the result of a
+call to a position adjustment function.}
 
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
-\item{na.rm}{Logical. If \code{FALSE} (the default), missing values are removed with a warning.}
+\item{na.rm}{Logical. If \code{FALSE} (the default), missing values are removed
+with a warning.}
 
 \item{show.legend}{Logical. Should this layer be included in the legends?}
 
-\item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics rather than combining with them.}
+\item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics
+rather than combining with them.}
 
-\item{fun}{A function that defines the vector field. It should take a numeric vector of length 2
-(representing \eqn{(x, y)}) and return a numeric vector of length 2 (representing \eqn{(dx, dy)}).
+\item{fun}{A function that defines the vector field. It should take a numeric
+vector of length 2 (representing \eqn{(x, y)}) and return a numeric vector
+of length 2 (representing \eqn{(dx, dy)}).
 \strong{(Required)}}
 
-\item{xlim}{Numeric vector of length two. Specifies the limits of the x-axis domain.
-Defaults to \code{c(-1, 1)}.}
+\item{xlim}{Numeric vector of length two. Specifies the limits of the x-axis
+domain. Defaults to \code{c(-1, 1)}.}
 
-\item{ylim}{Numeric vector of length two. Specifies the limits of the y-axis domain.
-Defaults to \code{c(-1, 1)}.}
+\item{ylim}{Numeric vector of length two. Specifies the limits of the y-axis
+domain. Defaults to \code{c(-1, 1)}.}
 
-\item{n}{Integer. Grid resolution specifying the number of seed points along each axis.
-Higher values produce a denser vector field. Defaults to \code{11}.}
+\item{n}{Integer. Grid resolution specifying the number of seed points along
+each axis. Higher values produce a denser vector field. Defaults to \code{11}.}
 
-\item{center}{Logical. If \code{TRUE}, centers the seed points or the vectors so that the original (x, y)
-becomes the midpoint. Defaults differ between the variants.}
+\item{center}{Logical. If \code{TRUE}, centers the seed points or the vectors so
+that the original (x, y) becomes the midpoint. Defaults differ between the
+variants.}
 
-\item{normalize}{Logical. If \code{TRUE}, stream lengths are normalized based on grid spacing.
-If \code{FALSE}, a default arc length is used. (Default is \code{TRUE}; if \code{TRUE}, it is converted internally to \code{"vector"}.)}
+\item{normalize}{Logical. If \code{TRUE}, stream lengths are normalized based on
+grid spacing. If \code{FALSE}, a default arc length is used. (Default is \code{TRUE};
+if \code{TRUE}, it is converted internally to \code{"vector"}.)}
 
-\item{tail_point}{Logical. If \code{TRUE}, a point is drawn at the tail of each streamline.}
+\item{tail_point}{Logical. If \code{TRUE}, a point is drawn at the tail of each
+streamline.}
 
-\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the streamlines. In geom_vector_field,
-the default is a closed arrow with a 30° angle and length \code{0.02} npc; in geom_vector_field2 the default is \code{NULL}.}
+\item{eval_point}{Logical. If \code{TRUE}, a point is drawn at the evaluation
+point, corresponding to the original (untransformed) seed point before any
+centering or normalization is applied. This allows for comparison between
+the original and transformed positions. Default is \code{FALSE}.}
+
+\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the
+streamlines. In geom_vector_field, the default is a closed arrow with a 30°
+angle and length \code{0.02} npc; in geom_vector_field2 the default is \code{NULL}.}
 }
 \value{
-A ggplot2 layer that computes and plots a vector field using streamlines.
+A ggplot2 layer that computes and plots a vector field using
+streamlines.
 }
 \description{
-These functions provide convenient ggplot2 layers for drawing vector fields using streamlines.
+These functions provide convenient ggplot2 layers for drawing vector fields
+using streamlines.
 }
 \details{
-A user-defined function (\code{fun}) specifies the behavior of the vector field by taking a numeric
-vector of length 2 (representing \eqn{(x, y)}) and returning a numeric vector of length 2
-(representing \eqn{(dx, dy)}). The underlying \link{StatStreamField} computes the streamlines based on
-the vector field function, and \link{GeomStream} renders them.
+A user-defined function (\code{fun}) specifies the behavior of the vector field by
+taking a numeric vector of length 2 (representing \eqn{(x, y)}) and returning
+a numeric vector of length 2 (representing \eqn{(dx, dy)}). The underlying
+\link{StatStreamField} computes the streamlines based on the vector field
+function, and \link{GeomStream} renders them.
 
 Two variants are provided:
 \itemize{

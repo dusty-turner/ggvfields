@@ -72,6 +72,15 @@ original (x, y) becomes the midpoint of the vector. Default is \code{FALSE}.}
 \item{normalize}{Logical. If \code{TRUE}, the vector endpoints are adjusted so
 that each vector has unit length.}
 
+\item{tail_point}{Logical. If \code{TRUE}, a point is drawn at the tail (i.e., the
+starting point) of each vector. This can help to indicate the origin of the
+vector. Default is \code{FALSE}.}
+
+\item{eval_point}{Logical. If \code{TRUE}, a point is drawn at the evaluation
+point, corresponding to the original (untransformed) seed point before any
+centering or normalization is applied. This allows for comparison between
+the original and transformed positions. Default is \code{FALSE}.}
+
 \item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to
 the vectors (default: \code{grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")}).}
 

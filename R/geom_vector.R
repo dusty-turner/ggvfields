@@ -40,6 +40,13 @@
 #'   original (x, y) becomes the midpoint of the vector. Default is `FALSE`.
 #' @param normalize Logical. If `TRUE`, the vector endpoints are adjusted so
 #'   that each vector has unit length.
+#' @param tail_point Logical. If `TRUE`, a point is drawn at the tail (i.e., the
+#'   starting point) of each vector. This can help to indicate the origin of the
+#'   vector. Default is `FALSE`.
+#' @param eval_point Logical. If `TRUE`, a point is drawn at the evaluation
+#'   point, corresponding to the original (untransformed) seed point before any
+#'   centering or normalization is applied. This allows for comparison between
+#'   the original and transformed positions. Default is `FALSE`.
 #' @param ... Other arguments passed on to [ggplot2::layer()].
 #'
 #' @return A ggplot2 layer that can be added to a plot.

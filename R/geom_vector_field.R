@@ -1,50 +1,67 @@
 #' Vector Field Layers for ggplot2
 #'
-#' These functions provide convenient ggplot2 layers for drawing vector fields using streamlines.
+#' These functions provide convenient ggplot2 layers for drawing vector fields
+#' using streamlines.
 #'
-#' A user-defined function (`fun`) specifies the behavior of the vector field by taking a numeric
-#' vector of length 2 (representing \eqn{(x, y)}) and returning a numeric vector of length 2
-#' (representing \eqn{(dx, dy)}). The underlying [StatStreamField] computes the streamlines based on
-#' the vector field function, and [GeomStream] renders them.
+#' A user-defined function (`fun`) specifies the behavior of the vector field by
+#' taking a numeric vector of length 2 (representing \eqn{(x, y)}) and returning
+#' a numeric vector of length 2 (representing \eqn{(dx, dy)}). The underlying
+#' [StatStreamField] computes the streamlines based on the vector field
+#' function, and [GeomStream] renders them.
 #'
 #' Two variants are provided:
 #'
 #' - **geom_vector_field()** uses a default mapping that sets `color = after_stat(norm)`.
 #' - **geom_vector_field2()** uses a default mapping that sets `length = after_stat(norm)` (with `color`
-#'   unmapped by default).
+#' unmapped by default).
 #'
 #' @inheritParams ggplot2::geom_path
 #' @inheritParams geom_stream
 #'
-#' @param mapping A set of aesthetic mappings created by [ggplot2::aes()]. Additional aesthetics such as
-#'   `color`, `size`, `linetype`, and `alpha` can be defined. In geom_vector_field, the default mapping
-#'   includes `color = after_stat(norm)`, whereas in geom_vector_field2 the default mapping includes
-#'   `length = after_stat(norm)`.
+#' @param mapping A set of aesthetic mappings created by [ggplot2::aes()].
+#'   Additional aesthetics such as `color`, `size`, `linetype`, and `alpha` can
+#'   be defined. In geom_vector_field, the default mapping includes `color =
+#'   after_stat(norm)`, whereas in geom_vector_field2 the default mapping
+#'   includes `length = after_stat(norm)`.
 #' @param data A data frame containing the input data.
-#' @param stat The statistical transformation to use on the data for this layer. Defaults to [StatStreamField].
-#' @param position Position adjustment, either as a string or the result of a call to a position adjustment function.
-#' @param na.rm Logical. If `FALSE` (the default), missing values are removed with a warning.
+#' @param stat The statistical transformation to use on the data for this layer.
+#'   Defaults to [StatStreamField].
+#' @param position Position adjustment, either as a string or the result of a
+#'   call to a position adjustment function.
+#' @param na.rm Logical. If `FALSE` (the default), missing values are removed
+#'   with a warning.
 #' @param show.legend Logical. Should this layer be included in the legends?
-#' @param inherit.aes Logical. If `FALSE`, overrides the default aesthetics rather than combining with them.
-#' @param fun A function that defines the vector field. It should take a numeric vector of length 2
-#'   (representing \eqn{(x, y)}) and return a numeric vector of length 2 (representing \eqn{(dx, dy)}).
+#' @param inherit.aes Logical. If `FALSE`, overrides the default aesthetics
+#'   rather than combining with them.
+#' @param fun A function that defines the vector field. It should take a numeric
+#'   vector of length 2 (representing \eqn{(x, y)}) and return a numeric vector
+#'   of length 2 (representing \eqn{(dx, dy)}).
 #'   **(Required)**
-#' @param xlim Numeric vector of length two. Specifies the limits of the x-axis domain.
-#'   Defaults to `c(-1, 1)`.
-#' @param ylim Numeric vector of length two. Specifies the limits of the y-axis domain.
-#'   Defaults to `c(-1, 1)`.
-#' @param n Integer. Grid resolution specifying the number of seed points along each axis.
-#'   Higher values produce a denser vector field. Defaults to `11`.
-#' @param center Logical. If `TRUE`, centers the seed points or the vectors so that the original (x, y)
-#'   becomes the midpoint. Defaults differ between the variants.
-#' @param normalize Logical. If `TRUE`, stream lengths are normalized based on grid spacing.
-#'   If `FALSE`, a default arc length is used. (Default is `TRUE`; if `TRUE`, it is converted internally to `"vector"`.)
-#' @param tail_point Logical. If `TRUE`, a point is drawn at the tail of each streamline.
-#' @param arrow A [grid::arrow()] specification to add arrowheads to the streamlines. In geom_vector_field,
-#'   the default is a closed arrow with a 30° angle and length `0.02` npc; in geom_vector_field2 the default is `NULL`.
+#' @param xlim Numeric vector of length two. Specifies the limits of the x-axis
+#'   domain. Defaults to `c(-1, 1)`.
+#' @param ylim Numeric vector of length two. Specifies the limits of the y-axis
+#'   domain. Defaults to `c(-1, 1)`.
+#' @param n Integer. Grid resolution specifying the number of seed points along
+#'   each axis. Higher values produce a denser vector field. Defaults to `11`.
+#' @param center Logical. If `TRUE`, centers the seed points or the vectors so
+#'   that the original (x, y) becomes the midpoint. Defaults differ between the
+#'   variants.
+#' @param normalize Logical. If `TRUE`, stream lengths are normalized based on
+#'   grid spacing. If `FALSE`, a default arc length is used. (Default is `TRUE`;
+#'   if `TRUE`, it is converted internally to `"vector"`.)
+#' @param tail_point Logical. If `TRUE`, a point is drawn at the tail of each
+#'   streamline.
+#' @param eval_point Logical. If `TRUE`, a point is drawn at the evaluation
+#'   point, corresponding to the original (untransformed) seed point before any
+#'   centering or normalization is applied. This allows for comparison between
+#'   the original and transformed positions. Default is `FALSE`.
+#' @param arrow A [grid::arrow()] specification to add arrowheads to the
+#'   streamlines. In geom_vector_field, the default is a closed arrow with a 30°
+#'   angle and length `0.02` npc; in geom_vector_field2 the default is `NULL`.
 #' @param ... Other arguments passed on to [ggplot2::layer()].
 #'
-#' @return A ggplot2 layer that computes and plots a vector field using streamlines.
+#' @return A ggplot2 layer that computes and plots a vector field using
+#'   streamlines.
 #'
 #' @examples
 #' # Define a simple rotational vector field function
@@ -80,6 +97,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
                               center = TRUE,
                               normalize = TRUE,
                               tail_point = FALSE,
+                              eval_point = FALSE,
                               arrow = grid::arrow(angle = 30,
                                                   length = unit(0.02, "npc"),
                                                   type = "closed")
@@ -121,8 +139,9 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
       # L = .1,
       max_it = 2,
       center = center,
-      tail_point = tail_point,
       normalize = normalize,
+      tail_point = tail_point,
+      eval_point = eval_point,
       arrow = arrow,
       ...
     )
@@ -147,6 +166,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
                               center = TRUE,
                               normalize = TRUE,
                               tail_point = FALSE,
+                              eval_point = FALSE,
                               arrow = grid::arrow(angle = 30,
                                                   length = unit(0.02, "npc"),
                                                   type = "closed")
@@ -191,6 +211,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
       center = center,
       normalize = normalize,
       tail_point = tail_point,
+      eval_point = eval_point,
       arrow = arrow,
       ...
     )
@@ -213,6 +234,7 @@ geom_vector_field2 <- function(mapping = NULL, data = NULL,
                                center = FALSE,
                                normalize = TRUE,
                                tail_point = TRUE,
+                               eval_point = FALSE,
                                arrow = NULL) {
 
   # Define default mapping for geom_vector_field2
@@ -255,6 +277,7 @@ geom_vector_field2 <- function(mapping = NULL, data = NULL,
       center = center,
       normalize = normalize,
       tail_point = tail_point,
+      eval_point = eval_point,
       arrow = arrow,
       ...
     )
@@ -277,6 +300,7 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
                                center = FALSE,
                                normalize = TRUE,
                                tail_point = TRUE,
+                               eval_point = FALSE,
                                arrow = NULL) {
 
   # Define default mapping for stat_stream_field2
@@ -319,6 +343,7 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
       center = center,
       normalize = normalize,
       tail_point = tail_point,
+      eval_point = eval_point,
       arrow = arrow,
       ...
     )
