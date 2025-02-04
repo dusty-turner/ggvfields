@@ -61,6 +61,11 @@
 #' - [ggplot2::geom_path] as the base geometry on which [GeomStream] is built.
 #'
 #' @examples
+#'
+#' f <- efield_maker()
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#' ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#'
 #' # Define a simple rotational vector field function
 #' rotational_field <- function(u) {
 #'   x <- u[1]
@@ -75,7 +80,7 @@
 #' # Create a stream field layer with tail points
 #' ggplot() +
 #'   geom_stream_field(fun = rotational_field, tail_point = TRUE)
-
+#'
 #' # Create a stream field with centered streams
 #' ggplot() +
 #'   geom_stream_field(fun = rotational_field, center = TRUE)
