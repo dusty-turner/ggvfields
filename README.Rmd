@@ -50,8 +50,10 @@ wind_data <- data.frame(
   spd = rchisq(n, df = 2)
 ) |> 
   within({
-    dx <- spd * cos(dir) # Compute the x-component of the vector
-    dy <- spd * sin(dir) # Compute the y-component of the vector
+    fx    <- spd * cos(dir)          # Compute the x-component of the vector
+    fy    <- spd * sin(dir)          # Compute the y-component of the vector
+    xend  <- lon + fx                # Compute the end x-coordinate
+    yend  <- lat + fy                # Compute the end y-coordinate
   })
 
 round(wind_data, digits = 2) 
@@ -69,14 +71,21 @@ These functions allow for flexible visualizations of vector data.
 
 ```{r}
 ggplot(wind_data) +
-  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy)) 
+  geom_vector(aes(x = lon, y = lat, xend = xend, yend = yend)) 
+```
+
+`geom_vector` also supports both `xend`/`yend` format as well as `dx`/`dy` format.
+
+```{r}
+ggplot(wind_data) +
+  geom_vector(aes(x = lon, y = lat, fx = fx, fy = fy)) 
 ```
 
 - **`geom_vector2`**: Maps the norm of a vector directly to its length.  This provides a more intuitive representation of magnitude. This is done by mapping `length = after_stat(norm)` by default.
 
 ```{r}
 ggplot(wind_data) +
-  geom_vector2(aes(x = lon, y = lat, dx = dx, dy = dy)) 
+  geom_vector2(aes(x = lon, y = lat, fx = fx, fy = fy)) 
 ```
 
 #### Why Length Mapping Matters
@@ -90,7 +99,7 @@ This feature of `geom_vector2` enhances interpretability by using actual vector 
 
 #### Polar Coordinates Support
 
-Both `geom_vector` and `geom_vector2` also support polar coordinates, where vectors are specified using magnitude (`distance`) and direction (`angle`). Instead of providing Cartesian components (`dx`, `dy`), users can directly supply polar data. This feature simplifies workflows for directional data and works  for all subsequent relevant functions that handle polar coordinates.
+Both `geom_vector` and `geom_vector2` also support polar coordinates, where vectors are specified using magnitude (`distance`) and direction (`angle`). Instead of providing Cartesian components (`dx`, `dy` or `xend`, `yend`), users can directly supply polar data. This feature simplifies workflows for directional data and works  for all subsequent relevant functions that handle polar coordinates.
 
 Polar coordinates can be visualized like this:
 
@@ -111,7 +120,7 @@ The example below turns off this default behavior:
 
 ```{r}
 ggplot(wind_data) +
-  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy), center = FALSE, normalize = FALSE) 
+  geom_vector(aes(x = lon, y = lat, fx = fx, fy = fy), center = FALSE, normalize = FALSE) 
 ```
 
 
@@ -123,14 +132,14 @@ ggplot(wind_data) +
 f <- function(v) c(-v[2], v[1]) # Define a function for the vector field
 
 ggplot() +
-  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) 
+  geom_vector_field(fun = f) 
 ```
 
 - **`geom_vector_field2`**: Similar to `geom_vector_field`, but maps the norm of vectors to their lengths instead of color.
 
 ```{r}
 ggplot() +
-  geom_vector_field2(fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) 
+  geom_vector_field2(fun = f) 
 ```
 
 
@@ -139,8 +148,8 @@ ggplot() +
 Both `geom_vector_field` and `geom_vector_field2` can automatically determine plot limits based on the function provided. This happens when data exists in previous layers or in the base ggplot object.  This allows the limits to be inferred from context. Customize limits with the `xlim` and `ylim` parameters if needed for more control.
 
 ```{r}
-ggplot(data = wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
-  geom_vector() + 
+ggplot(data = wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
+  geom_vector() +
   geom_vector_field(fun = f) # Automatically determines limits based on existing data
 ```
 

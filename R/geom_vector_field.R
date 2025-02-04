@@ -115,7 +115,6 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
   } else {
     mapping <- default_mapping
   }
-
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
   if(normalize) normalize <- "vector"

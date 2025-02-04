@@ -20,8 +20,8 @@ stat_vector(
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
-  center = FALSE,
-  normalize = FALSE,
+  center = TRUE,
+  normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
@@ -40,7 +40,9 @@ geom_vector2(
   inherit.aes = TRUE,
   center = FALSE,
   normalize = FALSE,
-  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
+  tail_point = TRUE,
+  eval_point = FALSE,
+  arrow = NULL
 )
 }
 \arguments{
@@ -125,11 +127,11 @@ ggplot(vectors1, aes(x = x, y = y, xend = xend, yend = yend)) +
 vectors2 <- data.frame(
   x        = c(0, 1, 2),
   y        = c(0, 1, 2),
-  angle    = c(0, 90, 45),
+  angle    = c(0, pi/2, pi/4),
   distance = c(3, 4, 5)
 )
-ggplot(vectors2, aes(x = x, y = y, angle = angle, distance = distance)) +
-  geom_vector()
+ggplot(vectors2) +
+  geom_vector(aes(x = x, y = y, angle = angle, distance = distance))
 
 # Using center = TRUE to adjust vectors so that they originate from their midpoints:
 ggplot(vectors1, aes(x = x, y = y, xend = xend, yend = yend)) +

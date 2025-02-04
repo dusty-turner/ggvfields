@@ -66,11 +66,11 @@
 #' vectors2 <- data.frame(
 #'   x        = c(0, 1, 2),
 #'   y        = c(0, 1, 2),
-#'   angle    = c(0, 90, 45),
+#'   angle    = c(0, pi/2, pi/4),
 #'   distance = c(3, 4, 5)
 #' )
-#' ggplot(vectors2, aes(x = x, y = y, angle = angle, distance = distance)) +
-#'   geom_vector()
+#' ggplot(vectors2) +
+#'   geom_vector(aes(x = x, y = y, angle = angle, distance = distance))
 #'
 #' # Using center = TRUE to adjust vectors so that they originate from their midpoints:
 #' ggplot(vectors1, aes(x = x, y = y, xend = xend, yend = yend)) +
@@ -96,8 +96,8 @@ geom_vector <- function(mapping = NULL, data = NULL,
                         na.rm = FALSE,
                         show.legend = NA,
                         inherit.aes = TRUE,
-                        center = FALSE,
-                        normalize = FALSE,
+                        center = TRUE,
+                        normalize = TRUE,
                         tail_point = FALSE,
                         eval_point = FALSE,
                         arrow = grid::arrow(angle = 25,
@@ -142,8 +142,8 @@ stat_vector <- function(mapping = NULL, data = NULL,
                         na.rm = FALSE,
                         show.legend = NA,
                         inherit.aes = TRUE,
-                        center = FALSE,
-                        normalize = FALSE,
+                        center = TRUE,
+                        normalize = TRUE,
                         tail_point = FALSE,
                         eval_point = FALSE,
                         arrow = grid::arrow(angle = 25,
@@ -176,7 +176,10 @@ stat_vector <- function(mapping = NULL, data = NULL,
 StatVector <- ggproto("StatVector", Stat,
                       required_aes = c("x", "y"),
 
-                      default_aes = aes(xend = NA, yend = NA, distance = NA, angle = NA),
+                      default_aes = aes(xend = NA, yend = NA,
+                                        distance = NA, angle = NA,
+                                        fx = NA, fy = NA
+                      ),
 
                       compute_group = function(data, scales, center, normalize, ...) {
 
@@ -185,23 +188,31 @@ StatVector <- ggproto("StatVector", Stat,
                         data$x_original <- data$x
                         data$y_original <- data$y
 
-                        data$norm <- sqrt((data$xend-data$x)^2+(data$yend-data$y)^2)
-
-                        if(n == 0) return(data)
-
+                        # If xend/yend are not provided (or are all missing), try fx/fy, then angle/distance.
                         if((!"xend" %in% names(data) || all(is.na(data$xend))) ||
                            (!"yend" %in% names(data) || all(is.na(data$yend)))) {
-                          if("angle" %in% names(data) && "distance" %in% names(data)) {
-                            data$xend <- data$x + data$distance * cos(data$angle * pi/180)
-                            data$yend <- data$y + data$distance * sin(data$angle * pi/180)
+
+                          if("fx" %in% names(data) && "fy" %in% names(data) &&
+                             !(all(is.na(data$fx)) || all(is.na(data$fy)))) {
+                            # Use fx and fy to compute the endpoints.
+                            data$xend <- data$x + data$fx
+                            data$yend <- data$y + data$fy
+                          } else if("angle" %in% names(data) && "distance" %in% names(data) &&
+                                    !(all(is.na(data$angle)) || all(is.na(data$distance)))) {
+                            # Use angle and distance to compute the endpoints.
+                            data$xend <- data$x + data$distance * cos(data$angle * 180 / pi)
+                            data$yend <- data$y + data$distance * sin(data$angle * 180 / pi)
                           } else {
-                            stop("Either xend/yend or angle/distance must be provided.")
+                            stop("Either xend/yend or fx/fy or angle/distance must be provided.")
                           }
                         }
 
+                        # Recompute norm in case we just computed xend/yend from fx/fy or angle/distance.
+                        data$norm <- sqrt((data$xend - data$x)^2 + (data$yend - data$y)^2)
+
                         if(normalize){
-                          data$xend <- data$x + (data$xend-data$x)/data$norm
-                          data$yend <- data$y + (data$yend-data$y)/data$norm
+                          data$xend <- data$x + (data$xend - data$x) / data$norm
+                          data$yend <- data$y + (data$yend - data$y) / data$norm
                         }
 
                         if(center) {
@@ -212,6 +223,7 @@ StatVector <- ggproto("StatVector", Stat,
                           data$xend <- data$xend - xdiff / 2
                           data$yend <- data$yend - ydiff / 2
                         }
+
                         data_start <- data
                         data_start$t <- 0
                         data_end <- data
@@ -227,6 +239,7 @@ StatVector <- ggproto("StatVector", Stat,
                         if("distance" %in% names(data_start)) data_start$distance <- NA_real_
                         if("angle" %in% names(data_end)) data_end$angle <- NA_real_
                         if("distance" %in% names(data_end)) data_end$distance <- NA_real_
+
                         combined <- rbind(data_start, data_end)
                         interleaved <- combined[c(rbind(seq_len(n), seq_len(n) + n)), ]
                         rownames(interleaved) <- NULL
@@ -235,6 +248,7 @@ StatVector <- ggproto("StatVector", Stat,
                         interleaved
                       }
 )
+
 
 #' @rdname geom_vector
 #' @export
@@ -247,9 +261,9 @@ geom_vector2 <- function(mapping = NULL, data = NULL,
                          inherit.aes = TRUE,
                          center = FALSE,
                          normalize = FALSE,
-                         arrow = grid::arrow(angle = 25,
-                                             length = unit(0.025, "npc"),
-                                             type = "closed")) {
+                         tail_point = TRUE,
+                         eval_point = FALSE,
+                         arrow = NULL) {
 
   default_mapping <- ggplot2::aes(length = after_stat(norm))
 
@@ -272,6 +286,8 @@ geom_vector2 <- function(mapping = NULL, data = NULL,
       arrow = arrow,
       center = center,
       normalize = normalize,
+      tail_point = tail_point,
+      eval_point = eval_point,
       ...
     )
   )

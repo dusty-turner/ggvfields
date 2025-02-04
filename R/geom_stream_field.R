@@ -75,6 +75,10 @@
 #' # Create a stream field layer with tail points
 #' ggplot() +
 #'   geom_stream_field(fun = rotational_field, tail_point = TRUE)
+
+#' # Create a stream field with centered streams
+#' ggplot() +
+#'   geom_stream_field(fun = rotational_field, center = TRUE)
 #'
 #' @name geom_stream_field
 #' @aliases stat_stream_field StatStreamField
@@ -235,30 +239,48 @@ StatStreamField <- ggproto(
       "y" = rep(seq(ylim[1], ylim[2], length.out = n[2]), each = n[1])
     )
 
+    ## Get dt and L defaulted
     dt <- rep(dt, nrow(grid))
+    L <- min(diff(xlim), diff(ylim))
+    # L <- sqrt(diff(xlim)^2 + diff(ylim)^2)
 
-    if(normalize == "stream") {
-      L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * 0.9
-    } else if(normalize == "vector") {
-      L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * 0.8
 
-      if(center) L <- L/2 # for some reason centering a vector doubles the length in the process: fix later
+    if(normalize == "stream") L <- L / (max(n) - 1) * 0.9
+    if(normalize == "vector") {
+      L <- L / (max(n) - 1) * 0.8
 
       # Calculate dt for each grid point
       norms <- apply(grid, 1, function(v) sqrt(sum(fun(v) ^ 2)))
       dt <- L / norms
+      # u[i,] <- u[i-1,] + f(u[i-1,])*dt
 
       # Replace infinite dt values with 0
       dt[is.infinite(dt)] <- 0
 
     }
-    else if(!normalize) L <- (min(diff(xlim), diff(ylim))) / 2
+
+
+
+    # if(normalize == "stream") {
+      # L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * 0.9
+    # } else if(normalize == "vector") {
+    #   L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * 0.8
+    #
+    #   if(center) L <- L/2 # for some reason centering a vector doubles the length in the process: fix later
+    #
+    #   # Calculate dt for each grid point
+    #   norms <- apply(grid, 1, function(v) sqrt(sum(fun(v) ^ 2)))
+    #   dt <- L / norms
+    #
+    #   # Replace infinite dt values with 0
+    #   dt[is.infinite(dt)] <- 0
+    #
+    # }
+    # else if(!normalize) L <- (min(diff(xlim), diff(ylim))) / 2
 
     # initialize the data frame
     df <- data.frame()
 
-    # print("L")
-    # print(L)
     for (i in 1:nrow(grid)) {
       # Compute the stream for the current grid point using ode_stepper()
       temp <- transform(
@@ -273,9 +295,11 @@ StatStreamField <- ggproto(
       # Bind the current stream's data to the overall data frame
       df <- rbind(df, temp)
     }
-
+# print(df)
     df
   }
+
+
 )
 
 
@@ -284,24 +308,18 @@ StatStreamField <- ggproto(
 
 
 
-
-
 ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, method = "lsoda", center = FALSE) {
-  # print("dt in ode stepper")
-  # print(dt)
-  # print("L in ode stepper")
-  # print(L)
-  # concept: if center = TRUE, the t's are shifted 1:5 -> -2:2 or 0:6 -> -2:3
-  # the implementation simply runs ode_stepper on the negative of the function
+
   if (center) {
+
     # define a few helpers
     neg_fun <- function(u) -fun(u)
     flip <- function(df) df[nrow(df):1,]
 
     # solve in both directions
-    df_negative <- ode_stepper(u0, neg_fun, dt = dt, t0, L = L/2, max_it, method, center = FALSE)
+    df_negative <- ode_stepper(u0, neg_fun, dt = dt/2, t0, L = L, max_it, method, center = FALSE)
     df_negative$t <- -df_negative$t
-    df_positive <- ode_stepper(u0,     fun, dt = dt, t0, L = L/2, max_it, method, center = FALSE)
+    df_positive <- ode_stepper(u0,     fun, dt = dt/2, t0, L = L, max_it, method, center = FALSE)
 
     # combine the datasets
     df <- rbind( flip(df_negative[-1,]), df_positive )
@@ -358,9 +376,9 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
     # update length of curve
     mat[i,"l"] <- mat[i-1,"l"] + mat[i,"d"]
 
+
     # stop if curve has exceeded max length
     if (mat[i,"l"] >= L) break
-
   }
 
   # return full rows
@@ -369,6 +387,7 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
   df$avg_spd <- df$l[i] / df$t[i]
   df$norm <- norm_fu0
   # df$length <- df$norm
+
   df
 
 }

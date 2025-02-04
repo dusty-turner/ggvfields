@@ -207,30 +207,11 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 
                       setup_data = function(data, params){
 
-
-                        ## Remove rows if there are more than 2 rows in a group
-                        if (all(!is.na(data$length))) {
-                          unique_groups <- unique(data$group)
-
-                          keep <- rep(FALSE, nrow(data))
-
-                          # Loop over each unique group to mark the first and last rows to keep
-                          for (g in unique(data$group)) {
-                            idx <- which(data$group == g)
-
-                            if (length(idx) >= 2) {
-                              # Mark first and last rows
-                              keep[idx[1]] <- TRUE
-                              keep[idx[length(idx)]] <- TRUE
-                            } else {
-                              # If there's only one row, decide if you want to keep it.
-                              keep[idx] <- TRUE
-                            }
-                          }
-
-                          # Subset the data frame
-                          data <- data[keep, ]
-
+                        ## remove all 0 length vectors
+                        # data <- data[ave(data$l, data$group, FUN = function(x) !all(x == 0)) == TRUE, ]
+                        if("l" %in% names(data)) {
+                          ndcs_of_non_zero_gradients <- ave(data$l, data$group, FUN = function(x) !all(abs(x) <= 1e-6)) |> as.logical()
+                          data <- data[ndcs_of_non_zero_gradients, ]
                         }
 
                         data
@@ -297,6 +278,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                         tail_point_grob <- grid::nullGrob()
                         eval_point_grob <- grid::nullGrob()
 
+
                         # Create a pathGrob using the transformed coordinates
                         stream_grob <- grid::polylineGrob(
                           x = grid::unit(coords$x, "npc") + grid::unit(coords$offset_x, "cm"),
@@ -304,11 +286,11 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                           id = coords$group,  # Handle grouping for multiple paths
                           default.units = "native",  # Use native units for scaling
                           gp = grid::gpar(
-                            col = coords$colour,        # Set line color
-                            fill = coords$colour,
-                            lwd = coords$linewidth,    # Set line width (converted from ggplot2 size)
-                            linetype = coords$linetype, # Set line type
-                            alpha = coords$alpha         # Set transparency
+                            col =  coords[!duplicated(coords$group), "colour"],        # Set line color
+                            fill = coords[!duplicated(coords$group), "colour"],
+                            lwd = coords[!duplicated(coords$group), "linewidth"],    # Set line width (converted from ggplot2 size)
+                            linetype = coords[!duplicated(coords$group), "linetype"], # Set line type
+                            alpha = coords[!duplicated(coords$group), "alpha"]         # Set transparency
                           ), arrow = arrow
                         )
 
