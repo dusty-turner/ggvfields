@@ -29,21 +29,13 @@
 #' efield(c(0,1), charge_positions, charges)
 #'
 #'
-#' # visualize electric field
-#' #ggplot() +
-#' #  geom_vector_field(
-#' #    fun = function(u) efield(u, charge_positions, charges),
-#' #    xlim = c(-2,2), ylim = c(-2,2)
-#' #  ) +
-#' #  scale_color_viridis_c(trans = "log10")
+#' # efield_maker() simply wraps this function, defaulting to those charges
+#' f <- efield_maker()
+#' f(c(0,1))
 #'
-#'
-#' # visualize electric field using efield_maker, which is a simpler wrapper
-#' # it defaults charge_positions and charges to those above for easy ex usage
-#' #ggplot() +
-#' #  geom_vector_field(fun = efield_maker(), xlim = c(-2,2), ylim = c(-2,2)) +
-#' #  scale_color_viridis_c(trans = "sqrt")
-#'
+#' ggplot() +
+#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
+#'   scale_color_viridis_c(trans = "log10")
 #'
 #' # electric constant from https://en.wikipedia.org/wiki/Vacuum_permittivity
 #' ep0 <- 8.854187818814e-12
