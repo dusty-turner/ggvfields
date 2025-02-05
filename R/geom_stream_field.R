@@ -75,6 +75,7 @@
 #'
 #' # Create a stream field layer
 #' ggplot() + geom_stream_field(fun = rotational_field)
+#' ggplot() + geom_vector_field(fun = rotational_field)
 #'
 #' # Create a stream field layer with tail points
 #' ggplot() +
@@ -300,6 +301,13 @@ StatStreamField <- ggproto(
 
     }
 
+    # to check if df contains the right information, try this:
+    # ggplot(df) +
+    #   geom_path(
+    #     aes(x, y, group = paste(x0, y0), color = avg_spd),
+    #     arrow = arrow(length = unit(.02, "npc"))
+    #   )
+
   }
 
 
@@ -311,7 +319,7 @@ StatStreamField <- ggproto(
 
 
 
-ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, method = "lsoda", center = FALSE) {
+ode_stepper <- function(u0, fun, dt = .005, t0 = 0, L = 1, max_it = 1000, method = "lsoda", center = FALSE) {
 
   if (center) {
 
