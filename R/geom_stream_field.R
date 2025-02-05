@@ -63,7 +63,7 @@
 #' @examples
 #'
 #' f <- efield_maker()
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), normalize = FALSE)
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 #' ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 #'
 #' # Define a simple rotational vector field function
@@ -74,9 +74,7 @@
 #' }
 #'
 #' # Create a stream field layer
-#' ggplot() +
-#'   geom_stream_field(fun = rotational_field) +
-#'   coord_equal()
+#' ggplot() + geom_stream_field(fun = rotational_field)
 #'
 #' # Create a stream field layer with tail points
 #' ggplot() +
@@ -88,9 +86,13 @@
 #'
 #' @name geom_stream_field
 #' @aliases stat_stream_field StatStreamField
-#' @export
 NULL
 
+
+
+
+#' @rdname geom_stream_field
+#' @export
 geom_stream_field <- function(
   mapping = NULL,
   data = NULL,
@@ -269,21 +271,22 @@ StatStreamField <- ggproto(
     df <- data.frame()
 
     for (i in 1:nrow(grid)) {
+
       # compute the stream for the current grid point using ode_stepper()
-      temp <- transform(
+      stream <- transform(
         ode_stepper(grid[i, ], fun, dt[i], 0, L, max_it, method, center),
-        id = i  # tag with the current grid point's index
+        "id" = i
       )
 
       # add the original x and y coordinates to this stream's data
-      temp$x0 <- grid[i, "x"]
-      temp$y0 <- grid[i, "y"]
+      stream$x0 <- grid[i, "x"]
+      stream$y0 <- grid[i, "y"]
 
       # bind the current stream's data to the overall data frame
-      df <- rbind(df, temp)
+      df <- rbind(df, stream)
+
     }
 
-    df
   }
 
 
@@ -323,6 +326,7 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
 
     # return
     return(df)
+
   }
 
   # initialize the data structure, a matrix because it drops on subsetting
@@ -335,6 +339,8 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
   )
 
   # "solve" with ode() step by step
+  # note: this iteration might be faster if you don't reference columns by
+  # character, but by index: t=1, x=2, y=3, d=4, l=5
   for(i in 2:max_it) {
 
     # get "current" t and u = (x,y)
@@ -364,9 +370,24 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
     # update length of curve
     mat[i,"l"] <- mat[i-1,"l"] + mat[i,"d"]
 
+    # if curve has exceeded max length, crop and break
+    # note: actual length, once exceeding L, is probably slightly larger; this part fixes that
+    if (mat[i,"l"] >= L) {
 
-    # stop if curve has exceeded max length
-    if (mat[i,"l"] >= L) break
+      # compute how much of last vector is needed to make L
+      length_up_to_last_point <- mat[i-1,"l"]
+      length_needed_from_last_point <- L - length_up_to_last_point
+      m <- length_needed_from_last_point / mat[i,"d"]
+
+      # revise last point and related statistics and break
+      mat[i,c("x","y")] <- mat[i-1,c("x","y")] + m * (mat[i,c("x","y")] - mat[i-1,c("x","y")])
+      mat[i,"t"] <- mat[i-1,"t"] + m*(mat[i,"t"] - mat[i-1,"t"]) # more extensible than dt
+      mat[i,"d"] <- norm(mat[i,c("x","y")] - mat[i-1,c("x","y")])
+      mat[i,"l"] <- mat[i-1,"l"] + mat[i,"d"] # = L
+      break
+    }
+
+
   }
 
   # return full rows
@@ -379,8 +400,11 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
   df
 
 }
-# ode_stepper( c(-1,1), efield_maker() ) |>
-#   str()
+# ode_stepper( c(-1,1), efield_maker() ) |> str()
+#
+# ode_stepper(  c(-1,1), efield_maker(), L = 2 ) |> stream_length()
+# ode_stepper( c(-.2,1), efield_maker(), L = 2 ) |> stream_length()
+# ode_stepper( c(-.3,1), efield_maker(), L = 2 ) |> stream_length()
 #
 # ode_stepper( c(-1,1), efield_maker() ) |>
 #   ggplot(aes(x, y)) +
@@ -464,7 +488,8 @@ crop_stream_length <- function(data, L) {
 stream_length <- function(data) {
 
   # data is assumed to have columns t, x, y
-  data <- data[order(data$t),]
+  # t is assumed in order
+  # data <- data[order(data$t),]
 
   # discard any columns other than x and y
   data <- data[,c("x","y")]
