@@ -1,30 +1,33 @@
 #' Compute and Plot Potential Function from a Conservative Vector Field
 #'
-#' `geom_potential()` adds a raster layer to a ggplot object, visualizing the potential function
-#' derived from a conservative vector field. It computes the potential numerically over a specified
-#' grid and displays it as a heatmap.
+#' `geom_potential()` adds a raster layer to a ggplot object, visualizing the
+#' potential function derived from a conservative vector field. It computes the
+#' potential numerically over a specified grid and displays it as a heatmap.
 #'
 #' @inheritParams ggplot2::geom_segment
 #' @inheritParams ggplot2::stat_identity
-#' @param data The data to be displayed in this layer. If `NULL`, the default, the data
-#'   is inherited from the plot data as specified in the call to `ggplot()`.
-#' @param fun A function that takes a numeric vector of length 2 (`c(x, y)`) and returns
-#'   a numeric vector of length 2 (`c(dx, dy)`), defining the vector field.
-#' @param xlim,ylim Numeric vectors of length 2 defining the domain limits on the x/y-axis.
+#' @param data The data to be displayed in this layer. If `NULL`, the default,
+#'   the data is inherited from the plot data as specified in the call to
+#'   `ggplot()`.
+#' @param fun A function that takes a numeric vector of length 2 (`c(x, y)`) and
+#'   returns a numeric vector of length 2 (`c(dx, dy)`), defining the vector
+#'   field.
+#' @param xlim,ylim Numeric vectors of length 2 defining the domain limits on
+#'   the x/y-axis.  If not defined the function will attempt to inheret from
+#'   previous layers or default to c(-1,1).
 #' @param n Integer, the number of grid points along each axis. Defaults to 21.
-#' @param tolerance Numeric value specifying the tolerance level for verifying if the vector field
-#' is conservative. Defaults to `1e-6`.
-#
+#' @param tolerance Numeric value specifying the tolerance level for verifying
+#'   if the vector field is conservative. Defaults to `1e-6`.
 #'
-#' @return A `ggplot2` layer that can be added to a ggplot object to produce a potential function heatmap.
+#' @return A `ggplot2` layer that can be added to a ggplot object to produce a
+#'   potential function heatmap.
 #'
 #' @examples
 #' # Define a conservative vector field function
-#' library(ggvfields)
 #' fun <- function(v) {
-#' x <- v[1]
-#' y <- v[2]
-#' c(sin(x) + y, x - sin(y))
+#'   x <- v[1]
+#'   y <- v[2]
+#'   c(sin(x) + y, x - sin(y))
 #' }
 #'
 #' # Define domain limits
@@ -37,17 +40,16 @@
 #'
 #' @export
 geom_potential <- function(mapping = NULL, data = NULL,
-                           stat = StatPotential, geom = GeomPotential,
-                           ...,
-                           inherit.aes = TRUE,
-                           show.legend = NA,
-                           position = "identity",
-                           fun,
-                           xlim = NULL,
-                           ylim = NULL,
-                           n = 21,
-                           tolerance = 1e-6) {
-
+   stat = StatPotential,
+   position = "identity",
+   ...,
+   inherit.aes = TRUE,
+   show.legend = NA,
+   fun,
+   xlim = NULL,
+   ylim = NULL,
+   n = 11,
+   tolerance = 1e-6) {
 
   if (is.null(data)) {
     data <- data.frame(x = NA_real_, y = NA_real_)
@@ -70,9 +72,9 @@ geom_potential <- function(mapping = NULL, data = NULL,
 
   layer(
     stat = stat,
+    geom = GeomPotential,
     data = data,
     mapping = mapping,
-    geom = geom,
     position = position,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
@@ -89,6 +91,60 @@ geom_potential <- function(mapping = NULL, data = NULL,
 
 #' @rdname geom_potential
 #' @export
+stat_potential <- function(mapping = NULL, data = NULL,
+   geom = GeomPotential,
+   position = "identity",
+   ...,
+   inherit.aes = TRUE,
+   show.legend = NA,
+   fun,
+   xlim = NULL,
+   ylim = NULL,
+   n = 21,
+   tolerance = 1e-6) {
+
+  if (is.null(data)) {
+    data <- data.frame(x = NA_real_, y = NA_real_)
+  }
+
+  # Ensure the potential function is provided
+  if (missing(fun)) {
+    stop("Parameter `fun` must be provided to compute the potential function.")
+  }
+
+  # Default aesthetic mapping for fill
+  default_mapping <- aes(fill = after_stat(Potential))
+
+  # Merge user-provided mappings with defaults
+  if (is.null(mapping)) {
+    mapping <- default_mapping
+  } else {
+    mapping <- modifyList(default_mapping, mapping)
+  }
+
+  layer(
+    stat = StatPotential,
+    geom = geom,
+    data = data,
+    mapping = mapping,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      fun = fun,
+      xlim = xlim,
+      ylim = ylim,
+      n = n,
+      tolerance = tolerance,
+      ...
+    )
+  )
+}
+
+
+
+#' @rdname geom_potential
+#' @export
 StatPotential <- ggproto(
   "StatPotential",
   Stat,
@@ -97,20 +153,23 @@ StatPotential <- ggproto(
 
   default_aes = aes(fill = after_stat(Potential)),
 
-  compute_group = function(data, scales, fun = NULL, xlim = NULL, ylim = NULL, n = 11, tolerance = 1e-6, ...) {
+  compute_group = function(data, scales, fun = NULL, xlim = NULL, ylim = NULL, n, tolerance = 1e-6, ...) {
+
+    xlim <- xlim %||% scales$x$range$range
+    if (is.null(xlim)) {
+      cli::cli_warn("No xlim provided or inherited; defaulting to c(-1, 1).")
+      xlim <- c(-1, 1)
+    }
+
+    ylim <- ylim %||% scales$y$range$range
+    if (is.null(ylim)) {
+      cli::cli_warn("No ylim provided or inherited; defaulting to c(-1, 1).")
+      ylim <- c(-1, 1)
+    }
+
     # Ensure the vector field function is provided
     if (is.null(fun)) {
       stop("Parameter `fun` must be provided to compute the potential function.")
-    }
-
-    # Generate grid if not provided
-    if (is.null(xlim) || is.null(ylim)) {
-      if (nrow(data) > 0 && all(c("x", "y") %in% names(data))) {
-        xlim <- range(data$x, na.rm = TRUE)
-        ylim <- range(data$y, na.rm = TRUE)
-      } else {
-        stop("When using `StatPotential`, you must supply `xlim` and `ylim` if data is not provided.")
-      }
     }
 
     # Generate grid

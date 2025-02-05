@@ -13,26 +13,6 @@ An object of class \code{StatVectorSmooth} (inherits from \code{Stat}, \code{ggp
 An object of class \code{GeomVectorSmooth} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 6.
 }
 \usage{
-stat_vector_smooth(
-  mapping = NULL,
-  data = NULL,
-  geom = "vector_smooth",
-  position = "identity",
-  ...,
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  n = c(11, 11),
-  method = "lm",
-  se = TRUE,
-  se.circle = TRUE,
-  conf_level = c(0.95, NA),
-  pi_type = "ellipse",
-  formula = cbind(fx, fy) ~ x * y,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-  eval_points = NULL
-)
-
 geom_vector_smooth(
   mapping = NULL,
   data = NULL,
@@ -49,8 +29,28 @@ geom_vector_smooth(
   pi_type = "ellipse",
   conf_level = c(0.95, NA),
   formula = cbind(fx, fy) ~ x * y,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
-  eval_points = NULL
+  eval_points = NULL,
+  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
+)
+
+stat_vector_smooth(
+  mapping = NULL,
+  data = NULL,
+  geom = "vector_smooth",
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  n = c(11, 11),
+  method = "lm",
+  se = TRUE,
+  se.circle = TRUE,
+  conf_level = c(0.95, NA),
+  pi_type = "ellipse",
+  formula = cbind(fx, fy) ~ x * y,
+  eval_points = NULL,
+  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
 )
 
 StatVectorSmooth
@@ -64,8 +64,8 @@ GeomVectorSmooth
 
 \item{data}{A data frame containing the vector data in wide format.}
 
-\item{geom}{The geometric object used to draw the streamline. Defaults to
-\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
+\item{stat}{The statistical transformation to use on the data for this layer.
+Defaults to \link{StatVector}.}
 
 \item{position}{Position adjustment, either as a string or the result of a
 call to a position adjustment function.}
@@ -94,9 +94,6 @@ smoothed vectors.}
 the vectors to represent the radius of the confidence interval. This feature
 is useful when \code{se = TRUE}.}
 
-\item{conf_level}{Numeric vector; specifies the confidence levels for the
-prediction intervals when \code{se = TRUE}. \strong{Default is \code{conf_level = 0.95}}.}
-
 \item{pi_type}{Character; determines how prediction intervals are displayed
 around the smoothed vectors. Two options are available:
 \itemize{
@@ -111,19 +108,22 @@ is \code{NULL}, the function switches \code{pi_type} to \code{"wedge"} to ensure
 interval representation.
 }}
 
+\item{conf_level}{Numeric vector; specifies the confidence levels for the
+prediction intervals when \code{se = TRUE}. \strong{Default is \code{conf_level = 0.95}}.}
+
 \item{formula}{A formula specifying the multivariate linear model used
 for smoothing. The default formula is \code{cbind(fx, fy) ~ x * y}.}
-
-\item{arrow}{Arrow specification created by \code{grid::arrow()}. This parameter
-controls the appearance of arrowheads at the ends of vectors, including
-angle, length, and type.}
 
 \item{eval_points}{Data frame of evaluation points, or \code{NULL}. When provided,
 it specifies the grid points where the smoothing model is evaluated. If
 \code{NULL}, the function generates a grid based on \code{n}.}
 
-\item{stat}{The statistical transformation to use on the data for this layer.
-Defaults to \link{StatVector}.}
+\item{arrow}{Arrow specification created by \code{grid::arrow()}. This parameter
+controls the appearance of arrowheads at the ends of vectors, including
+angle, length, and type.}
+
+\item{geom}{The geometric object used to draw the streamline. Defaults to
+\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
 }
 \value{
 A \code{ggplot2} layer that can be added to a ggplot object to create a

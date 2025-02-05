@@ -106,10 +106,11 @@ direction.
 
 Two variants are available:
 \itemize{
-\item \strong{geom_vector()} creates the layer with the user-supplied aesthetic mapping.
-\item \strong{geom_vector2()} uses the same underlying stat (\link{StatVector}) but adds a default mapping for
-\code{length = after_stat(norm)} so that the computed vector norm is available as
-an aesthetic.
+\item \strong{geom_vector()} creates the layer with the user-supplied aesthetic
+mapping.
+\item \strong{geom_vector2()} uses the same underlying stat (\link{StatVector}) but adds a
+default mapping for \code{length = after_stat(norm)} so that the computed vector
+norm is available as an aesthetic.
 }
 }
 \examples{

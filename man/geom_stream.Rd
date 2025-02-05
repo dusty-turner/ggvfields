@@ -75,9 +75,8 @@ to use \code{position_jitter()}, give the position as \code{"jitter"}.
 \link[ggplot2:layer_positions]{layer position} documentation.
 }}
 
-\item{...}{Other arguments passed to the respective
-\code{\link[ggplot2:geom_path]{ggplot2::geom_path()}} or \link[ggplot2:ggplot2-ggproto]{ggplot2::Stat} for customization (e.g.,
-\code{linetype}, \code{color}, \code{linewidth}).}
+\item{...}{Other arguments passed to the respective \code{\link[ggplot2:geom_path]{ggplot2::geom_path()}} or
+\link[ggplot2:ggplot2-ggproto]{ggplot2::Stat} for customization (e.g., \code{linetype}, \code{color}, \code{linewidth}).}
 
 \item{na.rm}{If \code{FALSE} (default), missing values are removed with a warning.
 If \code{TRUE}, missing values are silently removed.}
@@ -87,28 +86,27 @@ If \code{TRUE}, missing values are silently removed.}
 \item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics rather than
 combining with them.}
 
-\item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to place arrowheads
-on the streamline (e.g., to indicate direction).}
+\item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to place arrowheads on
+the streamline (e.g., to indicate direction).}
 
 \item{geom}{The geometric object used to draw the streamline. Defaults to
 \link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
 }
 \value{
 A ggplot2 layer that can be added to a plot to produce a streamline
-visualization. Internally, this layer reorders data by \code{t} within each group,
-then draws a continuous path.
+visualization. Internally, this layer reorders data by \code{t} within each
+group, then draws a continuous path.
 }
 \description{
-\code{geom_stream()} generates a ggplot2 layer that visualizes
-data as continuous "streams" over a temporal variable \code{t}.
-Each stream is defined by \strong{x}, \strong{y}, and \strong{t} aesthetics, and
-optionally grouped by \strong{group}. The data points within each group
-are automatically ordered by \code{t} to form a continuous streamline path.
+\code{geom_stream()} generates a ggplot2 layer that visualizes data as continuous
+"streams" over a temporal variable \code{t}. Each stream is defined by \strong{x},
+\strong{y}, and \strong{t} aesthetics, and optionally grouped by \strong{group}. The data
+points within each group are automatically ordered by \code{t} to form a
+continuous streamline path.
 }
 \section{Aesthetics}{
-
-\code{geom_stream()} and \code{stat_stream()} understand the following aesthetics
-(required aesthetics are in \strong{bold}):
+ \code{geom_stream()} and \code{stat_stream()} understand the
+following aesthetics (required aesthetics are in \strong{bold}):
 \itemize{
 \item \strong{\code{x}}: Typically the horizontal axis (often mapped to time \code{t}).
 \item \strong{\code{y}}: The vertical axis (often magnitude or value at time \code{t}).
@@ -166,7 +164,7 @@ ggplot(streams) +
 
 }
 \seealso{
-\link[ggplot2:geom_path]{ggplot2::geom_path} for the underlying path geometry, and \link[grid:arrow]{grid::arrow}
-to customize arrowheads.
+\link[ggplot2:geom_path]{ggplot2::geom_path} for the underlying path geometry, and
+\link[grid:arrow]{grid::arrow} to customize arrowheads.
 }
 \keyword{datasets}

@@ -3,6 +3,7 @@
 \docType{data}
 \name{geom_potential}
 \alias{geom_potential}
+\alias{stat_potential}
 \alias{StatPotential}
 \alias{GeomPotential}
 \title{Compute and Plot Potential Function from a Conservative Vector Field}
@@ -16,11 +17,25 @@ geom_potential(
   mapping = NULL,
   data = NULL,
   stat = StatPotential,
-  geom = GeomPotential,
+  position = "identity",
   ...,
   inherit.aes = TRUE,
   show.legend = NA,
+  fun,
+  xlim = NULL,
+  ylim = NULL,
+  n = 11,
+  tolerance = 1e-06
+)
+
+stat_potential(
+  mapping = NULL,
+  data = NULL,
+  geom = GeomPotential,
   position = "identity",
+  ...,
+  inherit.aes = TRUE,
+  show.legend = NA,
   fun,
   xlim = NULL,
   ylim = NULL,
@@ -38,8 +53,9 @@ GeomPotential
 at the top level of the plot. You must supply \code{mapping} if there is no plot
 mapping.}
 
-\item{data}{The data to be displayed in this layer. If \code{NULL}, the default, the data
-is inherited from the plot data as specified in the call to \code{ggplot()}.}
+\item{data}{The data to be displayed in this layer. If \code{NULL}, the default,
+the data is inherited from the plot data as specified in the call to
+\code{ggplot()}.}
 
 \item{stat}{The statistical transformation to use on the data for this layer.
 When using a \verb{geom_*()} function to construct a layer, the \code{stat}
@@ -54,17 +70,17 @@ give the stat as \code{"count"}.
 \link[ggplot2:layer_stats]{layer stat} documentation.
 }}
 
-\item{geom}{The geometric object to use to display the data for this layer.
-When using a \verb{stat_*()} function to construct a layer, the \code{geom} argument
-can be used to override the default coupling between stats and geoms. The
-\code{geom} argument accepts the following:
+\item{position}{A position adjustment to use on the data for this layer. This
+can be used in various ways, including to prevent overplotting and
+improving the display. The \code{position} argument accepts the following:
 \itemize{
-\item A \code{Geom} ggproto subclass, for example \code{GeomPoint}.
-\item A string naming the geom. To give the geom as a string, strip the
-function name of the \code{geom_} prefix. For example, to use \code{geom_point()},
-give the geom as \code{"point"}.
-\item For more information and other ways to specify the geom, see the
-\link[ggplot2:layer_geoms]{layer geom} documentation.
+\item The result of calling a position function, such as \code{position_jitter()}.
+This method allows for passing extra arguments to the position.
+\item A string naming the position adjustment. To give the position as a
+string, strip the function name of the \code{position_} prefix. For example,
+to use \code{position_jitter()}, give the position as \code{"jitter"}.
+\item For more information and other ways to specify the position, see the
+\link[ggplot2:layer_positions]{layer position} documentation.
 }}
 
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}'s \code{params} argument. These
@@ -106,44 +122,47 @@ the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
 It can also be a named logical vector to finely select the aesthetics to
 display.}
 
-\item{position}{A position adjustment to use on the data for this layer. This
-can be used in various ways, including to prevent overplotting and
-improving the display. The \code{position} argument accepts the following:
-\itemize{
-\item The result of calling a position function, such as \code{position_jitter()}.
-This method allows for passing extra arguments to the position.
-\item A string naming the position adjustment. To give the position as a
-string, strip the function name of the \code{position_} prefix. For example,
-to use \code{position_jitter()}, give the position as \code{"jitter"}.
-\item For more information and other ways to specify the position, see the
-\link[ggplot2:layer_positions]{layer position} documentation.
-}}
+\item{fun}{A function that takes a numeric vector of length 2 (\code{c(x, y)}) and
+returns a numeric vector of length 2 (\code{c(dx, dy)}), defining the vector
+field.}
 
-\item{fun}{A function that takes a numeric vector of length 2 (\code{c(x, y)}) and returns
-a numeric vector of length 2 (\code{c(dx, dy)}), defining the vector field.}
-
-\item{xlim, ylim}{Numeric vectors of length 2 defining the domain limits on the x/y-axis.}
+\item{xlim, ylim}{Numeric vectors of length 2 defining the domain limits on
+the x/y-axis.  If not defined the function will attempt to inheret from
+previous layers or default to c(-1,1).}
 
 \item{n}{Integer, the number of grid points along each axis. Defaults to 21.}
 
-\item{tolerance}{Numeric value specifying the tolerance level for verifying if the vector field
-is conservative. Defaults to \code{1e-6}.}
+\item{tolerance}{Numeric value specifying the tolerance level for verifying
+if the vector field is conservative. Defaults to \code{1e-6}.}
+
+\item{geom}{The geometric object to use to display the data for this layer.
+When using a \verb{stat_*()} function to construct a layer, the \code{geom} argument
+can be used to override the default coupling between stats and geoms. The
+\code{geom} argument accepts the following:
+\itemize{
+\item A \code{Geom} ggproto subclass, for example \code{GeomPoint}.
+\item A string naming the geom. To give the geom as a string, strip the
+function name of the \code{geom_} prefix. For example, to use \code{geom_point()},
+give the geom as \code{"point"}.
+\item For more information and other ways to specify the geom, see the
+\link[ggplot2:layer_geoms]{layer geom} documentation.
+}}
 }
 \value{
-A \code{ggplot2} layer that can be added to a ggplot object to produce a potential function heatmap.
+A \code{ggplot2} layer that can be added to a ggplot object to produce a
+potential function heatmap.
 }
 \description{
-\code{geom_potential()} adds a raster layer to a ggplot object, visualizing the potential function
-derived from a conservative vector field. It computes the potential numerically over a specified
-grid and displays it as a heatmap.
+\code{geom_potential()} adds a raster layer to a ggplot object, visualizing the
+potential function derived from a conservative vector field. It computes the
+potential numerically over a specified grid and displays it as a heatmap.
 }
 \examples{
 # Define a conservative vector field function
-library(ggvfields)
 fun <- function(v) {
-x <- v[1]
-y <- v[2]
-c(sin(x) + y, x - sin(y))
+  x <- v[1]
+  y <- v[2]
+  c(sin(x) + y, x - sin(y))
 }
 
 # Define domain limits

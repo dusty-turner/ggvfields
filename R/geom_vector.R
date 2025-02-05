@@ -12,10 +12,11 @@
 #'
 #' Two variants are available:
 #'
-#' - **geom_vector()** creates the layer with the user-supplied aesthetic mapping.
-#' - **geom_vector2()** uses the same underlying stat ([StatVector]) but adds a default mapping for
-#' `length = after_stat(norm)` so that the computed vector norm is available as
-#' an aesthetic.
+#' - **geom_vector()** creates the layer with the user-supplied aesthetic
+#' mapping.
+#' - **geom_vector2()** uses the same underlying stat ([StatVector]) but adds a
+#' default mapping for `length = after_stat(norm)` so that the computed vector
+#' norm is available as an aesthetic.
 #'
 #' @inheritParams ggplot2::geom_path
 #' @inheritParams geom_stream
@@ -90,20 +91,18 @@
 NULL
 
 geom_vector <- function(mapping = NULL, data = NULL,
-                        stat = StatVector,
-                        position = "identity",
-                        ...,
-                        na.rm = FALSE,
-                        show.legend = NA,
-                        inherit.aes = TRUE,
-                        center = TRUE,
-                        normalize = TRUE,
-                        tail_point = FALSE,
-                        eval_point = FALSE,
-                        arrow = grid::arrow(angle = 25,
-                                            length = unit(0.025, "npc"),
-                                            type = "closed")
-                        ) {
+  stat = StatVector,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  center = TRUE,
+  normalize = TRUE,
+  tail_point = FALSE,
+  eval_point = FALSE,
+  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
+  ) {
 
   default_mapping <- ggplot2::aes(color = after_stat(norm))
 
@@ -136,20 +135,18 @@ geom_vector <- function(mapping = NULL, data = NULL,
 #' @rdname geom_vector
 #' @export
 stat_vector <- function(mapping = NULL, data = NULL,
-                        geom = GeomStream,
-                        position = "identity",
-                        ...,
-                        na.rm = FALSE,
-                        show.legend = NA,
-                        inherit.aes = TRUE,
-                        center = TRUE,
-                        normalize = TRUE,
-                        tail_point = FALSE,
-                        eval_point = FALSE,
-                        arrow = grid::arrow(angle = 25,
-                                            length = unit(0.025, "npc"),
-                                            type = "closed")
-                        ) {
+  geom = GeomStream,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  center = TRUE,
+  normalize = TRUE,
+  tail_point = FALSE,
+  eval_point = FALSE,
+  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
+  ) {
 
   layer(
     stat = StatVector,
@@ -174,96 +171,94 @@ stat_vector <- function(mapping = NULL, data = NULL,
 #' @rdname geom_vector
 #' @export
 StatVector <- ggproto("StatVector", Stat,
-                      required_aes = c("x", "y"),
+  required_aes = c("x", "y"),
 
-                      default_aes = aes(xend = NA, yend = NA,
-                                        distance = NA, angle = NA,
-                                        fx = NA, fy = NA
-                      ),
+  default_aes = aes(xend = NA, yend = NA, distance = NA, angle = NA,
+                    fx = NA, fy = NA),
 
-                      compute_group = function(data, scales, center, normalize, ...) {
+  compute_group = function(data, scales, center, normalize, ...) {
 
-                        n <- nrow(data)
+    n <- nrow(data)
 
-                        data$x0 <- data$x
-                        data$y0 <- data$y
+    data$x0 <- data$x
+    data$y0 <- data$y
 
-                        # If xend/yend are not provided (or are all missing), try fx/fy, then angle/distance.
-                        if((!"xend" %in% names(data) || all(is.na(data$xend))) ||
-                           (!"yend" %in% names(data) || all(is.na(data$yend)))) {
+    # If xend/yend are not provided (or are all missing), try fx/fy, then angle/distance.
+    if((!"xend" %in% names(data) || all(is.na(data$xend))) ||
+       (!"yend" %in% names(data) || all(is.na(data$yend)))) {
 
-                          if("fx" %in% names(data) && "fy" %in% names(data) &&
-                             !(all(is.na(data$fx)) || all(is.na(data$fy)))) {
-                            # Use fx and fy to compute the endpoints.
-                            data$xend <- data$x + data$fx
-                            data$yend <- data$y + data$fy
-                          } else if("angle" %in% names(data) && "distance" %in% names(data) &&
-                                    !(all(is.na(data$angle)) || all(is.na(data$distance)))) {
-                            # Use angle and distance to compute the endpoints.
-                            data$xend <- data$x + data$distance * cos(data$angle * 180 / pi)
-                            data$yend <- data$y + data$distance * sin(data$angle * 180 / pi)
-                          } else {
-                            stop("Either xend/yend or fx/fy or angle/distance must be provided.")
-                          }
-                        }
+      if("fx" %in% names(data) && "fy" %in% names(data) &&
+         !(all(is.na(data$fx)) || all(is.na(data$fy)))) {
+        # Use fx and fy to compute the endpoints.
+        data$xend <- data$x + data$fx
+        data$yend <- data$y + data$fy
+      } else if("angle" %in% names(data) && "distance" %in% names(data) &&
+                !(all(is.na(data$angle)) || all(is.na(data$distance)))) {
+        # Use angle and distance to compute the endpoints.
+        data$xend <- data$x + data$distance * cos(data$angle * 180 / pi)
+        data$yend <- data$y + data$distance * sin(data$angle * 180 / pi)
+      } else {
+        stop("Either xend/yend or fx/fy or angle/distance must be provided.")
+      }
+    }
 
-                        # Recompute norm in case we just computed xend/yend from fx/fy or angle/distance.
-                        data$norm <- sqrt((data$xend - data$x)^2 + (data$yend - data$y)^2)
+    # Recompute norm in case we just computed xend/yend from fx/fy or angle/distance.
+    data$norm <- sqrt((data$xend - data$x)^2 + (data$yend - data$y)^2)
 
-                        if(normalize){
-                          data$xend <- data$x + (data$xend - data$x) / data$norm
-                          data$yend <- data$y + (data$yend - data$y) / data$norm
-                        }
+    if(normalize){
+      data$xend <- data$x + (data$xend - data$x) / data$norm
+      data$yend <- data$y + (data$yend - data$y) / data$norm
+    }
 
-                        if(center) {
-                          xdiff <- data$xend - data$x
-                          ydiff <- data$yend - data$y
-                          data$x <- data$x - xdiff / 2
-                          data$y <- data$y - ydiff / 2
-                          data$xend <- data$xend - xdiff / 2
-                          data$yend <- data$yend - ydiff / 2
-                        }
+    if(center) {
+      xdiff <- data$xend - data$x
+      ydiff <- data$yend - data$y
+      data$x <- data$x - xdiff / 2
+      data$y <- data$y - ydiff / 2
+      data$xend <- data$xend - xdiff / 2
+      data$yend <- data$yend - ydiff / 2
+    }
 
-                        data_start <- data
-                        data_start$t <- 0
-                        data_end <- data
-                        data_end$t <- 1
-                        data_end$x <- data_end$xend
-                        data_end$y <- data_end$yend
-                        data_start$xend <- NA_real_
-                        data_start$yend <- NA_real_
-                        data_end$xend <- NA_real_
-                        data_end$yend <- NA_real_
+    data_start <- data
+    data_start$t <- 0
+    data_end <- data
+    data_end$t <- 1
+    data_end$x <- data_end$xend
+    data_end$y <- data_end$yend
+    data_start$xend <- NA_real_
+    data_start$yend <- NA_real_
+    data_end$xend <- NA_real_
+    data_end$yend <- NA_real_
 
-                        if("angle" %in% names(data_start)) data_start$angle <- NA_real_
-                        if("distance" %in% names(data_start)) data_start$distance <- NA_real_
-                        if("angle" %in% names(data_end)) data_end$angle <- NA_real_
-                        if("distance" %in% names(data_end)) data_end$distance <- NA_real_
+    if("angle" %in% names(data_start)) data_start$angle <- NA_real_
+    if("distance" %in% names(data_start)) data_start$distance <- NA_real_
+    if("angle" %in% names(data_end)) data_end$angle <- NA_real_
+    if("distance" %in% names(data_end)) data_end$distance <- NA_real_
 
-                        combined <- rbind(data_start, data_end)
-                        interleaved <- combined[c(rbind(seq_len(n), seq_len(n) + n)), ]
-                        rownames(interleaved) <- NULL
-                        interleaved$group <- rep(seq_len(n), each = 2)
+    combined <- rbind(data_start, data_end)
+    interleaved <- combined[c(rbind(seq_len(n), seq_len(n) + n)), ]
+    rownames(interleaved) <- NULL
+    interleaved$group <- rep(seq_len(n), each = 2)
 
-                        interleaved
-                      }
+    interleaved
+  }
 )
 
 
 #' @rdname geom_vector
 #' @export
 geom_vector2 <- function(mapping = NULL, data = NULL,
-                         stat = StatVector,
-                         position = "identity",
-                         ...,
-                         na.rm = FALSE,
-                         show.legend = NA,
-                         inherit.aes = TRUE,
-                         center = FALSE,
-                         normalize = FALSE,
-                         tail_point = TRUE,
-                         eval_point = FALSE,
-                         arrow = NULL) {
+   stat = StatVector,
+   position = "identity",
+   ...,
+   na.rm = FALSE,
+   show.legend = NA,
+   inherit.aes = TRUE,
+   center = FALSE,
+   normalize = FALSE,
+   tail_point = TRUE,
+   eval_point = FALSE,
+   arrow = NULL) {
 
   default_mapping <- ggplot2::aes(length = after_stat(norm))
 

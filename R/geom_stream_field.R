@@ -301,7 +301,22 @@ StatStreamField <- ggproto(
 
     }
 
-    df
+# Compute divergence and curl by group (each group is identified by id)
+  df <- do.call(rbind, lapply(split(df, df$id), function(subdf) {
+
+    # Calculate the gradient of the vector field at each point.
+    grad <- t(apply(subdf[, c("x", "y")], 1, function(v) numDeriv::grad(fun, v)))
+    grad_u <- grad[, 1]
+    grad_v <- grad[, 2]
+
+    # Compute divergence and curl.
+    subdf$divergence <- grad_u + grad_v
+    subdf$curl <- grad_v - grad_u
+
+    subdf
+  }))
+
+  df
     # to check if df contains the right information, try this:
     # ggplot(df) +
     #   geom_path(

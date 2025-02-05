@@ -84,24 +84,22 @@
 #' @export
 NULL
 geom_vector_field <- function(mapping = NULL, data = NULL,
-                              stat = StatStreamField,
-                              position = "identity",
-                              ...,
-                              na.rm = FALSE,
-                              show.legend = NA,
-                              inherit.aes = FALSE,
-                              fun,
-                              xlim = NULL,
-                              ylim = NULL,
-                              n = 11,
-                              center = TRUE,
-                              normalize = TRUE,
-                              tail_point = FALSE,
-                              eval_point = FALSE,
-                              arrow = grid::arrow(angle = 30,
-                                                  length = unit(0.02, "npc"),
-                                                  type = "closed")
-) {
+  stat = StatStreamField,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = FALSE,
+  fun,
+  xlim = NULL,
+  ylim = NULL,
+  n = 11,
+  center = TRUE,
+  normalize = TRUE,
+  tail_point = FALSE,
+  eval_point = FALSE,
+  arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
+  ) {
 
   # Define default mapping for geom_vector_field
   default_mapping <- aes(color = after_stat(norm))
@@ -151,25 +149,23 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
 #' @export
 #'
 stat_vector_field <- function(mapping = NULL, data = NULL,
-                              stat = StatStreamField,
-                              geom = GeomStream,
-                              position = "identity",
-                              ...,
-                              na.rm = FALSE,
-                              show.legend = NA,
-                              inherit.aes = FALSE,
-                              fun,
-                              xlim = NULL,
-                              ylim = NULL,
-                              n = 11,
-                              center = TRUE,
-                              normalize = TRUE,
-                              tail_point = FALSE,
-                              eval_point = FALSE,
-                              arrow = grid::arrow(angle = 30,
-                                                  length = unit(0.02, "npc"),
-                                                  type = "closed")
-) {
+  stat = StatStreamField,
+  geom = GeomStream,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = FALSE,
+  fun,
+  xlim = NULL,
+  ylim = NULL,
+  n = 11,
+  center = TRUE,
+  normalize = TRUE,
+  tail_point = FALSE,
+  eval_point = FALSE,
+  arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
+  ) {
 
   # Define default mapping for geom_vector_field
   default_mapping <- aes(color = after_stat(norm))
@@ -183,7 +179,6 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
   } else {
     mapping <- default_mapping
   }
-
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
@@ -220,21 +215,21 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
 #' @rdname geom_vector_field
 #' @export
 geom_vector_field2 <- function(mapping = NULL, data = NULL,
-                               stat = StatStreamField,
-                               position = "identity",
-                               ...,
-                               na.rm = FALSE,
-                               show.legend = TRUE,
-                               inherit.aes = FALSE,
-                               fun,
-                               xlim = NULL,
-                               ylim = NULL,
-                               n = 11,
-                               center = FALSE,
-                               normalize = TRUE,
-                               tail_point = TRUE,
-                               eval_point = FALSE,
-                               arrow = NULL) {
+   stat = StatStreamField,
+   position = "identity",
+   ...,
+   na.rm = FALSE,
+   show.legend = TRUE,
+   inherit.aes = FALSE,
+   fun,
+   xlim = NULL,
+   ylim = NULL,
+   n = 11,
+   center = FALSE,
+   normalize = TRUE,
+   tail_point = TRUE,
+   eval_point = FALSE,
+   arrow = NULL) {
 
   # Define default mapping for geom_vector_field2
   default_mapping <- ggplot2::aes(color = after_stat(NULL), length = after_stat(norm))
@@ -286,21 +281,21 @@ geom_vector_field2 <- function(mapping = NULL, data = NULL,
 #' @rdname geom_vector_field
 #' @export
 stat_vector_field2 <- function(mapping = NULL, data = NULL,
-                               geom = GeomStream,
-                               position = "identity",
-                               ...,
-                               na.rm = FALSE,
-                               show.legend = TRUE,
-                               inherit.aes = FALSE,
-                               fun,
-                               xlim = NULL,
-                               ylim = NULL,
-                               n = 11,
-                               center = FALSE,
-                               normalize = TRUE,
-                               tail_point = TRUE,
-                               eval_point = FALSE,
-                               arrow = NULL) {
+   geom = GeomStream,
+   position = "identity",
+   ...,
+   na.rm = FALSE,
+   show.legend = TRUE,
+   inherit.aes = FALSE,
+   fun,
+   xlim = NULL,
+   ylim = NULL,
+   n = 11,
+   center = FALSE,
+   normalize = TRUE,
+   tail_point = TRUE,
+   eval_point = FALSE,
+   arrow = NULL) {
 
   # Define default mapping for stat_stream_field2
   default_mapping <- ggplot2::aes(color = after_stat(NULL), length = after_stat(norm))
