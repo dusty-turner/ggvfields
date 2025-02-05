@@ -99,10 +99,11 @@ geom_stream_field <- function(
   ...,
   na.rm = FALSE,
   show.legend = NA,
-  inherit.aes = TRUE,
+  inherit.aes = FALSE,
+  # inherit.aes = TRUE,
   fun,
-  xlim = c(-1, 1),
-  ylim = c(-1, 1),
+  xlim = NULL,
+  ylim = NULL,
   n = 11,
   max_it = 1000,
   dt = .0025,
@@ -170,8 +171,8 @@ stat_stream_field <- function(
   show.legend = NA,
   inherit.aes = TRUE,
   fun,
-  xlim = c(-1, 1),
-  ylim = c(-1, 1),
+  xlim = NULL,
+  ylim = NULL,
   n = 11,
   max_it = 1000,
   dt = .0025,
@@ -238,6 +239,18 @@ StatStreamField <- ggproto(
   default_aes = aes(group = after_stat(id)),
 
   compute_group = function(data, scales, fun, xlim, ylim, n, method, max_it = 1000, dt, L = NULL, center, normalize, ...) {
+
+    xlim <- xlim %||% scales$x$range$range
+    if (is.null(xlim)) {
+      cli::cli_warn("No xlim provided or inherited; defaulting to c(-1, 1).")
+      xlim <- c(-1, 1)
+    }
+
+    ylim <- ylim %||% scales$y$range$range
+    if (is.null(ylim)) {
+      cli::cli_warn("No ylim provided or inherited; defaulting to c(-1, 1).")
+      ylim <- c(-1, 1)
+    }
 
     # make grid of points on which to compute streams
     grid <- cbind(

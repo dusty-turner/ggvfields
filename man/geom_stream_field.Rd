@@ -17,8 +17,8 @@ stat_stream_field(
   show.legend = NA,
   inherit.aes = TRUE,
   fun,
-  xlim = c(-1, 1),
-  ylim = c(-1, 1),
+  xlim = NULL,
+  ylim = NULL,
   n = 11,
   max_it = 1000,
   dt = 0.0025,
@@ -158,8 +158,8 @@ before centering or normalization is applied.
 \examples{
 
 f <- efield_maker()
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), normalize = FALSE)
+ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 
 # Define a simple rotational vector field function
 rotational_field <- function(u) {
@@ -170,7 +170,8 @@ rotational_field <- function(u) {
 
 # Create a stream field layer
 ggplot() +
-  geom_stream_field(fun = rotational_field)
+  geom_stream_field(fun = rotational_field) +
+  coord_equal()
 
 # Create a stream field layer with tail points
 ggplot() +
