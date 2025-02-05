@@ -300,7 +300,7 @@ StatStreamField <- ggproto(
       # Bind the current stream's data to the overall data frame
       df <- rbind(df, temp)
     }
-# print(df)
+
     df
   }
 
@@ -319,7 +319,9 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
 
     # define a few helpers
     neg_fun <- function(u) -fun(u)
-    flip <- function(df) df[nrow(df):1,]
+    flip <- function(df) if (nrow(df) == 0L) df else df[nrow(df):1,]
+    # the nrow(df) == 0 part is if the original eval point fails, vec field is not defined at that point
+    # if you df[nrow(df):1,] on a 0-row df, you get back a row of NAs
 
     # solve in both directions
     df_negative <- ode_stepper(u0, neg_fun, dt = dt/2, t0, L = L, max_it, method, center = FALSE)
@@ -333,7 +335,7 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
     n_neg <- nrow(df_negative) - 1
     n_pos <- nrow(df_positive)
     n <- nrow(df)
-    df$d <- c(NA, df$d[1:n_neg], df_positive$d[-1])
+    df$d <- if (n == 1) NA_real_ else c(NA_real_, df$d[1:n_neg], df_positive$d[-1])
     df$l <- c(0, cumsum(df$d[-1]))
     df$avg_spd <- df$l[n] / (df$t[n] - df$t[1])
 
@@ -346,10 +348,10 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
   # initialize the data structure, a matrix because it drops on subsetting
   mat <- cbind(
     "t" = t0 + dt*(0:(max_it-1)),
-    "x" = c(u0[1], rep(NA, max_it-1)),
-    "y" = c(u0[2], rep(NA, max_it-1)),
-    "d" = rep(NA, max_it),             # dist since last step
-    "l" = c(    0, rep(NA, max_it-1))  # arc length = cumulative dist traveled
+    "x" = c(u0[1], rep(NA_real_, max_it-1)),
+    "y" = c(u0[2], rep(NA_real_, max_it-1)),
+    "d" = rep(NA_real_, max_it),             # dist since last step
+    "l" = c(    0, rep(NA_real_, max_it-1))  # arc length = cumulative dist traveled
   )
 
   # "solve" with ode() step by step
@@ -368,10 +370,11 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
        "parms" = NULL
     )[2,c("x","y")]
 
-    # break if ode fails
+    # break if ode fails (including on the grid value)
     if ( any( is.nan(mat[i,c("x","y")]) | is.na(mat[i,c("x","y")]) ) ) {
       df <- mat[1:(i-1),,drop=FALSE] |> matrix_to_df_with_names()
-      df$avg_spd <- df$l[i-1] / df$t[i-1]
+      df$avg_spd <- if (df$t[i-1] != 0) df$l[i-1] / df$t[i-1] else NA_real_
+      df$norm <- norm_fu0
       return( df )
     }
 
