@@ -63,8 +63,8 @@
 #' @examples
 #'
 #' f <- efield_maker()
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-#' ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#' ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 #'
 #' # Define a simple rotational vector field function
 #' rotational_field <- function(u) {
@@ -75,7 +75,8 @@
 #'
 #' # Create a stream field layer
 #' ggplot() +
-#'   geom_stream_field(fun = rotational_field)
+#'   geom_stream_field(fun = rotational_field) +
+#'   coord_equal()
 #'
 #' # Create a stream field layer with tail points
 #' ggplot() +
@@ -250,54 +251,35 @@ StatStreamField <- ggproto(
     # L <- sqrt(diff(xlim)^2 + diff(ylim)^2)
 
 
-    if(normalize == "stream") L <- L / (max(n) - 1) * 0.9
+    if(normalize == "stream") L <- L / (max(n) - 1) * 0.6
+
     if(normalize == "vector") {
       L <- L / (max(n) - 1) * 0.8
 
-      # Calculate dt for each grid point
+      # calculate dt for each grid point
       norms <- apply(grid, 1, function(v) sqrt(sum(fun(v) ^ 2)))
-      dt <- L / norms
-      # u[i,] <- u[i-1,] + f(u[i-1,])*dt
+      dt <- L / norms # normalizes for euler: u[i,] <- u[i-1,] + f(u[i-1,])*dt = u[i,] <- u[i-1,] + f(u[i-1,]) * (L/|f(u[i-1,])|)
 
-      # Replace infinite dt values with 0
+      # replace infinite dt values with 0
       dt[is.infinite(dt)] <- 0
 
     }
-
-
-
-    # if(normalize == "stream") {
-      # L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * 0.9
-    # } else if(normalize == "vector") {
-    #   L <- (min(diff(xlim), diff(ylim)) / (max(n) - 1)) * 0.8
-    #
-    #   if(center) L <- L/2 # for some reason centering a vector doubles the length in the process: fix later
-    #
-    #   # Calculate dt for each grid point
-    #   norms <- apply(grid, 1, function(v) sqrt(sum(fun(v) ^ 2)))
-    #   dt <- L / norms
-    #
-    #   # Replace infinite dt values with 0
-    #   dt[is.infinite(dt)] <- 0
-    #
-    # }
-    # else if(!normalize) L <- (min(diff(xlim), diff(ylim))) / 2
 
     # initialize the data frame
     df <- data.frame()
 
     for (i in 1:nrow(grid)) {
-      # Compute the stream for the current grid point using ode_stepper()
+      # compute the stream for the current grid point using ode_stepper()
       temp <- transform(
         ode_stepper(grid[i, ], fun, dt[i], 0, L, max_it, method, center),
-        id = i  # Tag with the current grid point's index
+        id = i  # tag with the current grid point's index
       )
 
-      # Add the original x and y coordinates to this stream's data
+      # add the original x and y coordinates to this stream's data
       temp$x_original <- grid[i, "x"]
       temp$y_original <- grid[i, "y"]
 
-      # Bind the current stream's data to the overall data frame
+      # bind the current stream's data to the overall data frame
       df <- rbind(df, temp)
     }
 
@@ -343,8 +325,6 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
     return(df)
   }
 
-  norm_fu0 <- norm(fun(u0))
-
   # initialize the data structure, a matrix because it drops on subsetting
   mat <- cbind(
     "t" = t0 + dt*(0:(max_it-1)),
@@ -374,7 +354,7 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
     if ( any( is.nan(mat[i,c("x","y")]) | is.na(mat[i,c("x","y")]) ) ) {
       df <- mat[1:(i-1),,drop=FALSE] |> matrix_to_df_with_names()
       df$avg_spd <- if (df$t[i-1] != 0) df$l[i-1] / df$t[i-1] else NA_real_
-      df$norm <- norm_fu0
+      df$norm <- norm( fun(u0) )
       return( df )
     }
 
@@ -393,7 +373,7 @@ ode_stepper <- function(u0, fun, dt = .0025, t0 = 0, L = 1, max_it = 1000, metho
   row.names(mat) <- NULL
   df <- matrix_to_df_with_names(mat[1:i,])
   df$avg_spd <- df$l[i] / df$t[i]
-  df$norm <- norm_fu0
+  df$norm <- norm(fun(u0))
   # df$length <- df$norm
 
   df
