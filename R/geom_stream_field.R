@@ -63,7 +63,7 @@
 #' @examples
 #'
 #' f <- efield_maker()
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), normalize = FALSE)
 #' ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 #'
 #' # Define a simple rotational vector field function
@@ -276,8 +276,8 @@ StatStreamField <- ggproto(
       )
 
       # add the original x and y coordinates to this stream's data
-      temp$x_original <- grid[i, "x"]
-      temp$y_original <- grid[i, "y"]
+      temp$x0 <- grid[i, "x"]
+      temp$y0 <- grid[i, "y"]
 
       # bind the current stream's data to the overall data frame
       df <- rbind(df, temp)

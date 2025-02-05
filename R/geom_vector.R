@@ -185,8 +185,8 @@ StatVector <- ggproto("StatVector", Stat,
 
                         n <- nrow(data)
 
-                        data$x_original <- data$x
-                        data$y_original <- data$y
+                        data$x0 <- data$x
+                        data$y0 <- data$y
 
                         # If xend/yend are not provided (or are all missing), try fx/fy, then angle/distance.
                         if((!"xend" %in% names(data) || all(is.na(data$xend))) ||

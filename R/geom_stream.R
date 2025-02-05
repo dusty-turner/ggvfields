@@ -230,8 +230,8 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 
                         # used for eval_point
                         data_for_eval_coords <- data
-                        data_for_eval_coords$x <- data_for_eval_coords$x_original
-                        data_for_eval_coords$y <- data_for_eval_coords$y_original
+                        data_for_eval_coords$x <- data_for_eval_coords$x0
+                        data_for_eval_coords$y <- data_for_eval_coords$y0
                         coords_for_eval_point <- coord$transform(data_for_eval_coords, panel_params)
 
 
