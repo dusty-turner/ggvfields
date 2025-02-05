@@ -95,7 +95,7 @@ geom_stream <- function(mapping = NULL, data = NULL,
                         show.legend = NA,
                         inherit.aes = TRUE,
                         arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
-                        ) {
+) {
 
   # If 'id' is provided in mapping, map it to 'group'
   if (!is.null(mapping) && "id" %in% names(mapping)) {
@@ -128,7 +128,7 @@ stat_stream <- function(mapping = NULL, data = NULL,
                         show.legend = NA,
                         inherit.aes = TRUE,
                         arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
-                        ) {
+) {
 
   # If 'id' is provided in mapping, map it to 'group'
   if (!is.null(mapping) && "id" %in% names(mapping)) {
@@ -159,7 +159,7 @@ StatStream <- ggproto("StatStream", Stat,
                       default_aes = aes(x = NA, y = NA, length = 1,
                                         color = "black", fill = "black",
                                         linewidth = 1, linetype = 1, alpha = 1
-                                        ),
+                      ),
                       # No need to specify group here; grouping is handled via 'group' aesthetic
                       compute_group = function(data, scales, ...) {
                         # Ensure the data is ordered by the temporal variable 't'
@@ -241,7 +241,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 
                           unique_groups <- unique(coords$group)
 
-                         for(g in unique_groups) {
+                          for(g in unique_groups) {
                             idx <- which(coords$group == g)
 
 
@@ -250,24 +250,24 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                             x2 <- coords$x[idx[2]]
                             y2 <- coords$y[idx[2]]
 
-                              dx <- coords$x[idx[2]] - coords$x[idx[1]]
-                              dy <- coords$y[idx[2]] - coords$y[idx[1]]
+                            dx <- coords$x[idx[2]] - coords$x[idx[1]]
+                            dy <- coords$y[idx[2]] - coords$y[idx[1]]
 
-                              dist <- sqrt(dx^2 + dy^2)
+                            dist <- sqrt(dx^2 + dy^2)
 
-                              angle <- atan2(dy, dx)
+                            angle <- atan2(dy, dx)
 
-                              # Desired length in cm, from the second row's 'length'
-                              desired_length <- coords$length[idx[2]]
+                            # Desired length in cm, from the second row's 'length'
+                            desired_length <- coords$length[idx[2]]
 
-                              coords$x[idx[2]] <- coords$x[idx[1]]
-                              coords$y[idx[2]] <- coords$y[idx[1]]
+                            coords$x[idx[2]] <- coords$x[idx[1]]
+                            coords$y[idx[2]] <- coords$y[idx[1]]
 
-                              coords$offset_x[idx[1]] <- 0
-                              coords$offset_x[idx[2]] <- desired_length * cos(angle)
+                            coords$offset_x[idx[1]] <- 0
+                            coords$offset_x[idx[2]] <- desired_length * cos(angle)
 
-                              coords$offset_y[idx[1]] <- 0
-                              coords$offset_y[idx[2]] <- desired_length * sin(angle)
+                            coords$offset_y[idx[1]] <- 0
+                            coords$offset_y[idx[2]] <- desired_length * sin(angle)
 
                           }
 
@@ -372,11 +372,11 @@ scale_length_continuous <- function(max_range = 0.5, ...) {
   # For larger max_range, combine scale with theme modification
   adjusted_width <- unit(max(0.5, max_range * 1.1), "cm")
 
-    scale <-
-  list(
-    scale,
-    theme(legend.key.width = adjusted_width)
-  )
+  scale <-
+    list(
+      scale,
+      theme(legend.key.width = adjusted_width)
+    )
   scale
 }
 

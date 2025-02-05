@@ -11,7 +11,7 @@
 #'   axis for smoothing.
 #' @param method Character; specifies the smoothing method to use. The only
 #'   supported method is `"lm"`, which fits a multivariate linear model to predict
-#'   the vector displacements `dx` and `dy` based on the coordinates `x` and `y`.
+#'   the vector displacements `fx` and `fy` based on the coordinates `x` and `y`.
 #' @param se Logical; if `TRUE`, confidence intervals are plotted around the
 #'   smoothed vectors.
 #' @param se.circle Logical; if `TRUE`, circles are drawn around the origin of
@@ -28,7 +28,7 @@
 #'     direction and magnitude of the vectors. Wedges show the range of possible
 #'     vector orientations and lengths.
 #'   - `"ellipse"`: Uses ellipses to depict prediction intervals, reflecting
-#'     the covariance between the vector components (`dx` and `dy`). Ellipses
+#'     the covariance between the vector components (`fx` and `fy`). Ellipses
 #'     provide a visual representation of joint uncertainty in vector directions.
 #'   The default is `"wedge"`. If `pi_type` is set to `"ellipse"` and `eval_points`
 #'   is `NULL`, the function switches `pi_type` to `"wedge"` to ensure proper
@@ -37,7 +37,7 @@
 #'   controls the appearance of arrowheads at the ends of vectors, including
 #'   angle, length, and type.
 #' @param formula A formula specifying the multivariate linear model used
-#'   for smoothing. The default formula is `cbind(dx, dy) ~ x * y`.
+#'   for smoothing. The default formula is `cbind(fx, fy) ~ x * y`.
 #' @return A `ggplot2` layer that can be added to a ggplot object to create a
 #'   smooth vector field plot.
 #' @importFrom stats qt
@@ -50,8 +50,8 @@
 #'
 #' - **`x`**: The x-coordinate of the vector's starting point.
 #' - **`y`**: The y-coordinate of the vector's starting point.
-#' - **`dx`**: The vector's displacement along the x-axis.
-#' - **`dy`**: The vector's displacement along the y-axis.
+#' - **`fx`**: The vector's displacement along the x-axis.
+#' - **`fy`**: The vector's displacement along the y-axis.
 #' - `color`: The color of the vector line.
 #' - `linewidth`: The thickness of the vector line.
 #' - `linetype`: The type of the vector line (e.g., solid or dashed).
@@ -62,15 +62,15 @@
 #' **Multivariate Linear Model**:
 #'
 #' The `"lm"` method fits a multivariate linear model to predict vector displacements
-#' `dx` and `dy` based on the input coordinates `x` and `y`. This model includes
+#' `fx` and `fy` based on the input coordinates `x` and `y`. This model includes
 #' interaction terms (`x * y`) to capture more complex relationships in the vector field.
 #'
 #' **Prediction Intervals**:
 #'
 #' Two types of prediction intervals are supported:
 #'
-#' - **Ellipse**: Ellipses are used to represent the covariance of predicted `dx`
-#'   and `dy` values. The size and orientation of the ellipses illustrate both
+#' - **Ellipse**: Ellipses are used to represent the covariance of predicted `fx`
+#'   and `fy` values. The size and orientation of the ellipses illustrate both
 #'   the uncertainty in vector magnitude and the correlation between vector components.
 #' - **Wedge**: Wedges are angular sectors that indicate the range of possible
 #'   directions and lengths for the vectors. This type of prediction interval
@@ -103,10 +103,10 @@
 #'
 #' sample_points$xend <- result[, 1]
 #' sample_points$yend <- result[, 2]
-#' sample_points$dx <- sample_points$xend - sample_points$x
-#' sample_points$dy <- sample_points$yend - sample_points$y
-#' sample_points$distance <- sqrt(sample_points$dx^2 + sample_points$dy^2)
-#' sample_points$angle <- atan2(sample_points$dy, sample_points$dx)
+#' sample_points$fx <- sample_points$xend - sample_points$x
+#' sample_points$fy <- sample_points$yend - sample_points$y
+#' sample_points$distance <- sqrt(sample_points$fx^2 + sample_points$fy^2)
+#' sample_points$angle <- atan2(sample_points$fy, sample_points$fx)
 #'
 #' # Define evaluation points
 #' eval_points <- data.frame(
@@ -116,20 +116,20 @@
 #'
 #' # Example 1:
 #' ggplot(sample_points, aes(x = x, y = y)) +
-#'   geom_vector(aes(dx = dx, dy = dy, color = NULL), center = FALSE, alpha = 0.2) +
-#'   geom_vector_smooth(aes(dx = dx, dy = dy), n = 5) +
+#'   geom_vector(aes(fx = fx, fy = fy, color = NULL), center = FALSE, alpha = 0.2) +
+#'   geom_vector_smooth(aes(fx = fx, fy = fy), n = 5) +
 #'   ggtitle("Smoothed Vector Field")
 #'
 #' # Example 2: Ellipse with eval_points
 #' ggplot(sample_points, aes(x = x, y = y)) +
-#'   geom_vector(aes(dx = dx, dy = dy, color = NULL), center = FALSE, alpha = 0.2) +
-#'   geom_vector_smooth(aes(dx = dx, dy = dy), eval_points = eval_points, conf_level = c(0.9)) +
+#'   geom_vector(aes(fx = fx, fy = fy, color = NULL), center = FALSE, alpha = 0.2) +
+#'   geom_vector_smooth(aes(fx = fx, fy = fy), eval_points = eval_points, conf_level = c(0.9)) +
 #'   ggtitle("Smoothed Vector Field with Ellipse Intervals")
 #'
 #' # Example 3: Wedge with eval_points
 #' ggplot(sample_points, aes(x = x, y = y)) +
-#'   geom_vector(aes(dx = dx, dy = dy, color = NULL), center = FALSE, alpha = 0.2) +
-#'   geom_vector_smooth(aes(dx = dx, dy = dy), eval_points = eval_points, pi_type = "ellipse") +
+#'   geom_vector(aes(fx = fx, fy = fy, color = NULL), center = FALSE, alpha = 0.2) +
+#'   geom_vector_smooth(aes(fx = fx, fy = fy), eval_points = eval_points, pi_type = "ellipse") +
 #'   ggtitle("Smoothed Vector Field with Wedge Intervals")
 #'
 NULL
@@ -148,7 +148,7 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
                                se.circle = TRUE,
                                conf_level = c(.95, NA),
                                pi_type = "ellipse",
-                               formula = cbind(dx, dy) ~ x * y,
+                               formula = cbind(fx, fy) ~ x * y,
                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                                eval_points = NULL) {
 
@@ -190,7 +190,7 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
                                se.circle = TRUE,
                                pi_type = "ellipse",
                                conf_level = c(.95, NA),
-                               formula = cbind(dx, dy) ~ x * y,
+                               formula = cbind(fx, fy) ~ x * y,
                                arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                                eval_points = NULL) {
 
@@ -227,7 +227,7 @@ StatVectorSmooth <- ggproto(
   dropped_aes = c("distance", "angle"),
   default_aes = aes(
     color = "#3366FF", linewidth = 0.5, linetype = 1, alpha = 1,
-    angle = NA, distance = NA, dx = NA, dy = NA
+    angle = NA, distance = NA, fx = NA, fy = NA
   ),
 
   compute_group = function(
@@ -250,14 +250,14 @@ StatVectorSmooth <- ggproto(
     # Use helper function to validate input
     validation_result <- validate_aesthetics(data)
 
-    # If 'angle' and 'distance' are provided, compute 'dx' and 'dy'
+    # If 'angle' and 'distance' are provided, compute 'fx' and 'fy'
     if (!all(is.na(data$angle)) && !all(is.na(data$distance))) {
-      data$dx <- data$distance * cos(data$angle)
-      data$dy <- data$distance * sin(data$angle)
-    } else if (all(!is.na(data$dx)) && all(!is.na(data$dy))) {
-      # If 'dx' and 'dy' are provided, compute 'angle' and 'distance'
-      data$distance <- sqrt(data$dx^2 + data$dy^2)
-      data$angle <- atan2(data$dy, data$dx)
+      data$fx <- data$distance * cos(data$angle)
+      data$fy <- data$distance * sin(data$angle)
+    } else if (all(!is.na(data$fx)) && all(!is.na(data$fy))) {
+      # If 'fx' and 'fy' are provided, compute 'angle' and 'distance'
+      data$distance <- sqrt(data$fx^2 + data$fy^2)
+      data$angle <- atan2(data$fy, data$fx)
     }
 
     # Ensure 'n' is a numeric vector of length 2
@@ -286,17 +286,15 @@ StatVectorSmooth <- ggproto(
       y_spacing <- diff(sort(unique(grid$y)))[1]
       base_radius <- min(x_spacing, y_spacing) / 2.5
     }
-
     grid$id <- seq_len(nrow(grid))
 
-
-    # Calculate xend and yend using dx and dy
-    data$xend <- data$x + data$dx
-    data$yend <- data$y + data$dy
+    # Calculate xend and yend using fx and fy
+    data$xend <- data$x + data$fx
+    data$yend <- data$y + data$fy
 
     # Calculate angle and distance
-    data$distance <- sqrt(data$dx^2 + data$dy^2)
-    data$angle <- atan2(data$dy, data$dx)
+    data$distance <- sqrt(data$fx^2 + data$fy^2)
+    data$angle <- atan2(data$fy, data$fx)
 
     # ----------------------------
     # 2. Model Fitting and Prediction
@@ -305,12 +303,12 @@ StatVectorSmooth <- ggproto(
     # Fit the multivariate linear model
     model_mv <- lm(formula, data = data)
 
-    # Predict dx and dy for the grid
+    # Predict fx and fy for the grid
     predictions_mv <- predict(model_mv, newdata = grid)
 
     # Extract predicted means (ensure correct column names)
-    grid$dx <- predictions_mv[, "dx"]  # Predicted dx
-    grid$dy <- predictions_mv[, "dy"]  # Predicted dy
+    grid$fx <- predictions_mv[, "fx"]  # Predicted fx
+    grid$fy <- predictions_mv[, "fy"]  # Predicted fy
 
     # ----------------------------
     # 3. Covariance Matrix Computation
@@ -321,7 +319,7 @@ StatVectorSmooth <- ggproto(
     # Create the design matrix for the grid
     design_matrix <- model.matrix(formula, data = grid)
 
-    # Number of response variables (dx and dy)
+    # Number of response variables (fx and fy)
     n_resp <- length(all.vars(formula[[2]]))
 
     # Number of coefficients per response
@@ -337,9 +335,9 @@ StatVectorSmooth <- ggproto(
     Sigma <- cov(residuals_mv)
 
     # Extract correlation coefficient
-    sigma_x <- sqrt(Sigma["dx", "dx"])
-    sigma_y <- sqrt(Sigma["dy", "dy"])
-    rho <- Sigma["dx", "dy"] / (sigma_x * sigma_y)
+    sigma_x <- sqrt(Sigma["fx", "fx"])
+    sigma_y <- sqrt(Sigma["fy", "fy"])
+    rho <- Sigma["fx", "fy"] / (sigma_x * sigma_y)
 
     expected_coeffs <- coeffs_per_response * n_resp
     if (total_coeffs != expected_coeffs) {
@@ -347,22 +345,22 @@ StatVectorSmooth <- ggproto(
     }
 
     # Extract covariance matrices
-    cov_beta_dx <- cov_coef[1:coeffs_per_response, 1:coeffs_per_response]     # Covariance for dx coefficients
-    cov_beta_dy <- cov_coef[(coeffs_per_response+1):(expected_coeffs), (coeffs_per_response+1):(expected_coeffs)]     # Covariance for dy coefficients
-    cov_beta_dx_dy <- cov_coef[1:coeffs_per_response, (coeffs_per_response+1):(expected_coeffs)]  # Covariance between dx and dy coefficients
+    cov_beta_fx <- cov_coef[1:coeffs_per_response, 1:coeffs_per_response]     # Covariance for fx coefficients
+    cov_beta_fy <- cov_coef[(coeffs_per_response+1):(expected_coeffs), (coeffs_per_response+1):(expected_coeffs)]     # Covariance for fy coefficients
+    cov_beta_fx_fy <- cov_coef[1:coeffs_per_response, (coeffs_per_response+1):(expected_coeffs)]  # Covariance between fx and fy coefficients
 
-    # Compute variance for dx and dy predictions
-    var_dx <- rowSums(design_matrix * (design_matrix %*% cov_beta_dx))
-    var_dy <- rowSums(design_matrix * (design_matrix %*% cov_beta_dy))
-    cov_dx_dy <- rowSums(design_matrix * (design_matrix %*% cov_beta_dx_dy))
+    # Compute variance for fx and fy predictions
+    var_fx <- rowSums(design_matrix * (design_matrix %*% cov_beta_fx))
+    var_fy <- rowSums(design_matrix * (design_matrix %*% cov_beta_fy))
+    cov_fx_fy <- rowSums(design_matrix * (design_matrix %*% cov_beta_fx_fy))
 
     # Add residual variances and covariance
-    var_dx <- var_dx + Sigma["dx", "dx"]
-    var_dy <- var_dy + Sigma["dy", "dy"]
-    cov_dx_dy <- cov_dx_dy + Sigma["dx", "dy"]
+    var_fx <- var_fx + Sigma["fx", "fx"]
+    var_fy <- var_fy + Sigma["fy", "fy"]
+    cov_fx_fy <- cov_fx_fy + Sigma["fx", "fy"]
 
-    # Assemble the covariance matrix for (dx, dy) predictions
-    cov_pred <- data.frame(var_dx, var_dy, cov_dx_dy)
+    # Assemble the covariance matrix for (fx, fy) predictions
+    cov_pred <- data.frame(var_fx, var_fy, cov_fx_fy)
 
     # ----------------------------
     # 4. Compute Prediction Intervals
@@ -373,9 +371,9 @@ StatVectorSmooth <- ggproto(
       if (pi_type == "ellipse") {
         ellipse_params_list <- mapply(
           compute_ellipse_params,
-          var_dx = cov_pred$var_dx,
-          var_dy = cov_pred$var_dy,
-          cov_dx_dy = cov_pred$cov_dx_dy,
+          var_fx = cov_pred$var_fx,
+          var_fy = cov_pred$var_fy,
+          cov_fx_fy = cov_pred$cov_fx_fy,
           MoreArgs = list(conf_level = conf_level[1]),
           SIMPLIFY = FALSE
         )
@@ -390,24 +388,24 @@ StatVectorSmooth <- ggproto(
           predict_theta_interval,
           x = grid$x,
           y = grid$y,
-          mux = grid$dx,
-          muy = grid$dy,
+          mux = grid$fx,
+          muy = grid$fy,
           MoreArgs = list(Sigma = Sigma, rho = rho, conf_level = conf_level[1]),
           SIMPLIFY = FALSE
         ))
         grid <- cbind(grid, wedge_angles)
-        grid$r_upper <- sqrt(grid$dx^2 + grid$dy^2)
+        grid$r_upper <- sqrt(grid$fx^2 + grid$fy^2)
         grid$r_lower <- 0
 
         # Adjust scale if eval_points is NULL
         if (is.null(eval_points)) {
-          current_magnitudes <- sqrt(grid$dx^2 + grid$dy^2)
+          current_magnitudes <- sqrt(grid$fx^2 + grid$fy^2)
           current_magnitudes[current_magnitudes == 0] <- 1  # Avoid division by zero
           scaling_factors <- base_radius / current_magnitudes
-          grid$dx <- grid$dx * scaling_factors
-          grid$dy <- grid$dy * scaling_factors
-          grid$xend <- grid$x + grid$dx
-          grid$yend <- grid$y + grid$dy
+          grid$fx <- grid$fx * scaling_factors
+          grid$fy <- grid$fy * scaling_factors
+          grid$xend <- grid$x + grid$fx
+          grid$yend <- grid$y + grid$fy
           grid$r_upper <- base_radius
         }
 
@@ -416,8 +414,8 @@ StatVectorSmooth <- ggproto(
           compute_prediction_endpoints,
           x = grid$x,
           y = grid$y,
-          dx = grid$dx,
-          dy = grid$dy,
+          fx = grid$fx,
+          fy = grid$fy,
           angle_lower = grid$min_angle,
           angle_upper = grid$max_angle,
           SIMPLIFY = FALSE
@@ -428,15 +426,16 @@ StatVectorSmooth <- ggproto(
 
       # Finalize result
       result <- grid
-      result$xend <- result$x + result$dx
-      result$yend <- result$y + result$dy
+      result$xend <- result$x + result$fx
+      result$yend <- result$y + result$fy
     } else {
       stop("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
     }
 
     return(result)
-    }
-  )
+  }
+)
+
 
 
 
@@ -542,7 +541,6 @@ GeomVectorSmooth <- ggproto(
         stop("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
       }
     }
-
     if (se.circle) {
       # Initialize a list to store all circle polygons
       circle_polygons <- vector("list", nrow(data))
@@ -550,7 +548,7 @@ GeomVectorSmooth <- ggproto(
       for (i in 1:nrow(data)) {
         circle_polygons[[i]] <- create_circle_data(
           x = data$x[i], y = data$y[i],
-          radius = sqrt(data$dx[i]^2 + data$dy[i]^2),
+          radius = sqrt(data$fx[i]^2 + data$fy[i]^2),
           n = 100,
           group = data$id[i]
         )

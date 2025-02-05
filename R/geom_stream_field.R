@@ -95,27 +95,27 @@ NULL
 #' @rdname geom_stream_field
 #' @export
 geom_stream_field <- function(
-  mapping = NULL,
-  data = NULL,
-  stat = StatStreamField,
-  position = "identity",
-  ...,
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = FALSE,
-  # inherit.aes = TRUE,
-  fun,
-  xlim = NULL,
-  ylim = NULL,
-  n = 11,
-  max_it = 1000,
-  dt = .0025,
-  L = NULL,
-  center = TRUE,
-  normalize = TRUE,
-  tail_point = FALSE,
-  method = "rk4",
-  arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
+    mapping = NULL,
+    data = NULL,
+    stat = StatStreamField,
+    position = "identity",
+    ...,
+    na.rm = FALSE,
+    show.legend = NA,
+    inherit.aes = FALSE,
+    # inherit.aes = TRUE,
+    fun,
+    xlim = NULL,
+    ylim = NULL,
+    n = 11,
+    max_it = 1000,
+    dt = .0025,
+    L = NULL,
+    center = TRUE,
+    normalize = TRUE,
+    tail_point = FALSE,
+    method = "rk4",
+    arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
 
   # Define default mapping for geom_vector_field
@@ -165,26 +165,26 @@ geom_stream_field <- function(
 #' @rdname geom_stream_field
 #' @export
 stat_stream_field <- function(
-  mapping = NULL,
-  data = NULL,
-  geom = GeomStream,
-  position = "identity",
-  ...,
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  fun,
-  xlim = NULL,
-  ylim = NULL,
-  n = 11,
-  max_it = 1000,
-  dt = .0025,
-  L = NULL,
-  center = TRUE,
-  normalize = TRUE,
-  tail_point = FALSE,
-  method = "rk4",
-  arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
+    mapping = NULL,
+    data = NULL,
+    geom = GeomStream,
+    position = "identity",
+    ...,
+    na.rm = FALSE,
+    show.legend = NA,
+    inherit.aes = TRUE,
+    fun,
+    xlim = NULL,
+    ylim = NULL,
+    n = 11,
+    max_it = 1000,
+    dt = .0025,
+    L = NULL,
+    center = TRUE,
+    normalize = TRUE,
+    tail_point = FALSE,
+    method = "rk4",
+    arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
 
   # Define default mapping for geom_vector_field
@@ -301,6 +301,7 @@ StatStreamField <- ggproto(
 
     }
 
+    df
     # to check if df contains the right information, try this:
     # ggplot(df) +
     #   geom_path(
@@ -370,11 +371,11 @@ ode_stepper <- function(u0, fun, dt = .005, t0 = 0, L = 1, max_it = 1000, method
 
     # compute next u = (x,y). all t's were computed in advance
     mat[i,c("x","y")] <- ode(
-           "y" = u,
-       "times" = c(t, t + dt),
-        "func" = function(t, y, parms = NULL, ...) list(fun(y)),
+      "y" = u,
+      "times" = c(t, t + dt),
+      "func" = function(t, y, parms = NULL, ...) list(fun(y)),
       "method" = method,
-       "parms" = NULL
+      "parms" = NULL
     )[2,c("x","y")]
 
     # break if ode fails (including on the grid value)

@@ -136,24 +136,24 @@ validate_aesthetics <- function(data) {
   has_angle_distance <- columns_valid(data, c("angle", "distance"))
 
   # Check if both 'dx' and 'dy' are provided and fully populated
-  has_dx_dy <- columns_valid(data, c("dx", "dy"))
+  has_fx_fy <- columns_valid(data, c("fx", "fy"))
 
   # If neither pair is fully provided, throw an error
-  if (!(has_angle_distance || has_dx_dy)) {
-    stop("You must provide either both 'dx' and 'dy' or both 'angle' and 'distance' aesthetics.")
+  if (!(has_angle_distance || has_fx_fy)) {
+    stop("You must provide either both 'fx' and 'fy' or both 'angle' and 'distance' aesthetics.")
   }
 
   # Return a list indicating which pair is present
   return(list(
     has_angle_distance = has_angle_distance,
-    has_dx_dy = has_dx_dy
+    has_fx_fy = has_fx_fy
   ))
 }
 
 # Compute ellipse parameters based on covariance
-compute_ellipse_params <- function(var_dx, var_dy, cov_dx_dy, conf_level = 0.95) {
+compute_ellipse_params <- function(var_fx, var_fy, cov_fx_fy, conf_level = 0.95) {
   # Construct the covariance matrix
-  cov_matrix <- matrix(c(var_dx, cov_dx_dy, cov_dx_dy, var_dy), nrow = 2)
+  cov_matrix <- matrix(c(var_fx, cov_fx_fy, cov_fx_fy, var_fy), nrow = 2)
 
   # Eigen decomposition
   eig <- eigen(cov_matrix)
@@ -517,7 +517,7 @@ calculate_wedge_angles <- function(x, y, xend, yend, a, b, angle_deg) {
 }
 
 # Define a helper function to compute wedge endpoints (unchanged)
-compute_prediction_endpoints <- function(x, y, dx, dy, angle_lower, angle_upper) {
+compute_prediction_endpoints <- function(x, y, fx, fy, angle_lower, angle_upper) {
   # Validate inputs
   if (!is.numeric(x) || length(x) != 1) {
     stop("Input 'x' must be a single numeric value.")
@@ -525,11 +525,11 @@ compute_prediction_endpoints <- function(x, y, dx, dy, angle_lower, angle_upper)
   if (!is.numeric(y) || length(y) != 1) {
     stop("Input 'y' must be a single numeric value.")
   }
-  if (!is.numeric(dx) || length(dx) != 1) {
-    stop("Input 'dx' must be a single numeric value.")
+  if (!is.numeric(fx) || length(fx) != 1) {
+    stop("Input 'fx' must be a single numeric value.")
   }
-  if (!is.numeric(dy) || length(dy) != 1) {
-    stop("Input 'dy' must be a single numeric value.")
+  if (!is.numeric(fy) || length(fy) != 1) {
+    stop("Input 'fy' must be a single numeric value.")
   }
   if (!is.numeric(angle_lower) || length(angle_lower) != 1) {
     stop("Input 'angle_lower' must be a single numeric value in radians.")
@@ -539,7 +539,7 @@ compute_prediction_endpoints <- function(x, y, dx, dy, angle_lower, angle_upper)
   }
 
   # Calculate the magnitude of the predicted vector
-  magnitude <- sqrt(dx^2 + dy^2)
+  magnitude <- sqrt(fx^2 + fy^2)
 
   # Compute the endpoints based on absolute angles
   xend_lower <- x + magnitude * cos(angle_lower)

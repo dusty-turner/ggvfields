@@ -28,7 +28,7 @@ stat_vector_smooth(
   se.circle = TRUE,
   conf_level = c(0.95, NA),
   pi_type = "ellipse",
-  formula = cbind(dx, dy) ~ x * y,
+  formula = cbind(fx, fy) ~ x * y,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   eval_points = NULL
 )
@@ -48,7 +48,7 @@ geom_vector_smooth(
   se.circle = TRUE,
   pi_type = "ellipse",
   conf_level = c(0.95, NA),
-  formula = cbind(dx, dy) ~ x * y,
+  formula = cbind(fx, fy) ~ x * y,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
   eval_points = NULL
 )
@@ -85,7 +85,7 @@ axis for smoothing.}
 
 \item{method}{Character; specifies the smoothing method to use. The only
 supported method is \code{"lm"}, which fits a multivariate linear model to predict
-the vector displacements \code{dx} and \code{dy} based on the coordinates \code{x} and \code{y}.}
+the vector displacements \code{fx} and \code{fy} based on the coordinates \code{x} and \code{y}.}
 
 \item{se}{Logical; if \code{TRUE}, confidence intervals are plotted around the
 smoothed vectors.}
@@ -104,7 +104,7 @@ around the smoothed vectors. Two options are available:
 direction and magnitude of the vectors. Wedges show the range of possible
 vector orientations and lengths.
 \item \code{"ellipse"}: Uses ellipses to depict prediction intervals, reflecting
-the covariance between the vector components (\code{dx} and \code{dy}). Ellipses
+the covariance between the vector components (\code{fx} and \code{fy}). Ellipses
 provide a visual representation of joint uncertainty in vector directions.
 The default is \code{"wedge"}. If \code{pi_type} is set to \code{"ellipse"} and \code{eval_points}
 is \code{NULL}, the function switches \code{pi_type} to \code{"wedge"} to ensure proper
@@ -112,7 +112,7 @@ interval representation.
 }}
 
 \item{formula}{A formula specifying the multivariate linear model used
-for smoothing. The default formula is \code{cbind(dx, dy) ~ x * y}.}
+for smoothing. The default formula is \code{cbind(fx, fy) ~ x * y}.}
 
 \item{arrow}{Arrow specification created by \code{grid::arrow()}. This parameter
 controls the appearance of arrowheads at the ends of vectors, including
@@ -139,15 +139,15 @@ in ggplot2, but is designed specifically for vector data rather than scalar data
 \strong{Multivariate Linear Model}:
 
 The \code{"lm"} method fits a multivariate linear model to predict vector displacements
-\code{dx} and \code{dy} based on the input coordinates \code{x} and \code{y}. This model includes
+\code{fx} and \code{fy} based on the input coordinates \code{x} and \code{y}. This model includes
 interaction terms (\code{x * y}) to capture more complex relationships in the vector field.
 
 \strong{Prediction Intervals}:
 
 Two types of prediction intervals are supported:
 \itemize{
-\item \strong{Ellipse}: Ellipses are used to represent the covariance of predicted \code{dx}
-and \code{dy} values. The size and orientation of the ellipses illustrate both
+\item \strong{Ellipse}: Ellipses are used to represent the covariance of predicted \code{fx}
+and \code{fy} values. The size and orientation of the ellipses illustrate both
 the uncertainty in vector magnitude and the correlation between vector components.
 \item \strong{Wedge}: Wedges are angular sectors that indicate the range of possible
 directions and lengths for the vectors. This type of prediction interval
@@ -163,8 +163,8 @@ parameter.
 \itemize{
 \item \strong{\code{x}}: The x-coordinate of the vector's starting point.
 \item \strong{\code{y}}: The y-coordinate of the vector's starting point.
-\item \strong{\code{dx}}: The vector's displacement along the x-axis.
-\item \strong{\code{dy}}: The vector's displacement along the y-axis.
+\item \strong{\code{fx}}: The vector's displacement along the x-axis.
+\item \strong{\code{fy}}: The vector's displacement along the y-axis.
 \item \code{color}: The color of the vector line.
 \item \code{linewidth}: The thickness of the vector line.
 \item \code{linetype}: The type of the vector line (e.g., solid or dashed).
@@ -197,10 +197,10 @@ result <- t(apply(sample_points, 1, generate_vectors))
 
 sample_points$xend <- result[, 1]
 sample_points$yend <- result[, 2]
-sample_points$dx <- sample_points$xend - sample_points$x
-sample_points$dy <- sample_points$yend - sample_points$y
-sample_points$distance <- sqrt(sample_points$dx^2 + sample_points$dy^2)
-sample_points$angle <- atan2(sample_points$dy, sample_points$dx)
+sample_points$fx <- sample_points$xend - sample_points$x
+sample_points$fy <- sample_points$yend - sample_points$y
+sample_points$distance <- sqrt(sample_points$fx^2 + sample_points$fy^2)
+sample_points$angle <- atan2(sample_points$fy, sample_points$fx)
 
 # Define evaluation points
 eval_points <- data.frame(
@@ -210,20 +210,20 @@ eval_points <- data.frame(
 
 # Example 1:
 ggplot(sample_points, aes(x = x, y = y)) +
-  geom_vector(aes(dx = dx, dy = dy, color = NULL), center = FALSE, alpha = 0.2) +
-  geom_vector_smooth(aes(dx = dx, dy = dy), n = 5) +
+  geom_vector(aes(fx = fx, fy = fy, color = NULL), center = FALSE, alpha = 0.2) +
+  geom_vector_smooth(aes(fx = fx, fy = fy), n = 5) +
   ggtitle("Smoothed Vector Field")
 
 # Example 2: Ellipse with eval_points
 ggplot(sample_points, aes(x = x, y = y)) +
-  geom_vector(aes(dx = dx, dy = dy, color = NULL), center = FALSE, alpha = 0.2) +
-  geom_vector_smooth(aes(dx = dx, dy = dy), eval_points = eval_points, conf_level = c(0.9)) +
+  geom_vector(aes(fx = fx, fy = fy, color = NULL), center = FALSE, alpha = 0.2) +
+  geom_vector_smooth(aes(fx = fx, fy = fy), eval_points = eval_points, conf_level = c(0.9)) +
   ggtitle("Smoothed Vector Field with Ellipse Intervals")
 
 # Example 3: Wedge with eval_points
 ggplot(sample_points, aes(x = x, y = y)) +
-  geom_vector(aes(dx = dx, dy = dy, color = NULL), center = FALSE, alpha = 0.2) +
-  geom_vector_smooth(aes(dx = dx, dy = dy), eval_points = eval_points, pi_type = "ellipse") +
+  geom_vector(aes(fx = fx, fy = fy, color = NULL), center = FALSE, alpha = 0.2) +
+  geom_vector_smooth(aes(fx = fx, fy = fy), eval_points = eval_points, pi_type = "ellipse") +
   ggtitle("Smoothed Vector Field with Wedge Intervals")
 
 }

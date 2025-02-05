@@ -188,16 +188,16 @@ When evaluation points are provided, smoothing is performed at those locations a
 ```{r}
 eval_point <- data.frame(x = .5, y = .5) 
 
-ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
+ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector(aes(color = after_stat(NULL)), normalize = FALSE) +
-  geom_vector_smooth(eval_points = eval_point) + 
+  geom_vector_smooth(eval_points = eval_point) +
   lims(x = c(-7,10), y = c(-3,3))
 ```
 
 - **Using Wedges to Visualize Uncertainty**:
 
 ```{r}
-ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
+ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector(aes(color = after_stat(NULL)), normalize = FALSE) +
   geom_vector_smooth(eval_points = eval_point, pi_type = "wedge") 
 ```
@@ -205,7 +205,7 @@ ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
 - **Grid-Based Smoothing**:
   
 ```{r}
-ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
+ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector_smooth(pi_type = "wedge") + 
   geom_vector() 
 ```
@@ -213,7 +213,7 @@ ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
 - **Custom Grid Resolution**:
   
 ```{r}
-ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
+ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector_smooth(n = 6, pi_type = "wedge") 
 ```
 
@@ -222,7 +222,7 @@ ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
 For all options, you can change the confidence level from the default to another value by using the `conf_level` argument. 
 
 ```{r}
-ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
+ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector(aes(color = after_stat(NULL)), normalize = FALSE) +
   geom_vector_smooth(eval_points = eval_point, pi_type = "wedge") +
   geom_vector_smooth(eval_points = eval_point, pi_type = "wedge", conf_level = .7) 

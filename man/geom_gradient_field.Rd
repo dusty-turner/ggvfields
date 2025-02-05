@@ -3,26 +3,10 @@
 \name{geom_gradient_field}
 \alias{geom_gradient_field}
 \alias{stat_gradient_field}
-\title{Geom Gradient Field}
+\alias{geom_gradient_field2}
+\alias{stat_gradient_field2}
+\title{Gradient Field Layers for ggplot2}
 \usage{
-geom_gradient_field(
-  mapping = NULL,
-  data = NULL,
-  stat = StatStreamField,
-  position = "identity",
-  ...,
-  na.rm = FALSE,
-  show.legend = TRUE,
-  inherit.aes = TRUE,
-  fun,
-  xlim = c(-1, 1),
-  ylim = c(-1, 1),
-  n = 11,
-  center = TRUE,
-  normalize = TRUE,
-  arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"), type = "closed")
-)
-
 stat_gradient_field(
   mapping = NULL,
   data = NULL,
@@ -33,108 +17,137 @@ stat_gradient_field(
   show.legend = TRUE,
   inherit.aes = TRUE,
   fun,
-  xlim = c(-1, 1),
-  ylim = c(-1, 1),
+  xlim = NULL,
+  ylim = NULL,
   n = 11,
   center = TRUE,
   normalize = TRUE,
+  tail_point = FALSE,
+  eval_point = FALSE,
   arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"), type = "closed")
+)
+
+geom_gradient_field2(
+  mapping = NULL,
+  data = NULL,
+  stat = StatStreamField,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = TRUE,
+  inherit.aes = TRUE,
+  fun,
+  xlim = NULL,
+  ylim = NULL,
+  n = 11,
+  center = FALSE,
+  normalize = TRUE,
+  tail_point = TRUE,
+  eval_point = FALSE,
+  arrow = NULL
+)
+
+stat_gradient_field2(
+  mapping = NULL,
+  data = NULL,
+  geom = GeomStream,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = TRUE,
+  inherit.aes = TRUE,
+  fun,
+  xlim = NULL,
+  ylim = NULL,
+  n = 11,
+  center = FALSE,
+  normalize = TRUE,
+  tail_point = TRUE,
+  eval_point = FALSE,
+  arrow = NULL
 )
 }
 \arguments{
-\item{mapping}{Aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}. You can map aesthetics like
-\code{color}, \code{size}, \code{linetype}, etc., to variables computed by the stat.}
+\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}. Additional aesthetics such as
+\code{color}, \code{size}, \code{linetype}, and \code{alpha} can be defined. In \strong{geom_gradient_field} the default mapping
+includes \code{color = after_stat(norm)}, whereas in \strong{geom_gradient_field2} the default mapping includes
+\code{length = after_stat(norm)}.}
 
-\item{data}{A data frame or other object, as in \code{\link[ggplot2:layer]{ggplot2::layer()}}. If \code{NULL}, the layer
-uses the plot's data.}
+\item{data}{A data frame containing the input data.}
 
-\item{stat}{The statistical transformation to use on the data for this layer. Default is \code{\link{StatStreamField}}.}
+\item{geom}{The geometric object used to draw the streamline. Defaults to
+\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
 
-\item{position}{Position adjustment, either as a string, or the result of a call to a
-position adjustment function. Defaults to \code{"identity"}.}
+\item{position}{Position adjustment, either as a string or the result of a call to a position adjustment function.}
 
-\item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{ggplot2::layer()}} and the underlying
-StatGradientField and \link{GeomStream}. These are often used to set aesthetics like \code{color = "blue"}
-or \code{size = 1.0}.}
+\item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
-\item{na.rm}{Logical. If \code{FALSE} (default), removes missing values with a warning.
-If \code{TRUE}, silently removes missing values.}
+\item{na.rm}{Logical. If \code{FALSE} (the default), missing values are removed with a warning.}
 
-\item{show.legend}{Logical. Should this layer be included in the legends? \code{NA}, the default,
-includes it if any aesthetics are mapped. \code{FALSE} never includes it, and \code{TRUE} always includes
-it.}
+\item{show.legend}{Logical. Should this layer be included in the legends?}
 
-\item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics, rather than
-combining with them. This is most useful for helper functions that define both data and
-aesthetics, and should not inherit behavior from the main ggplot call.}
+\item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics rather than combining with them.}
 
-\item{fun}{A scalar function that defines the field. It should take a numeric vector of
-length 2 (representing \eqn{(x, y)} coordinates) and return a single numeric value representing
-the scalar field at that point. \strong{(Required)}}
+\item{fun}{A function that defines the scalar field. It should take a numeric vector of length 2 (representing
+\eqn{(x, y)}) and return a single numeric value. \strong{(Required)}}
 
-\item{xlim}{Numeric vector of length two. Specifies the limits of the x-axis domain.
-Defaults to \code{c(-1, 1)}.}
+\item{xlim}{Numeric vector of length two. Specifies the limits of the x-axis domain. Defaults to \code{c(-1, 1)}.}
 
-\item{ylim}{Numeric vector of length two. Specifies the limits of the y-axis domain.
-Defaults to \code{c(-1, 1)}.}
+\item{ylim}{Numeric vector of length two. Specifies the limits of the y-axis domain. Defaults to \code{c(-1, 1)}.}
 
-\item{n}{Integer. Grid resolution specifying the number of seed points along each axis.
-Higher values produce a denser vector field. Defaults to \code{11}.}
+\item{n}{Integer. Grid resolution specifying the number of seed points along each axis. Higher values produce a
+denser gradient field. Defaults to \code{11}.}
 
-\item{center}{Logical. If \code{TRUE}, centers the seed points around the midpoint of the domain.
-Useful for symmetric flows. Defaults to \code{TRUE}.}
+\item{center}{Logical. If \code{TRUE}, centers the seed points so that the original (x, y) becomes the midpoint.
+Defaults differ between the variants.}
 
-\item{normalize}{Logical; if \code{TRUE}, normalizes each vector to a unit length before
-applying any scaling. This can help prevent overplotting in dense plots and
-ensures consistent visual representation.}
+\item{normalize}{Logical. If \code{TRUE}, gradient vectors are normalized based on grid spacing. If \code{TRUE},
+it is converted internally to \code{"vector"}. Default is \code{TRUE}.}
 
-\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the vectors, indicating
-direction. Defaults to a closed arrow with a 30-degree angle and length \code{0.02} npc.}
+\item{tail_point}{Logical. If \code{TRUE}, a point is drawn at the tail of each gradient vector.
+Defaults differ between the variants.}
 
-\item{geom}{The geometric object to use to display the data. Defaults to \link{GeomStream}.}
+\item{eval_point}{Logical. If \code{TRUE}, a point is drawn at the evaluation point where the gradient was computed.
+Default is \code{FALSE}.}
+
+\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the gradient vectors.
+In \strong{geom_gradient_field} the default is a closed arrow with a 30° angle and length \code{0.02} npc;
+in \strong{geom_gradient_field2} the default is \code{NULL}.}
+
+\item{stat}{The statistical transformation to use on the data for this layer. Defaults to \link{StatStreamField}.}
 }
 \value{
-A ggplot2 \strong{Layer} object that can be added to a plot. It computes the gradient
-vectors based on the specified scalar field function and visualizes them.
+A ggplot2 layer that computes and plots a gradient field by numerically differentiating a scalar field.
 }
 \description{
-\code{geom_gradient_field()} creates a ggplot2 layer that visualizes the gradient of a scalar field
-by generating a vector field. It internally computes the gradient using numerical differentiation
-and leverages StatGradientField to process the data, which is then rendered using a specified geom
-(defaulting to \link{GeomStream}).
+These functions provide convenient ggplot2 layers for drawing gradient fields by computing the
+gradient of a scalar field. A user-defined function (\code{fun}) specifies the behavior of the scalar
+field by taking a numeric vector of length 2 (representing \eqn{(x, y)}) and returning a single numeric
+value. The underlying \link{StatStreamField} computes the gradient via numerical differentiation (using
+\code{\link[numDeriv:grad]{numDeriv::grad()}}) and \link{GeomStream} renders the resulting vectors.
 }
 \details{
+Two variants are provided:
 \itemize{
-\item \strong{Scalar Field Function (\code{fun})}: The function should encapsulate the behavior of the scalar field.
-For example, a paraboloid field can be defined as \code{function(v) { v[1]^2 + v[2]^2 }}.
-\item \strong{Gradient Calculation}:
-The gradient is computed numerically using the \code{numDeriv::grad} function, which approximates
-the gradient vector \eqn{(\partial f / \partial x, \partial f / \partial y)} at each point.
-\item \strong{Aesthetic Mappings}: Vector aesthetics like \code{color}, \code{size}, and \code{linetype} can be customized
-via the \code{mapping} parameter or by setting them directly in the \code{geom_gradient_field} call.
+\item \strong{geom_gradient_field()} uses a default mapping that sets \code{color = after_stat(norm)}.
+\item \strong{geom_gradient_field2()} uses a default mapping that sets \code{length = after_stat(norm)} (with \code{color}
+unmapped by default).
 }
 }
-\section{Aesthetics}{
-
-\code{geom_gradient_field()} understands the following aesthetics (optional):
-\itemize{
-\item \code{color}: Color of the gradient vectors.
-\item \code{size}: Thickness of the gradient vectors.
-\item \code{linetype}: Line type of the gradient vectors.
-\item \code{alpha}: Transparency level of the gradient vectors.
-}
-}
-
 \examples{
-
+# Define a simple paraboloid scalar field function
 paraboloid_field <- function(v) {
   x <- v[1]
   y <- v[2]
   x^2 + y^2
 }
 
-# Create the gradient field plot
+# Using geom_gradient_field()
 ggplot() +
   geom_gradient_field(fun = paraboloid_field)
+
+# Using geom_gradient_field2()
+ggplot() +
+  geom_gradient_field2(fun = paraboloid_field)
 
 }
