@@ -6,6 +6,7 @@ url: ""
 # Use Bootstrap version 5 for styling
 template:
   bootstrap: 5
+  mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
 # Reference section for function documentation
 reference:
@@ -36,5 +37,4 @@ reference:
       - geom_function_2d
       - geom_potential
       - ggvfields
-      - animation_transition
       - efield

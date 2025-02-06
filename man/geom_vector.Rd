@@ -6,6 +6,7 @@
 \alias{geom_vector2}
 \alias{stat_vector}
 \alias{StatVector}
+\alias{stat_vector2}
 \title{Vector Layers for ggplot2}
 \format{
 An object of class \code{StatVector} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
@@ -33,6 +34,22 @@ geom_vector2(
   mapping = NULL,
   data = NULL,
   stat = StatVector,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  center = FALSE,
+  normalize = FALSE,
+  tail_point = TRUE,
+  eval_point = FALSE,
+  arrow = NULL
+)
+
+stat_vector2(
+  mapping = NULL,
+  data = NULL,
+  geom = GeomStream,
   position = "identity",
   ...,
   na.rm = FALSE,

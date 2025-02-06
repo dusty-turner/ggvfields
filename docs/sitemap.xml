@@ -13,9 +13,6 @@
     <loc>/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>/reference/animation_transition.html</loc>
-  </url>
-  <url>
     <loc>/reference/efield.html</loc>
   </url>
   <url>
@@ -25,31 +22,31 @@
     <loc>/reference/geom_flow.html</loc>
   </url>
   <url>
+    <loc>/reference/geom_function_1d2d.html</loc>
+  </url>
+  <url>
     <loc>/reference/geom_function_2d.html</loc>
   </url>
   <url>
     <loc>/reference/geom_gradient_field.html</loc>
   </url>
   <url>
-    <loc>/reference/geom_gradient_field2.html</loc>
+    <loc>/reference/geom_potential.html</loc>
   </url>
   <url>
-    <loc>/reference/geom_potential.html</loc>
+    <loc>/reference/geom_stream.html</loc>
   </url>
   <url>
     <loc>/reference/geom_streamplot.html</loc>
   </url>
   <url>
+    <loc>/reference/geom_stream_field.html</loc>
+  </url>
+  <url>
     <loc>/reference/geom_vector.html</loc>
   </url>
   <url>
-    <loc>/reference/geom_vector2.html</loc>
-  </url>
-  <url>
     <loc>/reference/geom_vector_field.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_vector_field2.html</loc>
   </url>
   <url>
     <loc>/reference/geom_vector_smooth.html</loc>

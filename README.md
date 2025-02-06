@@ -41,22 +41,24 @@ wind_data <- data.frame(
   spd = rchisq(n, df = 2)
 ) |> 
   within({
-    dx <- spd * cos(dir) # Compute the x-component of the vector
-    dy <- spd * sin(dir) # Compute the y-component of the vector
+    fx    <- spd * cos(dir)          # Compute the x-component of the vector
+    fy    <- spd * sin(dir)          # Compute the y-component of the vector
+    xend  <- lon + fx                # Compute the end x-coordinate
+    yend  <- lat + fy                # Compute the end y-coordinate
   })
 
 round(wind_data, digits = 2) 
-#>      lon   lat   dir   spd    dy    dx
-#> 1  -1.21 -0.48  0.08  3.55  0.30  3.53
-#> 2   0.28 -1.00  0.23  2.19  0.50  2.13
-#> 3   1.08 -0.78 -0.30  2.99 -0.87  2.86
-#> 4  -2.35  0.06  0.19 10.81  2.06 10.61
-#> 5   0.43  0.96 -0.27  3.45 -0.91  3.33
-#> 6   0.51 -0.11  0.00  3.91  0.01  3.91
-#> 7  -0.57 -0.51  0.28  0.16  0.04  0.15
-#> 8  -0.55 -0.91 -0.02  0.42 -0.01  0.42
-#> 9  -0.56 -0.84 -0.40  0.42 -0.16  0.38
-#> 10 -0.89  2.42  0.42  4.17  1.69  3.81
+#>      lon   lat   dir   spd  yend  xend    fy    fx
+#> 1  -1.21 -0.48  0.08  3.55 -0.18  2.33  0.30  3.53
+#> 2   0.28 -1.00  0.23  2.19 -0.50  2.41  0.50  2.13
+#> 3   1.08 -0.78 -0.30  2.99 -1.65  3.94 -0.87  2.86
+#> 4  -2.35  0.06  0.19 10.81  2.12  8.26  2.06 10.61
+#> 5   0.43  0.96 -0.27  3.45  0.05  3.75 -0.91  3.33
+#> 6   0.51 -0.11  0.00  3.91 -0.10  4.41  0.01  3.91
+#> 7  -0.57 -0.51  0.28  0.16 -0.47 -0.42  0.04  0.15
+#> 8  -0.55 -0.91 -0.02  0.42 -0.92 -0.12 -0.01  0.42
+#> 9  -0.56 -0.84 -0.40  0.42 -1.00 -0.18 -0.16  0.38
+#> 10 -0.89  2.42  0.42  4.17  4.11  2.92  1.69  3.81
 ```
 
 ------------------------------------------------------------------------
@@ -74,10 +76,20 @@ These functions allow for flexible visualizations of vector data.
 
 ``` r
 ggplot(wind_data) +
-  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy)) 
+  geom_vector(aes(x = lon, y = lat, xend = xend, yend = yend)) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+
+`geom_vector` also supports both `xend`/`yend` format as well as
+`dx`/`dy` format.
+
+``` r
+ggplot(wind_data) +
+  geom_vector(aes(x = lon, y = lat, fx = fx, fy = fy)) 
+```
+
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
 - **`geom_vector2`**: Maps the norm of a vector directly to its length.
   This provides a more intuitive representation of magnitude. This is
@@ -85,10 +97,10 @@ ggplot(wind_data) +
 
 ``` r
 ggplot(wind_data) +
-  geom_vector2(aes(x = lon, y = lat, dx = dx, dy = dy)) 
+  geom_vector2(aes(x = lon, y = lat, fx = fx, fy = fy)) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
 
 #### Why Length Mapping Matters
 
@@ -106,10 +118,10 @@ and ensures consistent interpretation.
 
 Both `geom_vector` and `geom_vector2` also support polar coordinates,
 where vectors are specified using magnitude (`distance`) and direction
-(`angle`). Instead of providing Cartesian components (`dx`, `dy`), users
-can directly supply polar data. This feature simplifies workflows for
-directional data and works for all subsequent relevant functions that
-handle polar coordinates.
+(`angle`). Instead of providing Cartesian components (`dx`, `dy` or
+`xend`, `yend`), users can directly supply polar data. This feature
+simplifies workflows for directional data and works for all subsequent
+relevant functions that handle polar coordinates.
 
 Polar coordinates can be visualized like this:
 
@@ -118,7 +130,7 @@ ggplot(wind_data) +
   geom_vector(aes(x = lon, y = lat, distance = spd, angle = dir)) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
 
 #### Normalize and Center
 
@@ -146,10 +158,10 @@ The example below turns off this default behavior:
 
 ``` r
 ggplot(wind_data) +
-  geom_vector(aes(x = lon, y = lat, dx = dx, dy = dy), center = FALSE, normalize = FALSE) 
+  geom_vector(aes(x = lon, y = lat, fx = fx, fy = fy), center = FALSE, normalize = FALSE) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
 
 ### `geom_vector_field` and `geom_vector_field2`
 
@@ -160,20 +172,24 @@ ggplot(wind_data) +
 f <- function(v) c(-v[2], v[1]) # Define a function for the vector field
 
 ggplot() +
-  geom_vector_field(fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) 
+  geom_vector_field(fun = f) 
+#> Warning: No xlim provided or inherited; defaulting to c(-1, 1).
+#> Warning: No ylim provided or inherited; defaulting to c(-1, 1).
 ```
 
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
 
 - **`geom_vector_field2`**: Similar to `geom_vector_field`, but maps the
   norm of vectors to their lengths instead of color.
 
 ``` r
 ggplot() +
-  geom_vector_field2(fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) 
+  geom_vector_field2(fun = f) 
+#> Warning: No xlim provided or inherited; defaulting to c(-1, 1).
+#> Warning: No ylim provided or inherited; defaulting to c(-1, 1).
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
 #### Automatic Limit Detection
 
@@ -184,12 +200,12 @@ the limits to be inferred from context. Customize limits with the `xlim`
 and `ylim` parameters if needed for more control.
 
 ``` r
-ggplot(data = wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
-  geom_vector() + 
+ggplot(data = wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
+  geom_vector() +
   geom_vector_field(fun = f) # Automatically determines limits based on existing data
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
 
 ------------------------------------------------------------------------
 
@@ -243,42 +259,44 @@ or ellipses to indicate uncertainty.
 ``` r
 eval_point <- data.frame(x = .5, y = .5) 
 
-ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
+ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector(aes(color = after_stat(NULL)), normalize = FALSE) +
-  geom_vector_smooth(eval_points = eval_point) + 
+  geom_vector_smooth(eval_points = eval_point) +
   lims(x = c(-7,10), y = c(-3,3))
-```
-
-<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
-
-- **Using Wedges to Visualize Uncertainty**:
-
-``` r
-ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
-  geom_vector(aes(color = after_stat(NULL)), normalize = FALSE) +
-  geom_vector_smooth(eval_points = eval_point, pi_type = "wedge") 
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_stream()`).
 ```
 
 <img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
 
-- **Grid-Based Smoothing**:
+- **Using Wedges to Visualize Uncertainty**:
 
 ``` r
-ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
-  geom_vector_smooth(pi_type = "wedge") + 
-  geom_vector() 
+ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
+  geom_vector(aes(color = after_stat(NULL)), normalize = FALSE) +
+  geom_vector_smooth(eval_points = eval_point, pi_type = "wedge") 
 ```
 
 <img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
 
-- **Custom Grid Resolution**:
+- **Grid-Based Smoothing**:
 
 ``` r
-ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
-  geom_vector_smooth(n = 6, pi_type = "wedge") 
+ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
+  geom_vector_smooth(pi_type = "wedge") + 
+  geom_vector() 
 ```
 
 <img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
+
+- **Custom Grid Resolution**:
+
+``` r
+ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
+  geom_vector_smooth(n = 6, pi_type = "wedge") 
+```
+
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
 
 - **Altering Confidence Level**
 
@@ -286,13 +304,13 @@ For all options, you can change the confidence level from the default to
 another value by using the `conf_level` argument.
 
 ``` r
-ggplot(wind_data, aes(x = lon, y = lat, dx = dx, dy = dy)) +
+ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector(aes(color = after_stat(NULL)), normalize = FALSE) +
   geom_vector_smooth(eval_points = eval_point, pi_type = "wedge") +
   geom_vector_smooth(eval_points = eval_point, pi_type = "wedge", conf_level = .7) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
 
 ### `geom_gradient_field` and `geom_gradient_field2`
 
@@ -321,7 +339,7 @@ ggplot() +
   geom_gradient_field(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
 ```
 
-<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
 
 - **Gradient Field with Norm to Length**:
 
@@ -330,7 +348,7 @@ ggplot() +
   geom_gradient_field2(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
 ```
 
-<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-19-1.png" width="100%" />
 
 - **Adjusting Grid Density**:
 
@@ -344,7 +362,7 @@ ggplot() +
   geom_gradient_field(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10), n = 5)
 ```
 
-<img src="man/figures/README-unnamed-chunk-19-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-20-1.png" width="100%" />
 
 ### `geom_potential`
 
@@ -371,7 +389,7 @@ ggplot() +
   geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi))
 ```
 
-<img src="man/figures/README-unnamed-chunk-20-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-21-1.png" width="100%" />
 
 The tolerance parameter can be adjusted to control the sensitivity of
 the conservativeness check. Decreasing the tolerance makes the check
@@ -382,7 +400,7 @@ ggplot() +
   geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), tolerance = 1e-4)
 ```
 
-<img src="man/figures/README-unnamed-chunk-21-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-22-1.png" width="100%" />
 
 As with other functions, we can increase the granulatity of the
 visualization with the `n` parameter.
@@ -392,7 +410,7 @@ ggplot() +
   geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), n = 50)
 ```
 
-<img src="man/figures/README-unnamed-chunk-22-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-23-1.png" width="100%" />
 
 ### `geom_streamplot`
 
@@ -411,7 +429,7 @@ ggplot() +
   geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3)) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-23-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-24-1.png" width="100%" />
 
 The `chop` parameter (defaulted to `TRUE`) allows you to chop the
 trajectories into segments. This can be useful for better visualization
@@ -424,7 +442,7 @@ ggplot() +
   geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3), chop = FALSE) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-24-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-25-1.png" width="100%" />
 
 It may also be useful to break up the streamlines into more segments.
 The scale_stream parameter (defaults to 1) adjusts the segmentation of
@@ -439,7 +457,7 @@ ggplot() +
   ) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-25-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-26-1.png" width="100%" />
 
 ### `geom_flow`
 
@@ -465,12 +483,9 @@ flow lines, abstracting away complex calculations for the user.
 ``` r
 ggplot() +
   geom_flow(fun = f, xlim = c(-10, 10), ylim = c(-10, 10))
-#> Warning: Computation failed in `stat_flow()`.
-#> Caused by error in `ode()`:
-#> ! argument "method" is missing, with no default
 ```
 
-<img src="man/figures/README-unnamed-chunk-26-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-27-1.png" width="100%" />
 
 In this example, flow lines evolve according to the vector field defined
 by `f`. The color along each line will show how the particle moves over
@@ -512,12 +527,9 @@ ggplot() +
     fun = f, n = c(21, 21), xlim = c(-10, 10), ylim = c(-10, 10),
     iterations = 1000, threshold_distance = 0.5
   ) 
-#> Warning: Computation failed in `stat_flow()`.
-#> Caused by error in `ode()`:
-#> ! argument "method" is missing, with no default
 ```
 
-<img src="man/figures/README-unnamed-chunk-27-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-28-1.png" width="100%" />
 
 ## Other Features
 
@@ -558,7 +570,7 @@ ggplot() +
   ) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-28-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-29-1.png" width="100%" />
 
 ### Curl
 
@@ -587,32 +599,25 @@ ggplot() +
   ) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-29-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-30-1.png" width="100%" />
 
-## Features in Development
-
-### Animation with `geom_streamplot`
-
-``` r
-p <- ggplot() +
- geom_streamplot(
-   aes(rownum = after_stat(rownum)), 
-    fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
- ) +
- coord_fixed() +
- theme_bw()
-
-anim <- animation_transition(plot = p) +   
- gganimate::transition_reveal(rownum) +
- gganimate::ease_aes('linear')
-
-gganimate::animate(
-  anim, nframes = 25, fps = 5, end_pause = 0, renderer = gganimate::gifski_renderer()
-  )
-```
-
-<img src="man/figures/README-animation-1.gif" width="100%" />
-
+<!-- ## Features in Development -->
+<!-- ### Animation with `geom_streamplot` -->
+<!-- ```{r animation, cache = TRUE, eval = TRUE} -->
+<!-- p <- ggplot() + -->
+<!--  geom_streamplot( -->
+<!--    aes(rownum = after_stat(rownum)),  -->
+<!--     fun = f, xlim = c(-3, 3), ylim = c(-3, 3), -->
+<!--  ) + -->
+<!--  coord_fixed() + -->
+<!--  theme_bw() -->
+<!-- anim <- animation_transition(plot = p) +    -->
+<!--  gganimate::transition_reveal(rownum) + -->
+<!--  gganimate::ease_aes('linear') -->
+<!-- gganimate::animate( -->
+<!--   anim, nframes = 25, fps = 5, end_pause = 0, renderer = gganimate::gifski_renderer() -->
+<!--   ) -->
+<!-- ``` -->
 <!-- The `mask_shape_type` parameter allows you to specify the mask shape used for streamline generation which influences how the streamlines are placed and how closely they can approach each other. The default mask shape is `"square"`, but you can also use `"diamond"`, `"inset_square"`, or `"circle"`.  During streamline generation, when a streamline enters the specified shape, no other streamlines will enter that region.  -->
 <!-- - **Square Mask (default)**: Streamlines are restricted to a grid where each cell is a square. This generally results in evenly spaced streamlines. -->
 <!-- - **Diamond Mask**: Streamlines are restricted to a square grid with diamonds inset within each square.  This can create a more dense pattern which can have better visualizations for some functions. - **Inset Square Mask**: Streamlines are restricted to a grid with smaller squares inset within larger squares. This can create a denser and more detailed pattern of streamlines. -->

@@ -74,24 +74,23 @@ geom_function_1d2d <- function(mapping = NULL, data = NULL,
                               show.legend = NA,
                               inherit.aes = FALSE,
                               fun,
-                              xlim = NULL,
-                              ylim = NULL,
                               t0 = 0,
                               T = 10,
                               dt = 0.01,
-                              n = 11,
                               tail_point = FALSE,
                               arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"),
                                                   type = "closed")
 ) {
-  # Ensure that data exists
-  if (is.null(data)) data <- ensure_nonempty_data(data)
-  # Ensure that n has two elements (for x and y grid dimensions)
-  n <- ensure_length_two(n)
 
-  # If no mapping is provided, use a default mapping.
-  if (is.null(mapping)) {
-    mapping <- aes(color = after_stat(t))
+  if (is.null(data)) data <- ensure_nonempty_data(data)
+
+  default_mapping <- aes(color = after_stat(t))
+
+  if (!is.null(mapping)) {
+    if (!"color" %in% names(mapping) && !"colour" %in% names(mapping))
+      mapping <- modifyList(default_mapping, mapping)
+  } else {
+    mapping <- default_mapping
   }
 
   layer(
@@ -127,8 +126,6 @@ stat_function_1d2d <- function(mapping = NULL, data = NULL,
                                show.legend = NA,
                                inherit.aes = FALSE,
                                fun,
-                               xlim = NULL,
-                               ylim = NULL,
                                t0 = 0,
                                T = 10,
                                dt = 0.01,
@@ -137,14 +134,16 @@ stat_function_1d2d <- function(mapping = NULL, data = NULL,
                                arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"),
                                                    type = "closed")
 ) {
-  # Ensure that data exists
-  if (is.null(data)) data <- ensure_nonempty_data(data)
-  # Ensure that n has two elements (for x and y grid dimensions)
-  n <- ensure_length_two(n)
 
-  # If no mapping is provided, use a default mapping.
-  if (is.null(mapping)) {
-    mapping <- aes(color = after_stat(t))
+  if (is.null(data)) data <- ensure_nonempty_data(data)
+
+  default_mapping <- aes(color = after_stat(t))
+
+  if (!is.null(mapping)) {
+    if (!"color" %in% names(mapping) && !"colour" %in% names(mapping))
+      mapping <- modifyList(default_mapping, mapping)
+  } else {
+    mapping <- default_mapping
   }
 
   layer(
@@ -175,7 +174,7 @@ stat_function_1d2d <- function(mapping = NULL, data = NULL,
 Stat1d2d <- ggproto("Stat1d2d", Stat,
   default_aes = aes(color = after_stat(t)),
 
-  compute_group = function(data, scales, fun, xlim, ylim, t0, T, dt, n, ...) {
+  compute_group = function(data, scales, fun, t0, T, dt, ...) {
 
     t <- seq(t0, T, dt)
 
