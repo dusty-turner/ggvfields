@@ -18,6 +18,8 @@
 #' @param n Integer. Grid resolution (the number of seed points along each
 #'   axis). Defaults to 11, resulting in an \eqn{n \times n} grid of seed
 #'   points.
+#' @param args List of additional arguments passed on to the function defined by
+#'   `fun`.
 #' @param max_it Integer. Maximum number of integration steps per streamline.
 #'   This controls how far each streamline can propagate. Defaults to 1000.
 #' @param dt Numeric. Time-step size for integration. Smaller values produce
@@ -87,13 +89,8 @@
 #'
 #' @name geom_stream_field
 #' @aliases stat_stream_field StatStreamField
-NULL
-
-
-
-
-#' @rdname geom_stream_field
 #' @export
+NULL
 geom_stream_field <- function(
     mapping = NULL,
     data = NULL,
@@ -108,6 +105,7 @@ geom_stream_field <- function(
     xlim = NULL,
     ylim = NULL,
     n = 11,
+    args = list(),
     max_it = 1000,
     dt = .0025,
     L = NULL,
@@ -147,6 +145,7 @@ geom_stream_field <- function(
       xlim = xlim,
       ylim = ylim,
       n = n,
+      args = args,
       method = method,
       na.rm = na.rm,
       max_it = max_it,
@@ -177,6 +176,7 @@ stat_stream_field <- function(
     xlim = NULL,
     ylim = NULL,
     n = 11,
+    args = list(),
     max_it = 1000,
     dt = .0025,
     L = NULL,
@@ -217,6 +217,7 @@ stat_stream_field <- function(
       xlim = xlim,
       ylim = ylim,
       n = n,
+      args = args,
       method = method,
       na.rm = na.rm,
       max_it = max_it,
@@ -241,7 +242,9 @@ StatStreamField <- ggproto(
   Stat,
   default_aes = aes(group = after_stat(id)),
 
-  compute_group = function(data, scales, fun, xlim, ylim, n, method, max_it = 1000, dt, L = NULL, center, normalize, ...) {
+  compute_group = function(data, scales, fun, xlim, ylim, n, method,
+                           max_it = 1000, dt, L = NULL, center, normalize,
+                           args = list(), ...) {
 
     xlim <- xlim %||% scales$x$range$range
     if (is.null(xlim)) {
@@ -254,6 +257,12 @@ StatStreamField <- ggproto(
       cli::cli_warn("No ylim provided or inherited; defaulting to c(-1, 1).")
       ylim <- c(-1, 1)
     }
+# browser()
+    orig_fun <- fun
+
+    fun <- function(v) {
+      rlang::inject(orig_fun(v, !!!args))
+    }
 
     # make grid of points on which to compute streams
     grid <- cbind(
@@ -263,9 +272,8 @@ StatStreamField <- ggproto(
 
     ## Get dt and L defaulted
     dt <- rep(dt, nrow(grid))
-    L <- min(diff(xlim), diff(ylim))
-    # L <- sqrt(diff(xlim)^2 + diff(ylim)^2)
-
+    # L <- min(diff(xlim), diff(ylim))
+    L <- sqrt(diff(xlim)^2 + diff(ylim)^2)
 
     if(normalize == "stream") L <- L / (max(n) - 1) * 0.6
 
