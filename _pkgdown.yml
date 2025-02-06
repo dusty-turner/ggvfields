@@ -27,6 +27,8 @@ reference:
       - stat_gradient_field
       - geom_gradient_field2
       - stat_gradient_field2
+      - geom_function_1d2d
+      - stat_function_1d2d
       - scale_length_continuous
       - geom_flow
       - geom_streamplot

@@ -38,7 +38,7 @@ dictated by Coulomb's law. This function is mainly used to provide examples
 for visualizing vector fields with ggvfields.
 }
 \examples{
-
+\dontrun{
 # set a - charge at (-1,-1) and a + charge at (1,1)
 charge_positions <- rbind(c(-1,-1), c(1,1))
 charges <- c(-1, +1)
@@ -60,7 +60,7 @@ ggplot() +
 ep0 <- 8.854187818814e-12
 k <- (4*pi*ep0)^-1
 efield(c(0,1), charge_positions, charges, k)
-
+}
 }
 \seealso{
 \url{https://en.wikipedia.org/wiki/Coulomb\%27s_law}

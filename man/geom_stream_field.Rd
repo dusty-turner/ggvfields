@@ -161,9 +161,9 @@ before centering or normalization is applied.
 
 \examples{
 
+\dontrun{
 f <- efield_maker()
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 
 # Define a simple rotational vector field function
 rotational_field <- function(u) {
@@ -174,7 +174,6 @@ rotational_field <- function(u) {
 
 # Create a stream field layer
 ggplot() + geom_stream_field(fun = rotational_field)
-ggplot() + geom_vector_field(fun = rotational_field)
 
 # Create a stream field layer with tail points
 ggplot() +
@@ -183,6 +182,7 @@ ggplot() +
 # Create a stream field with centered streams
 ggplot() +
   geom_stream_field(fun = rotational_field, center = TRUE)
+}
 
 }
 \keyword{datasets}
