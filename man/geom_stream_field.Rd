@@ -195,6 +195,7 @@ before centering or normalization is applied.
 
 f <- efield_maker()
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) + coord_equal()
 ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 
 # Define a simple rotational vector field function

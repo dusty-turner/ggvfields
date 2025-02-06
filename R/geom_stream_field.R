@@ -64,6 +64,7 @@
 #'
 #' f <- efield_maker()
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) + coord_equal()
 #' ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 #'
 #' # Define a simple rotational vector field function
@@ -267,7 +268,7 @@ StatStreamField <- ggproto(
     # L <- sqrt(diff(xlim)^2 + diff(ylim)^2)
 
 
-    if(normalize == "stream") L <- L / (max(n) - 1) * 0.6
+    if(normalize == "stream") L <- L / (max(n) - 1) * 0.45
 
     if(normalize == "vector") {
       L <- L / (max(n) - 1) * 0.8
@@ -301,15 +302,15 @@ StatStreamField <- ggproto(
 
     }
 
-# Compute divergence and curl by group (each group is identified by id)
+  # compute divergence and curl by group (each group is identified by id)
   df <- do.call(rbind, lapply(split(df, df$id), function(subdf) {
 
-    # Calculate the gradient of the vector field at each point.
+    # calculate the gradient of the vector field at each point.
     grad <- t(apply(subdf[, c("x", "y")], 1, function(v) numDeriv::grad(fun, v)))
     grad_u <- grad[, 1]
     grad_v <- grad[, 2]
 
-    # Compute divergence and curl.
+    # compute divergence and curl.
     subdf$divergence <- grad_u + grad_v
     subdf$curl <- grad_v - grad_u
 
@@ -335,9 +336,9 @@ StatStreamField <- ggproto(
 
 
 
-ode_stepper <- function(u0, fun, dt = .005, t0 = 0, L = 1, max_it = 1000, method = "lsoda", center = FALSE) {
+ode_stepper <- function(u0, fun, dt = .005, t0 = 0, L = 1, max_it = 5000, method = "lsoda", center = FALSE) {
 
-  if (center) {
+  if ( center ) {
 
     # define a few helpers
     neg_fun <- function(u) -fun(u)
@@ -366,78 +367,72 @@ ode_stepper <- function(u0, fun, dt = .005, t0 = 0, L = 1, max_it = 1000, method
 
   }
 
-  # initialize the data structure, a matrix because it drops on subsetting
-  mat <- cbind(
-    "t" = t0 + dt*(0:(max_it-1)),
-    "x" = c(u0[1], rep(NA_real_, max_it-1)),
-    "y" = c(u0[2], rep(NA_real_, max_it-1)),
-    "d" = rep(NA_real_, max_it),             # dist since last step
-    "l" = c(    0, rep(NA_real_, max_it-1))  # arc length = cumulative dist traveled
-  )
-
-  # "solve" with ode() step by step
-  # note: this iteration might be faster if you don't reference columns by
-  # character, but by index: t=1, x=2, y=3, d=4, l=5
-  for(i in 2:max_it) {
-
-    # get "current" t and u = (x,y)
-    t <- mat[i-1,"t"]
-    u <- mat[i-1,c("x","y")]
-
-    # compute next u = (x,y). all t's were computed in advance
-    mat[i,c("x","y")] <- ode(
-      "y" = u,
-      "times" = c(t, t + dt),
-      "func" = function(t, y, parms = NULL, ...) list(fun(y)),
-      "method" = method,
-      "parms" = NULL
-    )[2,c("x","y")]
-
-    # break if ode fails (including on the grid value)
-    if ( any( is.nan(mat[i,c("x","y")]) | is.na(mat[i,c("x","y")]) ) ) {
-      df <- mat[1:(i-1),,drop=FALSE] |> matrix_to_df_with_names()
-      df$avg_spd <- if (df$t[i-1] != 0) df$l[i-1] / df$t[i-1] else NA_real_
-      df$norm <- norm( fun(u0) )
-      return( df )
-    }
-
-    # compute distance traversed in that step
-    mat[i,"d"] <- norm(mat[i,c("x","y")] - mat[i-1,c("x","y")])
-
-    # update length of curve
-    mat[i,"l"] <- mat[i-1,"l"] + mat[i,"d"]
-
-    # if curve has exceeded max length, crop and break
-    # note: actual length, once exceeding L, is probably slightly larger; this part fixes that
-    if (mat[i,"l"] >= L) {
-
-      # compute how much of last vector is needed to make L
-      length_up_to_last_point <- mat[i-1,"l"]
-      length_needed_from_last_point <- L - length_up_to_last_point
-      m <- length_needed_from_last_point / mat[i,"d"]
-
-      # revise last point and related statistics and break
-      mat[i,c("x","y")] <- mat[i-1,c("x","y")] + m * (mat[i,c("x","y")] - mat[i-1,c("x","y")])
-      mat[i,"t"] <- mat[i-1,"t"] + m*(mat[i,"t"] - mat[i-1,"t"]) # more extensible than dt
-      mat[i,"d"] <- norm(mat[i,c("x","y")] - mat[i-1,c("x","y")])
-      mat[i,"l"] <- mat[i-1,"l"] + mat[i,"d"] # = L
-      break
-    }
-
-
+  # wrap fun for deSolve::ode()
+  df <- data.frame()
+  fun_wrapper <- function(t, u, parms) {
+    norm <- function(x) sqrt(sum(x^2))
+    fu <- fun(u[1:2])
+    # df <<- rbind( df, c(t, u[1:2], fu) |> t() |> matrix_to_df_with_names(c("t","x","y","fx","fy")) )
+    df <<- rbind( df, c(t, u[1:2]) |> t() |> matrix_to_df_with_names(c("t","x","y")) )
+    list( c( fu, "l" = norm(fu) ) )
   }
 
-  # return full rows
-  row.names(mat) <- NULL
-  df <- matrix_to_df_with_names(mat[1:i,])
-  df$avg_spd <- df$l[i] / df$t[i]
-  df$norm <- norm(fun(u0))
-  # df$length <- df$norm
+  rootfun <- function(t, u, parms) u[3] - parms$L
 
+  # solve up to length L; soln is not actually used after since evals are captured
+  soln <- deSolve::ode(
+    func = fun_wrapper,
+    y = c(u0, "l" = 0), # 0 = initial arc length
+    parms = list("L" = L),
+    # times = seq(0, 1, by = dt),
+    times = c(0, 1e6),
+    rootfun = rootfun,
+    maxsteps = max_it
+  )
+
+  # deSolve::ode() only provides solutions at the times requested (0 up until
+  # stop, not 1e6) but it has to evaluate the function bunches of times.
+  # the wrapper above tracks these
+
+  # compute d and l stats
+  n <- nrow(df)
+  df$d <- c(NA_real_, apply( df[2:n,c("x","y")] - df[1:(n-1),c("x","y")], 1, norm ))
+  df$l <- c(0, cumsum(df$d[-1]))
+
+  # crop back
+  df <- df |> crop_stream_length(L)
+  n <- nrow(df)
+  df$avg_spd <- df$l[n] / df$t[n]
+  df$norm <- norm(fun(u0))
+
+  # return
   df
 
+  # convert to nice data frame and return
+  # n <- nrow(soln)
+  # soln <- as.data.frame(soln)
+  # names(soln) <- c("t", "x", "y", "l")
+  #
+  # with(
+  #   soln,
+  #   data.frame(
+  #     "t" = t,
+  #     "x" = x,
+  #     "y" = y,
+  #     "d" = c(NA_real_, diff(l)),
+  #     "l" = l,
+  #     "avg_spd" = l[n] / t[n],
+  #     "norm" = norm(fun(u0))
+  #   )
+  # )
+
 }
-# ode_stepper( c(-1,1), efield_maker() ) |> str()
+# f <- function(u) c(-u[2], u[1])
+# ode_stepper( c(1,0), f, L = pi) |> str()
+# ode_stepper( c(1,0), f, L = pi) |> tail()
+# ode_stepper( c(1,0), f, L = pi) |>
+#   ggplot(aes(x, y)) +
+#     geom_path(aes(color = t))
 #
 # ode_stepper(  c(-1,1), efield_maker(), L = 2 ) |> stream_length()
 # ode_stepper( c(-.2,1), efield_maker(), L = 2 ) |> stream_length()
