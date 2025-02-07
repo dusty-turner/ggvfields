@@ -31,6 +31,7 @@
 #' @param center Logical. If `TRUE`, centers the seed points or the resulting
 #'   streamlines so that the original (x, y) becomes the midpoint. Default is
 #'   `TRUE`.
+#' @param type `"stream"` (default) or `"vector"`.
 #' @param normalize Logical. If `TRUE`, stream lengths are normalized based on
 #'   grid spacing. If `FALSE`, a default arc length is used. Default is `TRUE`.
 #' @param method Character. Integration method, e.g., `"rk4"` for Runge-Kutta 4
@@ -66,9 +67,30 @@
 #'
 #' f <- function(u) c(-u[2], u[1])
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), tail_point = TRUE)
-#' ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-#' ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), tail_point = TRUE)
+#'
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), center = FALSE)
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector", center = FALSE)
+#'
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), normalize = FALSE)
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector", normalize = FALSE)
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), center = FALSE, normalize = FALSE)
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector", center = FALSE, normalize = FALSE)
+#'
+#' # run systems until specified lengths
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), normalize = TRUE, L = .08)
+#'
+#' # run systems for specified times
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), normalize = FALSE, T = .1)
+#'
+#' # is this the stream analogue to geom_vector_field2()? it's the actual distance
+#' # traveled over the given time period. but nothing to communicate arc length...
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1),
+#'   normalize = FALSE, T = .15, center = FALSE, color = "black", tail_point = TRUE, arrow = NULL)
 #'
 #' f <- efield_maker()
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
@@ -115,9 +137,10 @@ geom_stream_field <- function(
     n = 11,
     args = list(),
     max_it = 1000,
-    tlim = c(0, 1e6),
+    T = NULL,
     L = NULL,
     center = TRUE,
+    type = "stream",
     normalize = TRUE,
     tail_point = FALSE,
     method = "rk4",
@@ -138,8 +161,6 @@ geom_stream_field <- function(
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
 
-  if(normalize) normalize <- "stream"
-
   layer(
     stat = stat,
     geom = GeomStream,
@@ -157,9 +178,10 @@ geom_stream_field <- function(
       method = method,
       na.rm = na.rm,
       max_it = max_it,
-      tlim = tlim,
+      T = T,
       L = L,
       center = center,
+      type = type,
       normalize = normalize,
       tail_point = tail_point,
       arrow = arrow,
@@ -186,9 +208,10 @@ stat_stream_field <- function(
     n = 11,
     args = list(),
     max_it = 1000,
-    tlim = c(0, 1e6),
+    T = NULL,
     L = NULL,
     center = TRUE,
+    type = "stream",
     normalize = TRUE,
     tail_point = FALSE,
     method = "rk4",
@@ -210,7 +233,6 @@ stat_stream_field <- function(
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
-  if(normalize) normalize <- "stream"
 
   layer(
     stat = StatStreamField,
@@ -229,10 +251,11 @@ stat_stream_field <- function(
       method = method,
       na.rm = na.rm,
       max_it = max_it,
-      tlim = tlim,
+      T = T,
       L = L,
       center = center,
-      normalize = normalize,
+      type = type,
+      normalize = TRUE,
       tail_point = tail_point,
       arrow = arrow,
       ...
@@ -250,7 +273,9 @@ StatStreamField <- ggproto(
   Stat,
   default_aes = aes(group = after_stat(id)),
 
-  compute_group = function(data, scales, fun, xlim, ylim, n, method, max_it = 1000, tlim = c(0, 1e6), L = NULL, center, normalize, ...) {
+  compute_group = function(data, scales, fun, xlim, ylim, n,
+                           method, max_it = 1000, T = NULL, L = NULL,
+                           center, type, normalize, ...) {
 
     xlim <- xlim %||% scales$x$range$range
     if (is.null(xlim)) {
@@ -264,11 +289,9 @@ StatStreamField <- ggproto(
       ylim <- c(-1, 1)
     }
 
-    orig_fun <- fun
-
-    fun <- function(v) {
-      rlang::inject(orig_fun(v, !!!args))
-    }
+    # allow for additional args to be passed
+    # orig_fun <- fun
+    # fun <- function(v) rlang::inject(orig_fun(v, !!!args))
 
     # make grid of points on which to compute streams
     grid <- cbind(
@@ -276,9 +299,15 @@ StatStreamField <- ggproto(
       "y" = rep(seq(ylim[1], ylim[2], length.out = n[2]), each = n[1])
     )
 
-    # compute default L value
-    L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.45
-    if (normalize == "vector") L <- 2*L
+    # compute default L value (normalizing only)
+    if (normalize && is.null(L)) {
+      L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
+    }
+
+    # compute default T value (not normalizing and type="stream" only)
+    if (!normalize && is.null(T)) {
+      T <- 1
+    }
 
     # initialize the data frame
     list_of_streams <- vector(mode = "list", length = nrow(grid))
@@ -286,17 +315,20 @@ StatStreamField <- ggproto(
     for (i in 1:nrow(grid)) {
 
       # compute the stream for the current grid point using ode_stepper()
-      if (normalize == "vector") {
+      if (type == "vector") {
+
         u <- grid[i,]
         fu <- fun(u)
         nfu <- norm(fu)
 
+        v <- if (normalize) L*fu/nfu else fu
+
         if (center) {
-          from <- u - (1/2)*L*fu/norm(fu)
-          to <- u + (1/2)*L*fu/norm(fu)
+          from <- u - v/2
+          to <- u + v/2
         } else {
           from <- u
-          to <- u + L*fu/norm(fu)
+          to <- u + v
         }
 
         stream <- data.frame(
@@ -305,15 +337,23 @@ StatStreamField <- ggproto(
           "y" = c(from[2], to[2]),
           "d" = c(NA_real_, L),
           "l" = c(0, L),
-          "avg_spd" = L/nfu,
+          "avg_spd" = nfu, # = L / (L/nfu)
           "norm" = nfu,
           "id" = i
         )
-      } else { # normalize == "stream"
-        stream <- transform(
-          ode_stepper(grid[i, ], fun, tlim, L, max_it, method, center),
-          "id" = i
-        )
+
+      }
+
+      if (type == "stream") {
+
+        if (normalize) {
+          stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, method, center)
+        } else {
+          stream <- ode_stepper(grid[i, ], fun, T = T, L = 1e6, max_it, method, center)
+        }
+
+        stream <- transform(stream, "id" = i)
+
       }
 
       # add the original x and y coordinates to this stream's data
@@ -354,7 +394,8 @@ StatStreamField <- ggproto(
 
 
 
-ode_stepper <- function(u0, fun, tlim = c(0, 1e6), L = 1, max_it = 5000, method = "lsoda", center = FALSE) {
+ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000,
+                        method = "lsoda", center = FALSE) {
 
   if ( center ) {
 
@@ -365,9 +406,9 @@ ode_stepper <- function(u0, fun, tlim = c(0, 1e6), L = 1, max_it = 5000, method 
     # if you df[nrow(df):1,] on a 0-row df, you get back a row of NAs
 
     # solve in both directions
-    df_negative <- ode_stepper(u0, neg_fun, tlim, L, max_it, method, center = FALSE)
+    df_negative <- ode_stepper(u0, neg_fun, T, L/2, max_it, method, center = FALSE)
     df_negative$t <- -df_negative$t
-    df_positive <- ode_stepper(u0,     fun, tlim, L, max_it, method, center = FALSE)
+    df_positive <- ode_stepper(u0,     fun, T, L/2, max_it, method, center = FALSE)
 
     # combine the datasets
     df <- rbind( flip(df_negative[-1,]), df_positive )
@@ -387,7 +428,7 @@ ode_stepper <- function(u0, fun, tlim = c(0, 1e6), L = 1, max_it = 5000, method 
 
   # deSolve::ode() is a little particular in terms of what it assumes about the
   # function. first, it assumes that the function returns a list with a vector
-  # in it, e.g. list(1:2). second, it only solves up until at the points tlim
+  # in it, e.g. list(1:2). second, it only solves up until at the points c(0,T)
   # unless it is interrupted by the length being L. in either case, it returns
   # a data frame with 2 rows, discarding intermediate information.
   # thus, we create a wrapper of fun that (1) returns the value as a list,
@@ -415,7 +456,7 @@ ode_stepper <- function(u0, fun, tlim = c(0, 1e6), L = 1, max_it = 5000, method 
     func = fun_wrapper,
     y = c(u0, "l" = 0), # 0 = initial arc length
     parms = list("L" = L),
-    times = tlim,
+    times = c(0, T),
     rootfun = rootfun,
     maxsteps = max_it
   )
@@ -427,7 +468,8 @@ ode_stepper <- function(u0, fun, tlim = c(0, 1e6), L = 1, max_it = 5000, method 
 
   # ode() evals of fun go further than needed, and ode() internally crops back
   # the result. since we don't use the output of ode(), we need to manually crop back
-  df <- df |> crop_stream_length(L)
+  if (!is.null(L)) df <- df |> crop_stream_length(L)
+  if (!is.null(T)) df <- df |> crop_stream_time(T)
 
   # now add on average speed and the norm
   n <- nrow(df)
@@ -475,7 +517,7 @@ crop_stream_length <- function(data, L) {
   n <- nrow(data)
 
   # return data if length >= arc length of data
-  # NOTE: this will need to change in the future, presumably to extent last seg
+  # NOTE: this may need to change in the future, presumably to extent last seg
   if (L >= data$l[n]) return( data )
 
   # find index of first point overshooting desired length
@@ -524,6 +566,45 @@ crop_stream_length <- function(data, L) {
 #   ggplot(aes(x,y)) +
 #     geom_path(aes(color = l)) +
 #     coord_equal(xlim = c(-1,1), ylim = c(-1,1))
+
+
+
+
+# this function behaves just like crop_stream_length(), see main comments there
+crop_stream_time <- function(data, T) {
+
+  # determine number of points in the path
+  n <- nrow(data)
+
+  # return data if doesn't get to time T, return data
+  # NOTE: this may need to change in the future
+  if (T >= data$t[n]) return( data )
+
+  # find index of first point overshooting desired time
+  i <- min( which( data$t > T ) )
+
+  # discard all the points past the first crossing
+  data <- data[1:i,]
+
+  # essentially we want data[1:(i-1),] plus another point on the line segment
+  # between data[i-1,] and data[i,]. the length of that line should be enough
+  # to get the total polyline time to T
+  almost_T <- data$t[i-1]
+  proportion_needed <- (T - almost_T) / (data$t[i] - almost_T)
+  v <- data[i,c("x","y")] - data[i-1,c("x","y")]
+  data[i,c("x","y")] <- data[i-1,c("x","y")] + proportion_needed * v
+
+  # now to update t, d, and l
+  data[i,"d"] <- proportion_needed * norm(v)
+  data[i,"l"] <- data[i-1,"l"] + data[i-1,"d"]
+  data[i,"t"] <- T
+
+  # return data
+  data
+
+}
+
+
 
 
 

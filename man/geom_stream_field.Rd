@@ -22,9 +22,10 @@ stat_stream_field(
   n = 11,
   args = list(),
   max_it = 1000,
-  tlim = c(0, 1e+06),
+  T = NULL,
   L = NULL,
   center = TRUE,
+  type = "stream",
   normalize = TRUE,
   tail_point = FALSE,
   method = "rk4",
@@ -111,6 +112,8 @@ derived from the grid spacing. Default is \code{NULL}.}
 streamlines so that the original (x, y) becomes the midpoint. Default is
 \code{TRUE}.}
 
+\item{type}{\code{"stream"} (default) or \code{"vector"}.}
+
 \item{normalize}{Logical. If \code{TRUE}, stream lengths are normalized based on
 grid spacing. If \code{FALSE}, a default arc length is used. Default is \code{TRUE}.}
 
@@ -163,9 +166,30 @@ before centering or normalization is applied.
 
 f <- function(u) c(-u[2], u[1])
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), tail_point = TRUE)
-ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), tail_point = TRUE)
+
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), center = FALSE)
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector", center = FALSE)
+
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), normalize = FALSE)
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector", normalize = FALSE)
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), center = FALSE, normalize = FALSE)
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector", center = FALSE, normalize = FALSE)
+
+# run systems until specified lengths
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), normalize = TRUE, L = .08)
+
+# run systems for specified times
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), normalize = FALSE, T = .1)
+
+# is this the stream analogue to geom_vector_field2()? it's the actual distance
+# traveled over the given time period. but nothing to communicate arc length...
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1),
+  normalize = FALSE, T = .15, center = FALSE, color = "black", tail_point = TRUE, arrow = NULL)
 
 f <- efield_maker()
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
