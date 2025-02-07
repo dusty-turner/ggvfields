@@ -341,18 +341,16 @@ StatStreamField <- ggproto(
     )
 
     # compute default L value (normalizing only)
-    if (normalize && is.null(L)) {
+    # this is computed either if 1) normalizing and L is computed automatically
+    # or 2) not normalizing and computing T automatically
+    if ( (normalize && is.null(L)) || (!normalize && is.null(T)) ) {
       L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
-    }
-
-    # compute default T value (not normalizing and type="stream" only)
-    if (!normalize && is.null(T)) {
-      T <- 1
     }
 
     # initialize the data frame
     list_of_streams <- vector(mode = "list", length = nrow(grid))
 
+    # iterate computing streams/vectors
     for (i in 1:nrow(grid)) {
 
       # compute the stream for the current grid point using ode_stepper()
@@ -387,10 +385,10 @@ StatStreamField <- ggproto(
 
       if (type == "stream") {
 
-        if (normalize) {
-          stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, method, center)
-        } else {
+        if ( !normalize && !is.null(T) ) {
           stream <- ode_stepper(grid[i, ], fun, T = T, L = 1e6, max_it, method, center)
+        } else {
+          stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, method, center)
         }
 
         stream <- transform(stream, "id" = i)
@@ -406,23 +404,50 @@ StatStreamField <- ggproto(
 
     }
 
-  # compute divergence and curl by group (each group is identified by id)
-  # df <- do.call(rbind, lapply(split(df, df$id), function(subdf) {
-  #
-  #   # calculate the gradient of the vector field at each point.
-  #   grad <- t(apply(subdf[, c("x", "y")], 1, function(v) numDeriv::grad(fun, v)))
-  #   grad_u <- grad[, 1]
-  #   grad_v <- grad[, 2]
-  #
-  #   # compute divergence and curl.
-  #   subdf$divergence <- grad_u + grad_v
-  #   subdf$curl <- grad_v - grad_u
-  #
-  #   subdf
-  # }))
 
-  # bind the streams together and return
-  do.call("rbind", list_of_streams)
+    # temporally crop back streams if not normalizing and T not specified
+    if ( !normalize && is.null(T) ) {
+
+      # compute how long it takes for each stream to get to L
+      times_to_L_by_stream <- vapply(
+        list_of_streams,
+        function(df) df$t[nrow(df)] - df$t[1], # if center = FALSE, will have negative times
+        numeric(1)
+      )
+      times_to_L_by_stream <- unname(times_to_L_by_stream)
+
+      # find the fastest stream to get to L, and the associated time
+      fastest_stream_id <- which.min( times_to_L_by_stream )[1] # may have ties
+      smallest_t <- times_to_L_by_stream[fastest_stream_id]
+
+      # go back through grid cropping time to T = fastest_t
+      for (i in 1:nrow(grid)) {
+        list_of_streams[[i]] <- crop_stream_time(list_of_streams[[i]], T = smallest_t)
+      }
+
+    }
+
+
+
+
+
+    # compute divergence and curl by group (each group is identified by id)
+    # df <- do.call(rbind, lapply(split(df, df$id), function(subdf) {
+    #
+    #   # calculate the gradient of the vector field at each point.
+    #   grad <- t(apply(subdf[, c("x", "y")], 1, function(v) numDeriv::grad(fun, v)))
+    #   grad_u <- grad[, 1]
+    #   grad_v <- grad[, 2]
+    #
+    #   # compute divergence and curl.
+    #   subdf$divergence <- grad_u + grad_v
+    #   subdf$curl <- grad_v - grad_u
+    #
+    #   subdf
+    # }))
+
+    # combine streams and return
+    do.call("rbind", list_of_streams)
 
   }
 
