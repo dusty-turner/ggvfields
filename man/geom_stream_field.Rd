@@ -170,31 +170,18 @@ streamlines are then passed to \link{GeomStream} for rendering.
 f <- function(u) c(-u[2], u[1])
 
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), center = FALSE)
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector",
-  center = FALSE)
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), center = FALSE)
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector", center = FALSE)
 
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1),
-  normalize = FALSE)
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector",
-  normalize = FALSE)
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), center = FALSE,
-  normalize = FALSE)
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector",
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), normalize = FALSE)
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector", normalize = FALSE)
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), center = FALSE, normalize = FALSE)
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector",
   center = FALSE, normalize = FALSE)
 
 # run systems until specified lengths
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), normalize = TRUE,
-  L = .08)
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), normalize = TRUE, L = .08)
 
 # run systems for specified times
 ggplot() +
