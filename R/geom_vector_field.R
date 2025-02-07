@@ -66,20 +66,14 @@
 #'   streamlines.
 #'
 #' @examples
-#' # Define a simple rotational vector field function
-#' rotational_field <- function(u) {
-#'   x <- u[1]
-#'   y <- u[2]
-#'   c(-y, x)
-#' }
 #'
-#' # Using geom_vector_field()
-#' ggplot() +
-#'   geom_vector_field(fun = rotational_field)
+#' f <- function(u) c(-u[2], u[1])
+#' ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#' ggplot() + geom_vector_field2(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 #'
-#' # Using geom_vector_field2()
-#' ggplot() +
-#'   geom_vector_field2(fun = rotational_field)
+#' f <- efield_maker()
+#' ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#' ggplot() + geom_vector_field2(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 #'
 #' @name geom_vector_field
 #' @aliases geom_vector_field stat_vector_field geom_vector_field2 stat_vector_field2
@@ -98,6 +92,7 @@ geom_vector_field <- function(
   xlim = NULL,
   ylim = NULL,
   n = 11,
+  tlim = c(0, 1e6),
   args = list(),
   center = TRUE,
   normalize = TRUE,
@@ -138,7 +133,7 @@ geom_vector_field <- function(
       args = args,
       method = "euler",
       na.rm = na.rm,
-      dt = 1,
+      tlim = tlim,
       max_it = 2,
       center = center,
       normalize = normalize,
@@ -167,6 +162,7 @@ stat_vector_field <- function(
   xlim = NULL,
   ylim = NULL,
   n = 11,
+  tlim = c(0, 1e6),
   args = list(),
   center = TRUE,
   normalize = TRUE,
@@ -208,9 +204,7 @@ stat_vector_field <- function(
       args = args,
       method = "euler",
       na.rm = na.rm,
-      dt = 1,
-      L = .1,
-      max_it = 2,
+      tlim = tlim,
       center = center,
       normalize = normalize,
       tail_point = tail_point,
@@ -236,6 +230,7 @@ geom_vector_field2 <- function(
    xlim = NULL,
    ylim = NULL,
    n = 11,
+   tlim = c(0, 1e6),
    args = list(),
    center = FALSE,
    normalize = TRUE,
@@ -279,8 +274,7 @@ geom_vector_field2 <- function(
       args = args,
       method = "euler",
       na.rm = na.rm,
-      dt = 1,
-      max_it = 2,
+      tlim = tlim,
       center = center,
       normalize = normalize,
       tail_point = tail_point,
@@ -304,6 +298,7 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
    xlim = NULL,
    ylim = NULL,
    n = 11,
+   tlim = c(0, 1e6),
    args = list(),
    center = FALSE,
    normalize = TRUE,
@@ -347,8 +342,7 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
       args = args,
       method = "euler",
       na.rm = na.rm,
-      dt = 1,
-      max_it = 2,
+      tlim = tlim,
       center = center,
       normalize = normalize,
       tail_point = tail_point,

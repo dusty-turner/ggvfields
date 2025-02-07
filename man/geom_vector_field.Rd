@@ -21,6 +21,7 @@ stat_vector_field(
   xlim = NULL,
   ylim = NULL,
   n = 11,
+  tlim = c(0, 1e+06),
   args = list(),
   center = TRUE,
   normalize = TRUE,
@@ -42,6 +43,7 @@ geom_vector_field2(
   xlim = NULL,
   ylim = NULL,
   n = 11,
+  tlim = c(0, 1e+06),
   args = list(),
   center = FALSE,
   normalize = TRUE,
@@ -63,6 +65,7 @@ stat_vector_field2(
   xlim = NULL,
   ylim = NULL,
   n = 11,
+  tlim = c(0, 1e+06),
   args = list(),
   center = FALSE,
   normalize = TRUE,
@@ -158,19 +161,13 @@ unmapped by default).
 }
 }
 \examples{
-# Define a simple rotational vector field function
-rotational_field <- function(u) {
-  x <- u[1]
-  y <- u[2]
-  c(-y, x)
-}
 
-# Using geom_vector_field()
-ggplot() +
-  geom_vector_field(fun = rotational_field)
+f <- function(u) c(-u[2], u[1])
+ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_vector_field2(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 
-# Using geom_vector_field2()
-ggplot() +
-  geom_vector_field2(fun = rotational_field)
+f <- efield_maker()
+ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+ggplot() + geom_vector_field2(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 
 }

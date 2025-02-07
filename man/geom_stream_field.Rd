@@ -22,7 +22,7 @@ stat_stream_field(
   n = 11,
   args = list(),
   max_it = 1000,
-  dt = 0.0025,
+  tlim = c(0, 1e+06),
   L = NULL,
   center = TRUE,
   normalize = TRUE,
@@ -103,10 +103,6 @@ points.}
 \item{max_it}{Integer. Maximum number of integration steps per streamline.
 This controls how far each streamline can propagate. Defaults to 1000.}
 
-\item{dt}{Numeric. Time-step size for integration. Smaller values produce
-more precise streamlines but increase computation time. Default is
-\code{0.0025}.}
-
 \item{L}{Numeric. Maximum arc length for each streamline. A streamline stops
 once its length exceeds this value. If \code{NULL}, a suitable default is
 derived from the grid spacing. Default is \code{NULL}.}
@@ -128,6 +124,10 @@ or \code{"euler"} for Euler's method. Defaults to \code{"rk4"}.}
 \item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification for adding arrowheads to each
 streamline. By default, a closed arrow with a 30° angle and a length of
 \code{0.02} npc is used.}
+
+\item{dt}{Numeric. Time-step size for integration. Smaller values produce
+more precise streamlines but increase computation time. Default is
+\code{0.0025}.}
 }
 \value{
 A ggplot2 layer that computes the streamlines over the specified
@@ -161,28 +161,36 @@ before centering or normalization is applied.
 
 \examples{
 
-\dontrun{
+f <- function(u) c(-u[2], u[1])
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), tail_point = TRUE)
+ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), tail_point = TRUE)
+
 f <- efield_maker()
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
+  scale_color_viridis_c(trans = "log10") +
+  coord_equal()
+ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 
-# Define a simple rotational vector field function
-rotational_field <- function(u) {
-  x <- u[1]
-  y <- u[2]
-  c(-y, x)
-}
+f <- function(u) u
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 
-# Create a stream field layer
-ggplot() + geom_stream_field(fun = rotational_field)
+f <- function(u) c(2,1)
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 
-# Create a stream field layer with tail points
 ggplot() +
-  geom_stream_field(fun = rotational_field, tail_point = TRUE)
+  geom_stream_field(fun = f, aes(alpha = after_stat(t)), xlim = c(-2,2), ylim = c(-2,2)) +
+  scale_alpha(range  = c(0,1))
 
-# Create a stream field with centered streams
 ggplot() +
-  geom_stream_field(fun = rotational_field, center = TRUE)
-}
+  geom_stream_field(
+  fun = f, xlim = c(-1,1), ylim = c(-1,1),
+  linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
+)
 
 }
 \keyword{datasets}
