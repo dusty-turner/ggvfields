@@ -95,6 +95,10 @@ f <- function(t) {
 ggplot() +
   geom_function_1d2d(fun = f, T = 6.5, arrow = NULL, color = "black")
 
+f <- function(t)  c(abs(cos(t)*t), t)
+
+ggplot() + geom_function_1d2d(fun = f, t0 = -20,  T = 20)
+
 # Lissajous curve
 lissajous <- function(t, A = 1, B = 1, a = 3, b = 2, delta = pi/2) {
   c(A * sin(a * t + delta), B * sin(b * t))
@@ -125,6 +129,20 @@ ggplot() +
   geom_function_1d2d( fun = lissajous, T = 2 * pi, color = "black", arrow = NULL,
     args = list(A = 0.5, B = 0.5, a = 5, b = 4, delta = pi/2)
   )
+
+# Harmonic cuves
+
+f <- function(t,
+  A1 = 1, A2 = 1, A3 = 1, A4 = 1,
+  f1 = 1, f2 = 2, f3 = 3, f4 = 4,
+  p1 = 0, p2 = pi/4, p3 = pi/2, p4 = 3*pi/4,
+  d1 = 0.1, d2 = 0.2, d3 = 0.3, d4 = 0.4) {
+    x <- A1 * sin(t * f1 + p1) * exp(-d1 * t) + A2 * sin(t * f2 + p2) * exp(-d2 * t)
+    y <- A3 * sin(t * f3 + p3) * exp(-d3 * t) + A4 * sin(t * f4 + p4) * exp(-d4 * t)
+    c(x, y)
+}
+
+ggplot() + geom_function_1d2d(fun = f, t0 = 0,  T = 5)
 
 }
 \keyword{datasets}
