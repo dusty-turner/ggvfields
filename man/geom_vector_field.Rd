@@ -77,8 +77,9 @@ stat_vector_field2(
 \arguments{
 \item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
 Additional aesthetics such as \code{color}, \code{size}, \code{linetype}, and \code{alpha} can
-be defined. In geom_vector_field, the default mapping includes \code{color = after_stat(norm)}, whereas in geom_vector_field2 the default mapping
-includes \code{length = after_stat(norm)}.}
+be defined. In
+\strong{geom_vector_field}, the default mapping includes \code{color = after_stat(norm)},
+whereas in \strong{geom_vector_field2} the default mapping includes \code{length = after_stat(norm)}.}
 
 \item{data}{A data frame containing the input data.}
 
@@ -115,6 +116,9 @@ domain. Defaults to \code{c(-1, 1)}.}
 \item{n}{Integer. Grid resolution specifying the number of seed points along
 each axis. Higher values produce a denser vector field. Defaults to \code{11}.}
 
+\item{tlim}{Numeric vector of length two specifying the integration time
+limits. Defaults to \code{c(0, 1e6)}.}
+
 \item{args}{List of additional arguments passed on to the function defined by
 \code{fun}.}
 
@@ -132,11 +136,12 @@ streamline.}
 \item{eval_point}{Logical. If \code{TRUE}, a point is drawn at the evaluation
 point, corresponding to the original (untransformed) seed point before any
 centering or normalization is applied. This allows for comparison between
-the original and transformed positions. Default is \code{FALSE}.}
+the original and transformed positions. Defaults to \code{FALSE}.}
 
 \item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the
-streamlines. In geom_vector_field, the default is a closed arrow with a 30°
-angle and length \code{0.02} npc; in geom_vector_field2 the default is \code{NULL}.}
+streamlines. In
+\strong{geom_vector_field}, the default is a closed arrow with a 30° angle and length \code{0.02} npc;
+in \strong{geom_vector_field2} the default is \code{NULL}.}
 }
 \value{
 A ggplot2 layer that computes and plots a vector field using
