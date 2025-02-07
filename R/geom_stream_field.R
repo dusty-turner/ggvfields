@@ -62,16 +62,36 @@
 #'
 #' @examples
 #'
-#' f <- efield_maker()
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) + coord_equal()
-#' ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-#'
 #' f <- function(u) c(-u[2], u[1])
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), tail_point = TRUE)
 #' ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 #' ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), tail_point = TRUE)
+#'
+#' f <- efield_maker()
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
+#'   scale_color_viridis_c(trans = "log10") +
+#'   coord_equal()
+#' ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#'
+#' f <- function(u) u
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#' ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#'
+#' f <- function(u) c(2,1)
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#' ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#'
+#' ggplot() +
+#'   geom_stream_field(fun = f, aes(alpha = after_stat(t)), xlim = c(-2,2), ylim = c(-2,2)) +
+#'   scale_alpha(range  = c(0,1))
+#'
+#' ggplot() +
+#'   geom_stream_field(
+#'   fun = f, xlim = c(-1,1), ylim = c(-1,1),
+#'   linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
+#' )
 #'
 #' @name geom_stream_field
 #' @aliases stat_stream_field StatStreamField
