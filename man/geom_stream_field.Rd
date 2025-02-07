@@ -165,9 +165,6 @@ before centering or normalization is applied.
 \examples{
 
 f <- function(u) c(-u[2], u[1])
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), tail_point = TRUE)
 
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
@@ -185,27 +182,44 @@ ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), normalize 
 # run systems for specified times
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), normalize = FALSE, T = .1)
 
-# is this the stream analogue to geom_vector_field2()? it's the actual distance
-# traveled over the given time period. but nothing to communicate arc length...
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+
+# is this geom_stream_field2()? but no legend...
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1),
   normalize = FALSE, T = .15, center = FALSE, color = "black", tail_point = TRUE, arrow = NULL)
 
+# is this geom_vector_field2()? but no legend...
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector",
+  normalize = FALSE, T = .15, center = FALSE, color = "black", tail_point = TRUE, arrow = NULL)
+
+# tail and eval points
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), eval_point = TRUE)
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), eval_point = TRUE,
+  type = "vector", arrow = NULL
+)
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1),
+  tail_point = TRUE, type = "vector", arrow = NULL, center = FALSE
+)
+
+
+
+
 f <- efield_maker()
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
   scale_color_viridis_c(trans = "log10") +
   coord_equal()
-ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 
 f <- function(u) u
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
 
 f <- function(u) c(2,1)
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
 
+# bug here with alpha
 ggplot() +
   geom_stream_field(fun = f, aes(alpha = after_stat(t)), xlim = c(-2,2), ylim = c(-2,2)) +
   scale_alpha(range  = c(0,1))
@@ -215,6 +229,22 @@ ggplot() +
   fun = f, xlim = c(-1,1), ylim = c(-1,1),
   linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
 )
+
+f <- function(u) {
+  x <- u[1]; y <- u[2]
+  c(y, y*(-x^2 - 2*y^2 + 1) - x)
+}
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
+
+f <- function(u) {
+  x <- u[1]; y <- u[2]
+  c(y, x - x^3)
+}
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
+
+
 
 }
 \keyword{datasets}
