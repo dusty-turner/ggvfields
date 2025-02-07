@@ -197,15 +197,23 @@ draw_key_length <- function(data, params, size) {
 #' @export
 GeomStream <- ggproto("GeomStream", GeomPath,
   # required_aes = c("x", "y"),
-  default_aes = modifyList(GeomPath$default_aes, list(alpha = 1, length = after_stat(NA_real_))),
+  default_aes = modifyList(
+    GeomPath$default_aes,
+    list("alpha" = 1, "linewidth" = 1.1, "length" = after_stat(NA_real_))
+  ),
 
   setup_data = function(data, params){
 
-    ## remove all 0 length vectors
-    # data <- data[ave(data$l, data$group, FUN = function(x) !all(x == 0)) == TRUE, ]
+    # we want to remove all points whose f(u) = c(0,0)
     if("l" %in% names(data)) {
-      ndcs_of_non_zero_gradients <- ave(data$l, data$group, FUN = function(x) !all(abs(x) <= 1e-6)) |> as.logical()
-      data <- data[ndcs_of_non_zero_gradients, ]
+
+      group_of_zero_fun <- which( vapply(
+        split(data, data$group),
+        function(df) abs(df[nrow(df),"l"]) < 1e-6,
+        logical(1)
+      ) )
+      data <- subset(data, group != group_of_zero_fun)
+
     }
 
     data
