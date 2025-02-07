@@ -37,6 +37,8 @@
 #' @param T Numeric. The ending value of the time sequence. Defaults to `10`.
 #' @param dt Numeric. The time increment for evaluating `fun`. Defaults to
 #'   `0.01`.
+#' @param args List of additional arguments passed on to the function defined by
+#'   `fun`.
 #' @param tail_point Logical. If `TRUE`, a point is drawn at the tail (starting
 #'   position) of the stream.
 #' @param arrow A [grid::arrow()] specification to add arrowheads to the stream.
@@ -47,20 +49,58 @@
 #'   one-dimensional function over a time sequence.
 #'
 #' @examples
-#' # Define a simple function that maps time to a 2D coordinate (e.g., circular motion)
 #' f <- function(t) {
 #'   c(sin(t), cos(t))
 #' }
 #'
-#' ggplot() +
-#'   geom_function_1d2d(fun = f)
+#' ggplot() + geom_function_1d2d(fun = f)
 #'
 #' f <- function(t) {
-#'   c(sin(t), t*cos(t))
+#'   c(sin(t), t * cos(t))
 #' }
 #'
 #' ggplot() +
 #'   geom_function_1d2d(fun = f, T = 20, tail_point = TRUE)
+#'
+#' f <- function(t) {
+#'   x <- sin(t) * (exp(cos(t)) - 2 * cos(4 * t) - (sin(t / 12))^5)
+#'   y <- cos(t) * (exp(cos(t)) - 2 * cos(4 * t) - (sin(t / 12))^5)
+#'   c(x, y)
+#' }
+#'
+#' ggplot() +
+#'   geom_function_1d2d(fun = f, T = 6.5, arrow = NULL, color = "black")
+#'
+#' # Lissajous curve
+#' lissajous <- function(t, A = 1, B = 1, a = 3, b = 2, delta = pi/2) {
+#'   c(A * sin(a * t + delta), B * sin(b * t))
+#' }
+#'
+#' ggplot() +
+#'   geom_function_1d2d( fun = lissajous, T = 2 * pi, color = "black", arrow = NULL,
+#'     args = list(A = 1, B = 1, a = 3, b = 2, delta = pi/2)
+#'   )
+#'
+#' # Example 5: Variations on Lissajous curves
+#' ggplot() +
+#'   geom_function_1d2d( fun = lissajous, T = 2 * pi, color = "black", arrow = NULL,
+#'     args = list(A = 2, B = 1, a = 4, b = 2, delta = pi/4)
+#'   )
+#'
+#' ggplot() +
+#'   geom_function_1d2d( fun = lissajous, T = 2 * pi, color = "black", arrow = NULL,
+#'     args = list(A = 1, B = 2, a = 5, b = 3, delta = pi/3)
+#'   )
+#'
+#' ggplot() +
+#'   geom_function_1d2d( fun = lissajous, T = 2 * pi, color = "black", arrow = NULL,
+#'     args = list(A = 0.5, B = 0.5, a = 2, b = 3, delta = pi/6)
+#'   )
+#'
+#' ggplot() +
+#'   geom_function_1d2d( fun = lissajous, T = 2 * pi, color = "black", arrow = NULL,
+#'     args = list(A = 0.5, B = 0.5, a = 5, b = 4, delta = pi/2)
+#'   )
 #'
 #' @name geom_function_1d2d
 #' @aliases geom_function_1d2d stat_function_1d2d Stat1d2d
@@ -77,6 +117,7 @@ geom_function_1d2d <- function(mapping = NULL, data = NULL,
                               t0 = 0,
                               T = 10,
                               dt = 0.01,
+                              args = list(),
                               tail_point = FALSE,
                               arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"),
                                                   type = "closed")
@@ -106,6 +147,7 @@ geom_function_1d2d <- function(mapping = NULL, data = NULL,
       t0 = t0,
       T = T,
       dt = dt,
+      args = args,
       na.rm = na.rm,
       tail_point = tail_point,
       arrow = arrow,
@@ -129,7 +171,7 @@ stat_function_1d2d <- function(mapping = NULL, data = NULL,
                                t0 = 0,
                                T = 10,
                                dt = 0.01,
-                               n = 11,
+                               args = list(),
                                tail_point = FALSE,
                                arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"),
                                                    type = "closed")
@@ -159,6 +201,7 @@ stat_function_1d2d <- function(mapping = NULL, data = NULL,
       t0 = t0,
       T = T,
       dt = dt,
+      args = args,
       na.rm = na.rm,
       tail_point = tail_point,
       arrow = arrow,
@@ -174,9 +217,12 @@ stat_function_1d2d <- function(mapping = NULL, data = NULL,
 Stat1d2d <- ggproto("Stat1d2d", Stat,
   default_aes = aes(color = after_stat(t)),
 
-  compute_group = function(data, scales, fun, t0, T, dt, ...) {
+  compute_group = function(data, scales, fun, t0, T, dt, args, ...) {
 
     t <- seq(t0, T, dt)
+
+    orig_fun <- fun
+    fun <- function(v) rlang::inject(orig_fun(v, !!!args))
 
     stream_values <- t(sapply(t, fun))
     stream <- cbind(t, stream_values)
