@@ -212,7 +212,11 @@ GeomStream <- ggproto("GeomStream", GeomPath,
         function(df) abs(df[nrow(df),"l"]) < 1e-6,
         logical(1)
       ) )
-      data <- subset(data, group != group_of_zero_fun)
+
+      # remove zero-length groups
+      if (length(group_of_zero_fun) > 0) {
+        data <- subset(data, group != group_of_zero_fun)
+      }
 
     }
 
