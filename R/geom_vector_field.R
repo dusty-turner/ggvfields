@@ -20,9 +20,10 @@
 #'
 #' @param mapping A set of aesthetic mappings created by [ggplot2::aes()].
 #'   Additional aesthetics such as `color`, `size`, `linetype`, and `alpha` can
-#'   be defined. In geom_vector_field, the default mapping includes `color =
-#'   after_stat(norm)`, whereas in geom_vector_field2 the default mapping
-#'   includes `length = after_stat(norm)`.
+#'   be defined. In
+#'   **geom_vector_field**, the default mapping includes `color = after_stat(norm)`,
+#'   whereas in **geom_vector_field2** the default mapping includes `length =
+#'   after_stat(norm)`.
 #' @param data A data frame containing the input data.
 #' @param stat The statistical transformation to use on the data for this layer.
 #'   Defaults to [StatStreamField].
@@ -43,6 +44,8 @@
 #'   domain. Defaults to `c(-1, 1)`.
 #' @param n Integer. Grid resolution specifying the number of seed points along
 #'   each axis. Higher values produce a denser vector field. Defaults to `11`.
+#' @param tlim Numeric vector of length two specifying the integration time
+#'   limits. Defaults to `c(0, 1e6)`.
 #' @param args List of additional arguments passed on to the function defined by
 #'   `fun`.
 #' @param center Logical. If `TRUE`, centers the seed points or the vectors so
@@ -56,10 +59,11 @@
 #' @param eval_point Logical. If `TRUE`, a point is drawn at the evaluation
 #'   point, corresponding to the original (untransformed) seed point before any
 #'   centering or normalization is applied. This allows for comparison between
-#'   the original and transformed positions. Default is `FALSE`.
+#'   the original and transformed positions. Defaults to `FALSE`.
 #' @param arrow A [grid::arrow()] specification to add arrowheads to the
-#'   streamlines. In geom_vector_field, the default is a closed arrow with a 30°
-#'   angle and length `0.02` npc; in geom_vector_field2 the default is `NULL`.
+#'   streamlines. In
+#'   **geom_vector_field**, the default is a closed arrow with a 30° angle and length `0.02` npc;
+#'   in **geom_vector_field2** the default is `NULL`.
 #' @param ... Other arguments passed on to [ggplot2::layer()].
 #'
 #' @return A ggplot2 layer that computes and plots a vector field using
@@ -76,7 +80,8 @@
 #' ggplot() + geom_vector_field2(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 #'
 #' @name geom_vector_field
-#' @aliases geom_vector_field stat_vector_field geom_vector_field2 stat_vector_field2
+#' @aliases geom_vector_field stat_vector_field geom_vector_field2
+#'   stat_vector_field2
 #' @export
 NULL
 geom_vector_field <- function(
