@@ -39,7 +39,7 @@ stat_potential(
   fun,
   xlim = NULL,
   ylim = NULL,
-  n = 21,
+  n = 11,
   tolerance = 1e-06
 )
 
@@ -165,13 +165,9 @@ fun <- function(v) {
   c(sin(x) + y, x - sin(y))
 }
 
-# Define domain limits
-xlim <- c(-pi, pi)
-ylim <- c(-pi, pi)
-
 # Create the potential function heatmap
 ggplot() +
-  geom_potential(fun = fun, xlim = xlim, ylim = ylim)
+  geom_potential(fun = fun)
 
 }
 \keyword{datasets}

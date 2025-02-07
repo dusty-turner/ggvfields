@@ -43,6 +43,8 @@
 #'   domain. Defaults to `c(-1, 1)`.
 #' @param n Integer. Grid resolution specifying the number of seed points along
 #'   each axis. Higher values produce a denser vector field. Defaults to `11`.
+#' @param args List of additional arguments passed on to the function defined by
+#'   `fun`.
 #' @param center Logical. If `TRUE`, centers the seed points or the vectors so
 #'   that the original (x, y) becomes the midpoint. Defaults differ between the
 #'   variants.
@@ -77,7 +79,9 @@
 #' @aliases geom_vector_field stat_vector_field geom_vector_field2 stat_vector_field2
 #' @export
 NULL
-geom_vector_field <- function(mapping = NULL, data = NULL,
+geom_vector_field <- function(
+  mapping = NULL,
+  data = NULL,
   stat = StatStreamField,
   position = "identity",
   ...,
@@ -89,6 +93,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
   ylim = NULL,
   n = 11,
   tlim = c(0, 1e6),
+  args = list(),
   center = TRUE,
   normalize = TRUE,
   tail_point = FALSE,
@@ -125,6 +130,7 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
       xlim = xlim,
       ylim = ylim,
       n = n,
+      args = args,
       method = "euler",
       na.rm = na.rm,
       tlim = tlim,
@@ -142,7 +148,9 @@ geom_vector_field <- function(mapping = NULL, data = NULL,
 #' @rdname geom_vector_field
 #' @export
 #'
-stat_vector_field <- function(mapping = NULL, data = NULL,
+stat_vector_field <- function(
+  mapping = NULL,
+  data = NULL,
   stat = StatStreamField,
   geom = GeomStream,
   position = "identity",
@@ -155,6 +163,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
   ylim = NULL,
   n = 11,
   tlim = c(0, 1e6),
+  args = list(),
   center = TRUE,
   normalize = TRUE,
   tail_point = FALSE,
@@ -192,6 +201,7 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
       xlim = xlim,
       ylim = ylim,
       n = n,
+      args = args,
       method = "euler",
       na.rm = na.rm,
       tlim = tlim,
@@ -207,7 +217,9 @@ stat_vector_field <- function(mapping = NULL, data = NULL,
 
 #' @rdname geom_vector_field
 #' @export
-geom_vector_field2 <- function(mapping = NULL, data = NULL,
+geom_vector_field2 <- function(
+   mapping = NULL,
+   data = NULL,
    stat = StatStreamField,
    position = "identity",
    ...,
@@ -219,6 +231,7 @@ geom_vector_field2 <- function(mapping = NULL, data = NULL,
    ylim = NULL,
    n = 11,
    tlim = c(0, 1e6),
+   args = list(),
    center = FALSE,
    normalize = TRUE,
    tail_point = TRUE,
@@ -258,6 +271,7 @@ geom_vector_field2 <- function(mapping = NULL, data = NULL,
       xlim = xlim,
       ylim = ylim,
       n = n,
+      args = args,
       method = "euler",
       na.rm = na.rm,
       tlim = tlim,
@@ -285,6 +299,7 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
    ylim = NULL,
    n = 11,
    tlim = c(0, 1e6),
+   args = list(),
    center = FALSE,
    normalize = TRUE,
    tail_point = TRUE,
@@ -324,6 +339,7 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
       xlim = xlim,
       ylim = ylim,
       n = n,
+      args = args,
       method = "euler",
       na.rm = na.rm,
       tlim = tlim,

@@ -22,6 +22,7 @@ stat_vector_field(
   ylim = NULL,
   n = 11,
   tlim = c(0, 1e+06),
+  args = list(),
   center = TRUE,
   normalize = TRUE,
   tail_point = FALSE,
@@ -43,6 +44,7 @@ geom_vector_field2(
   ylim = NULL,
   n = 11,
   tlim = c(0, 1e+06),
+  args = list(),
   center = FALSE,
   normalize = TRUE,
   tail_point = TRUE,
@@ -64,6 +66,7 @@ stat_vector_field2(
   ylim = NULL,
   n = 11,
   tlim = c(0, 1e+06),
+  args = list(),
   center = FALSE,
   normalize = TRUE,
   tail_point = TRUE,
@@ -111,6 +114,9 @@ domain. Defaults to \code{c(-1, 1)}.}
 
 \item{n}{Integer. Grid resolution specifying the number of seed points along
 each axis. Higher values produce a denser vector field. Defaults to \code{11}.}
+
+\item{args}{List of additional arguments passed on to the function defined by
+\code{fun}.}
 
 \item{center}{Logical. If \code{TRUE}, centers the seed points or the vectors so
 that the original (x, y) becomes the midpoint. Defaults differ between the

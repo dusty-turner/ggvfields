@@ -18,6 +18,8 @@
 #' @param n Integer. Grid resolution (the number of seed points along each
 #'   axis). Defaults to 11, resulting in an \eqn{n \times n} grid of seed
 #'   points.
+#' @param args List of additional arguments passed on to the function defined by
+#'   `fun`.
 #' @param max_it Integer. Maximum number of integration steps per streamline.
 #'   This controls how far each streamline can propagate. Defaults to 1000.
 #' @param dt Numeric. Time-step size for integration. Smaller values produce
@@ -95,13 +97,8 @@
 #'
 #' @name geom_stream_field
 #' @aliases stat_stream_field StatStreamField
-NULL
-
-
-
-
-#' @rdname geom_stream_field
 #' @export
+NULL
 geom_stream_field <- function(
     mapping = NULL,
     data = NULL,
@@ -116,6 +113,7 @@ geom_stream_field <- function(
     xlim = NULL,
     ylim = NULL,
     n = 11,
+    args = list(),
     max_it = 1000,
     tlim = c(0, 1e6),
     L = NULL,
@@ -155,6 +153,7 @@ geom_stream_field <- function(
       xlim = xlim,
       ylim = ylim,
       n = n,
+      args = args,
       method = method,
       na.rm = na.rm,
       max_it = max_it,
@@ -185,6 +184,7 @@ stat_stream_field <- function(
     xlim = NULL,
     ylim = NULL,
     n = 11,
+    args = list(),
     max_it = 1000,
     tlim = c(0, 1e6),
     L = NULL,
@@ -225,6 +225,7 @@ stat_stream_field <- function(
       xlim = xlim,
       ylim = ylim,
       n = n,
+      args = args,
       method = method,
       na.rm = na.rm,
       max_it = max_it,
@@ -263,6 +264,12 @@ StatStreamField <- ggproto(
       ylim <- c(-1, 1)
     }
 
+    orig_fun <- fun
+
+    fun <- function(v) {
+      rlang::inject(orig_fun(v, !!!args))
+    }
+
     # make grid of points on which to compute streams
     grid <- cbind(
       "x" = rep(seq(xlim[1], xlim[2], length.out = n[1]), times = n[2]),
@@ -272,7 +279,6 @@ StatStreamField <- ggproto(
     # compute default L value
     L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.45
     if (normalize == "vector") L <- 2*L
-
 
     # initialize the data frame
     list_of_streams <- vector(mode = "list", length = nrow(grid))

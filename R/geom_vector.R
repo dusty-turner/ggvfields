@@ -247,7 +247,9 @@ StatVector <- ggproto("StatVector", Stat,
 
 #' @rdname geom_vector
 #' @export
-geom_vector2 <- function(mapping = NULL, data = NULL,
+geom_vector2 <- function(
+   mapping = NULL,
+   data = NULL,
    stat = StatVector,
    position = "identity",
    ...,
@@ -271,6 +273,51 @@ geom_vector2 <- function(mapping = NULL, data = NULL,
   layer(
     stat = stat,
     geom = GeomStream,
+    mapping = mapping,
+    data = data,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      na.rm = na.rm,
+      arrow = arrow,
+      center = center,
+      normalize = normalize,
+      tail_point = tail_point,
+      eval_point = eval_point,
+      ...
+    )
+  )
+}
+
+#' @rdname geom_vector
+#' @export
+stat_vector2 <- function(
+   mapping = NULL,
+   data = NULL,
+   geom = GeomStream,
+   position = "identity",
+   ...,
+   na.rm = FALSE,
+   show.legend = NA,
+   inherit.aes = TRUE,
+   center = FALSE,
+   normalize = FALSE,
+   tail_point = TRUE,
+   eval_point = FALSE,
+   arrow = NULL) {
+
+  default_mapping <- ggplot2::aes(length = after_stat(norm))
+
+  if (is.null(mapping)) {
+    mapping <- default_mapping
+  } else {
+    mapping <- modifyList(default_mapping, mapping)
+  }
+
+  layer(
+    stat = StatVector,
+    geom = geom,
     mapping = mapping,
     data = data,
     position = position,
