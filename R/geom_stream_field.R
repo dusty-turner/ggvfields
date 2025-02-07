@@ -67,24 +67,11 @@
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) + coord_equal()
 #' ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 #'
-#' # Define a simple rotational vector field function
-#' rotational_field <- function(u) {
-#'   x <- u[1]
-#'   y <- u[2]
-#'   c(-y, x)
-#' }
-#'
-#' # Create a stream field layer
-#' ggplot() + geom_stream_field(fun = rotational_field)
-#' ggplot() + geom_vector_field(fun = rotational_field)
-#'
-#' # Create a stream field layer with tail points
-#' ggplot() +
-#'   geom_stream_field(fun = rotational_field, tail_point = TRUE)
-#'
-#' # Create a stream field with centered streams
-#' ggplot() +
-#'   geom_stream_field(fun = rotational_field, center = TRUE)
+#' f <- function(u) c(-u[2], u[1])
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), tail_point = TRUE)
+#' ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#' ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), tail_point = TRUE)
 #'
 #' @name geom_stream_field
 #' @aliases stat_stream_field StatStreamField
@@ -110,7 +97,7 @@ geom_stream_field <- function(
     ylim = NULL,
     n = 11,
     max_it = 1000,
-    dt = .0025,
+    tlim = c(0, 1e6),
     L = NULL,
     center = TRUE,
     normalize = TRUE,
@@ -151,7 +138,7 @@ geom_stream_field <- function(
       method = method,
       na.rm = na.rm,
       max_it = max_it,
-      dt = dt,
+      tlim = tlim,
       L = L,
       center = center,
       normalize = normalize,
@@ -179,7 +166,7 @@ stat_stream_field <- function(
     ylim = NULL,
     n = 11,
     max_it = 1000,
-    dt = .0025,
+    tlim = c(0, 1e6),
     L = NULL,
     center = TRUE,
     normalize = TRUE,
@@ -221,7 +208,7 @@ stat_stream_field <- function(
       method = method,
       na.rm = na.rm,
       max_it = max_it,
-      dt = dt,
+      tlim = tlim,
       L = L,
       center = center,
       normalize = normalize,
@@ -242,7 +229,7 @@ StatStreamField <- ggproto(
   Stat,
   default_aes = aes(group = after_stat(id)),
 
-  compute_group = function(data, scales, fun, xlim, ylim, n, method, max_it = 1000, dt, L = NULL, center, normalize, ...) {
+  compute_group = function(data, scales, fun, xlim, ylim, n, method, max_it = 1000, tlim = c(0, 1e6), L = NULL, center, normalize, ...) {
 
     xlim <- xlim %||% scales$x$range$range
     if (is.null(xlim)) {
@@ -262,68 +249,73 @@ StatStreamField <- ggproto(
       "y" = rep(seq(ylim[1], ylim[2], length.out = n[2]), each = n[1])
     )
 
-    ## Get dt and L defaulted
-    dt <- rep(dt, nrow(grid))
-    L <- min(diff(xlim), diff(ylim))
-    # L <- sqrt(diff(xlim)^2 + diff(ylim)^2)
+    # compute default L value
+    L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.45
+    if (normalize == "vector") L <- 2*L
 
-
-    if(normalize == "stream") L <- L / (max(n) - 1) * 0.45
-
-    if(normalize == "vector") {
-      L <- L / (max(n) - 1) * 0.8
-
-      # calculate dt for each grid point
-      norms <- apply(grid, 1, function(v) sqrt(sum(fun(v) ^ 2)))
-      dt <- L / norms # normalizes for euler: u[i,] <- u[i-1,] + f(u[i-1,])*dt = u[i,] <- u[i-1,] + f(u[i-1,]) * (L/|f(u[i-1,])|)
-
-      # replace infinite dt values with 0
-      dt[is.infinite(dt)] <- 0
-
-    }
 
     # initialize the data frame
-    df <- data.frame()
+    list_of_streams <- vector(mode = "list", length = nrow(grid))
 
     for (i in 1:nrow(grid)) {
 
       # compute the stream for the current grid point using ode_stepper()
-      stream <- transform(
-        ode_stepper(grid[i, ], fun, dt[i], 0, L, max_it, method, center),
-        "id" = i
-      )
+      if (normalize == "vector") {
+        u <- grid[i,]
+        fu <- fun(u)
+        nfu <- norm(fu)
+
+        if (center) {
+          from <- u - (1/2)*L*fu/norm(fu)
+          to <- u + (1/2)*L*fu/norm(fu)
+        } else {
+          from <- u
+          to <- u + L*fu/norm(fu)
+        }
+
+        stream <- data.frame(
+          "t" = c(0, L/nfu),
+          "x" = c(from[1], to[1]),
+          "y" = c(from[2], to[2]),
+          "d" = c(NA_real_, L),
+          "l" = c(0, L),
+          "avg_spd" = L/nfu,
+          "norm" = nfu,
+          "id" = i
+        )
+      } else { # normalize == "stream"
+        stream <- transform(
+          ode_stepper(grid[i, ], fun, tlim, L, max_it, method, center),
+          "id" = i
+        )
+      }
 
       # add the original x and y coordinates to this stream's data
       stream$x0 <- grid[i, "x"]
       stream$y0 <- grid[i, "y"]
 
-      # bind the current stream's data to the overall data frame
-      df <- rbind(df, stream)
+      # store the stream
+      list_of_streams[[i]] <- stream
 
     }
 
   # compute divergence and curl by group (each group is identified by id)
-  df <- do.call(rbind, lapply(split(df, df$id), function(subdf) {
+  # df <- do.call(rbind, lapply(split(df, df$id), function(subdf) {
+  #
+  #   # calculate the gradient of the vector field at each point.
+  #   grad <- t(apply(subdf[, c("x", "y")], 1, function(v) numDeriv::grad(fun, v)))
+  #   grad_u <- grad[, 1]
+  #   grad_v <- grad[, 2]
+  #
+  #   # compute divergence and curl.
+  #   subdf$divergence <- grad_u + grad_v
+  #   subdf$curl <- grad_v - grad_u
+  #
+  #   subdf
+  # }))
 
-    # calculate the gradient of the vector field at each point.
-    grad <- t(apply(subdf[, c("x", "y")], 1, function(v) numDeriv::grad(fun, v)))
-    grad_u <- grad[, 1]
-    grad_v <- grad[, 2]
-
-    # compute divergence and curl.
-    subdf$divergence <- grad_u + grad_v
-    subdf$curl <- grad_v - grad_u
-
-    subdf
-  }))
-
-  df
-    # to check if df contains the right information, try this:
-    # ggplot(df) +
-    #   geom_path(
-    #     aes(x, y, group = paste(x0, y0), color = avg_spd),
-    #     arrow = arrow(length = unit(.02, "npc"))
-    #   )
+  # bind the streams together and return
+  do.call("rbind", list_of_streams)
 
   }
 
@@ -336,7 +328,7 @@ StatStreamField <- ggproto(
 
 
 
-ode_stepper <- function(u0, fun, dt = .005, t0 = 0, L = 1, max_it = 5000, method = "lsoda", center = FALSE) {
+ode_stepper <- function(u0, fun, tlim = c(0, 1e6), L = 1, max_it = 5000, method = "lsoda", center = FALSE) {
 
   if ( center ) {
 
@@ -347,9 +339,9 @@ ode_stepper <- function(u0, fun, dt = .005, t0 = 0, L = 1, max_it = 5000, method
     # if you df[nrow(df):1,] on a 0-row df, you get back a row of NAs
 
     # solve in both directions
-    df_negative <- ode_stepper(u0, neg_fun, dt = dt/2, t0, L = L, max_it, method, center = FALSE)
+    df_negative <- ode_stepper(u0, neg_fun, tlim, L, max_it, method, center = FALSE)
     df_negative$t <- -df_negative$t
-    df_positive <- ode_stepper(u0,     fun, dt = dt/2, t0, L = L, max_it, method, center = FALSE)
+    df_positive <- ode_stepper(u0,     fun, tlim, L, max_it, method, center = FALSE)
 
     # combine the datasets
     df <- rbind( flip(df_negative[-1,]), df_positive )
@@ -367,11 +359,20 @@ ode_stepper <- function(u0, fun, dt = .005, t0 = 0, L = 1, max_it = 5000, method
 
   }
 
-  # wrap fun for deSolve::ode()
-  df <- data.frame()
+  # deSolve::ode() is a little particular in terms of what it assumes about the
+  # function. first, it assumes that the function returns a list with a vector
+  # in it, e.g. list(1:2). second, it only solves up until at the points tlim
+  # unless it is interrupted by the length being L. in either case, it returns
+  # a data frame with 2 rows, discarding intermediate information.
+  # thus, we create a wrapper of fun that (1) returns the value as a list,
+  # (2) tracks where fun was evaluated, and (3) adds the cumulative length
+  # to the curve. for (3), the system is
+  # x'(t) = fun(u)[1], y'(t) = fun(u)[2], l'(t) = sqrt(x'(t)^2 + y'(t)).
+  # this system is interrupted by the "root" function that is 0 when l(t) = L
   fun_wrapper <- function(t, u, parms) {
     norm <- function(x) sqrt(sum(x^2))
     fu <- fun(u[1:2])
+    # use this if you also want to remember the function values fx(u) and fy(u)
     # df <<- rbind( df, c(t, u[1:2], fu) |> t() |> matrix_to_df_with_names(c("t","x","y","fx","fy")) )
     df <<- rbind( df, c(t, u[1:2]) |> t() |> matrix_to_df_with_names(c("t","x","y")) )
     list( c( fu, "l" = norm(fu) ) )
@@ -379,28 +380,30 @@ ode_stepper <- function(u0, fun, dt = .005, t0 = 0, L = 1, max_it = 5000, method
 
   rootfun <- function(t, u, parms) u[3] - parms$L
 
+
+  # initialize the data frame tracking evals of fun
+  df <- data.frame()
+
   # solve up to length L; soln is not actually used after since evals are captured
   soln <- deSolve::ode(
     func = fun_wrapper,
     y = c(u0, "l" = 0), # 0 = initial arc length
     parms = list("L" = L),
-    # times = seq(0, 1, by = dt),
-    times = c(0, 1e6),
+    times = tlim,
     rootfun = rootfun,
     maxsteps = max_it
   )
-
-  # deSolve::ode() only provides solutions at the times requested (0 up until
-  # stop, not 1e6) but it has to evaluate the function bunches of times.
-  # the wrapper above tracks these
 
   # compute d and l stats
   n <- nrow(df)
   df$d <- c(NA_real_, apply( df[2:n,c("x","y")] - df[1:(n-1),c("x","y")], 1, norm ))
   df$l <- c(0, cumsum(df$d[-1]))
 
-  # crop back
+  # ode() evals of fun go further than needed, and ode() internally crops back
+  # the result. since we don't use the output of ode(), we need to manually crop back
   df <- df |> crop_stream_length(L)
+
+  # now add on average speed and the norm
   n <- nrow(df)
   df$avg_spd <- df$l[n] / df$t[n]
   df$norm <- norm(fun(u0))
@@ -408,28 +411,10 @@ ode_stepper <- function(u0, fun, dt = .005, t0 = 0, L = 1, max_it = 5000, method
   # return
   df
 
-  # convert to nice data frame and return
-  # n <- nrow(soln)
-  # soln <- as.data.frame(soln)
-  # names(soln) <- c("t", "x", "y", "l")
-  #
-  # with(
-  #   soln,
-  #   data.frame(
-  #     "t" = t,
-  #     "x" = x,
-  #     "y" = y,
-  #     "d" = c(NA_real_, diff(l)),
-  #     "l" = l,
-  #     "avg_spd" = l[n] / t[n],
-  #     "norm" = norm(fun(u0))
-  #   )
-  # )
-
 }
 # f <- function(u) c(-u[2], u[1])
 # ode_stepper( c(1,0), f, L = pi) |> str()
-# ode_stepper( c(1,0), f, L = pi) |> tail()
+# ode_stepper( c(1,0), f, L = pi) |> tail() # look at last l
 # ode_stepper( c(1,0), f, L = pi) |>
 #   ggplot(aes(x, y)) +
 #     geom_path(aes(color = t))

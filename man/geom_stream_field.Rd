@@ -21,7 +21,7 @@ geom_stream_field(
   ylim = NULL,
   n = 11,
   max_it = 1000,
-  dt = 0.0025,
+  tlim = c(0, 1e+06),
   L = NULL,
   center = TRUE,
   normalize = TRUE,
@@ -44,7 +44,7 @@ stat_stream_field(
   ylim = NULL,
   n = 11,
   max_it = 1000,
-  dt = 0.0025,
+  tlim = c(0, 1e+06),
   L = NULL,
   center = TRUE,
   normalize = TRUE,
@@ -132,10 +132,6 @@ points.}
 \item{max_it}{Integer. Maximum number of integration steps per streamline.
 This controls how far each streamline can propagate. Defaults to 1000.}
 
-\item{dt}{Numeric. Time-step size for integration. Smaller values produce
-more precise streamlines but increase computation time. Default is
-\code{0.0025}.}
-
 \item{L}{Numeric. Maximum arc length for each streamline. A streamline stops
 once its length exceeds this value. If \code{NULL}, a suitable default is
 derived from the grid spacing. Default is \code{NULL}.}
@@ -160,6 +156,10 @@ streamline. By default, a closed arrow with a 30° angle and a length of
 
 \item{geom}{The geometric object used to draw the streamline. Defaults to
 \link{GeomStream}.}
+
+\item{dt}{Numeric. Time-step size for integration. Smaller values produce
+more precise streamlines but increase computation time. Default is
+\code{0.0025}.}
 }
 \value{
 A ggplot2 layer that computes the streamlines over the specified
@@ -198,24 +198,11 @@ ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) + coord_equal()
 ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 
-# Define a simple rotational vector field function
-rotational_field <- function(u) {
-  x <- u[1]
-  y <- u[2]
-  c(-y, x)
-}
-
-# Create a stream field layer
-ggplot() + geom_stream_field(fun = rotational_field)
-ggplot() + geom_vector_field(fun = rotational_field)
-
-# Create a stream field layer with tail points
-ggplot() +
-  geom_stream_field(fun = rotational_field, tail_point = TRUE)
-
-# Create a stream field with centered streams
-ggplot() +
-  geom_stream_field(fun = rotational_field, center = TRUE)
+f <- function(u) c(-u[2], u[1])
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), tail_point = TRUE)
+ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), tail_point = TRUE)
 
 }
 \keyword{datasets}
