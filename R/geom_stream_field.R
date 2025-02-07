@@ -131,6 +131,11 @@
 #'   linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
 #' )
 #'
+#'
+#'
+#'
+#' # neat examples
+#'
 #' f <- function(u) {
 #'   x <- u[1]; y <- u[2]
 #'   c(y, y*(-x^2 - 2*y^2 + 1) - x)
@@ -145,6 +150,12 @@
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
 #'
+#' f <- function(u) {
+#'   x <- u[1]; y <- u[2]
+#'   c(x^2 - y^2, x^2 + y^2 - 2)
+#' }
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
 #'
 #'
 #' @name geom_stream_field
