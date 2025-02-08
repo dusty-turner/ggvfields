@@ -531,7 +531,6 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000,
   # x'(t) = fun(u)[1], y'(t) = fun(u)[2], l'(t) = sqrt(x'(t)^2 + y'(t)).
   # this system is interrupted by the "root" function that is 0 when l(t) = L
   fun_wrapper <- function(t, u, parms) {
-    norm <- function(x) sqrt(sum(x^2))
     fu <- fun(u[1:2])
     df <<- rbind(
       df,
@@ -555,6 +554,19 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000,
     rootfun = rootfun,
     maxsteps = max_it
   )
+
+  # the evals have lots of near-duplicated rows. let's remove those
+  row_is_duplicate <- logical( nrow(df) )
+  for (i in 2:nrow(df)) {
+    u <- as.numeric( df[i-1,] )
+    v <- as.numeric( df[i  ,] )
+    row_is_duplicate[i] <- norm(u-v) <= 1e-5
+  }
+  df <- df[!row_is_duplicate,]
+  row.names(df) <- 1:nrow(df)
+
+  # time order streams. they are almost always in order, but not quite always.
+  df <- df[order(df$t),]
 
   # compute d and l stats
   n <- nrow(df)
