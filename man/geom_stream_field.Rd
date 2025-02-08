@@ -169,86 +169,74 @@ streamlines are then passed to \link{GeomStream} for rendering.
 
 f <- function(u) c(-u[2], u[1])
 
+# the basic usage involves you providing a fun, xlim, and ylim
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), center = FALSE)
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector", center = FALSE)
 
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), normalize = FALSE)
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector", normalize = FALSE)
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), center = FALSE, normalize = FALSE)
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector",
-  center = FALSE, normalize = FALSE)
+# if unspecified, xlim and ylim default to c(-1,1). we use this in what
+# follows to focus on other parts of the code
+ggplot() + geom_stream_field(fun = f)
+ggplot() + geom_stream_field(fun = f, type = "vector")
+ggplot() + geom_stream_field(fun = f, center = FALSE)
+ggplot() + geom_stream_field(fun = f, type = "vector", center = FALSE)
+
+ggplot() + geom_stream_field(fun = f, normalize = FALSE)
+ggplot() + geom_stream_field(fun = f, normalize = FALSE, type = "vector")
+ggplot() + geom_stream_field(fun = f, normalize = FALSE, center = FALSE)
+ggplot() + geom_stream_field(fun = f, normalize = FALSE, type = "vector", center = FALSE)
 
 # run systems until specified lengths
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), normalize = TRUE, L = .08)
+ggplot() + geom_stream_field(fun = f, normalize = TRUE, L = .08)
 
 # run systems for specified times
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1),
-  normalize = FALSE, T = .1)
+ggplot() + geom_stream_field(fun = f, normalize = FALSE, T = .1)
 
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_stream_field(fun = f)
 
 # is this geom_stream_field2()? but no legend...
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1),
-  normalize = FALSE, T = .15, center = FALSE, color = "black",
-  tail_point = TRUE, arrow = NULL)
+ggplot() + geom_stream_field(fun = f, normalize = FALSE, T = .15,
+  center = FALSE, color = "black", tail_point = TRUE, arrow = NULL)
 
 # is this geom_vector_field2()? but no legend...
 ggplot() +
-  geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector",
+  geom_stream_field(fun = f, type = "vector",
   normalize = FALSE, T = .15, center = FALSE, color = "black",
   tail_point = TRUE, arrow = NULL)
 
 # tail and eval points
-ggplot() +
-geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), eval_point = TRUE)
-ggplot() +
-geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), eval_point = TRUE,
-  type = "vector", arrow = NULL)
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1),
-  tail_point = TRUE, type = "vector", arrow = NULL, center = FALSE
-)
+ggplot() + geom_stream_field(fun = f, eval_point = TRUE)
+ggplot() + geom_stream_field(fun = f, eval_point = TRUE, type = "vector", arrow = NULL)
+ggplot() + geom_stream_field(fun = f, tail_point = TRUE, type = "vector",
+  arrow = NULL, center = FALSE)
 
 
 
 
 f <- efield_maker()
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2),
-  type = "vector")
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
 ggplot() +
   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
   scale_color_viridis_c(trans = "log10") +
   coord_equal()
 
 f <- function(u) u
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
 
 f <- function(u) c(2,1)
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
 
 # bug here with alpha
 ggplot() +
-  geom_stream_field(fun = f, aes(alpha = after_stat(t)), xlim = c(-2,2),
-    ylim = c(-2,2)) +
+  geom_stream_field(fun = f, aes(alpha = after_stat(t)), xlim = c(-2,2), ylim = c(-2,2)) +
   scale_alpha(range  = c(0,1))
 
 ggplot() +
   geom_stream_field(
-  fun = f, xlim = c(-1,1), ylim = c(-1,1),
-  linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
-)
+    fun = f, xlim = c(-1,1), ylim = c(-1,1),
+    linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
+  )
 
 
 
@@ -259,19 +247,15 @@ f <- function(u) {
   x <- u[1]; y <- u[2]
   c(y, y*(-x^2 - 2*y^2 + 1) - x)
 }
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
 
 f <- function(u) {
   x <- u[1]; y <- u[2]
   c(y, x - x^3)
 }
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-ggplot() +
-  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
 
 f <- function(u) {
   x <- u[1]; y <- u[2]

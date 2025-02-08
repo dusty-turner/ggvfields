@@ -69,86 +69,74 @@
 #'
 #' f <- function(u) c(-u[2], u[1])
 #'
+#' # the basic usage involves you providing a fun, xlim, and ylim
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), center = FALSE)
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector", center = FALSE)
 #'
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), normalize = FALSE)
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector", normalize = FALSE)
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), center = FALSE, normalize = FALSE)
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector",
-#'   center = FALSE, normalize = FALSE)
+#' # if unspecified, xlim and ylim default to c(-1,1). we use this in what
+#' # follows to focus on other parts of the code
+#' ggplot() + geom_stream_field(fun = f)
+#' ggplot() + geom_stream_field(fun = f, type = "vector")
+#' ggplot() + geom_stream_field(fun = f, center = FALSE)
+#' ggplot() + geom_stream_field(fun = f, type = "vector", center = FALSE)
+#'
+#' ggplot() + geom_stream_field(fun = f, normalize = FALSE)
+#' ggplot() + geom_stream_field(fun = f, normalize = FALSE, type = "vector")
+#' ggplot() + geom_stream_field(fun = f, normalize = FALSE, center = FALSE)
+#' ggplot() + geom_stream_field(fun = f, normalize = FALSE, type = "vector", center = FALSE)
 #'
 #' # run systems until specified lengths
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), normalize = TRUE, L = .08)
+#' ggplot() + geom_stream_field(fun = f, normalize = TRUE, L = .08)
 #'
 #' # run systems for specified times
-#' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1),
-#'   normalize = FALSE, T = .1)
+#' ggplot() + geom_stream_field(fun = f, normalize = FALSE, T = .1)
 #'
-#' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#' ggplot() + geom_stream_field(fun = f)
 #'
 #' # is this geom_stream_field2()? but no legend...
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1),
-#'   normalize = FALSE, T = .15, center = FALSE, color = "black",
-#'   tail_point = TRUE, arrow = NULL)
+#' ggplot() + geom_stream_field(fun = f, normalize = FALSE, T = .15,
+#'   center = FALSE, color = "black", tail_point = TRUE, arrow = NULL)
 #'
 #' # is this geom_vector_field2()? but no legend...
 #' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector",
+#'   geom_stream_field(fun = f, type = "vector",
 #'   normalize = FALSE, T = .15, center = FALSE, color = "black",
 #'   tail_point = TRUE, arrow = NULL)
 #'
 #' # tail and eval points
-#' ggplot() +
-#' geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), eval_point = TRUE)
-#' ggplot() +
-#' geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), eval_point = TRUE,
-#'   type = "vector", arrow = NULL)
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1),
-#'   tail_point = TRUE, type = "vector", arrow = NULL, center = FALSE
-#' )
+#' ggplot() + geom_stream_field(fun = f, eval_point = TRUE)
+#' ggplot() + geom_stream_field(fun = f, eval_point = TRUE, type = "vector", arrow = NULL)
+#' ggplot() + geom_stream_field(fun = f, tail_point = TRUE, type = "vector",
+#'   arrow = NULL, center = FALSE)
 #'
 #'
 #'
 #'
 #' f <- efield_maker()
-#' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-#' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2),
-#'   type = "vector")
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
 #' ggplot() +
 #'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
 #'   scale_color_viridis_c(trans = "log10") +
 #'   coord_equal()
 #'
 #' f <- function(u) u
-#' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-#' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
 #'
 #' f <- function(u) c(2,1)
-#' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-#' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
 #'
 #' # bug here with alpha
 #' ggplot() +
-#'   geom_stream_field(fun = f, aes(alpha = after_stat(t)), xlim = c(-2,2),
-#'     ylim = c(-2,2)) +
+#'   geom_stream_field(fun = f, aes(alpha = after_stat(t)), xlim = c(-2,2), ylim = c(-2,2)) +
 #'   scale_alpha(range  = c(0,1))
 #'
 #' ggplot() +
 #'   geom_stream_field(
-#'   fun = f, xlim = c(-1,1), ylim = c(-1,1),
-#'   linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
-#' )
+#'     fun = f, xlim = c(-1,1), ylim = c(-1,1),
+#'     linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
+#'   )
 #'
 #'
 #'
@@ -159,19 +147,15 @@
 #'   x <- u[1]; y <- u[2]
 #'   c(y, y*(-x^2 - 2*y^2 + 1) - x)
 #' }
-#' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-#' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
 #'
 #' f <- function(u) {
 #'   x <- u[1]; y <- u[2]
 #'   c(y, x - x^3)
 #' }
-#' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-#' ggplot() +
-#'   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
 #'
 #' f <- function(u) {
 #'   x <- u[1]; y <- u[2]
@@ -343,19 +327,19 @@ StatStreamField <- ggproto(
 
     xlim <- xlim %||% scales$x$range$range
     if (is.null(xlim)) {
-      cli::cli_warn("No xlim provided or inherited; defaulting to c(-1, 1).")
+      # cli::cli_warn("No xlim provided or inherited; defaulting to c(-1, 1).")
       xlim <- c(-1, 1)
     }
 
     ylim <- ylim %||% scales$y$range$range
     if (is.null(ylim)) {
-      cli::cli_warn("No ylim provided or inherited; defaulting to c(-1, 1).")
+      # cli::cli_warn("No ylim provided or inherited; defaulting to c(-1, 1).")
       ylim <- c(-1, 1)
     }
 
     # allow for additional args to be passed
-    orig_fun <- fun
-    fun <- function(v) rlang::inject(orig_fun(v, !!!args))
+    # orig_fun <- fun
+    # fun <- function(v) rlang::inject(orig_fun(v, !!!args))
 
     # make grid of points on which to compute streams
     grid <- cbind(
@@ -368,6 +352,14 @@ StatStreamField <- ggproto(
     # or 2) not normalizing and computing T automatically
     if ( (normalize && is.null(L)) || (!normalize && is.null(T)) ) {
       L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
+    }
+
+    # initialize T for !normalizing vectors; this will be an inefficient
+    # implementation as i will recompute fun on the grid later, but fine for now
+    if (!normalize && type == "vector") {
+      grid_norms <- apply(grid, 1, function(u) norm(fun(u)))
+      fastest_vector_id <- which.max(grid_norms)
+      T <- L / grid_norms[fastest_vector_id]
     }
 
     # initialize the data frame
@@ -383,7 +375,11 @@ StatStreamField <- ggproto(
         fu <- fun(u)
         nfu <- norm(fu)
 
-        v <- if (normalize) L*fu/nfu else T*fu
+        v <- if (normalize) {
+          L*fu/nfu
+        } else {
+          T*fu
+        }
 
         if (center) {
           from <- u - v/2
@@ -400,7 +396,7 @@ StatStreamField <- ggproto(
           "d" = c(NA_real_, L),
           "l" = c(0, L),
           "avg_spd" = nfu, # = L / (L/nfu)
-          "norm" = nfu,
+          # "norm" = nfu,
           "id" = i
         )
 
@@ -440,34 +436,19 @@ StatStreamField <- ggproto(
       times_to_L_by_stream <- unname(times_to_L_by_stream)
 
       # find the fastest stream to get to L, and the associated time
-      fastest_stream_id <- which.min( times_to_L_by_stream )[1] # may have ties
+      fastest_stream_id <- which.min( times_to_L_by_stream )
       smallest_t <- times_to_L_by_stream[fastest_stream_id]
 
       # go back through grid cropping time to T = fastest_t
       for (i in 1:nrow(grid)) {
-        list_of_streams[[i]] <- crop_stream_time(list_of_streams[[i]], T = smallest_t)
+        list_of_streams[[i]] <- crop_stream_time(
+          list_of_streams[[i]],
+          T = smallest_t,
+          centered = TRUE
+        )
       }
 
     }
-
-
-
-
-
-    # compute divergence and curl by group (each group is identified by id)
-    # df <- do.call(rbind, lapply(split(df, df$id), function(subdf) {
-    #
-    #   # calculate the gradient of the vector field at each point.
-    #   grad <- t(apply(subdf[, c("x", "y")], 1, function(v) numDeriv::grad(fun, v)))
-    #   grad_u <- grad[, 1]
-    #   grad_v <- grad[, 2]
-    #
-    #   # compute divergence and curl.
-    #   subdf$divergence <- grad_u + grad_v
-    #   subdf$curl <- grad_v - grad_u
-    #
-    #   subdf
-    # }))
 
     # combine streams and return
     do.call("rbind", list_of_streams)
@@ -476,6 +457,24 @@ StatStreamField <- ggproto(
 
 
 )
+
+
+
+
+# compute divergence and curl by group (each group is identified by id)
+# df <- do.call(rbind, lapply(split(df, df$id), function(subdf) {
+#
+#   # calculate the gradient of the vector field at each point.
+#   grad <- t(apply(subdf[, c("x", "y")], 1, function(v) numDeriv::grad(fun, v)))
+#   grad_u <- grad[, 1]
+#   grad_v <- grad[, 2]
+#
+#   # compute divergence and curl.
+#   subdf$divergence <- grad_u + grad_v
+#   subdf$curl <- grad_v - grad_u
+#
+#   subdf
+# }))
 
 
 
@@ -491,22 +490,28 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000,
     # define a few helpers
     neg_fun <- function(u) -fun(u)
     flip <- function(df) if (nrow(df) == 0L) df else df[nrow(df):1,]
-    # the nrow(df) == 0 part is if the original eval point fails, vec field is not defined at that point
+    # the nrow(df) == 0 part is if the original eval point fails,
+    # vec field is not defined at that point, so
     # if you df[nrow(df):1,] on a 0-row df, you get back a row of NAs
 
     # solve in both directions
     df_negative <- ode_stepper(u0, neg_fun, T, L/2, max_it, method, center = FALSE)
-    df_negative$t <- -df_negative$t
     df_positive <- ode_stepper(u0,     fun, T, L/2, max_it, method, center = FALSE)
 
-    # combine the datasets
+    # format both for merging
+    n_neg <- nrow(df_negative)
+    n_pos <- nrow(df_positive)
+
+    df_negative$t <- -df_negative$t
+    row.names(df_negative) <- -(0:(n_neg-1))
+    row.names(df_positive) <- 0:(n_pos-1)
+
+    # merge
     df <- rbind( flip(df_negative[-1,]), df_positive )
 
     # shift lengths, recompute distances, arc length, avg speed
-    n_neg <- nrow(df_negative) - 1
-    n_pos <- nrow(df_positive)
     n <- nrow(df)
-    df$d <- if (n == 1) NA_real_ else c(NA_real_, df$d[1:n_neg], df_positive$d[-1])
+    df$d <- if (n == 1) NA_real_ else c(NA_real_, df$d[1:(n_neg-1)], df_positive$d[-1])
     df$l <- c(0, cumsum(df$d[-1]))
     df$avg_spd <- df$l[n] / (df$t[n] - df$t[1])
 
@@ -528,9 +533,10 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000,
   fun_wrapper <- function(t, u, parms) {
     norm <- function(x) sqrt(sum(x^2))
     fu <- fun(u[1:2])
-    # use this if you also want to remember the function values fx(u) and fy(u)
-    # df <<- rbind( df, c(t, u[1:2], fu) |> t() |> matrix_to_df_with_names(c("t","x","y","fx","fy")) )
-    df <<- rbind( df, c(t, u[1:2]) |> t() |> matrix_to_df_with_names(c("t","x","y")) )
+    df <<- rbind(
+      df,
+      matrix_to_df_with_names(t( c(t, u[1:2]) ), c("t","x","y"))
+    )
     list( c( fu, "l" = norm(fu) ) )
   }
 
@@ -660,10 +666,66 @@ crop_stream_length <- function(data, L) {
 
 
 # this function behaves just like crop_stream_length(), see main comments there
-crop_stream_time <- function(data, T) {
+crop_stream_time <- function(data, T, centered = FALSE) {
+  # when centered = FALSE, the stream is assumed to run from 0 to T, or rather
+  # something more than T, and this function crops back the stream to 0 to T
+  # it's more challenging when t runs from some -T to T, usually resulting from
+  # running the curve until length L/2 in reverse and L/2 in forward time.
+  # these will have values tmin and tmax, and tmin is typically not -tmax.
+  # to create a centered stream that is time-cropped to a given T,
+  # assuming the original stream runs from tmin to tmax and is of length
+  # L/2 from tmin to 0 and L/2 from 0 to tmax, we can't just look for T/2 in
+  # both directions. (note: T is always less than the -tmin + tmax; tmin < 0)
+
+  if ( centered ) {
+
+    # define a helper
+    flip <- function(df) if (nrow(df) == 0L) df else df[nrow(df):1,]
+
+    # compute basic quantities
+    n <- nrow(data)
+    tmin <- data$t[1]; tmax <- data$t[n]
+    stream_T <- tmax - tmin
+    ptn <- T / stream_T # = proportion of time needed
+
+    # break stream into two: positive and negative stream components
+    rn <- as.integer( row.names(data) )
+    neg_t_stream <- data[rn <= 0,]; n_neg <- nrow(neg_t_stream)
+    pos_t_stream <- data[rn >= 0,]; n_pos <- nrow(pos_t_stream)
+
+    # revert negative stream to pos t
+    neg_t_stream <- flip( neg_t_stream )
+    neg_t_stream$t <- -neg_t_stream$t
+
+    # crop both to the desired proportion
+    neg_t_stream <- crop_stream_time( neg_t_stream, ptn*(-tmin), centered = FALSE )
+    pos_t_stream <- crop_stream_time( pos_t_stream, ptn * tmax, centered = FALSE )
+
+    # flip negative
+    neg_t_stream <- flip( neg_t_stream[-1,] ) # remove t = 0 row
+    neg_t_stream$t <- -neg_t_stream$t
+
+    # reconstruct cropped stream
+    stream <- rbind(neg_t_stream, pos_t_stream)
+    n <- nrow(stream)
+    stream$d <- c(
+      NA_real_,
+      apply(
+        stream[2:n,c("x","y")] - stream[1:(n-1),c("x","y")],
+        1,
+        norm
+      )
+    )
+    stream$l <- c(0, cumsum(stream$d[-1]))
+
+    # return
+    return( stream )
+
+  }
 
   # determine number of points in the path
   n <- nrow(data)
+  if (n == 0) return(data)
 
   # return data if doesn't get to time T, return data
   # NOTE: this may need to change in the future
