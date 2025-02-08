@@ -48,9 +48,6 @@
 #' @export efield
 efield <- function(u, charge_positions, charges, k = 1, q_test = +1) {
 
-  norm <- function(u) sqrt(sum(u^2))
-  normalize <- function(u) u / norm(u)
-
   F <- c(0,0)
   for (i in 1:nrow(charge_positions)) {
     u_charge <- charge_positions[i,]

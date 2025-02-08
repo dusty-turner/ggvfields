@@ -860,7 +860,20 @@ matrix_to_df_with_names <- function(mat, col_names = NULL) {
 }
 
 
-norm <- function(x) sqrt(sum(x^2))
+norm <- function(u) sqrt(sum(u^2))
+
+normalize <- function(u) u / norm(u)
+
+ip <- function(u, v) sum(u*v)
+
+angle <- function(u, v) {
+  u <- normalize(u)
+  v <- normalize(v)
+  ip_uv <- ip(u, v)
+  if (ip_uv < -1) ip_uv <- -1
+  if (ip_uv >  1) ip_uv <-  1
+  acos( ip_uv )
+}
 
 
 
