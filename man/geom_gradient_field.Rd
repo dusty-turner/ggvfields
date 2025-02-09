@@ -20,7 +20,11 @@ stat_gradient_field(
   xlim = NULL,
   ylim = NULL,
   n = 11,
+  max_it = 1000,
+  T = NULL,
+  L = NULL,
   center = TRUE,
+  type = "stream",
   normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
@@ -40,9 +44,13 @@ geom_gradient_field2(
   xlim = NULL,
   ylim = NULL,
   n = 11,
-  center = FALSE,
+  max_it = 1000,
+  T = NULL,
+  L = NULL,
+  center = TRUE,
+  type = "stream",
   normalize = TRUE,
-  tail_point = TRUE,
+  tail_point = FALSE,
   eval_point = FALSE,
   arrow = NULL
 )
@@ -60,71 +68,87 @@ stat_gradient_field2(
   xlim = NULL,
   ylim = NULL,
   n = 11,
-  center = FALSE,
+  max_it = 1000,
+  T = NULL,
+  L = NULL,
+  center = TRUE,
+  type = "stream",
   normalize = TRUE,
-  tail_point = TRUE,
+  tail_point = FALSE,
   eval_point = FALSE,
   arrow = NULL
 )
 }
 \arguments{
-\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}. Additional aesthetics such as
-\code{color}, \code{size}, \code{linetype}, and \code{alpha} can be defined. In \strong{geom_gradient_field} the default mapping
-includes \code{color = after_stat(norm)}, whereas in \strong{geom_gradient_field2} the default mapping includes
-\code{length = after_stat(norm)}.}
+\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
+Additional aesthetics such as \code{color}, \code{size}, \code{linetype}, and \code{alpha} can
+be defined. In \strong{geom_gradient_field} the default mapping includes \code{color = after_stat(norm)}, whereas in \strong{geom_gradient_field2} the default
+mapping includes \code{length = after_stat(norm)}.}
 
 \item{data}{A data frame containing the input data.}
 
 \item{geom}{The geometric object used to draw the streamline. Defaults to
 \link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
 
-\item{position}{Position adjustment, either as a string or the result of a call to a position adjustment function.}
+\item{position}{Position adjustment, either as a string or the result of a
+call to a position adjustment function.}
 
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
-\item{na.rm}{Logical. If \code{FALSE} (the default), missing values are removed with a warning.}
+\item{na.rm}{Logical. If \code{FALSE} (the default), missing values are removed
+with a warning.}
 
 \item{show.legend}{Logical. Should this layer be included in the legends?}
 
-\item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics rather than combining with them.}
+\item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics
+rather than combining with them.}
 
-\item{fun}{A function that defines the scalar field. It should take a numeric vector of length 2 (representing
-\eqn{(x, y)}) and return a single numeric value. \strong{(Required)}}
+\item{fun}{A function that defines the scalar field. It should take a numeric
+vector of length 2 (representing \eqn{(x, y)}) and return a single numeric
+value. \strong{(Required)}}
 
-\item{xlim}{Numeric vector of length two. Specifies the limits of the x-axis domain. Defaults to \code{c(-1, 1)}.}
+\item{xlim}{Numeric vector of length two. Specifies the limits of the x-axis
+domain. Defaults to \code{c(-1, 1)}.}
 
-\item{ylim}{Numeric vector of length two. Specifies the limits of the y-axis domain. Defaults to \code{c(-1, 1)}.}
+\item{ylim}{Numeric vector of length two. Specifies the limits of the y-axis
+domain. Defaults to \code{c(-1, 1)}.}
 
-\item{n}{Integer. Grid resolution specifying the number of seed points along each axis. Higher values produce a
-denser gradient field. Defaults to \code{11}.}
+\item{n}{Integer. Grid resolution specifying the number of seed points along
+each axis. Higher values produce a denser gradient field. Defaults to \code{11}.}
 
-\item{center}{Logical. If \code{TRUE}, centers the seed points so that the original (x, y) becomes the midpoint.
-Defaults differ between the variants.}
+\item{center}{Logical. If \code{TRUE}, centers the seed points so that the
+original (x, y) becomes the midpoint. Defaults differ between the variants.}
 
-\item{normalize}{Logical. If \code{TRUE}, gradient vectors are normalized based on grid spacing. If \code{TRUE},
-it is converted internally to \code{"vector"}. Default is \code{TRUE}.}
+\item{normalize}{Logical. If \code{TRUE}, gradient vectors are normalized based on
+grid spacing. If \code{TRUE}, it is converted internally to \code{"vector"}. Default
+is \code{TRUE}.}
 
-\item{tail_point}{Logical. If \code{TRUE}, a point is drawn at the tail of each gradient vector.
-Defaults differ between the variants.}
+\item{tail_point}{Logical. If \code{TRUE}, a point is drawn at the tail of each
+gradient vector. Defaults differ between the variants.}
 
-\item{eval_point}{Logical. If \code{TRUE}, a point is drawn at the evaluation point where the gradient was computed.
-Default is \code{FALSE}.}
+\item{eval_point}{Logical. If \code{TRUE}, a point is drawn at the evaluation
+point where the gradient was computed. Default is \code{FALSE}.}
 
-\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the gradient vectors.
-In \strong{geom_gradient_field} the default is a closed arrow with a 30° angle and length \code{0.02} npc;
-in \strong{geom_gradient_field2} the default is \code{NULL}.}
+\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the
+gradient vectors. In \strong{geom_gradient_field} the default is a closed arrow
+with a 30° angle and length \code{0.02} npc; in \strong{geom_gradient_field2} the
+default is \code{NULL}.}
 
-\item{stat}{The statistical transformation to use on the data for this layer. Defaults to \link{StatStreamField}.}
+\item{stat}{The statistical transformation to use on the data for this layer.
+Defaults to \link{StatStreamField}.}
 }
 \value{
-A ggplot2 layer that computes and plots a gradient field by numerically differentiating a scalar field.
+A ggplot2 layer that computes and plots a gradient field by
+numerically differentiating a scalar field.
 }
 \description{
-These functions provide convenient ggplot2 layers for drawing gradient fields by computing the
-gradient of a scalar field. A user-defined function (\code{fun}) specifies the behavior of the scalar
-field by taking a numeric vector of length 2 (representing \eqn{(x, y)}) and returning a single numeric
-value. The underlying \link{StatStreamField} computes the gradient via numerical differentiation (using
-\code{\link[numDeriv:grad]{numDeriv::grad()}}) and \link{GeomStream} renders the resulting vectors.
+These functions provide convenient ggplot2 layers for drawing gradient fields
+by computing the gradient of a scalar field. A user-defined function (\code{fun})
+specifies the behavior of the scalar field by taking a numeric vector of
+length 2 (representing \eqn{(x, y)}) and returning a single numeric value.
+The underlying \link{StatStreamField} computes the gradient via numerical
+differentiation (using \code{\link[numDeriv:grad]{numDeriv::grad()}}) and \link{GeomStream} renders the
+resulting vectors.
 }
 \details{
 Two variants are provided:
@@ -135,19 +159,32 @@ unmapped by default).
 }
 }
 \examples{
-# Define a simple paraboloid scalar field function
-paraboloid_field <- function(v) {
-  x <- v[1]
-  y <- v[2]
-  x^2 + y^2
-}
 
-# Using geom_gradient_field()
-ggplot() +
-  geom_gradient_field(fun = paraboloid_field)
+Si <- matrix(c(1, .75, .75, 1), 2)
+f <- function(u) exp(-as.numeric(u \%*\% solve(Si) \%*\% u)/2) / (2*pi*det(Si))
 
-# Using geom_gradient_field2()
+ggplot() + geom_gradient_field(fun = f, xlim = c(-3,3), ylim = c(-3,3))
+
+df <- expand.grid( "x" = seq(-3, 3, .1), "y" = seq(-3, 3, .1) ) |>
+  transform( "fxy" = apply(cbind(x, y), 1, f) )
+
 ggplot() +
-  geom_gradient_field2(fun = paraboloid_field)
+  geom_raster(aes(x, y, fill = fxy), data = df) +
+  geom_gradient_field(fun = f, xlim = c(-3,3), ylim = c(-3,3)) +
+  coord_equal()
+
+library("ggdensity")
+fxy <- function(x, y) apply(cbind(x,y), 1, f)
+fxy(1, 2)
+f(1:2)
+
+ggplot() +
+  geom_hdr_fun(fun = fxy, xlim = c(-3,3), ylim = c(-3,3)) +
+  geom_gradient_field(fun = f, xlim = c(-3,3), ylim = c(-3,3)) +
+  coord_equal()
+
+
+
+ggplot() + geom_gradient_field2(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 
 }
