@@ -102,56 +102,34 @@ geom_stream_smooth <- function(mapping = NULL, data = NULL,
                                                    type = "closed")
 ) {
 
-  if (is.null(data)) {
-    stop("Error in geom_stream_smooth: 'data' is required.")
-  }
-  if (missing(formula) || is.null(formula)) {
-    stop("Error in geom_stream_smooth: 'formula' is required.")
-  }
-
-  # If xend/yend are missing or all NA, then try to compute them
-  if ((!"xend" %in% names(data) || all(is.na(data$xend))) ||
-      (!"yend" %in% names(data) || all(is.na(data$yend)))) {
-    if ("fx" %in% names(data) && "fy" %in% names(data) &&
-        !(all(is.na(data$fx)) || all(is.na(data$fy)))) {
-      # Use fx and fy to compute endpoints.
-      data$xend <- data$x + data$fx
-      data$yend <- data$y + data$fy
-    } else if ("angle" %in% names(data) && "distance" %in% names(data) &&
-               !(all(is.na(data$angle)) || all(is.na(data$distance)))) {
-      # Use angle and distance to compute endpoints.
-      data$xend <- data$x + data$distance * cos(data$angle * 180 / pi)
-      data$yend <- data$y + data$distance * sin(data$angle * 180 / pi)
-    } else {
-      stop("Either xend/yend or fx/fy or angle/distance must be provided.")
+  # Inspect the LHS of the formula. If it is cbind(xend, yend), then change it
+  lhs <- formula[[2]]
+  if (is.call(lhs) && identical(lhs[[1]], as.name("cbind"))) {
+    lhs_vars <- sapply(as.list(lhs[-1]), as.character)
+    if (all(lhs_vars %in% c("xend", "yend")) ||
+        all(lhs_vars %in% c("distance", "angle"))) {
+      # Change to use fx and fy instead
+      formula[[2]] <- substitute(cbind(fx, fy))
     }
   }
 
-  if ((!"fx" %in% names(data) || all(is.na(data$fx))) ||
-      (!"fy" %in% names(data) || all(is.na(data$fy)))) {
-    data$fx <- data$xend - data$x
-    data$fy <- data$yend - data$y
-  }
-
-  if (is.null(xlim)) {
-    xlim <- range(data$x, na.rm = TRUE)
-  }
-  if (is.null(ylim)) {
-    ylim <- range(data$y, na.rm = TRUE)
-  }
-
   n <- ensure_length_two(n)
-
   dots <- list(...)
   if (!("color" %in% names(dots))) {
     dots$color <- "blue"
   }
 
-  vec_field <- function(u, formula, data) {
-    model <- lm(formula, data = data)
+  # Define the vector field function. It retrieves the prepared data from the
+  # parent environment (which comes from the stat after setup_data()).
+  vec_field <- function(u) {
+    group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
+    # if (inherits(group_data, "try-error") || is.null(group_data)) {
+    #   stop("Could not retrieve group data for vector field calculation.")
+    # }
+    # Fit the regression using the (possibly modified) formula.
+    model <- lm(formula, data = group_data)
     newdata <- data.frame(x = u[1], y = u[2])
-    preds <- predict(model, newdata = newdata)
-    as.numeric(preds)
+    as.numeric(predict(model, newdata = newdata))
   }
 
   layer(
@@ -172,11 +150,9 @@ geom_stream_smooth <- function(mapping = NULL, data = NULL,
         xlim = xlim,
         ylim = ylim,
         type = type,
-        args = list(formula = formula, data = data),
         arrow = arrow
       ),
       dots
     )
   )
 }
-
