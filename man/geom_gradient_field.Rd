@@ -116,8 +116,26 @@ domain. Defaults to \code{c(-1, 1)}.}
 \item{n}{Integer. Grid resolution specifying the number of seed points along
 each axis. Higher values produce a denser gradient field. Defaults to \code{11}.}
 
+\item{max_it}{Integer. Maximum number of integration steps allowed when
+computing the gradient stream or vector. Defaults to 1000.}
+
+\item{T}{Numeric. Time increment used for numerical integration when
+\code{normalize} is FALSE. If not provided, it is computed automatically based
+on grid spacing and the vector field’s magnitude.}
+
+\item{L}{Numeric. Target length for the gradient vectors or streamlines. When
+\code{normalize} is TRUE, computed vectors are scaled to have length L. If not
+provided, L is computed automatically from the grid spacing.}
+
 \item{center}{Logical. If \code{TRUE}, centers the seed points so that the
 original (x, y) becomes the midpoint. Defaults differ between the variants.}
+
+\item{type}{Character. Specifies the type of field to compute: use \code{"stream"}
+to generate integrated streamlines or \code{"vector"} for individual vector
+segments. Defaults to \code{"stream"}.
+gradient vectors. In \strong{geom_gradient_field} the default is a closed arrow
+with a 30° angle and length \code{0.02} npc; in \strong{geom_gradient_field2} the
+default is \code{NULL}.}
 
 \item{normalize}{Logical. If \code{TRUE}, gradient vectors are normalized based on
 grid spacing. If \code{TRUE}, it is converted internally to \code{"vector"}. Default
@@ -129,10 +147,7 @@ gradient vector. Defaults differ between the variants.}
 \item{eval_point}{Logical. If \code{TRUE}, a point is drawn at the evaluation
 point where the gradient was computed. Default is \code{FALSE}.}
 
-\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the
-gradient vectors. In \strong{geom_gradient_field} the default is a closed arrow
-with a 30° angle and length \code{0.02} npc; in \strong{geom_gradient_field2} the
-default is \code{NULL}.}
+\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the}
 
 \item{stat}{The statistical transformation to use on the data for this layer.
 Defaults to \link{StatStreamField}.}
@@ -159,32 +174,32 @@ unmapped by default).
 }
 }
 \examples{
+Si <- matrix(c(1, 0.75, 0.75, 1), nrow = 2)
+f <- function(u) exp(-as.numeric(u \%*\% solve(Si) \%*\% u) / 2) / (2 * pi * det(Si))
 
-Si <- matrix(c(1, .75, .75, 1), 2)
-f <- function(u) exp(-as.numeric(u \%*\% solve(Si) \%*\% u)/2) / (2*pi*det(Si))
+ggplot() +
+  geom_gradient_field(fun = f, xlim = c(-3, 3), ylim = c(-3, 3))
 
-ggplot() + geom_gradient_field(fun = f, xlim = c(-3,3), ylim = c(-3,3))
-
-df <- expand.grid( "x" = seq(-3, 3, .1), "y" = seq(-3, 3, .1) ) |>
-  transform( "fxy" = apply(cbind(x, y), 1, f) )
+df <- expand.grid(x = seq(-3, 3, 0.1), y = seq(-3, 3, 0.1)) |>
+  transform(fxy = apply(cbind(x, y), 1, f))
 
 ggplot() +
   geom_raster(aes(x, y, fill = fxy), data = df) +
-  geom_gradient_field(fun = f, xlim = c(-3,3), ylim = c(-3,3)) +
+  geom_gradient_field(fun = f, xlim = c(-3, 3), ylim = c(-3, 3)) +
   coord_equal()
-
-library("ggdensity")
-fxy <- function(x, y) apply(cbind(x,y), 1, f)
-fxy(1, 2)
-f(1:2)
 
 ggplot() +
-  geom_hdr_fun(fun = fxy, xlim = c(-3,3), ylim = c(-3,3)) +
-  geom_gradient_field(fun = f, xlim = c(-3,3), ylim = c(-3,3)) +
-  coord_equal()
+  geom_gradient_field2(fun = f, xlim = c(-2, 2), ylim = c(-2, 2))
 
+\dontrun{
+  library("ggdensity")
+  fxy <- function(x, y) apply(cbind(x, y), 1, f)
+  fxy(1, 2)
+  f(1:2)
 
-
-ggplot() + geom_gradient_field2(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-
+  ggplot() +
+    geom_hdr_fun(fun = fxy, xlim = c(-3, 3), ylim = c(-3, 3)) +
+    geom_gradient_field(fun = f, xlim = c(-3, 3), ylim = c(-3, 3)) +
+    coord_equal()
+}
 }
