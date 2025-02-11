@@ -25,6 +25,7 @@ stat_vector(
   normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
+  L = NULL,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 )
 
@@ -59,6 +60,7 @@ stat_vector2(
   normalize = FALSE,
   tail_point = TRUE,
   eval_point = FALSE,
+  L = NULL,
   arrow = NULL
 )
 }
@@ -99,6 +101,10 @@ vector. Default is \code{FALSE}.}
 point, corresponding to the original (untransformed) seed point before any
 centering or normalization is applied. This allows for comparison between
 the original and transformed positions. Default is \code{FALSE}.}
+
+\item{L}{Numeric scalar. The desired length for the vectors (in data units).
+If \code{NULL} (the default), a default value is computed automatically based on
+the plot’s x and y limits.}
 
 \item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to
 the vectors (default: \code{grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")}).}

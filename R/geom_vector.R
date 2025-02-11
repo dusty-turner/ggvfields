@@ -48,6 +48,9 @@
 #'   point, corresponding to the original (untransformed) seed point before any
 #'   centering or normalization is applied. This allows for comparison between
 #'   the original and transformed positions. Default is `FALSE`.
+#' @param L Numeric scalar. The desired length for the vectors (in data units).
+#'   If `NULL` (the default), a default value is computed automatically based on
+#'   the plot’s x and y limits.
 #' @param ... Other arguments passed on to [ggplot2::layer()].
 #'
 #' @return A ggplot2 layer that can be added to a plot.
@@ -90,7 +93,9 @@
 #' @export
 NULL
 
-geom_vector <- function(mapping = NULL, data = NULL,
+geom_vector <- function(
+  mapping = NULL,
+  data = NULL,
   stat = StatVector,
   position = "identity",
   ...,
@@ -101,6 +106,7 @@ geom_vector <- function(mapping = NULL, data = NULL,
   normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
+  L = NULL,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
   ) {
 
@@ -127,6 +133,7 @@ geom_vector <- function(mapping = NULL, data = NULL,
       normalize = normalize,
       tail_point = tail_point,
       eval_point = eval_point,
+      L = L,
       ...
     )
   )
@@ -145,6 +152,7 @@ stat_vector <- function(mapping = NULL, data = NULL,
   normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
+  L = NULL,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
   ) {
 
@@ -163,6 +171,7 @@ stat_vector <- function(mapping = NULL, data = NULL,
       normalize = normalize,
       tail_point = tail_point,
       eval_point = eval_point,
+      L = L,
       ...
     )
   )
@@ -176,7 +185,8 @@ StatVector <- ggproto("StatVector", Stat,
   default_aes = aes(xend = NA, yend = NA, distance = NA, angle = NA,
                     fx = NA, fy = NA),
 
-  compute_group = function(data, scales, center, normalize, ...) {
+  compute_group = function(data, scales, center, normalize, L,...) {
+# browser()
 
     n <- nrow(data)
 
@@ -202,12 +212,25 @@ StatVector <- ggproto("StatVector", Stat,
       }
     }
 
-    # Recompute norm in case we just computed xend/yend from fx/fy or angle/distance.
     data$norm <- sqrt((data$xend - data$x)^2 + (data$yend - data$y)^2)
 
-    if(normalize){
-      data$xend <- data$x + (data$xend - data$x) / data$norm
-      data$yend <- data$y + (data$yend - data$y) / data$norm
+    if (is.null(L)) {
+      # use x/ylim if provided by a previous layer, otherwise base it on data
+      xlim <- if (!is.null(scales$x$range$range)) scales$x$range$range else range(data$x, na.rm = TRUE)
+      ylim <- if (!is.null(scales$y$range$range)) scales$y$range$range else range(data$y, na.rm = TRUE)
+
+      # Set a default grid resolution (number of cells along the larger axis).
+      # In geom_stream_field n is passed in; here we assume, say, 20.
+      grid_n <- 20
+
+      # Compute L similarly to geom_stream_field:
+      L <- min(diff(xlim), diff(ylim)) / (grid_n - 1) * 0.85
+    }
+
+    # This normalizes the vector to 1 unit then scales it by 'L'
+    if (normalize) {
+      data$xend <- data$x + L * (data$xend - data$x) / data$norm
+      data$yend <- data$y + L * (data$yend - data$y) / data$norm
     }
 
     if(center) {
@@ -239,7 +262,6 @@ StatVector <- ggproto("StatVector", Stat,
     interleaved <- combined[c(rbind(seq_len(n), seq_len(n) + n)), ]
     rownames(interleaved) <- NULL
     interleaved$group <- rep(seq_len(n), each = 2)
-
     interleaved
   }
 )
@@ -305,6 +327,7 @@ stat_vector2 <- function(
    normalize = FALSE,
    tail_point = TRUE,
    eval_point = FALSE,
+   L = NULL,
    arrow = NULL) {
 
   default_mapping <- ggplot2::aes(length = after_stat(norm))
@@ -330,6 +353,7 @@ stat_vector2 <- function(
       normalize = normalize,
       tail_point = tail_point,
       eval_point = eval_point,
+      L = L,
       ...
     )
   )

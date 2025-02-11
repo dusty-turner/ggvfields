@@ -319,25 +319,50 @@ StatStreamField <- ggproto(
   Stat,
   default_aes = aes(group = after_stat(id)),
 
+  setup_data = function(data, params) {
+    # If data has xend/yend (and not already fx/fy), compute fx and fy.
+    if (!is.null(data)) {
+      if (all(c("xend", "yend") %in% names(data)) &&
+          !(all(c("fx", "fy") %in% names(data)))) {
+        data$fx <- data$xend - data$x
+        data$fy <- data$yend - data$y
+        # Remove xend and yend so that they don't affect scale calculations.
+        data <- data[, setdiff(names(data), c("xend", "yend")), drop = FALSE]
+      } else if (all(c("angle", "distance") %in% names(data)) &&
+                 !(all(c("fx", "fy") %in% names(data)))) {
+        # Assuming 'angle' is in radians.
+        # If angles are in degrees, convert with: angle * pi / 180.
+        data$fx <- data$distance * cos(data$angle)
+        data$fy <- data$distance * sin(data$angle)
+        # Remove angle and distance so that they don't affect scale calculations.
+        data <- data[, setdiff(names(data), c("angle", "distance")), drop = FALSE]
+      }
+    }
+    data
+  },
+
   compute_group = function(data, scales, fun, xlim, ylim, n,
                            method, max_it = 1000, T = NULL, L = NULL,
-                           center, type, normalize, args, ...) {
+                           center, type, normalize, args = NULL, ...) {
+# browser()
+    ## pick the right limits.  may need updating but currently prioritizing
+    # limit specified by user
+    # range of data received from ggplot layer or in this layer
+    # range inherited from previous layer's scales
+    xlim <- xlim %||%
+      (if (!is.null(data) && "x" %in% names(data)) range(data$x, na.rm = TRUE) else NULL) %||%
+      scales$x$range$range %||%
+      c(-1, 1)
 
-    xlim <- xlim %||% scales$x$range$range
-    if (is.null(xlim)) {
-      # cli::cli_warn("No xlim provided or inherited; defaulting to c(-1, 1).")
-      xlim <- c(-1, 1)
-    }
+    ylim <- ylim %||%
+      (if (!is.null(data) && "y" %in% names(data)) range(data$y, na.rm = TRUE) else NULL) %||%
+      scales$y$range$range %||%
+      c(-1, 1)
 
-    ylim <- ylim %||% scales$y$range$range
-    if (is.null(ylim)) {
-      # cli::cli_warn("No ylim provided or inherited; defaulting to c(-1, 1).")
-      ylim <- c(-1, 1)
-    }
 
     # allow for additional args to be passed
-    # orig_fun <- fun
-    # fun <- function(v) rlang::inject(orig_fun(v, !!!args))
+    orig_fun <- fun
+    fun <- function(v) rlang::inject(orig_fun(v, !!!args))
 
     # make grid of points on which to compute streams
     grid <- cbind(
@@ -449,7 +474,16 @@ StatStreamField <- ggproto(
     }
 
     # combine streams and return
-    do.call("rbind", list_of_streams)
+    list_of_streams <-  do.call("rbind", list_of_streams)
+
+    ## fix remove aes warning
+    list_of_streams$fx <- NA_real_
+    list_of_streams$fy <- NA_real_
+    list_of_streams$distance <- NA_real_
+    list_of_streams$angle <- NA_real_
+
+    list_of_streams
+
 
   }
 
