@@ -193,14 +193,12 @@ ggplot() + geom_stream_field(fun = f, normalize = FALSE, T = .1)
 ggplot() + geom_stream_field(fun = f)
 
 # is this geom_stream_field2()? but no legend...
-ggplot() + geom_stream_field(fun = f, normalize = FALSE, T = .15,
+ggplot() + geom_stream_field(fun = f, normalize = FALSE,
   center = FALSE, color = "black", tail_point = TRUE, arrow = NULL)
 
 # is this geom_vector_field2()? but no legend...
-ggplot() +
-  geom_stream_field(fun = f, type = "vector",
-  normalize = FALSE, T = .15, center = FALSE, color = "black",
-  tail_point = TRUE, arrow = NULL)
+ggplot() + geom_stream_field(fun = f, normalize = FALSE, type = "vector",
+  center = FALSE, color = "black", tail_point = TRUE, arrow = NULL)
 
 # tail and eval points
 ggplot() + geom_stream_field(fun = f, eval_point = TRUE)

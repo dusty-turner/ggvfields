@@ -118,38 +118,47 @@ specified grid point, generating a smooth approximation of the vector field.
 }
 
 \examples{
-generate_vectors <- function(v) {
-  x <- v[1]
-  y <- v[2]
-  c(sin(x) + sin(y) + rnorm(1, 5, 1),
-    sin(x) - sin(y) - rnorm(1, 5, 1))
+
+# set true vector field
+f <- function(u) {
+  x <- u[1]; y <- u[2]
+  c(x^2 - y^2, x^2 + y^2 - 2)
 }
-# Set seed for reproducibility
-set.seed(123)
-# Create sample points and compute vectors
-sample_points <- data.frame(
-  x = runif(30, 0, 10),
-  y = runif(30, 0, 10)
-)
-result <- t(apply(sample_points, 1, generate_vectors))
-sample_points$xend <- result[, 1]
-sample_points$yend <- result[, 2]
-sample_points$fx <- sample_points$xend - sample_points$x
-sample_points$fy <- sample_points$yend - sample_points$y
-sample_points$distance <- sqrt(sample_points$fx^2 + sample_points$fy^2)
-sample_points$angle <- atan2(sample_points$fy, sample_points$fx)
-# Define evaluation points
-eval_points <- data.frame(
-  x = c(0, 7.5),
-  y = c(10, 5)
-)
+f <- function(u) c(-u[2], u[1])
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 
-p <- ggplot() +
-  geom_vector(data = sample_points,
-              aes(x = x, y = y, fx = fx, fy = fy),
-              color = "black")
+# create design points
+n <- 20
+df <- matrix(runif(2*n, -2, 2), nrow = n)
+df <- as.data.frame(df)
+names(df) <- c("x", "y")
 
-p + geom_stream_smooth(formula = cbind(fx, fy) ~ x * y, data = sample_points)
-p + geom_stream_smooth(formula = cbind(fx, fy) ~ poly(x,2) * poly(y,2), data = sample_points)
+# sample f at design points and add to df
+fdf <- apply(df, 1, f) |> t() |> as.data.frame()
+names(fdf) <- c("fx", "fy")
+df <- cbind(df, fdf)
+
+# visualize
+ggplot(df) + geom_vector(aes(x, y, fx = fx, fy = fy))
+
+# add smooth layer
+ggplot(df) +
+  geom_vector(aes(x, y, fx = fx, fy = fy)) +
+  geom_stream_smooth(formula = cbind(fx, fy) ~ x * y)
+
+ggplot(df) +
+  geom_vector(aes(x, y, fx = fx, fy = fy)) +
+  geom_stream_smooth(formula = cbind(fx, fy) ~ poly(x,2) * poly(y,2), data = sample_points)
+
+fhat <- function(u) {
+  model <- lm( cbind(fx, fy) ~ x * y, data = df )
+  newdata <- data.frame(x = u[1], y = u[2])
+  preds <- predict(model, newdata = newdata)
+  as.numeric(preds)
+}
+
+ggplot(df) +
+  geom_stream_field(fun = fhat, normalize = FALSE, color = "#3366FF") +
+  geom_vector(aes(x, y, fx = fx, fy = fy))
 
 }

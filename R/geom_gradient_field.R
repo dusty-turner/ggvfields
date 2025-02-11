@@ -74,13 +74,10 @@
 #'   geom_gradient_field(fun = f, xlim = c(-3,3), ylim = c(-3,3)) +
 #'   coord_equal()
 #'
-#' library("ggdensity")
 #' fxy <- function(x, y) apply(cbind(x,y), 1, f)
-#' fxy(1, 2)
-#' f(1:2)
 #'
 #' ggplot() +
-#'   geom_hdr_fun(fun = fxy, xlim = c(-3,3), ylim = c(-3,3)) +
+#'   ggdensity::geom_hdr_fun(fun = fxy, xlim = c(-3,3), ylim = c(-3,3)) +
 #'   geom_gradient_field(fun = f, xlim = c(-3,3), ylim = c(-3,3)) +
 #'   coord_equal()
 #'
