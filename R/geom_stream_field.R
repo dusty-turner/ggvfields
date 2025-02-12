@@ -322,6 +322,7 @@ StatStreamField <- ggproto(
   default_aes = aes(group = after_stat(id)),
 
   setup_data = function(data, params) {
+
     # If data has xend/yend (and not already fx/fy), compute fx and fy.
     if (!is.null(data)) {
       if (all(c("xend", "yend") %in% names(data)) &&
@@ -346,7 +347,6 @@ StatStreamField <- ggproto(
   compute_group = function(data, scales, fun, xlim, ylim, n,
                            method, max_it = 1000, T = NULL, L = NULL,
                            center, type, normalize, args = NULL, ...) {
-# browser()
     ## pick the right limits.  may need updating but currently prioritizing
     # limit specified by user
     # range of data received from ggplot layer or in this layer
