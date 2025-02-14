@@ -154,6 +154,13 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
    ) {
 
+  # default_mapping <- ggplot2::aes(color = after_stat(NULL))
+  # if (is.null(mapping)) {
+  #   mapping <- default_mapping
+  # } else {
+  #   mapping <- modifyList(default_mapping, mapping)
+  # }
+
   layer(
     stat = StatVectorSmooth,
     data = data,
@@ -229,17 +236,17 @@ StatVectorSmooth <- ggproto(
   Stat,
   required_aes = c("x", "y"),
   dropped_aes = c("distance", "angle"),
+  # default_aes = aes(
+  #   color = "#3366FF", linewidth = 0.5, linetype = 1, alpha = 1,
+  #   angle = NA, distance = NA, fx = NA, fy = NA, length = NA,
+  # ),
   default_aes = aes(
-    color = "#3366FF", linewidth = 0.5, linetype = 1, alpha = 1,
-    angle = NA, distance = NA, fx = NA, fy = NA
+    linewidth = 0.5, linetype = 1, alpha = 1,
+    angle = NA, distance = NA, fx = NA, fy = NA, length = NA
   ),
 
-  compute_group = function(
-    data, scales, n,
-    method,
-    se = TRUE, conf_level, pi_type,
-    eval_points = NULL, formula, ...
-  ) {
+  compute_group = function(data, scales, n, method, se = TRUE, conf_level,
+                           pi_type, eval_points = NULL, formula, ...) {
 
     # ----------------------------
     # 1. Initial Data Checks and Manipulation
@@ -435,7 +442,6 @@ StatVectorSmooth <- ggproto(
     } else {
       stop("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
     }
-
     return(result)
   }
 )
@@ -449,9 +455,13 @@ GeomVectorSmooth <- ggproto(
   "GeomVectorSmooth",
   GeomSegment,
   required_aes = c("x", "y", "xend", "yend"),
+  # default_aes = aes(
+  #   linewidth = 0.5, linetype = 1, alpha = 1,
+  #   fill = NULL, color = "#3366FF"
+  # ),
   default_aes = aes(
     linewidth = 0.5, linetype = 1, alpha = 1,
-    fill = NULL, color = "#3366FF"
+    fill = NULL
   ),
 
   setup_data = function(data, params) {
@@ -464,6 +474,11 @@ GeomVectorSmooth <- ggproto(
     arrow = NULL, se = TRUE, se.circle = FALSE,
     eval_points, pi_type
   ) {
+
+    if (is.null(data$colour)) {
+      data$colour <- "#3366FF"
+    }
+
     grobs <- list()
 
     if (pi_type == "ellipse" && is.null(eval_points)) {
