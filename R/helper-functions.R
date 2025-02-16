@@ -878,6 +878,6 @@ angle <- function(u, v) {
 
 
 
-utils::globalVariables(c("Potential", "fun", "f", "l", "max_t", "avg_spd"))
+utils::globalVariables(c("Potential", "fun", "f", "l", "max_t", "avg_spd", "x", "y", "fx", "fy"))
 
 

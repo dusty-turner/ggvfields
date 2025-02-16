@@ -111,6 +111,7 @@ geom_stream_smooth <- function(mapping = NULL, data = NULL,
                                                    type = "closed")
 ) {
 
+
   # Inspect the LHS of the formula. If it is cbind(xend, yend), then change it
   lhs <- formula[[2]]
   if (is.call(lhs) && identical(lhs[[1]], as.name("cbind"))) {
@@ -122,6 +123,8 @@ geom_stream_smooth <- function(mapping = NULL, data = NULL,
     }
   }
 
+  if (is.null(mapping)) mapping <- aes(x = x, y = y, fx = fx, fy = fy)
+
   n <- ensure_length_two(n)
   dots <- list(...)
   if (!("color" %in% names(dots))) {
@@ -132,6 +135,7 @@ geom_stream_smooth <- function(mapping = NULL, data = NULL,
   # parent environment (which comes from the stat after setup_data()).
   vec_field <- function(u) {
     group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
+
     # if (inherits(group_data, "try-error") || is.null(group_data)) {
     #   stop("Could not retrieve group data for vector field calculation.")
     # }

@@ -188,8 +188,12 @@ ggplot() +
   geom_gradient_field(fun = f, xlim = c(-3, 3), ylim = c(-3, 3)) +
   coord_equal()
 
+fxy <- function(x, y) apply(cbind(x,y), 1, f)
+
 ggplot() +
-  geom_gradient_field2(fun = f, xlim = c(-2, 2), ylim = c(-2, 2))
+  ggdensity::geom_hdr_fun(fun = fxy, xlim = c(-3,3), ylim = c(-3,3)) +
+  geom_gradient_field(fun = f, xlim = c(-3,3), ylim = c(-3,3)) +
+  coord_equal()
 
 \dontrun{
   library("ggdensity")
