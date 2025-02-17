@@ -28,6 +28,7 @@ stat_gradient_field(
   normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
+  grid = NULL,
   arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"), type = "closed")
 )
 
@@ -52,6 +53,7 @@ geom_gradient_field2(
   normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
+  grid = NULL,
   arrow = NULL
 )
 
@@ -76,6 +78,7 @@ stat_gradient_field2(
   normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
+  grid = NULL,
   arrow = NULL
 )
 }
@@ -146,6 +149,10 @@ gradient vector. Defaults differ between the variants.}
 
 \item{eval_point}{Logical. If \code{TRUE}, a point is drawn at the evaluation
 point where the gradient was computed. Default is \code{FALSE}.}
+
+\item{grid}{A data frame containing precomputed grid points for seed
+placement. If \code{NULL} (default), a regular Cartesian
+grid is generated based on \code{xlim}, \code{ylim}, and \code{n}.}
 
 \item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the}
 

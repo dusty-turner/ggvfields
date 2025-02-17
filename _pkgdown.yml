@@ -39,3 +39,4 @@ reference:
       - geom_potential
       - ggvfields
       - efield
+      - generate_hexagonal_lattice

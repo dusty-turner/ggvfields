@@ -28,6 +28,8 @@ stat_stream_field(
   type = "stream",
   normalize = TRUE,
   tail_point = FALSE,
+  eval_point = FALSE,
+  grid = NULL,
   method = "rk4",
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 )
@@ -130,6 +132,13 @@ the \code{T} parameter.}
 \item{tail_point}{Logical. If \code{TRUE}, draws a point at the tail (starting
 point) of each streamline. Defaults to \code{FALSE}.}
 
+\item{eval_point}{Logical. If \code{TRUE}, a point is drawn at the evaluation
+point where the gradient was computed. Default is \code{FALSE}.}
+
+\item{grid}{A data frame containing precomputed grid points for seed
+placement. If \code{NULL} (default), a regular Cartesian
+grid is generated based on \code{xlim}, \code{ylim}, and \code{n}.}
+
 \item{method}{Character. Integration method, e.g., \code{"rk4"} for Runge-Kutta 4
 or \code{"euler"} for Euler's method. Defaults to \code{"rk4"}.}
 
@@ -216,6 +225,12 @@ ggplot() +
     fun = f, xlim = c(-1,1), ylim = c(-1,1),
     linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
   )
+
+# Generate a hexagonal grid
+hex_lattice <- generate_hexagonal_lattice(xlim = c(-5, 5), ylim = c(-5, 5), d = 1)
+
+# Use the hexagonal grid in geom_stream_field
+ggplot() + geom_stream_field(fun = f, grid = hex_lattice)
 
 # neat examples
 

@@ -38,14 +38,19 @@
 #' @param normalize Logical. If `TRUE` (default), streamlines are normalized
 #'   based on grid spacing, using the `L` parameter to control maximum arc
 #'   length. If `FALSE`, streamlines are computed for a fixed time determined by
-#'   the `T` parameter.
+#' the `T` parameter.
 #' @param method Character. Integration method, e.g., `"rk4"` for Runge-Kutta 4
 #'   or `"euler"` for Euler's method. Defaults to `"rk4"`.
+#' @param grid A data frame containing precomputed grid points for seed
+#'   placement. If `NULL` (default), a regular Cartesian
+#'   grid is generated based on `xlim`, `ylim`, and `n`.
 #' @param arrow A [grid::arrow()] specification for adding arrowheads to the
 #'   streamline. By default, a closed arrow with a 30° angle and a length of
 #'   `0.02` npc is used.
 #' @param tail_point Logical. If `TRUE`, draws a point at the tail (starting
 #'   point) of each streamline. Defaults to `FALSE`.
+#' @param eval_point Logical. If `TRUE`, a point is drawn at the evaluation
+#'   point where the gradient was computed. Default is `FALSE`.
 #' @param geom The geometric object used to render the streamline. Defaults to
 #'   [GeomStream].
 #' @param ... Other arguments passed to [ggplot2::layer()] and the underlying
@@ -117,6 +122,12 @@
 #'     linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
 #'   )
 #'
+#' # Generate a hexagonal grid
+#' hex_lattice <- generate_hexagonal_lattice(xlim = c(-5, 5), ylim = c(-5, 5), d = 1)
+#'
+#' # Use the hexagonal grid in geom_stream_field
+#' ggplot() + geom_stream_field(fun = f, grid = hex_lattice)
+#'
 #' # neat examples
 #'
 #' f <- function(u) {
@@ -166,6 +177,7 @@ geom_stream_field <- function(
     normalize = TRUE,
     tail_point = FALSE,
     eval_point = FALSE,
+    grid = NULL,
     method = "rk4",
     arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
@@ -208,6 +220,7 @@ geom_stream_field <- function(
       normalize = normalize,
       tail_point = tail_point,
       eval_point = eval_point,
+      grid = grid,
       arrow = arrow,
       ...
     )
@@ -239,6 +252,7 @@ stat_stream_field <- function(
     normalize = TRUE,
     tail_point = FALSE,
     eval_point = FALSE,
+    grid = NULL,
     method = "rk4",
     arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
@@ -283,6 +297,7 @@ stat_stream_field <- function(
       normalize = TRUE,
       tail_point = tail_point,
       eval_point = eval_point,
+      grid = grid,
       arrow = arrow,
       ...
     )
@@ -324,32 +339,40 @@ StatStreamField <- ggproto(
 
   compute_group = function(data, scales, fun, xlim, ylim, n,
                            method, max_it = 1000, T = NULL, L = NULL,
-                           center, type, normalize, args = NULL, ...) {
+                           center, type, normalize, args = NULL, grid, ...) {
     ## pick the right limits.  may need updating but currently prioritizing
     # limit specified by user
     # range of data received from ggplot layer or in this layer
     # range inherited from previous layer's scales
 
-    xlim <- xlim %||%
-      (if (!is.null(data) && "x" %in% names(data)) range(data$x, na.rm = TRUE) else NULL) %||%
-      scales$x$range$range %||%
-      c(-1, 1)
+    if(is.null(grid)){
 
-    ylim <- ylim %||%
-      (if (!is.null(data) && "y" %in% names(data)) range(data$y, na.rm = TRUE) else NULL) %||%
-      scales$y$range$range %||%
-      c(-1, 1)
+      xlim <- xlim %||%
+        (if (!is.null(data) && "x" %in% names(data)) range(data$x, na.rm = TRUE) else NULL) %||%
+        scales$x$range$range %||% c(-1, 1)
 
+      ylim <- ylim %||%
+        (if (!is.null(data) && "y" %in% names(data)) range(data$y, na.rm = TRUE) else NULL) %||%
+        scales$y$range$range %||% c(-1, 1)
+
+      # make grid of points on which to compute streams
+      grid <- cbind(
+        "x" = rep(seq(xlim[1], xlim[2], length.out = n[1]), times = n[2]),
+        "y" = rep(seq(ylim[1], ylim[2], length.out = n[2]), each = n[1])
+      )
+    } else {
+      # browser()
+      grid  <- as.matrix(grid)
+      xlim <- range(grid[, "x"])
+      ylim <- range(grid[, "y"])
+    }
+
+
+    # browser()
 
     # allow for additional args to be passed
     orig_fun <- fun
     fun <- function(v) rlang::inject(orig_fun(v, !!!args))
-
-    # make grid of points on which to compute streams
-    grid <- cbind(
-      "x" = rep(seq(xlim[1], xlim[2], length.out = n[1]), times = n[2]),
-      "y" = rep(seq(ylim[1], ylim[2], length.out = n[2]), each = n[1])
-    )
     # compute default L value (normalizing only)
     # this is computed either if 1) normalizing and L is computed automatically
     # or 2) not normalizing and computing T automatically

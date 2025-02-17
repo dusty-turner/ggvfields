@@ -58,6 +58,9 @@
 #'   point, corresponding to the original (untransformed) seed point before any
 #'   centering or normalization is applied. This allows for comparison between
 #'   the original and transformed positions. Defaults to `FALSE`.
+#' @param grid A data frame containing precomputed grid points for seed
+#'   placement. If `NULL` (default), a regular Cartesian
+#'   grid is generated based on `xlim`, `ylim`, and `n`.
 #' @param arrow A [grid::arrow()] specification to add arrowheads to the
 #'   streamlines. In
 #'   **geom_vector_field**, the default is a closed arrow with a 30° angle and length `0.02` npc;
@@ -100,6 +103,7 @@ geom_vector_field <- function(
   normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
+  grid = NULL,
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
   ) {
 
@@ -139,6 +143,7 @@ geom_vector_field <- function(
       type = "vector",
       tail_point = tail_point,
       eval_point = eval_point,
+      grid = grid,
       arrow = arrow,
       ...
     )
@@ -167,6 +172,7 @@ stat_vector_field <- function(
   normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
+  grid = NULL,
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
   ) {
 
@@ -205,6 +211,7 @@ stat_vector_field <- function(
       type = "vector",
       tail_point = tail_point,
       eval_point = eval_point,
+      grid = grid,
       arrow = arrow,
       ...
     )
@@ -231,6 +238,7 @@ geom_vector_field2 <- function(
    normalize = TRUE,
    tail_point = TRUE,
    eval_point = FALSE,
+   grid = NULL,
    arrow = NULL) {
 
   # Define default mapping for stat_stream_field2
@@ -268,6 +276,7 @@ geom_vector_field2 <- function(
       type = "vector",
       tail_point = tail_point,
       eval_point = eval_point,
+      grid = grid,
       arrow = arrow,
       ...
     )
@@ -292,6 +301,7 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
    normalize = TRUE,
    tail_point = TRUE,
    eval_point = FALSE,
+   grid = NULL,
    arrow = NULL) {
 
   # Define default mapping for stat_stream_field2
@@ -329,6 +339,7 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
       type = "vector",
       tail_point = tail_point,
       eval_point = eval_point,
+      grid = grid,
       arrow = arrow,
       ...
     )

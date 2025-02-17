@@ -50,6 +50,9 @@
 #'   gradient vector. Defaults differ between the variants.
 #' @param eval_point Logical. If `TRUE`, a point is drawn at the evaluation
 #'   point where the gradient was computed. Default is `FALSE`.
+#' @param grid A data frame containing precomputed grid points for seed
+#'   placement. If `NULL` (default), a regular Cartesian
+#'   grid is generated based on `xlim`, `ylim`, and `n`.
 #' @param arrow A [grid::arrow()] specification to add arrowheads to the
 #' @param max_it Integer. Maximum number of integration steps allowed when
 #'   computing the gradient stream or vector. Defaults to 1000.
@@ -129,6 +132,7 @@ geom_gradient_field <- function(
   normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
+  grid = NULL,
   arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"), type = "closed")
 ) {
 
@@ -177,6 +181,7 @@ geom_gradient_field <- function(
       normalize = normalize,
       tail_point = tail_point,
       eval_point = eval_point,
+      grid = grid,
       arrow = arrow,
       ...
     )
@@ -207,6 +212,7 @@ stat_gradient_field <- function(
   normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
+  grid = NULL,
   arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"), type = "closed")
 ) {
 
@@ -254,6 +260,7 @@ stat_gradient_field <- function(
       normalize = normalize,
       tail_point = tail_point,
       eval_point = eval_point,
+      grid = grid,
       arrow = arrow,
       ...
     )
@@ -287,6 +294,7 @@ geom_gradient_field2 <- function(
   normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
+  grid = NULL,
   arrow = NULL
 ) {
   if (is.null(data)) data <- ensure_nonempty_data(data)
@@ -333,6 +341,7 @@ geom_gradient_field2 <- function(
       normalize = normalize,
       tail_point = tail_point,
       eval_point = eval_point,
+      grid = grid,
       arrow = arrow,
       ...
     )
@@ -368,6 +377,7 @@ stat_gradient_field2 <- function(
   normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
+  grid = NULL,
   arrow = NULL
 ) {
   if (is.null(data)) data <- ensure_nonempty_data(data)
@@ -414,6 +424,7 @@ stat_gradient_field2 <- function(
       normalize = normalize,
       tail_point = tail_point,
       eval_point = eval_point,
+      grid = grid,
       arrow = arrow,
       ...
     )

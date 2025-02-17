@@ -11,6 +11,9 @@
 #' @inheritParams ggplot2::layer
 #' @param formula A formula specifying the multivariate linear model used for
 #'   smoothing. Defaults to `cbind(fx, fy) ~ x * y`.
+#' @param eval_points Data frame of evaluation points, or `NULL`. When provided,
+#'   it specifies the grid points where the smoothing model is evaluated. If
+#'   `NULL`, the function generates a grid based on `n`.
 #' @param ... Additional arguments passed on to the layer. In addition, if a
 #'   fixed parameter `color` is not provided via `...`, then `color = "blue"` is
 #'   used.
@@ -48,48 +51,66 @@
 #' - `arrow`: Specifies arrowheads for the vectors.
 #'
 #' @examples
-#'
-#' # set true vector field
+#' # Define a true vector field function
 #' f <- function(u) {
 #'   x <- u[1]; y <- u[2]
 #'   c(x^2 - y^2, x^2 + y^2 - 2)
 #' }
+#'
+#' # Alternative example function
 #' f <- function(u) c(-u[2], u[1])
-#' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 #'
-#' # create design points
+#' # Visualize the vector field
+#' ggplot() + geom_stream_field(fun = f, xlim = c(-2, 2), ylim = c(-2, 2))
+#'
+#' # Generate design points
 #' n <- 20
-#' df <- matrix(runif(2*n, -2, 2), nrow = n)
-#' df <- as.data.frame(df)
-#' names(df) <- c("x", "y")
+#' df <- data.frame(x = runif(n, -2, 2), y = runif(n, -2, 2))
 #'
-#' # sample f at design points and add to df
-#' fdf <- apply(df, 1, f) |> t() |> as.data.frame()
-#' names(fdf) <- c("fx", "fy")
+#' # Sample function values at design points
+#' fdf <- as.data.frame(t(apply(df, 1, f)))
+#' colnames(fdf) <- c("fx", "fy")
 #' df <- cbind(df, fdf)
 #'
-#' # visualize
+#' # Visualize raw vector field data
 #' ggplot(df) + geom_vector(aes(x, y, fx = fx, fy = fy))
 #'
-#' # add smooth layer
+#' # Add smoothed layer using default model
 #' ggplot(df) +
 #'   geom_vector(aes(x, y, fx = fx, fy = fy)) +
 #'   geom_stream_smooth(formula = cbind(fx, fy) ~ x * y)
 #'
+#' # Use a more complex polynomial model
 #' ggplot(df) +
 #'   geom_vector(aes(x, y, fx = fx, fy = fy)) +
-#'   geom_stream_smooth(formula = cbind(fx, fy) ~ poly(x,2) * poly(y,2), data = df)
+#'   geom_stream_smooth(formula = cbind(fx, fy) ~ poly(x, 2) * poly(y, 2), data = df)
 #'
+#' # Fit a linear model and use it for prediction
 #' fhat <- function(u) {
-#'   model <- lm( cbind(fx, fy) ~ x * y, data = df )
-#'   newdata <- data.frame(x = u[1], y = u[2])
-#'   preds <- predict(model, newdata = newdata)
-#'   as.numeric(preds)
+#'   model <- lm(cbind(fx, fy) ~ x * y, data = df)
+#'   predict(model, newdata = data.frame(x = u[1], y = u[2])) |> as.numeric()
 #' }
 #'
+#' # Visualize estimated field with the raw vector field
 #' ggplot(df) +
 #'   geom_stream_field(fun = fhat, normalize = FALSE, color = "#3366FF") +
 #'   geom_vector(aes(x, y, fx = fx, fy = fy))
+#'
+#' # Generate a hexagonal grid
+#' hex_lattice <- generate_hexagonal_lattice(xlim = c(-5, 5), ylim = c(-5, 5), d = 1)
+#'
+#' # Use the hexagonal grid in geom_stream_field
+#' ggplot(data = df) +
+#'   geom_vector(aes(x, y, fx = fx, fy = fy), color = "black", normalize = FALSE) +
+#'   geom_stream_smooth(eval_points = hex_lattice)
+#'
+#' # user specified point
+#'
+#' eval_pts <- data.frame(x = c(0, 3), y = c(2, 5))
+#'
+#' ggplot(data = df) +
+#'   geom_vector(aes(x, y, fx = fx, fy = fy), color = "black", normalize = FALSE) +
+#'   geom_stream_smooth(eval_points = eval_pts)
 #'
 #' @export
 geom_stream_smooth <- function(mapping = NULL, data = NULL,
@@ -106,6 +127,7 @@ geom_stream_smooth <- function(mapping = NULL, data = NULL,
                                center = FALSE,
                                type = "vector",
                                formula = cbind(fx, fy) ~ x * y,
+                               eval_points = NULL,
                                arrow = grid::arrow(angle = 20,
                                                    length = unit(0.015, "npc"),
                                                    type = "closed")
@@ -162,6 +184,7 @@ geom_stream_smooth <- function(mapping = NULL, data = NULL,
         fun = vec_field,
         xlim = xlim,
         ylim = ylim,
+        grid = eval_points,
         type = type,
         arrow = arrow
       ),
