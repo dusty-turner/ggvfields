@@ -165,6 +165,7 @@ geom_stream_field <- function(
     type = "stream",
     normalize = TRUE,
     tail_point = FALSE,
+    eval_point = FALSE,
     method = "rk4",
     arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
@@ -206,6 +207,7 @@ geom_stream_field <- function(
       type = type,
       normalize = normalize,
       tail_point = tail_point,
+      eval_point = eval_point,
       arrow = arrow,
       ...
     )
@@ -236,6 +238,7 @@ stat_stream_field <- function(
     type = "stream",
     normalize = TRUE,
     tail_point = FALSE,
+    eval_point = FALSE,
     method = "rk4",
     arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
@@ -279,6 +282,7 @@ stat_stream_field <- function(
       type = type,
       normalize = TRUE,
       tail_point = tail_point,
+      eval_point = eval_point,
       arrow = arrow,
       ...
     )
@@ -457,6 +461,8 @@ StatStreamField <- ggproto(
     list_of_streams$fy <- NA_real_
     list_of_streams$distance <- NA_real_
     list_of_streams$angle <- NA_real_
+
+    list_of_streams$norm <- list_of_streams$l
 
     list_of_streams
 

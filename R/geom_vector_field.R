@@ -70,6 +70,7 @@
 #' @examples
 #'
 #' f <- function(u) c(-u[2], u[1])
+#' ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 #' ggplot() + geom_vector_field2(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 #'
 #' f <- efield_maker()
@@ -170,21 +171,18 @@ stat_vector_field <- function(
   ) {
 
   # Define default mapping for geom_vector_field
-  default_mapping <- aes(color = after_stat(norm))
+  default_mapping <- aes(color = after_stat(avg_spd))
 
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
   if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) {
-      mapping <- modifyList(default_mapping, mapping)
-    }
+    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
   } else {
     mapping <- default_mapping
   }
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
-  # if(normalize) normalize <- "vector"
 
   layer(
     stat = stat,
@@ -235,8 +233,8 @@ geom_vector_field2 <- function(
    eval_point = FALSE,
    arrow = NULL) {
 
-  # Define default mapping for geom_vector_field
-  default_mapping <- aes(color = after_stat(avg_spd))
+  # Define default mapping for stat_stream_field2
+  default_mapping <- ggplot2::aes(color = after_stat(NULL), length = after_stat(norm))
 
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
@@ -299,22 +297,16 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
   # Define default mapping for stat_stream_field2
   default_mapping <- ggplot2::aes(color = after_stat(NULL), length = after_stat(norm))
 
-  # Merge user-provided mapping with default mapping.
-  # User mapping takes precedence.
+  # Merge user-provided mapping with default mapping
+  # User mapping takes precedence
   if (!is.null(mapping)) {
-    if (!("color" %in% names(mapping))) {
-      mapping <- modifyList(default_mapping, mapping)
-    }
+    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
   } else {
     mapping <- default_mapping
   }
 
-  # Ensure data is not empty and ensure n is of the proper length if required
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
-
-  # If normalize is TRUE, convert it to "vector" as expected by the underlying stat
-  # if (normalize) normalize <- "vector"
 
   ggplot2::layer(
     stat = StatStreamField,
