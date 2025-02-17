@@ -21,7 +21,6 @@ stat_vector_field(
   xlim = NULL,
   ylim = NULL,
   n = 11,
-  tlim = c(0, 1e+06),
   args = list(),
   center = TRUE,
   normalize = TRUE,
@@ -43,7 +42,6 @@ geom_vector_field2(
   xlim = NULL,
   ylim = NULL,
   n = 11,
-  tlim = c(0, 1e+06),
   args = list(),
   center = FALSE,
   normalize = TRUE,
@@ -65,7 +63,6 @@ stat_vector_field2(
   xlim = NULL,
   ylim = NULL,
   n = 11,
-  tlim = c(0, 1e+06),
   args = list(),
   center = FALSE,
   normalize = TRUE,
@@ -116,9 +113,6 @@ domain. Defaults to \code{c(-1, 1)}.}
 \item{n}{Integer. Grid resolution specifying the number of seed points along
 each axis. Higher values produce a denser vector field. Defaults to \code{11}.}
 
-\item{tlim}{Numeric vector of length two specifying the integration time
-limits. Defaults to \code{c(0, 1e6)}.}
-
 \item{args}{List of additional arguments passed on to the function defined by
 \code{fun}.}
 
@@ -168,7 +162,6 @@ unmapped by default).
 \examples{
 
 f <- function(u) c(-u[2], u[1])
-ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 ggplot() + geom_vector_field2(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 
 f <- efield_maker()

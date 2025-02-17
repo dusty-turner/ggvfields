@@ -148,7 +148,7 @@ ggplot(df) +
 
 ggplot(df) +
   geom_vector(aes(x, y, fx = fx, fy = fy)) +
-  geom_stream_smooth(formula = cbind(fx, fy) ~ poly(x,2) * poly(y,2), data = sample_points)
+  geom_stream_smooth(formula = cbind(fx, fy) ~ poly(x,2) * poly(y,2), data = df)
 
 fhat <- function(u) {
   model <- lm( cbind(fx, fy) ~ x * y, data = df )

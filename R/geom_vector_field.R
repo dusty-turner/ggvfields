@@ -44,8 +44,6 @@
 #'   domain. Defaults to `c(-1, 1)`.
 #' @param n Integer. Grid resolution specifying the number of seed points along
 #'   each axis. Higher values produce a denser vector field. Defaults to `11`.
-#' @param tlim Numeric vector of length two specifying the integration time
-#'   limits. Defaults to `c(0, 1e6)`.
 #' @param args List of additional arguments passed on to the function defined by
 #'   `fun`.
 #' @param center Logical. If `TRUE`, centers the seed points or the vectors so
@@ -72,7 +70,6 @@
 #' @examples
 #'
 #' f <- function(u) c(-u[2], u[1])
-#' ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 #' ggplot() + geom_vector_field2(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 #'
 #' f <- efield_maker()
@@ -97,7 +94,6 @@ geom_vector_field <- function(
   xlim = NULL,
   ylim = NULL,
   n = 11,
-  tlim = c(0, 1e6),
   args = list(),
   center = TRUE,
   normalize = TRUE,
@@ -107,20 +103,18 @@ geom_vector_field <- function(
   ) {
 
   # Define default mapping for geom_vector_field
-  default_mapping <- aes(color = after_stat(norm))
+  default_mapping <- aes(color = after_stat(avg_spd))
 
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
   if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) {
-      mapping <- modifyList(default_mapping, mapping)
-    }
+    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
   } else {
     mapping <- default_mapping
   }
+
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
-  if(normalize) normalize <- "vector"
 
   layer(
     stat = stat,
@@ -138,10 +132,10 @@ geom_vector_field <- function(
       args = args,
       method = "euler",
       na.rm = na.rm,
-      tlim = tlim,
       max_it = 2,
       center = center,
       normalize = normalize,
+      type = "vector",
       tail_point = tail_point,
       eval_point = eval_point,
       arrow = arrow,
@@ -167,7 +161,6 @@ stat_vector_field <- function(
   xlim = NULL,
   ylim = NULL,
   n = 11,
-  tlim = c(0, 1e6),
   args = list(),
   center = TRUE,
   normalize = TRUE,
@@ -191,7 +184,7 @@ stat_vector_field <- function(
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
-  if(normalize) normalize <- "vector"
+  # if(normalize) normalize <- "vector"
 
   layer(
     stat = stat,
@@ -209,9 +202,9 @@ stat_vector_field <- function(
       args = args,
       method = "euler",
       na.rm = na.rm,
-      tlim = tlim,
       center = center,
       normalize = normalize,
+      type = "vector",
       tail_point = tail_point,
       eval_point = eval_point,
       arrow = arrow,
@@ -235,7 +228,6 @@ geom_vector_field2 <- function(
    xlim = NULL,
    ylim = NULL,
    n = 11,
-   tlim = c(0, 1e6),
    args = list(),
    center = FALSE,
    normalize = TRUE,
@@ -243,25 +235,19 @@ geom_vector_field2 <- function(
    eval_point = FALSE,
    arrow = NULL) {
 
-  # Define default mapping for geom_vector_field2
-  default_mapping <- ggplot2::aes(color = after_stat(NULL), length = after_stat(norm))
+  # Define default mapping for geom_vector_field
+  default_mapping <- aes(color = after_stat(avg_spd))
 
-  # Merge user-provided mapping with default mapping.
-  # User mapping takes precedence.
+  # Merge user-provided mapping with default mapping
+  # User mapping takes precedence
   if (!is.null(mapping)) {
-    if (!("color" %in% names(mapping))) {
-      mapping <- modifyList(default_mapping, mapping)
-    }
+    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
   } else {
     mapping <- default_mapping
   }
 
-  # Ensure data is not empty and n is of length two (if needed)
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
-
-  # Normalize flag: if TRUE, set to "vector" (as expected by the underlying stat)
-  if (normalize) normalize <- "vector"
 
   ggplot2::layer(
     stat = stat,
@@ -279,9 +265,9 @@ geom_vector_field2 <- function(
       args = args,
       method = "euler",
       na.rm = na.rm,
-      tlim = tlim,
       center = center,
       normalize = normalize,
+      type = "vector",
       tail_point = tail_point,
       eval_point = eval_point,
       arrow = arrow,
@@ -303,7 +289,6 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
    xlim = NULL,
    ylim = NULL,
    n = 11,
-   tlim = c(0, 1e6),
    args = list(),
    center = FALSE,
    normalize = TRUE,
@@ -329,7 +314,7 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
   n <- ensure_length_two(n)
 
   # If normalize is TRUE, convert it to "vector" as expected by the underlying stat
-  if (normalize) normalize <- "vector"
+  # if (normalize) normalize <- "vector"
 
   ggplot2::layer(
     stat = StatStreamField,
@@ -347,9 +332,9 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
       args = args,
       method = "euler",
       na.rm = na.rm,
-      tlim = tlim,
       center = center,
       normalize = normalize,
+      type = "vector",
       tail_point = tail_point,
       eval_point = eval_point,
       arrow = arrow,

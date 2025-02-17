@@ -154,13 +154,6 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
    ) {
 
-  # default_mapping <- ggplot2::aes(color = after_stat(NULL))
-  # if (is.null(mapping)) {
-  #   mapping <- default_mapping
-  # } else {
-  #   mapping <- modifyList(default_mapping, mapping)
-  # }
-
   layer(
     stat = StatVectorSmooth,
     data = data,

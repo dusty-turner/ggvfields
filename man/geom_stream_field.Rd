@@ -175,14 +175,10 @@ ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 # if unspecified, xlim and ylim default to c(-1,1). we use this in what
 # follows to focus on other parts of the code
 ggplot() + geom_stream_field(fun = f)
-ggplot() + geom_stream_field(fun = f, type = "vector")
 ggplot() + geom_stream_field(fun = f, center = FALSE)
-ggplot() + geom_stream_field(fun = f, type = "vector", center = FALSE)
 
 ggplot() + geom_stream_field(fun = f, normalize = FALSE)
-ggplot() + geom_stream_field(fun = f, normalize = FALSE, type = "vector")
 ggplot() + geom_stream_field(fun = f, normalize = FALSE, center = FALSE)
-ggplot() + geom_stream_field(fun = f, normalize = FALSE, type = "vector", center = FALSE)
 
 # run systems until specified lengths
 ggplot() + geom_stream_field(fun = f, normalize = TRUE, L = .08)
@@ -190,28 +186,15 @@ ggplot() + geom_stream_field(fun = f, normalize = TRUE, L = .08)
 # run systems for specified times
 ggplot() + geom_stream_field(fun = f, normalize = FALSE, T = .1)
 
-ggplot() + geom_stream_field(fun = f)
-
-# is this geom_stream_field2()? but no legend...
-ggplot() + geom_stream_field(fun = f, normalize = FALSE,
-  center = FALSE, color = "black", tail_point = TRUE, arrow = NULL)
-
-# is this geom_vector_field2()? but no legend...
-ggplot() + geom_stream_field(fun = f, normalize = FALSE, type = "vector",
-  center = FALSE, color = "black", tail_point = TRUE, arrow = NULL)
-
 # tail and eval points
+ggplot() + geom_stream_field(fun = f, tail_point = TRUE)
 ggplot() + geom_stream_field(fun = f, eval_point = TRUE)
-ggplot() + geom_stream_field(fun = f, eval_point = TRUE, type = "vector", arrow = NULL)
-ggplot() + geom_stream_field(fun = f, tail_point = TRUE, type = "vector",
-  arrow = NULL, center = FALSE)
 
 
 
 
 f <- efield_maker()
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
 ggplot() +
   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
   scale_color_viridis_c(trans = "log10") +
@@ -219,11 +202,9 @@ ggplot() +
 
 f <- function(u) u
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
 
 f <- function(u) c(2,1)
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1), type = "vector")
 
 # bug here with alpha
 ggplot() +
@@ -235,9 +216,6 @@ ggplot() +
     fun = f, xlim = c(-1,1), ylim = c(-1,1),
     linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
   )
-
-
-
 
 # neat examples
 
@@ -253,14 +231,12 @@ f <- function(u) {
   c(y, x - x^3)
 }
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
 
 f <- function(u) {
   x <- u[1]; y <- u[2]
   c(x^2 - y^2, x^2 + y^2 - 2)
 }
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), type = "vector")
 
 
 }
