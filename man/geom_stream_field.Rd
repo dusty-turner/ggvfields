@@ -207,7 +207,7 @@ ggplot() + geom_stream_field(fun = f, n = 5)
 ggplot() + geom_stream_field(fun = f, xlim = c(-5, 5)) + coord_equal()
 ggplot() + geom_stream_field(fun = f, xlim = c(-5, 5), n = c(21, 11)) + coord_equal()
 ggplot() + geom_stream_field(fun = f)
-ggplot() + geom_stream_field(fun = f, grid = grid_hex(c(-1,1), c(-1,1), .2)) ## warning
+ggplot() + geom_stream_field(fun = f, grid = grid_hex(c(-1,1), c(-1,1), .2))
 
 
 

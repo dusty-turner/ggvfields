@@ -176,8 +176,8 @@ draw_key_length <- function(data, params, size) {
   y0 <- unit(0.5, "npc")
 
   length_value <- data$length
-  x1 <- rev(x0 + unit(length_value, "cm"))
-  y1 <- rev(y0)
+  x1 <- x0 + unit(length_value, "cm")
+  y1 <- y0
 
   grid::segmentsGrob(
     x0 = x0, y0 = y0,
@@ -351,6 +351,14 @@ scale_length_continuous <- function(max_range = 0.5, ...) {
 
   args <- list(...)
 
+  if ("guide" %in% names(args)) {
+    guide_val <- args$guide
+    args$guide <- NULL
+  } else {
+    guide_val <- guide_legend(reverse = TRUE)
+  }
+
+
   if (any(grepl("trans|transform", names(args), ignore.case = TRUE))) {
     cli::cli_warn(c(
       "!" = "Applying a log style transformation with {.fn scale_length_continuous} may yield negative length values for norms below 1.",
@@ -358,11 +366,14 @@ scale_length_continuous <- function(max_range = 0.5, ...) {
     ))
   }
 
-  scale <- continuous_scale(
-    aesthetics = "length",
-    palette = scales::rescale_pal(range = c(.05, max_range)),
-    ...
-  )
+  scale <- do.call(continuous_scale, c(
+    list(
+      aesthetics = "length",
+      palette = scales::rescale_pal(range = c(.05, max_range)),
+      guide = guide_val
+    ),
+    args
+  ))
 
   # Return only the scale if max_range is at its default value
   if (max_range <= 0.5) {
