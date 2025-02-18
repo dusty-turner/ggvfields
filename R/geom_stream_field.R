@@ -410,7 +410,7 @@ StatStreamField <- ggproto(
 
     # initialize T for !normalizing vectors; this will be an inefficient
     # implementation as i will recompute fun on the grid later, but fine for now
-    if (!normalize && type == "vector") {
+    if (!normalize && type == "vector" && is.null(T)) {
       grid_norms <- apply(grid, 1, function(u) norm(fun(u)))
       fastest_vector_id <- which.max(grid_norms)
       T <- L / grid_norms[fastest_vector_id]
@@ -457,14 +457,13 @@ StatStreamField <- ggproto(
       }
 
       if (type == "stream") {
-
         if ( !normalize && !is.null(T) ) {
           stream <- ode_stepper(grid[i, ], fun, T = T, L = 1e6, max_it, method, center)
         } else {
           stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, method, center)
         }
 
-        stream <- transform(stream, "id" = i)
+        stream <- if(nrow(stream) >= 1) transform(stream, "id" = i) else next
 
       }
 
@@ -517,7 +516,6 @@ StatStreamField <- ggproto(
 
     list_of_streams
 
-
   }
 
 
@@ -567,17 +565,38 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000,
     # format both for merging
     n_neg <- nrow(df_negative)
     n_pos <- nrow(df_positive)
-
     df_negative$t <- -df_negative$t
-    row.names(df_negative) <- -(0:(n_neg-1))
-    row.names(df_positive) <- 0:(n_pos-1)
+    if (n_neg > 0) {
+      row.names(df_negative) <- as.character(-seq(0, n_neg - 1))
+    } else {
+      row.names(df_negative) <- character(0)
+    }
 
+    if (n_pos > 0) {
+      row.names(df_positive) <- as.character(seq(0, n_pos - 1))
+    } else {
+      row.names(df_positive) <- character(0)
+    }
     # merge
     df <- rbind( flip(df_negative[-1,]), df_positive )
 
+    if (nrow(df) == 0) {## this happens when stream is in a sync or source
+      df <- data.frame(
+        t       = numeric(0),
+        x       = numeric(0),
+        y       = numeric(0),
+        d       = numeric(0),
+        l       = numeric(0),
+        avg_spd = numeric(0),
+        norm    = numeric(0)
+      )
+      return(df)
+    }
+
+
     # shift lengths, recompute distances, arc length, avg speed
     n <- nrow(df)
-    df$d <- if (n == 1) NA_real_ else c(NA_real_, df$d[1:(n_neg-1)], df_positive$d[-1])
+    df$d <- if (n <= 1) NA_real_ else c(NA_real_, df$d[1:(n_neg-1)], df_positive$d[-1])
     df$l <- c(0, cumsum(df$d[-1]))
     df$avg_spd <- df$l[n] / (df$t[n] - df$t[1])
 
@@ -585,7 +604,6 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000,
     return(df)
 
   }
-
   # deSolve::ode() is a little particular in terms of what it assumes about the
   # function. first, it assumes that the function returns a list with a vector
   # in it, e.g. list(1:2). second, it only solves up until at the points c(0,T)
@@ -606,7 +624,6 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000,
   }
 
   rootfun <- function(t, u, parms) u[3] - parms$L
-
 
   # initialize the data frame tracking evals of fun
   df <- data.frame()
@@ -647,7 +664,13 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000,
   # now add on average speed and the norm
   n <- nrow(df)
   df$avg_spd <- df$l[n] / df$t[n]
-  df$norm <- norm(fun(u0))
+
+  if (nrow(df) == 0) {
+    df$norm <- numeric(0)
+    row.names(df) <- character(0)
+  } else {
+    df$norm <- norm(fun(u0))
+  }
 
   # return
   df
@@ -688,6 +711,9 @@ crop_stream_length <- function(data, L) {
 
   # determine number of points in the path
   n <- nrow(data)
+
+  ## happens when in a sync or source
+  if (is.na(data$l[n])) return(data[0, , drop = FALSE])
 
   # return data if length >= arc length of data
   # NOTE: this may need to change in the future, presumably to extent last seg
@@ -754,7 +780,6 @@ crop_stream_time <- function(data, T, centered = FALSE) {
   # assuming the original stream runs from tmin to tmax and is of length
   # L/2 from tmin to 0 and L/2 from 0 to tmax, we can't just look for T/2 in
   # both directions. (note: T is always less than the -tmin + tmax; tmin < 0)
-
   if ( centered ) {
 
     # define a helper
@@ -805,6 +830,9 @@ crop_stream_time <- function(data, T, centered = FALSE) {
   n <- nrow(data)
   if (n == 0) return(data)
 
+  ## happens when in a sync or source
+  if (is.na(data$t[n])) return(data[0, , drop = FALSE])
+  # if (is.na(data$t[n])) return( data[0, ] )
   # return data if doesn't get to time T, return data
   # NOTE: this may need to change in the future
   if (T >= data$t[n]) return( data )

@@ -78,11 +78,14 @@ or gradient fields.</p>
 <span>  n <span class="op">=</span> <span class="fl">11</span>,</span>
 <span>  args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  max_it <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  dt <span class="op">=</span> <span class="fl">0.0025</span>,</span>
+<span>  T <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  L <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"stream"</span>,</span>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"rk4"</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.02</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -112,7 +115,7 @@ from a <code>formula</code> (e.g. <code>~ head(.x, 10)</code>).</p></dd>
 
 
 <dt>geom</dt>
-<dd><p>The geometric object used to draw the streamline. Defaults to
+<dd><p>The geometric object used to render the streamline. Defaults to
 <a href="geom_stream.html">GeomStream</a>.</p></dd>
 
 
@@ -163,13 +166,13 @@ in the domain.</p></dd>
 <dt>xlim, ylim</dt>
 <dd><p>Numeric vectors of length two specifying the domain limits
 in the \(x\)- and \(y\)-directions, respectively. Defaults to
-\(c(-1, 1)\) for both.</p></dd>
+\(c(-1, 1)\) if not provided.</p></dd>
 
 
 <dt>n</dt>
-<dd><p>Integer. Grid resolution (the number of seed points along each
-axis). Defaults to 11, resulting in an \(n \times n\) grid of seed
-points.</p></dd>
+<dd><p>Integer or two-element numeric vector. Grid resolution specifying
+the number of seed points along each axis. Defaults to <code>11</code>, resulting in
+an \(11 \times 11\) grid.</p></dd>
 
 
 <dt>args</dt>
@@ -179,36 +182,54 @@ points.</p></dd>
 
 <dt>max_it</dt>
 <dd><p>Integer. Maximum number of integration steps per streamline.
-This controls how far each streamline can propagate. Defaults to 1000.</p></dd>
+Defaults to <code>1000</code>.</p></dd>
 
 
-<dt>dt</dt>
-<dd><p>Numeric. Time-step size for integration. Smaller values produce
-more precise streamlines but increase computation time. Default is
-<code>0.0025</code>.</p></dd>
+<dt>T</dt>
+<dd><p>Numeric. Maximum integration time for each streamline. When
+<code>normalize = FALSE</code>, the integration runs until time <code>T</code> is reached.
+Defaults to <code>NULL</code>, in which case a default value of <code>1</code> is used when
+needed.</p></dd>
 
 
 <dt>L</dt>
-<dd><p>Numeric. Maximum arc length for each streamline. A streamline stops
-once its length exceeds this value. If <code>NULL</code>, a suitable default is
-derived from the grid spacing. Default is <code>NULL</code>.</p></dd>
+<dd><p>Numeric. Maximum arc length for each streamline. When <code>normalize = TRUE</code>, the integration is halted once the cumulative arc length reaches
+<code>L</code>. Defaults to <code>NULL</code>, in which case a suitable default is computed from
+the grid spacing.</p></dd>
 
 
 <dt>center</dt>
-<dd><p>Logical. If <code>TRUE</code>, centers the seed points or the resulting
-streamlines so that the original (x, y) becomes the midpoint. Default is
-<code>TRUE</code>.</p></dd>
+<dd><p>Logical. If <code>TRUE</code> (default), centers the seed points or the
+resulting streamlines so that the original (x, y) becomes the midpoint.</p></dd>
+
+
+<dt>type</dt>
+<dd><p>Character. Either <code>"stream"</code> (default) or <code>"vector"</code>.</p><ul><li><p><code>"stream"</code> computes a full streamline by integrating in both directions (when <code>center = TRUE</code>).</p></li>
+<li><p><code>"vector"</code> computes a single vector representing the field at the seed point.</p></li>
+</ul></dd>
 
 
 <dt>normalize</dt>
-<dd><p>Logical. If <code>TRUE</code>, stream lengths are normalized based on
-grid spacing. If <code>FALSE</code>, a default arc length is used. Default is <code>TRUE</code>.</p></dd>
+<dd><p>Logical. If <code>TRUE</code> (default), streamlines are normalized
+based on grid spacing, using the <code>L</code> parameter to control maximum arc
+length. If <code>FALSE</code>, streamlines are computed for a fixed time determined by
+the <code>T</code> parameter.</p></dd>
 
 
 <dt>tail_point</dt>
-<dd><p>Logical. If <code>TRUE</code>, a point is drawn at the tail (i.e. the
-starting point) of each streamline. This can help to indicate the origin of
-the computed path. Default is <code>FALSE</code>.</p></dd>
+<dd><p>Logical. If <code>TRUE</code>, draws a point at the tail (starting
+point) of each streamline. Defaults to <code>FALSE</code>.</p></dd>
+
+
+<dt>eval_point</dt>
+<dd><p>Logical. If <code>TRUE</code>, a point is drawn at the evaluation
+point where the gradient was computed. Default is <code>FALSE</code>.</p></dd>
+
+
+<dt>grid</dt>
+<dd><p>A data frame containing precomputed grid points for seed
+placement. If <code>NULL</code> (default), a regular Cartesian
+grid is generated based on <code>xlim</code>, <code>ylim</code>, and <code>n</code>.</p></dd>
 
 
 <dt>method</dt>
@@ -217,7 +238,7 @@ or <code>"euler"</code> for Euler's method. Defaults to <code>"rk4"</code>.</p><
 
 
 <dt>arrow</dt>
-<dd><p>A <code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code> specification for adding arrowheads to each
+<dd><p>A <code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code> specification for adding arrowheads to the
 streamline. By default, a closed arrow with a 30° angle and a length of
 <code>0.02</code> npc is used.</p></dd>
 
@@ -226,18 +247,16 @@ streamline. By default, a closed arrow with a 30° angle and a length of
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A ggplot2 layer that computes the streamlines over the specified
-domain and draws them, optionally with arrowheads and with points at the
-tail and/or evaluation positions.</p>
+<p>A ggplot2 layer that computes and renders streamlines over the
+specified domain, optionally with arrowheads and tail points.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The streamlines are generated by numerically integrating the vector
-field defined by <code>fun(x, y)</code>. The computed streamlines are then passed to
-<a href="geom_stream.html">GeomStream</a> for rendering. When <code>tail_point = TRUE</code>, a point is drawn at
-the start of each streamline. When <code>eval_point = TRUE</code>, a point is drawn at
-the original (untransformed) seed point, allowing you to see the location
-before centering or normalization is applied.</p>
+field defined by <code>fun(x, y)</code>. The integration halts either when the
+cumulative arc length reaches <code>L</code> (if <code>normalize = TRUE</code>) or when the
+integration time reaches <code>T</code> (if <code>normalize = FALSE</code>). The computed
+streamlines are then passed to <a href="geom_stream.html">GeomStream</a> for rendering.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See Also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -251,28 +270,106 @@ before centering or normalization is applied.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">u</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">u</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># the basic usage involves you providing a fun, xlim, and ylim</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># if unspecified, xlim and ylim default to c(-1,1). we use this in what</span></span></span>
+<span class="r-in"><span><span class="co"># follows to focus on other parts of the code</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, center <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-4.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span>, center <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-5.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># run systems until specified lengths</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, normalize <span class="op">=</span> <span class="cn">TRUE</span>, L <span class="op">=</span> <span class="fl">.08</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-6.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># run systems for specified times</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span>, T <span class="op">=</span> <span class="fl">.1</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-7.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># tail and eval points</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, tail_point <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-8.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, eval_point <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-9.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="efield.html">efield_maker</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Define a simple rotational vector field function</span></span></span>
-<span class="r-in"><span><span class="va">rotational_field</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">u</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></span>
-<span class="r-in"><span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">u</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Create a stream field layer</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">rotational_field</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Create a stream field layer with tail points</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-10.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">rotational_field</span>, tail_point <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">scale_color_viridis_c</a></span><span class="op">(</span>trans <span class="op">=</span> <span class="st">"log10"</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-11.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Create a stream field with centered streams</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span><span class="op">)</span> <span class="va">u</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-12.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-13.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># bug here with alpha</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">rotational_field</span>, center <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">t</span><span class="op">)</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_alpha.html">scale_alpha</a></span><span class="op">(</span>range  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-14.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">geom_stream_field</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    linewidth <span class="op">=</span> <span class="fl">.75</span>, arrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-15.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Generate a hexagonal grid</span></span></span>
+<span class="r-in"><span><span class="va">hex_lattice</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_hexagonal_lattice.html">generate_hexagonal_lattice</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>, d <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in generate_hexagonal_lattice(xlim = c(-5, 5), ylim = c(-5, 5),     d = 1):</span> could not find function "generate_hexagonal_lattice"</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Use the hexagonal grid in geom_stream_field</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, grid <span class="op">=</span> <span class="va">hex_lattice</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in layer(stat = stat, geom = GeomStream, data = data, mapping = mapping,     position = position, show.legend = show.legend, inherit.aes = inherit.aes,     params = list(fun = fun, xlim = xlim, ylim = ylim, n = n,         args = args, method = method, na.rm = na.rm, max_it = max_it,         T = T, L = L, center = center, type = type, normalize = normalize,         tail_point = tail_point, eval_point = eval_point, arrow = arrow,         ...)):</span> object 'hex_lattice' not found</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># neat examples</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">u</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>; <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">u</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">y</span><span class="op">*</span><span class="op">(</span><span class="op">-</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="va">y</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">-</span> <span class="va">x</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-16.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"vector"</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 2 rows containing missing values or values outside the scale range</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> (`geom_stream()`).</span>
+<span class="r-plt img"><img src="geom_stream_field-17.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">u</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>; <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">u</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">x</span> <span class="op">-</span> <span class="va">x</span><span class="op">^</span><span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-18.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">u</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>; <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">u</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span>, <span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_stream_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_field-19.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
