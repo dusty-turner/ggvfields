@@ -44,6 +44,7 @@ geom_vector2(
   normalize = FALSE,
   tail_point = TRUE,
   eval_point = FALSE,
+  L = NULL,
   arrow = NULL
 )
 
