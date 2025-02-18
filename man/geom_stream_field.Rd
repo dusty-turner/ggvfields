@@ -199,41 +199,43 @@ ggplot() + geom_stream_field(fun = f, normalize = FALSE, T = .1)
 ggplot() + geom_stream_field(fun = f, tail_point = TRUE)
 ggplot() + geom_stream_field(fun = f, eval_point = TRUE)
 
+# changing the grid of evaluation
+ggplot() + geom_stream_field(fun = f)
+ggplot() + geom_stream_field(fun = f, grid = "hex")
+ggplot() + geom_stream_field(fun = f, grid = "hex", n = 5)
+ggplot() + geom_stream_field(fun = f, n = 5)
+ggplot() + geom_stream_field(fun = f, xlim = c(-5, 5)) + coord_equal()
+ggplot() + geom_stream_field(fun = f, xlim = c(-5, 5), n = c(21, 11)) + coord_equal()
+ggplot() + geom_stream_field(fun = f)
+ggplot() + geom_stream_field(fun = f, grid = grid_hex(c(-1,1), c(-1,1), .2))
 
 
 
+# using other ggplot2 tools
 f <- efield_maker()
+
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+
+ggplot() +
+  geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
+  scale_color_viridis_c(trans = "log10")
+
 ggplot() +
   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
   scale_color_viridis_c(trans = "log10") +
   coord_equal()
 
+
+# other vector fields
 f <- function(u) u
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 
 f <- function(u) c(2,1)
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 
-# bug here with alpha
-ggplot() +
-  geom_stream_field(fun = f, aes(alpha = after_stat(t)), xlim = c(-2,2), ylim = c(-2,2)) +
-  scale_alpha(range  = c(0,1))
 
-ggplot() +
-  geom_stream_field(
-    fun = f, xlim = c(-1,1), ylim = c(-1,1),
-    linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
-  )
-
-# Generate a hexagonal grid
-hex_lattice <- generate_hexagonal_lattice(xlim = c(-5, 5), ylim = c(-5, 5), d = 1)
-
-# Use the hexagonal grid in geom_stream_field
-ggplot() + geom_stream_field(fun = f, grid = hex_lattice)
 
 # neat examples
-
 f <- function(u) {
   x <- u[1]; y <- u[2]
   c(y, y*(-x^2 - 2*y^2 + 1) - x)
@@ -246,12 +248,29 @@ f <- function(u) {
   c(y, x - x^3)
 }
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2),
+  grid = grid_hex(c(-2,2), c(-2,2), .35))
 
 f <- function(u) {
   x <- u[1]; y <- u[2]
   c(x^2 - y^2, x^2 + y^2 - 2)
 }
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2),
+  grid = grid_hex(c(-2,2), c(-2,2), .35))
+
+
+
+# bug here with alpha
+ggplot() +
+  geom_stream_field(fun = f, aes(alpha = after_stat(t)), xlim = c(-2,2), ylim = c(-2,2)) +
+  scale_alpha(range  = c(0,1))
+
+ggplot() +
+  geom_stream_field(
+    fun = f, xlim = c(-1,1), ylim = c(-1,1),
+    linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
+  )
 
 
 }
