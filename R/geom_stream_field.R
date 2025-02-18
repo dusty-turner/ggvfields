@@ -103,7 +103,7 @@
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-5, 5)) + coord_equal()
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-5, 5), n = c(21, 11)) + coord_equal()
 #' ggplot() + geom_stream_field(fun = f)
-#' ggplot() + geom_stream_field(fun = f, grid = grid_hex(c(-1,1), c(-1,1), .2))
+#' ggplot() + geom_stream_field(fun = f, grid = grid_hex(c(-1,1), c(-1,1), .2)) ## warning
 #'
 #'
 #'
@@ -364,7 +364,7 @@ StatStreamField <- ggproto(
     # range of data received from ggplot layer or in this layer
     # range inherited from previous layer's scales
 
-    if( is.null(grid) || grid == "hex" ){
+    if (is.null(grid)) {
 
       xlim <- xlim %||%
         (if (!is.null(data) && "x" %in% names(data)) range(data$x, na.rm = TRUE) else NULL) %||%
@@ -375,27 +375,33 @@ StatStreamField <- ggproto(
         scales$y$range$range %||% c(-1, 1)
 
       # make grid of points on which to compute streams
-      if (is.null(grid)) {
+      grid <- cbind(
+        "x" = rep(seq(xlim[1], xlim[2], length.out = n[1]), times = n[2]),
+        "y" = rep(seq(ylim[1], ylim[2], length.out = n[2]), each = n[1])
+      )
 
-        grid <- cbind(
-          "x" = rep(seq(xlim[1], xlim[2], length.out = n[1]), times = n[2]),
-          "y" = rep(seq(ylim[1], ylim[2], length.out = n[2]), each = n[1])
-        )
+    } else if (is.character(grid) && length(grid) == 1 && grid == "hex") {
 
-      } else if (grid == "hex") {
+      xlim <- xlim %||%
+        (if (!is.null(data) && "x" %in% names(data)) range(data$x, na.rm = TRUE) else NULL) %||%
+        scales$x$range$range %||% c(-1, 1)
 
-        grid <- as.matrix( grid_hex(xlim, ylim,
-          d = sqrt((diff(xlim)/(n[1]+1))^2 + (diff(ylim)/(n[2]+1))^2)
-        ) )
+      ylim <- ylim %||%
+        (if (!is.null(data) && "y" %in% names(data)) range(data$y, na.rm = TRUE) else NULL) %||%
+        scales$y$range$range %||% c(-1, 1)
 
-      }
-
+      grid <- as.matrix(grid_hex(xlim, ylim,
+                                 d = sqrt((diff(xlim)/(n[1]+1))^2 + (diff(ylim)/(n[2]+1))^2)
+      ))
 
     } else {
+
       grid  <- as.matrix(grid)
       xlim <- range(grid[, "x"])
       ylim <- range(grid[, "y"])
+
     }
+
 
 
     # allow for additional args to be passed
