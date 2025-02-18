@@ -168,6 +168,7 @@ streamlines are then passed to \link{GeomStream} for rendering.
 \section{See Also}{
 
 \itemize{
+\item \code{\link[=geom_vector_field]{geom_vector_field()}} for straight arrows, i.e. \code{type = "vector"}
 \item \link{StatStreamField} for the underlying statistical transformation.
 \item \link{GeomStream} for the geometry that renders the resulting paths.
 \item \link[ggplot2:geom_path]{ggplot2::geom_path} as the base geometry on which \link{GeomStream} is built.
@@ -178,7 +179,7 @@ streamlines are then passed to \link{GeomStream} for rendering.
 
 f <- function(u) c(-u[2], u[1])
 
-# the basic usage involves you providing a fun, xlim, and ylim
+# the basic usage involves providing a fun, xlim, and ylim
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 
 # if unspecified, xlim and ylim default to c(-1,1). we use this in what

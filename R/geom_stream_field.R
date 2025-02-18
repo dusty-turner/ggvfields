@@ -66,6 +66,7 @@
 #'   streamlines are then passed to [GeomStream] for rendering.
 #'
 #' @section See Also:
+#' - [geom_vector_field()] for straight arrows, i.e. `type = "vector"`
 #' - [StatStreamField] for the underlying statistical transformation.
 #' - [GeomStream] for the geometry that renders the resulting paths.
 #' - [ggplot2::geom_path] as the base geometry on which [GeomStream] is built.
@@ -74,7 +75,7 @@
 #'
 #' f <- function(u) c(-u[2], u[1])
 #'
-#' # the basic usage involves you providing a fun, xlim, and ylim
+#' # the basic usage involves providing a fun, xlim, and ylim
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 #'
 #' # if unspecified, xlim and ylim default to c(-1,1). we use this in what
@@ -364,7 +365,7 @@ StatStreamField <- ggproto(
     # range of data received from ggplot layer or in this layer
     # range inherited from previous layer's scales
 
-    if( is.null(grid) || grid == "hex" ){
+    if( is.null(grid) || (!is.data.frame(grid) && grid == "hex") ){
 
       xlim <- xlim %||%
         (if (!is.null(data) && "x" %in% names(data)) range(data$x, na.rm = TRUE) else NULL) %||%
@@ -385,7 +386,7 @@ StatStreamField <- ggproto(
       } else if (grid == "hex") {
 
         grid <- as.matrix( grid_hex(xlim, ylim,
-          d = sqrt((diff(xlim)/(n[1]+1))^2 + (diff(ylim)/(n[2]+1))^2)
+          d = sqrt(3)/2 * sqrt((diff(xlim)/n[1])^2 + (diff(ylim)/n[2])^2)
         ) )
 
       }
