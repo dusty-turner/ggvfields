@@ -141,8 +141,8 @@ grid is generated based on \code{xlim}, \code{ylim}, and \code{n}.}
 
 \item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the
 streamlines. In
-\strong{geom_vector_field}, the default is a closed arrow with a 30° angle and length \code{0.02} npc;
-in \strong{geom_vector_field2} the default is \code{NULL}.}
+\strong{geom_vector_field}, the default is a closed arrow with a 30° angle and
+length \code{0.02} npc; in \strong{geom_vector_field2} the default is \code{NULL}.}
 }
 \value{
 A ggplot2 layer that computes and plots a vector field using
@@ -170,10 +170,20 @@ unmapped by default).
 
 f <- function(u) c(-u[2], u[1])
 ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-ggplot() + geom_vector_field2(fun = f, xlim = c(-1,1), ylim = c(-1,1))
+
+# xlim and ylim default to (-1,1), so for ease of illustration we remove them
+
+ggplot() + geom_vector_field(fun = f)
+ggplot() + geom_vector_field(fun = f, grid = "hex")
+
+ggplot() + geom_vector_field2(fun = f)
+ggplot() + geom_vector_field2(fun = f, grid = "hex")
 
 f <- efield_maker()
 ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 ggplot() + geom_vector_field2(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 
+}
+\seealso{
+\code{\link[=geom_stream_field]{geom_stream_field()}}
 }
