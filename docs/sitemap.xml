@@ -13,7 +13,13 @@
     <loc>/LICENSE-text.html</loc>
   </url>
   <url>
+    <loc>/LICENSE.html</loc>
+  </url>
+  <url>
     <loc>/reference/efield.html</loc>
+  </url>
+  <url>
+    <loc>/reference/generate_hexagonal_lattice.html</loc>
   </url>
   <url>
     <loc>/reference/geom_complex_function.html</loc>
@@ -23,6 +29,9 @@
   </url>
   <url>
     <loc>/reference/geom_function_1d2d.html</loc>
+  </url>
+  <url>
+    <loc>/reference/geom_function_1d_2d.html</loc>
   </url>
   <url>
     <loc>/reference/geom_function_2d.html</loc>
@@ -41,6 +50,9 @@
   </url>
   <url>
     <loc>/reference/geom_stream_field.html</loc>
+  </url>
+  <url>
+    <loc>/reference/geom_stream_smooth.html</loc>
   </url>
   <url>
     <loc>/reference/geom_vector.html</loc>

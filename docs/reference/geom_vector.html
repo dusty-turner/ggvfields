@@ -61,6 +61,7 @@
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  L <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">25</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -95,6 +96,7 @@
 <span>  normalize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  tail_point <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  L <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -166,6 +168,12 @@ centering or normalization is applied. This allows for comparison between
 the original and transformed positions. Default is <code>FALSE</code>.</p></dd>
 
 
+<dt>L</dt>
+<dd><p>Numeric scalar. The desired length for the vectors (in data units).
+If <code>NULL</code> (the default), a default value is computed automatically based on
+the plot’s x and y limits.</p></dd>
+
+
 <dt>arrow</dt>
 <dd><p>An optional <code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code> specification to add arrowheads to
 the vectors (default: <code>grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")</code>).</p></dd>
@@ -235,6 +243,9 @@ norm is available as an aesthetic.</p></li>
 <span class="r-in"><span><span class="co"># Using geom_vector2, which adds a default mapping for length:</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">vectors1</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu">geom_vector2</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Computation failed in `stat_vector()`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Caused by error in `compute_group()`:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> argument "L" is missing, with no default</span>
 <span class="r-plt img"><img src="geom_vector-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

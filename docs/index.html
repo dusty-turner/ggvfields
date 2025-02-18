@@ -143,7 +143,7 @@
 <h4 id="why-length-mapping-matters">Why Length Mapping Matters<a class="anchor" aria-label="anchor" href="#why-length-mapping-matters"></a>
 </h4>
 <p>Mapping vector lengths to their norms allows viewers to immediately understand magnitude differences without relying solely on color.</p>
-<p>The norm <span class="math inline"><strong>w</strong> = (<em>u</em>,<em>v</em>)</span> is calculated <span class="math display">$$|\mathbf{w}| = \sqrt{u^2 + v^2}$$</span> .</p>
+<p>The norm <span class="math inline"><strong>w</strong> = (<em>u</em>, <em>v</em>)</span> is calculated <span class="math display">$$|\mathbf{w}| = \sqrt{u^2 + v^2}$$</span> .</p>
 <p>This feature of <code>geom_vector2</code> enhances interpretability by using actual vector lengths to represent magnitude. The legend reflects the scaling and ensures consistent interpretation.</p>
 </div>
 <div class="section level4">
@@ -299,7 +299,7 @@ $$</span></p>
 <code>geom_gradient_field</code> and <code>geom_gradient_field2</code>
 <a class="anchor" aria-label="anchor" href="#geom_gradient_field-and-geom_gradient_field2"></a>
 </h3>
-<p>The geom_gradient_field function computes and visualizes gradient fields derived from scalar functions and displays the gradient vector field of a scalar function, <span class="math inline"><em>f</em>(<em>x</em>,<em>y</em>)</span>. The gradient is given by:</p>
+<p>The geom_gradient_field function computes and visualizes gradient fields derived from scalar functions and displays the gradient vector field of a scalar function, <span class="math inline"><em>f</em>(<em>x</em>, <em>y</em>)</span>. The gradient is given by:</p>
 <p><span class="math display">$$
 \nabla f(x, y) = \left( \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right)
 $$</span></p>
@@ -438,7 +438,7 @@ $$</span></p>
 <h3 id="divergence">Divergence<a class="anchor" aria-label="anchor" href="#divergence"></a>
 </h3>
 <p>Divergence is an operation on a vector field that describes how the field behaves at a point—whether vectors “spread out” from a point or “converge” toward it. Locally, the divergence of a vector field <span class="math inline"><strong>F</strong></span> in <span class="math inline">ℝ<sup>2</sup></span> at a particular point measures the “outflowing-ness” or rate of expansion of the vector field around that point. The divergence is a scalar value that can indicate sources (positive divergence) or sinks (negative divergence).</p>
-<p>If <span class="math inline"><strong>F</strong> = ⟨<em>F</em><sub><em>x</em></sub>(<em>x</em>,<em>y</em>), <em>F</em><sub><em>y</em></sub>(<em>x</em>,<em>y</em>)⟩</span> is a vector field, its divergence is defined as:</p>
+<p>If <span class="math inline"><strong>F</strong> = ⟨<em>F</em><sub><em>x</em></sub>(<em>x</em>, <em>y</em>), <em>F</em><sub><em>y</em></sub>(<em>x</em>, <em>y</em>)⟩</span> is a vector field, its divergence is defined as:</p>
 <p><span class="math display">$$
 \text{div} \, \mathbf{F} = \frac{\partial F_x}{\partial x} + \frac{\partial F_y}{\partial y}
 $$</span></p>
@@ -455,7 +455,7 @@ $$</span></p>
 <h3 id="curl">Curl<a class="anchor" aria-label="anchor" href="#curl"></a>
 </h3>
 <p>Curl is a measure of the rotation or swirling behavior of a vector field at a given point. In two dimensions, the curl of a vector field <span class="math inline"><strong>F</strong></span> in <span class="math inline">ℝ<sup>2</sup></span> is a scalar value that quantifies how much the vectors tend to rotate or circulate around a point. Positive curl values indicate counterclockwise rotation, while negative values represent clockwise rotation.</p>
-<p>If <span class="math inline"><strong>F</strong> = ⟨<em>F</em><sub><em>x</em></sub>(<em>x</em>,<em>y</em>), <em>F</em><sub><em>y</em></sub>(<em>x</em>,<em>y</em>)⟩</span> is a vector field, its curl is defined as:</p>
+<p>If <span class="math inline"><strong>F</strong> = ⟨<em>F</em><sub><em>x</em></sub>(<em>x</em>, <em>y</em>), <em>F</em><sub><em>y</em></sub>(<em>x</em>, <em>y</em>)⟩</span> is a vector field, its curl is defined as:</p>
 <p><span class="math display">$$
 \text{curl} \, \mathbf{F} = \frac{\partial F_y}{\partial x} - \frac{\partial F_x}{\partial y}
 $$</span></p>
@@ -568,9 +568,8 @@ $$</span></p>
 <div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li>
-<a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
-</li>
+<li><a href="LICENSE.html">Full license</a></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
 
