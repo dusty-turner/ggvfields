@@ -97,6 +97,8 @@
 #'
 #' # changing the grid of evaluation
 #' ggplot() + geom_stream_field(fun = f)
+#' ggplot() + geom_stream_field(fun = f, grid = "hex")
+#' ggplot() + geom_stream_field(fun = f, grid = "hex", n = 5)
 #' ggplot() + geom_stream_field(fun = f, n = 5)
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-5, 5)) + coord_equal()
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-5, 5), n = c(21, 11)) + coord_equal()
@@ -362,7 +364,7 @@ StatStreamField <- ggproto(
     # range of data received from ggplot layer or in this layer
     # range inherited from previous layer's scales
 
-    if(is.null(grid)){
+    if( is.null(grid) || grid == "hex" ){
 
       xlim <- xlim %||%
         (if (!is.null(data) && "x" %in% names(data)) range(data$x, na.rm = TRUE) else NULL) %||%
@@ -373,19 +375,28 @@ StatStreamField <- ggproto(
         scales$y$range$range %||% c(-1, 1)
 
       # make grid of points on which to compute streams
-      grid <- cbind(
-        "x" = rep(seq(xlim[1], xlim[2], length.out = n[1]), times = n[2]),
-        "y" = rep(seq(ylim[1], ylim[2], length.out = n[2]), each = n[1])
-      )
+      if (is.null(grid)) {
+
+        grid <- cbind(
+          "x" = rep(seq(xlim[1], xlim[2], length.out = n[1]), times = n[2]),
+          "y" = rep(seq(ylim[1], ylim[2], length.out = n[2]), each = n[1])
+        )
+
+      } else if (grid == "hex") {
+
+        grid <- as.matrix( grid_hex(xlim, ylim,
+          d = sqrt((diff(xlim)/(n[1]+1))^2 + (diff(ylim)/(n[2]+1))^2)
+        ) )
+
+      }
+
+
     } else {
-      # browser()
       grid  <- as.matrix(grid)
       xlim <- range(grid[, "x"])
       ylim <- range(grid[, "y"])
     }
 
-
-    # browser()
 
     # allow for additional args to be passed
     orig_fun <- fun

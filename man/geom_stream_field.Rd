@@ -201,6 +201,8 @@ ggplot() + geom_stream_field(fun = f, eval_point = TRUE)
 
 # changing the grid of evaluation
 ggplot() + geom_stream_field(fun = f)
+ggplot() + geom_stream_field(fun = f, grid = "hex")
+ggplot() + geom_stream_field(fun = f, grid = "hex", n = 5)
 ggplot() + geom_stream_field(fun = f, n = 5)
 ggplot() + geom_stream_field(fun = f, xlim = c(-5, 5)) + coord_equal()
 ggplot() + geom_stream_field(fun = f, xlim = c(-5, 5), n = c(21, 11)) + coord_equal()
