@@ -199,11 +199,16 @@ ggplot() + geom_stream_field(fun = f, normalize = FALSE, T = .1)
 ggplot() + geom_stream_field(fun = f, tail_point = TRUE)
 ggplot() + geom_stream_field(fun = f, eval_point = TRUE)
 
+# changing the grid of evaluation
+ggplot() + geom_stream_field(fun = f, n = 16)
+ggplot() + geom_stream_field(fun = f, n = c(6, 16))
+ggplot() + geom_stream_field(fun = f, grid = grid_hex(c(-1,1), c(-1,1), .2))
 
 
-
+# using scales
 f <- efield_maker()
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+
 ggplot() +
   geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2)) +
   scale_color_viridis_c(trans = "log10") +
@@ -226,11 +231,12 @@ ggplot() +
     linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
   )
 
-# Generate a hexagonal grid
-hex_lattice <- generate_hexagonal_lattice(xlim = c(-5, 5), ylim = c(-5, 5), d = 1)
+# generate a hexagonal grid
+hex_lattice <- generate_hexagonal_lattice(xlim = c(-2, 2), ylim = c(-2, 2), d = .35)
+ggplot() + geom_stream_field(fun = f, grid = hex_lattice) + coord_equal()
 
-# Use the hexagonal grid in geom_stream_field
-ggplot() + geom_stream_field(fun = f, grid = hex_lattice)
+hex_lattice <- generate_hexagonal_lattice(xlim = c(-2, 2), ylim = c(-2, 2), d = .5)
+ggplot() + geom_stream_field(fun = f, grid = hex_lattice, L = 1) + coord_equal()
 
 # neat examples
 
@@ -246,13 +252,14 @@ f <- function(u) {
   c(y, x - x^3)
 }
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), grid = hex_lattice)
 
 f <- function(u) {
   x <- u[1]; y <- u[2]
   c(x^2 - y^2, x^2 + y^2 - 2)
 }
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
-
+ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2), grid = hex_lattice)
 
 }
 \keyword{datasets}
