@@ -282,6 +282,7 @@ geom_vector2 <- function(
    normalize = FALSE,
    tail_point = TRUE,
    eval_point = FALSE,
+   L = NULL,
    arrow = NULL) {
 
   default_mapping <- ggplot2::aes(length = after_stat(norm))
@@ -307,6 +308,7 @@ geom_vector2 <- function(
       normalize = normalize,
       tail_point = tail_point,
       eval_point = eval_point,
+      L = L,
       ...
     )
   )

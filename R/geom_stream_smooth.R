@@ -97,7 +97,7 @@
 #'   geom_vector(aes(x, y, fx = fx, fy = fy))
 #'
 #' # Generate a hexagonal grid
-#' hex_lattice <- generate_hexagonal_lattice(xlim = c(-5, 5), ylim = c(-5, 5), d = 1)
+#' hex_lattice <- grid_hex(xlim = c(-5, 5), ylim = c(-5, 5), d = 1)
 #'
 #' # Use the hexagonal grid in geom_stream_field
 #' ggplot(data = df) +
@@ -106,7 +106,7 @@
 #'
 #' # user specified point
 #'
-#' eval_pts <- data.frame(x = c(0, 3), y = c(2, 5))
+#' eval_pts <- data.frame(x = c(0, 1), y = c(2, -1))
 #'
 #' ggplot(data = df) +
 #'   geom_vector(aes(x, y, fx = fx, fy = fy), color = "black", normalize = FALSE) +
