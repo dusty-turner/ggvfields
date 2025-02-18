@@ -66,6 +66,7 @@
 #'   streamlines are then passed to [GeomStream] for rendering.
 #'
 #' @section See Also:
+#' - [geom_vector_field()] for straight arrows, i.e. `type = "vector"`
 #' - [StatStreamField] for the underlying statistical transformation.
 #' - [GeomStream] for the geometry that renders the resulting paths.
 #' - [ggplot2::geom_path] as the base geometry on which [GeomStream] is built.
@@ -74,7 +75,7 @@
 #'
 #' f <- function(u) c(-u[2], u[1])
 #'
-#' # the basic usage involves you providing a fun, xlim, and ylim
+#' # the basic usage involves providing a fun, xlim, and ylim
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
 #'
 #' # if unspecified, xlim and ylim default to c(-1,1). we use this in what
@@ -364,7 +365,7 @@ StatStreamField <- ggproto(
     # range of data received from ggplot layer or in this layer
     # range inherited from previous layer's scales
 
-    if (is.null(grid)) {
+    if( is.null(grid) || (!is.data.frame(grid) && grid == "hex") ){
 
       xlim <- xlim %||%
         (if (!is.null(data) && "x" %in% names(data)) range(data$x, na.rm = TRUE) else NULL) %||%
@@ -375,33 +376,27 @@ StatStreamField <- ggproto(
         scales$y$range$range %||% c(-1, 1)
 
       # make grid of points on which to compute streams
-      grid <- cbind(
-        "x" = rep(seq(xlim[1], xlim[2], length.out = n[1]), times = n[2]),
-        "y" = rep(seq(ylim[1], ylim[2], length.out = n[2]), each = n[1])
-      )
+      if (is.null(grid)) {
 
-    } else if (is.character(grid) && length(grid) == 1 && grid == "hex") {
+        grid <- cbind(
+          "x" = rep(seq(xlim[1], xlim[2], length.out = n[1]), times = n[2]),
+          "y" = rep(seq(ylim[1], ylim[2], length.out = n[2]), each = n[1])
+        )
 
-      xlim <- xlim %||%
-        (if (!is.null(data) && "x" %in% names(data)) range(data$x, na.rm = TRUE) else NULL) %||%
-        scales$x$range$range %||% c(-1, 1)
+      } else if (grid == "hex") {
 
-      ylim <- ylim %||%
-        (if (!is.null(data) && "y" %in% names(data)) range(data$y, na.rm = TRUE) else NULL) %||%
-        scales$y$range$range %||% c(-1, 1)
+        grid <- as.matrix( grid_hex(xlim, ylim,
+          d = sqrt(3)/2 * sqrt((diff(xlim)/n[1])^2 + (diff(ylim)/n[2])^2)
+        ) )
 
-      grid <- as.matrix(grid_hex(xlim, ylim,
-                                 d = sqrt((diff(xlim)/(n[1]+1))^2 + (diff(ylim)/(n[2]+1))^2)
-      ))
+      }
+
 
     } else {
-
       grid  <- as.matrix(grid)
       xlim <- range(grid[, "x"])
       ylim <- range(grid[, "y"])
-
     }
-
 
 
     # allow for additional args to be passed
