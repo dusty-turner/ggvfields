@@ -56,6 +56,23 @@
 #' @return A ggplot2 layer that can be added to a plot.
 #'
 #' @examples
+#'
+#' set.seed(1234)
+#' n <- 10
+#'
+#' # generate wind data in polar coordinates
+#' data <- data.frame(
+#'   "x" = rnorm(n),
+#'   "y" = rnorm(n),
+#'   "dir" = runif(n, -pi, pi), # angle, in radians
+#'   "spd" = rchisq(n, df = 2)  # speed
+#' ) |>
+#'   transform( "fx" = spd*cos(dir), "fy" = spd*sin(dir) )
+#'
+#' ggplot(data, aes(x, y)) + geom_vector(aes(fx = fx, fy = fy))
+#' ggplot(data, aes(x, y)) + geom_vector(aes(angle = dir, distance = spd))
+#'
+#'
 #' # Basic usage with explicit start and end points:
 #' vectors1 <- data.frame(
 #'   x    = c(0, 1, 2),
@@ -221,7 +238,7 @@ StatVector <- ggproto("StatVector", Stat,
 
       # Set a default grid resolution (number of cells along the larger axis).
       # In geom_stream_field n is passed in; here we assume, say, 20.
-      grid_n <- 20
+      grid_n <- 11
 
       # Compute L similarly to geom_stream_field:
       L <- min(diff(xlim), diff(ylim)) / (grid_n - 1) * 0.85

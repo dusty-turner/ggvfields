@@ -136,6 +136,23 @@ norm is available as an aesthetic.
 }
 }
 \examples{
+
+set.seed(1234)
+n <- 10
+
+# generate wind data in polar coordinates
+data <- data.frame(
+  "x" = rnorm(n),
+  "y" = rnorm(n),
+  "dir" = runif(n, -pi, pi), # angle, in radians
+  "spd" = rchisq(n, df = 2)  # speed
+) |>
+  transform( "fx" = spd*cos(dir), "fy" = spd*sin(dir) )
+
+ggplot(data, aes(x, y)) + geom_vector(aes(fx = fx, fy = fy))
+ggplot(data, aes(x, y)) + geom_vector(aes(angle = dir, distance = spd))
+
+
 # Basic usage with explicit start and end points:
 vectors1 <- data.frame(
   x    = c(0, 1, 2),

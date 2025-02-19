@@ -191,7 +191,9 @@ ggplot() + geom_stream_field(fun = f, normalize = FALSE)
 ggplot() + geom_stream_field(fun = f, normalize = FALSE, center = FALSE)
 
 # run systems until specified lengths
-ggplot() + geom_stream_field(fun = f, normalize = TRUE, L = .08)
+ggplot() + geom_stream_field(fun = f, normalize = TRUE, L = .8)
+ggplot() + geom_vector_field(fun = f, normalize = TRUE, L = .3)
+ggplot() + geom_vector_field(fun = f, normalize = FALSE, L = 2)
 
 # run systems for specified times
 ggplot() + geom_stream_field(fun = f, normalize = FALSE, T = .1)
