@@ -398,10 +398,10 @@ StatStreamField <- ggproto(
       ylim <- range(grid[, "y"])
     }
 
-
     # allow for additional args to be passed
     orig_fun <- fun
     fun <- function(v) rlang::inject(orig_fun(v, !!!args))
+# browser()
     # compute default L value (normalizing only)
     # this is computed either if 1) normalizing and L is computed automatically
     # or 2) not normalizing and computing T automatically
@@ -419,7 +419,6 @@ StatStreamField <- ggproto(
 
     # initialize the data frame
     list_of_streams <- vector(mode = "list", length = nrow(grid))
-
     # iterate computing streams/vectors
     for (i in 1:nrow(grid)) {
 
@@ -444,14 +443,16 @@ StatStreamField <- ggproto(
           to <- u + v
         }
 
+        tempL <- ifelse(is.null(L), T*nfu, L)
+
         stream <- data.frame(
-          "t" = c(0, L/nfu),
+          "t" = c(0, tempL/nfu),
           "x" = c(from[1], to[1]),
           "y" = c(from[2], to[2]),
           "d" = c(NA_real_, L),
-          "l" = c(0, L),
+          "l" = c(0, tempL),
           "avg_spd" = nfu, # = L / (L/nfu)
-          # "norm" = nfu,
+          "norm" = nfu,
           "id" = i
         )
 
@@ -513,7 +514,7 @@ StatStreamField <- ggproto(
     list_of_streams$distance <- NA_real_
     list_of_streams$angle <- NA_real_
 
-    list_of_streams$norm <- list_of_streams$l
+    # list_of_streams$norm <- list_of_streams$l
 
     list_of_streams
 

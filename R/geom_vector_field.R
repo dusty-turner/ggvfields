@@ -116,7 +116,7 @@ geom_vector_field <- function(
   ) {
 
   # Define default mapping for geom_vector_field
-  default_mapping <- aes(color = after_stat(avg_spd))
+  default_mapping <- aes(color = after_stat(norm))
 
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
@@ -185,7 +185,7 @@ stat_vector_field <- function(
   ) {
 
   # Define default mapping for geom_vector_field
-  default_mapping <- aes(color = after_stat(avg_spd))
+  default_mapping <- aes(color = after_stat(norm))
 
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
@@ -243,7 +243,6 @@ geom_vector_field2 <- function(
    n = 11,
    args = list(),
    center = FALSE,
-   normalize = TRUE,
    tail_point = TRUE,
    eval_point = FALSE,
    grid = NULL,
@@ -280,10 +279,11 @@ geom_vector_field2 <- function(
       method = "euler",
       na.rm = na.rm,
       center = center,
-      normalize = normalize,
+      normalize = TRUE,
       type = "vector",
       tail_point = tail_point,
       eval_point = eval_point,
+      T = 1,
       grid = grid,
       arrow = arrow,
       ...
@@ -306,7 +306,6 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
    n = 11,
    args = list(),
    center = FALSE,
-   normalize = TRUE,
    tail_point = TRUE,
    eval_point = FALSE,
    grid = NULL,
@@ -343,10 +342,11 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
       method = "euler",
       na.rm = na.rm,
       center = center,
-      normalize = normalize,
+      normalize = TRUE,
       type = "vector",
       tail_point = tail_point,
       eval_point = eval_point,
+      T = 1,
       grid = grid,
       arrow = arrow,
       ...
