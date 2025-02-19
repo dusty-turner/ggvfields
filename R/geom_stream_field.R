@@ -87,7 +87,9 @@
 #' ggplot() + geom_stream_field(fun = f, normalize = FALSE, center = FALSE)
 #'
 #' # run systems until specified lengths
-#' ggplot() + geom_stream_field(fun = f, normalize = TRUE, L = .08)
+#' ggplot() + geom_stream_field(fun = f, normalize = TRUE, L = .8)
+#' ggplot() + geom_vector_field(fun = f, normalize = TRUE, L = .3)
+#' ggplot() + geom_vector_field(fun = f, normalize = FALSE, L = 2)
 #'
 #' # run systems for specified times
 #' ggplot() + geom_stream_field(fun = f, normalize = FALSE, T = .1)
@@ -402,6 +404,8 @@ StatStreamField <- ggproto(
     # allow for additional args to be passed
     orig_fun <- fun
     fun <- function(v) rlang::inject(orig_fun(v, !!!args))
+
+
     # compute default L value (normalizing only)
     # this is computed either if 1) normalizing and L is computed automatically
     # or 2) not normalizing and computing T automatically
@@ -411,10 +415,10 @@ StatStreamField <- ggproto(
 
     # initialize T for !normalizing vectors; this will be an inefficient
     # implementation as i will recompute fun on the grid later, but fine for now
-    if (!normalize && type == "vector" && is.null(T)) {
+    if (type == "vector" && !normalize && is.null(T)) {
       grid_norms <- apply(grid, 1, function(u) norm(fun(u)))
-      fastest_vector_id <- which.max(grid_norms)
-      T <- L / grid_norms[fastest_vector_id]
+      fastest_vector_ndx <- which.max(grid_norms)
+      T <- L / grid_norms[fastest_vector_ndx]
     }
 
     # initialize the data frame

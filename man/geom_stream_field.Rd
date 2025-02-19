@@ -191,7 +191,9 @@ ggplot() + geom_stream_field(fun = f, normalize = FALSE)
 ggplot() + geom_stream_field(fun = f, normalize = FALSE, center = FALSE)
 
 # run systems until specified lengths
-ggplot() + geom_stream_field(fun = f, normalize = TRUE, L = .08)
+ggplot() + geom_stream_field(fun = f, normalize = TRUE, L = .8)
+ggplot() + geom_vector_field(fun = f, normalize = TRUE, L = .3)
+ggplot() + geom_vector_field(fun = f, normalize = FALSE, L = 2)
 
 # run systems for specified times
 ggplot() + geom_stream_field(fun = f, normalize = FALSE, T = .1)
@@ -208,7 +210,7 @@ ggplot() + geom_stream_field(fun = f, n = 5)
 ggplot() + geom_stream_field(fun = f, xlim = c(-5, 5)) + coord_equal()
 ggplot() + geom_stream_field(fun = f, xlim = c(-5, 5), n = c(21, 11)) + coord_equal()
 ggplot() + geom_stream_field(fun = f)
-ggplot() + geom_stream_field(fun = f, grid = grid_hex(c(-1,1), c(-1,1), .2)) ## warning
+ggplot() + geom_stream_field(fun = f, grid = grid_hex(c(-1,1), c(-1,1), .2))
 
 
 
