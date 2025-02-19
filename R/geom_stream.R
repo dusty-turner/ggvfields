@@ -283,9 +283,9 @@ GeomStream <- ggproto("GeomStream", GeomPath,
     group_diff <- munched$group[-1] != munched$group[-n]
     start <- c(TRUE, group_diff)
     end <-   c(group_diff, TRUE)
-    # browser()
+    browser()
 
-    # if (!constant) {
+    if (!constant) {
 
       arrow <- ggplot2:::repair_segment_arrow(arrow, munched$group)
 
@@ -302,22 +302,22 @@ GeomStream <- ggproto("GeomStream", GeomPath,
           # linemitre = linemitre
         )
       )
-    # } else {
-    #   id <- match(munched$group, unique0(munched$group))
-    #   polylineGrob(
-    #     munched$x, munched$y, id = id,
-    #     default.units = "native", arrow = arrow,
-    #     gp = gg_par(
-    #       col = alpha(munched$colour, munched$alpha)[start],
-    #       fill = alpha(munched$fill, munched$alpha)[start],
-    #       lwd = munched$linewidth[start],
-    #       lty = munched$linetype[start],
-    #       lineend = lineend,
-    #       linejoin = linejoin,
-    #       linemitre = linemitre
-    #     )
-    #   )
-    # }
+    } else {
+      id <- match(munched$group, ggplot2:::unique0(munched$group))
+      grid::polylineGrob(
+        munched$x, munched$y, id = id,
+        default.units = "native", arrow = arrow,
+        gp = grid::gpar(
+          col = alpha(munched$colour, munched$alpha)[start],
+          fill = alpha(munched$fill, munched$alpha)[start],
+          lwd = munched$linewidth[start],
+          lty = munched$linetype[start]
+          # lineend = lineend,
+          # linejoin = linejoin,
+          # linemitre = linemitre
+        )
+      )
+    }
 
     # coords <- coord$transform(data, panel_params)
     #
