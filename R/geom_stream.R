@@ -164,6 +164,7 @@ StatStream <- ggproto("StatStream", Stat,
     }
 
     data$norm <- sqrt((diff(range(data$x)))^2 + (diff(range(data$y)))^2)
+
     data
 
     }
@@ -176,8 +177,8 @@ draw_key_length <- function(data, params, size) {
   y0 <- unit(0.5, "npc")
 
   length_value <- data$length
-  x1 <- rev(x0 + unit(length_value, "cm"))
-  y1 <- rev(y0)
+  x1 <- x0 + unit(length_value, "cm")
+  y1 <- y0
 
   grid::segmentsGrob(
     x0 = x0, y0 = y0,
@@ -204,6 +205,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 
   setup_data = function(data, params){
 
+    data <- data[!is.infinite(data$t), ]
     # we want to remove all points whose f(u) = c(0,0)
     if("l" %in% names(data)) {
 
@@ -283,17 +285,20 @@ GeomStream <- ggproto("GeomStream", GeomPath,
     eval_point_grob <- grid::nullGrob()
 
     # Create a pathGrob using the transformed coordinates
+    # stream_grob <- grid::pathGrob(
     stream_grob <- grid::polylineGrob(
       x = grid::unit(coords$x, "npc") + grid::unit(coords$offset_x, "cm"),
       y = grid::unit(coords$y, "npc") + grid::unit(coords$offset_y, "cm"),
       id = coords$group,  # Handle grouping for multiple paths
       default.units = "native",  # Use native units for scaling
       gp = grid::gpar(
-        col =  coords[!duplicated(coords$group), "colour"],
+      #   col =  alpha(coords[!duplicated(coords$group), "colour"], coords[!duplicated(coords$group), "alpha"]),
+ col =  coords[!duplicated(coords$group), "colour"],
+ # gpar(col = alpha(munched$colour, munched$alpha)[start],
         fill = coords[!duplicated(coords$group), "colour"],
         lwd = coords[!duplicated(coords$group), "linewidth"],
-        linetype = coords[!duplicated(coords$group), "linetype"],
-        alpha = coords[!duplicated(coords$group), "alpha"]
+        linetype = coords[!duplicated(coords$group), "linetype"]
+        # alpha = coords[!duplicated(coords$group), "alpha"]
       ), arrow = arrow
     )
 
@@ -351,6 +356,14 @@ scale_length_continuous <- function(max_range = 0.5, ...) {
 
   args <- list(...)
 
+  if ("guide" %in% names(args)) {
+    guide_val <- args$guide
+    args$guide <- NULL
+  } else {
+    guide_val <- guide_legend(reverse = TRUE)
+  }
+
+
   if (any(grepl("trans|transform", names(args), ignore.case = TRUE))) {
     cli::cli_warn(c(
       "!" = "Applying a log style transformation with {.fn scale_length_continuous} may yield negative length values for norms below 1.",
@@ -358,11 +371,14 @@ scale_length_continuous <- function(max_range = 0.5, ...) {
     ))
   }
 
-  scale <- continuous_scale(
-    aesthetics = "length",
-    palette = scales::rescale_pal(range = c(.05, max_range)),
-    ...
-  )
+  scale <- do.call(continuous_scale, c(
+    list(
+      aesthetics = "length",
+      palette = scales::rescale_pal(range = c(.05, max_range)),
+      guide = guide_val
+    ),
+    args
+  ))
 
   # Return only the scale if max_range is at its default value
   if (max_range <= 0.5) {
