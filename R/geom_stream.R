@@ -229,6 +229,62 @@ GeomStream <- ggproto("GeomStream", GeomPath,
   # Override the draw_group method
   draw_panel = function(data, panel_params, coord, tail_point = FALSE, eval_point = FALSE, arrow) {
 
+
+    # fix_linewidth <- function(data, name) {
+    #   if (is.null(data$linewidth) && !is.null(data$size)) {
+    #     deprecate_soft0("3.4.0", I(paste0("Using the `size` aesthetic with ", name)), I("the `linewidth` aesthetic"))
+    #     data$linewidth <- data$size
+    #   }
+    #   data
+    # }
+    #
+    # data <- fix_linewidth(data, snake_class(self))
+    # if (!anyDuplicated(data$group)) {
+    #   cli::cli_inform(c(
+    #     "{.fn {snake_class(self)}}: Each group consists of only one observation.",
+    #     i = "Do you need to adjust the {.field group} aesthetic?"
+    #   ))
+    # }
+    #
+    # # must be sorted on group
+    # data <- data[order(data$group), , drop = FALSE]
+    # munched <- coord_munch(coord, data, panel_params)
+    #
+    # # Silently drop lines with less than two points, preserving order
+    # rows <- stats::ave(seq_len(nrow(munched)), munched$group, FUN = length)
+    # munched <- munched[rows >= 2, ]
+    # if (nrow(munched) < 2) return(zeroGrob())
+    #
+    # # Work out whether we should use lines or segments
+    # attr <- ggplot2:::dapply(munched, "group", function(df) {
+    #   linetype <- ggplot2:::unique0(df$linetype)
+    #   ggplot2:::data_frame0(
+    #     solid = length(linetype) == 1 && (identical(linetype, "solid") || linetype == 1),
+    #     constant = nrow(ggplot2:::unique0(df[, names(df) %in% c("alpha", "colour", "linewidth", "linetype")])) == 1,
+    #     .size = 1
+    #   )
+    # })
+    # solid_lines <- all(attr$solid)
+    # constant <- all(attr$constant)
+    # if (!solid_lines && !constant) {
+    #   cli::cli_abort("{.fn {snake_class(self)}} can't have varying {.field colour}, {.field linewidth}, and/or {.field alpha} along the line when {.field linetype} isn't solid.")
+    # }
+    #
+    # # Work out grouping variables for grobs
+    # n <- nrow(munched)
+    # group_diff <- munched$group[-1] != munched$group[-n]
+    # start <- c(TRUE, group_diff)
+    # end <-   c(group_diff, TRUE)
+    #
+    # # munched$fill <- arrow.fill %||% munched$colour
+    # munched$fill <- munched$colour
+    #
+    # browser()
+
+    # coords <- coord$transform(munched, panel_params)
+
+
+
     coords <- coord$transform(data, panel_params)
 
     # used for tail_point
