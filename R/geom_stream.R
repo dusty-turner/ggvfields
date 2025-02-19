@@ -164,6 +164,7 @@ StatStream <- ggproto("StatStream", Stat,
     }
 
     data$norm <- sqrt((diff(range(data$x)))^2 + (diff(range(data$y)))^2)
+
     data
 
     }
@@ -220,7 +221,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 
     }
 
-    data
+    data <- data[!is.infinite(data$t), ]
 
   },
 
@@ -283,17 +284,20 @@ GeomStream <- ggproto("GeomStream", GeomPath,
     eval_point_grob <- grid::nullGrob()
 
     # Create a pathGrob using the transformed coordinates
+    # stream_grob <- grid::pathGrob(
     stream_grob <- grid::polylineGrob(
       x = grid::unit(coords$x, "npc") + grid::unit(coords$offset_x, "cm"),
       y = grid::unit(coords$y, "npc") + grid::unit(coords$offset_y, "cm"),
       id = coords$group,  # Handle grouping for multiple paths
       default.units = "native",  # Use native units for scaling
       gp = grid::gpar(
-        col =  coords[!duplicated(coords$group), "colour"],
+      #   col =  alpha(coords[!duplicated(coords$group), "colour"], coords[!duplicated(coords$group), "alpha"]),
+ col =  coords[!duplicated(coords$group), "colour"],
+ # gpar(col = alpha(munched$colour, munched$alpha)[start],
         fill = coords[!duplicated(coords$group), "colour"],
         lwd = coords[!duplicated(coords$group), "linewidth"],
-        linetype = coords[!duplicated(coords$group), "linetype"],
-        alpha = coords[!duplicated(coords$group), "alpha"]
+        linetype = coords[!duplicated(coords$group), "linetype"]
+        # alpha = coords[!duplicated(coords$group), "alpha"]
       ), arrow = arrow
     )
 
