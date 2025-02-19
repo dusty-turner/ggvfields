@@ -205,6 +205,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 
   setup_data = function(data, params){
 
+    data <- data[!is.infinite(data$t), ]
     # we want to remove all points whose f(u) = c(0,0)
     if("l" %in% names(data)) {
 
@@ -221,7 +222,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 
     }
 
-    data <- data[!is.infinite(data$t), ]
+    data
 
   },
 
