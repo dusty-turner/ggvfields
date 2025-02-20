@@ -151,6 +151,7 @@ geom_vector <- function(
       tail_point = tail_point,
       eval_point = eval_point,
       L = L,
+      type = "vector",
       ...
     )
   )
@@ -189,6 +190,7 @@ stat_vector <- function(mapping = NULL, data = NULL,
       tail_point = tail_point,
       eval_point = eval_point,
       L = L,
+      type = "vector",
       ...
     )
   )
@@ -325,6 +327,7 @@ geom_vector2 <- function(
       tail_point = tail_point,
       eval_point = eval_point,
       L = L,
+      type = "vector",
       ...
     )
   )
@@ -371,6 +374,7 @@ stat_vector2 <- function(
       tail_point = tail_point,
       eval_point = eval_point,
       L = L,
+      type = "vector",
       ...
     )
   )
