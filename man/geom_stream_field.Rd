@@ -5,6 +5,8 @@
 \alias{geom_stream_field}
 \alias{stat_stream_field}
 \alias{StatStreamField}
+\alias{geom_stream_field2}
+\alias{stat_stream_field2}
 \title{Create a Stream Field Layer in ggplot2}
 \usage{
 geom_stream_field(
@@ -59,6 +61,54 @@ stat_stream_field(
   grid = NULL,
   method = "rk4",
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
+)
+
+geom_stream_field2(
+  mapping = NULL,
+  data = NULL,
+  stat = StatStreamField,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = FALSE,
+  fun,
+  xlim = NULL,
+  ylim = NULL,
+  n = 11,
+  args = list(),
+  max_it = 1000,
+  L = NULL,
+  center = FALSE,
+  type = "stream",
+  tail_point = TRUE,
+  eval_point = FALSE,
+  grid = NULL,
+  method = "rk4"
+)
+
+stat_stream_field2(
+  mapping = NULL,
+  data = NULL,
+  geom = GeomStream,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = FALSE,
+  fun,
+  xlim = NULL,
+  ylim = NULL,
+  n = 11,
+  args = list(),
+  max_it = 1000,
+  L = NULL,
+  center = FALSE,
+  type = "stream",
+  tail_point = TRUE,
+  eval_point = FALSE,
+  grid = NULL,
+  method = "rk4"
 )
 }
 \arguments{

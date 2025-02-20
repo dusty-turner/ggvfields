@@ -16,6 +16,8 @@ reference:
       - stat_stream
       - geom_stream_field
       - stat_stream_field
+      - geom_stream_field2
+      - stat_stream_field2
       - geom_vector
       - stat_vector
       - geom_vector2

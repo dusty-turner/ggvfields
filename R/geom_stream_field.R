@@ -325,6 +325,149 @@ stat_stream_field <- function(
   )
 }
 
+#' @rdname geom_stream_field
+#' @export
+geom_stream_field2 <- function(
+    mapping = NULL,
+    data = NULL,
+    stat = StatStreamField,
+    position = "identity",
+    ...,
+    na.rm = FALSE,
+    show.legend = NA,
+    inherit.aes = FALSE,
+    # inherit.aes = TRUE,
+    fun,
+    xlim = NULL,
+    ylim = NULL,
+    n = 11,
+    args = list(),
+    max_it = 1000,
+    L = NULL,
+    center = FALSE,
+    type = "stream",
+    tail_point = TRUE,
+    eval_point = FALSE,
+    grid = NULL,
+    method = "rk4"
+    ) {
+
+  # Define default mapping for geom_vector_field
+  default_mapping <- aes(color = after_stat(NULL))
+
+  # Merge user-provided mapping with default mapping
+  # User mapping takes precedence
+  if (!is.null(mapping)) {
+    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
+  } else {
+    mapping <- default_mapping
+  }
+
+  if (is.null(data)) data <- ensure_nonempty_data(data)
+  n <- ensure_length_two(n)
+
+  layer(
+    stat = stat,
+    geom = GeomStream,
+    data = data,
+    mapping = mapping,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      fun = fun,
+      xlim = xlim,
+      ylim = ylim,
+      n = n,
+      args = args,
+      method = method,
+      na.rm = na.rm,
+      max_it = max_it,
+      T = NULL,
+      L = L,
+      center = center,
+      type = type,
+      normalize = TRUE,
+      tail_point = tail_point,
+      eval_point = eval_point,
+      grid = grid,
+      arrow = NULL,
+      ...
+    )
+  )
+}
+
+#' @rdname geom_stream_field
+#' @export
+stat_stream_field2 <- function(
+    mapping = NULL,
+    data = NULL,
+    geom = GeomStream,
+    position = "identity",
+    ...,
+    na.rm = FALSE,
+    show.legend = NA,
+    inherit.aes = FALSE,
+    # inherit.aes = TRUE,
+    fun,
+    xlim = NULL,
+    ylim = NULL,
+    n = 11,
+    args = list(),
+    max_it = 1000,
+    L = NULL,
+    center = FALSE,
+    type = "stream",
+    tail_point = TRUE,
+    eval_point = FALSE,
+    grid = NULL,
+    method = "rk4"
+    ) {
+
+  # Define default mapping for geom_vector_field
+  default_mapping <- aes(color = after_stat(NULL))
+
+  # Merge user-provided mapping with default mapping
+  # User mapping takes precedence
+  if (!is.null(mapping)) {
+    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
+  } else {
+    mapping <- default_mapping
+  }
+
+  if (is.null(data)) data <- ensure_nonempty_data(data)
+  n <- ensure_length_two(n)
+
+  layer(
+    stat = StatStreamField,
+    geom = geom,
+    data = data,
+    mapping = mapping,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      fun = fun,
+      xlim = xlim,
+      ylim = ylim,
+      n = n,
+      args = args,
+      method = method,
+      na.rm = na.rm,
+      max_it = max_it,
+      T = NULL,
+      L = L,
+      center = center,
+      type = type,
+      normalize = TRUE,
+      tail_point = tail_point,
+      eval_point = eval_point,
+      grid = grid,
+      arrow = NULL,
+      ...
+    )
+  )
+}
 
 #' @rdname geom_stream_field
 #' @format NULL
@@ -398,24 +541,31 @@ StatStreamField <- ggproto(
       xlim <- range(grid[, "x"])
       ylim <- range(grid[, "y"])
     }
-
+# browser()
     # allow for additional args to be passed
     orig_fun <- fun
     fun <- function(v) rlang::inject(orig_fun(v, !!!args))
-browser()
 
     ## protecting the user from themselves
     if( type == "vector" && !normalize && !is.null(L)){
       cli::cli_inform("Specifying L with non normalized vectors is incompatible.  Ignoreing L")
     }
     if( type == "vector" && normalize && !is.null(T)){
-      cli::cli_inform("Specifying T with normalized vectors is incompatible.  Ignoreing T")
+      if( T != 1 ){ ## this happens in geom_vector_field2
+        cli::cli_inform("Specifying T with normalized vectors is incompatible.  Ignoreing T")
+      }
     }
-    if( type == "stream" && normalize && !is.null(T)){
-      cli::cli_inform("Specifying T with normalized streams is incompatible.  Ignoreing T")
+    if( type == "stream" && normalize && !is.null(T) && !is.null(L)){
+      cli::cli_inform("Specifying T and L with normalized streams is incompatible.  Ignoreing L")
     }
-    if( type == "stream" && !normalize && is.null(T) %% is.null(L)){
-      cli::cli_inform("Specifying T and L with non normalized streams is incompatible.  Ignoreing L")
+    if( type == "stream" && !normalize && !is.null(T) && !is.null(L)){
+      cli::cli_inform("Specifying T and L with not normalized streams is incompatible.  Ignoreing T")
+    }
+# browser()
+    ## this combination implies that the user actually wants normalization
+    if( type == "stream" && !normalize && !is.null(T) && is.null(L)){
+      cli::cli_inform("Specifying T without L implies normalization.  Setting normalize to TRUE and ignoring L")
+      normalize <- TRUE
     }
 
     # compute default L value (normalizing only)
@@ -425,11 +575,15 @@ browser()
       L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
     }
 
-    if ( (!normalize && is.null(T) && type == "stream") ) {
+    if ( (normalize && is.null(T) && type == "stream") ) {
       if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
       grid_norms <- apply(grid, 1, function(u) norm(fun(u)))
       fastest_vector_ndx <- which.max(grid_norms)
       T <- L / grid_norms[fastest_vector_ndx]
+    }
+
+    if ( !normalize && type == "stream" && is.null(L) && is.null(T)){
+      L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
     }
 
     # initialize T for !normalizing vectors; this will be an inefficient
@@ -482,7 +636,7 @@ browser()
 
       }
       if (type == "stream") {
-        if ( !normalize && !is.null(T) ) {
+        if ( normalize ) {
           stream <- ode_stepper(grid[i, ], fun, T = T, L = 1e6, max_it, method, center)
         } else {
           stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, method, center)
