@@ -175,7 +175,6 @@
 #' @name geom_stream_field
 #' @aliases stat_stream_field StatStreamField
 #' @export
-NULL
 geom_stream_field <- function(
     mapping = NULL,
     data = NULL,
@@ -403,20 +402,43 @@ StatStreamField <- ggproto(
     # allow for additional args to be passed
     orig_fun <- fun
     fun <- function(v) rlang::inject(orig_fun(v, !!!args))
+browser()
+
+    ## protecting the user from themselves
+    if( type == "vector" && !normalize && !is.null(L)){
+      cli::cli_inform("Specifying L with non normalized vectors is incompatible.  Ignoreing L")
+    }
+    if( type == "vector" && normalize && !is.null(T)){
+      cli::cli_inform("Specifying T with normalized vectors is incompatible.  Ignoreing T")
+    }
+    if( type == "stream" && normalize && !is.null(T)){
+      cli::cli_inform("Specifying T with normalized streams is incompatible.  Ignoreing T")
+    }
+    if( type == "stream" && !normalize && is.null(T) %% is.null(L)){
+      cli::cli_inform("Specifying T and L with non normalized streams is incompatible.  Ignoreing L")
+    }
 
     # compute default L value (normalizing only)
     # this is computed either if 1) normalizing and L is computed automatically
     # or 2) not normalizing and computing T automatically
-    if ( (normalize && is.null(L)) || (!normalize && is.null(T)) ) {
+    if ( (normalize && is.null(L)) && type == "vector") {
       L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
+    }
+
+    if ( (!normalize && is.null(T) && type == "stream") ) {
+      if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
+      grid_norms <- apply(grid, 1, function(u) norm(fun(u)))
+      fastest_vector_ndx <- which.max(grid_norms)
+      T <- L / grid_norms[fastest_vector_ndx]
     }
 
     # initialize T for !normalizing vectors; this will be an inefficient
     # implementation as i will recompute fun on the grid later, but fine for now
     if (type == "vector" && !normalize && is.null(T)) {
-      grid_norms <- apply(grid, 1, function(u) norm(fun(u)))
-      fastest_vector_ndx <- which.max(grid_norms)
-      T <- L / grid_norms[fastest_vector_ndx]
+      # grid_norms <- apply(grid, 1, function(u) norm(fun(u)))
+      # fastest_vector_ndx <- which.max(grid_norms)
+      # T <- L / grid_norms[fastest_vector_ndx]
+      T <- 1
     }
 
     # initialize the data frame
@@ -459,7 +481,6 @@ StatStreamField <- ggproto(
         )
 
       }
-
       if (type == "stream") {
         if ( !normalize && !is.null(T) ) {
           stream <- ode_stepper(grid[i, ], fun, T = T, L = 1e6, max_it, method, center)

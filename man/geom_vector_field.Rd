@@ -7,6 +7,28 @@
 \alias{stat_vector_field2}
 \title{Vector Field Layers for ggplot2}
 \usage{
+geom_vector_field(
+  mapping = NULL,
+  data = NULL,
+  stat = StatStreamField,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = FALSE,
+  fun,
+  xlim = NULL,
+  ylim = NULL,
+  n = 11,
+  args = list(),
+  center = TRUE,
+  normalize = TRUE,
+  tail_point = FALSE,
+  eval_point = FALSE,
+  grid = NULL,
+  arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
+)
+
 stat_vector_field(
   mapping = NULL,
   data = NULL,
@@ -84,9 +106,6 @@ whereas in \strong{geom_vector_field2} the default mapping includes \code{length
 \item{stat}{The statistical transformation to use on the data for this layer.
 Defaults to \link{StatStreamField}.}
 
-\item{geom}{The geometric object used to draw the streamline. Defaults to
-\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
-
 \item{position}{Position adjustment, either as a string or the result of a
 call to a position adjustment function.}
 
@@ -141,6 +160,9 @@ grid is generated based on \code{xlim}, \code{ylim}, and \code{n}.}
 streamlines. In
 \strong{geom_vector_field}, the default is a closed arrow with a 30° angle and
 length \code{0.02} npc; in \strong{geom_vector_field2} the default is \code{NULL}.}
+
+\item{geom}{The geometric object used to draw the streamline. Defaults to
+\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
 }
 \value{
 A ggplot2 layer that computes and plots a vector field using

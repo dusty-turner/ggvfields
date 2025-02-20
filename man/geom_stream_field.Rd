@@ -7,6 +7,33 @@
 \alias{StatStreamField}
 \title{Create a Stream Field Layer in ggplot2}
 \usage{
+geom_stream_field(
+  mapping = NULL,
+  data = NULL,
+  stat = StatStreamField,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = FALSE,
+  fun,
+  xlim = NULL,
+  ylim = NULL,
+  n = 11,
+  args = list(),
+  max_it = 1000,
+  T = NULL,
+  L = NULL,
+  center = TRUE,
+  type = "stream",
+  normalize = TRUE,
+  tail_point = FALSE,
+  eval_point = FALSE,
+  grid = NULL,
+  method = "rk4",
+  arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
+)
+
 stat_stream_field(
   mapping = NULL,
   data = NULL,
@@ -55,8 +82,18 @@ the plot data. The return value must be a \code{data.frame}, and
 will be used as the layer data. A \code{function} can be created
 from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
 
-\item{geom}{The geometric object used to render the streamline. Defaults to
-\link{GeomStream}.}
+\item{stat}{The statistical transformation to use on the data for this layer.
+When using a \verb{geom_*()} function to construct a layer, the \code{stat}
+argument can be used the override the default coupling between geoms and
+stats. The \code{stat} argument accepts the following:
+\itemize{
+\item A \code{Stat} ggproto subclass, for example \code{StatCount}.
+\item A string naming the stat. To give the stat as a string, strip the
+function name of the \code{stat_} prefix. For example, to use \code{stat_count()},
+give the stat as \code{"count"}.
+\item For more information and other ways to specify the stat, see the
+\link[ggplot2:layer_stats]{layer stat} documentation.
+}}
 
 \item{position}{A position adjustment to use on the data for this layer. This
 can be used in various ways, including to prevent overplotting and
@@ -145,6 +182,9 @@ or \code{"euler"} for Euler's method. Defaults to \code{"rk4"}.}
 \item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification for adding arrowheads to the
 streamline. By default, a closed arrow with a 30° angle and a length of
 \code{0.02} npc is used.}
+
+\item{geom}{The geometric object used to render the streamline. Defaults to
+\link{GeomStream}.}
 }
 \value{
 A ggplot2 layer that computes and renders streamlines over the

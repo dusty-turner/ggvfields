@@ -227,7 +227,6 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 
   # Override the draw_group method
   draw_panel = function(data, panel_params, coord, tail_point = FALSE, eval_point = FALSE, arrow) {
-# browser()
     if ("length" %in% names(data) && all(!is.na(data$length)) && "avg_spd" %in% names(data)) {
       # if (!any(is.na(data$length))) {
 

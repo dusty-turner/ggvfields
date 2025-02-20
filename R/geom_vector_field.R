@@ -89,10 +89,8 @@
 #' ggplot() + geom_vector_field2(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 #'
 #' @name geom_vector_field
-#' @aliases geom_vector_field stat_vector_field geom_vector_field2
-#'   stat_vector_field2
+#' @aliases geom_vector_field stat_vector_field geom_vector_field2 stat_vector_field2
 #' @export
-NULL
 geom_vector_field <- function(
   mapping = NULL,
   data = NULL,
