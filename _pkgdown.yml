@@ -33,12 +33,11 @@ reference:
       - geom_function_1d_2d
       - stat_function_1d_2d
       - geom_stream_smooth
-      - scale_length_continuous
-      - geom_flow
-      - geom_streamplot
       - geom_vector_smooth
-      - geom_function_2d
       - geom_potential
+      - scale_length_continuous
       - ggvfields
       - efield
       - generate_hexagonal_lattice
+      - geom_flow
+      - geom_streamplot
