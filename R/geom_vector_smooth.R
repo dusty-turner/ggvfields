@@ -215,6 +215,7 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
       conf_level = conf_level,
       arrow = arrow,
       eval_points = eval_points,
+      formula = formula,
       na.rm = na.rm,
       ...
     )
