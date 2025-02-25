@@ -4,9 +4,9 @@
 \name{geom_stream_field}
 \alias{geom_stream_field}
 \alias{stat_stream_field}
-\alias{StatStreamField}
 \alias{geom_stream_field2}
 \alias{stat_stream_field2}
+\alias{StatStreamField}
 \title{Create a Stream Field Layer in ggplot2}
 \usage{
 geom_stream_field(
@@ -112,157 +112,117 @@ stat_stream_field2(
 )
 }
 \arguments{
-\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and
-\code{inherit.aes = TRUE} (the default), it is combined with the default mapping
-at the top level of the plot. You must supply \code{mapping} if there is no plot
-mapping.}
+\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
+(Optional)}
 
-\item{data}{The data to be displayed in this layer. There are three
-options:
+\item{data}{A data frame or other object, as in \code{\link[ggplot2:layer]{ggplot2::layer()}}.
+(Optional)}
 
-If \code{NULL}, the default, the data is inherited from the plot
-data as specified in the call to \code{\link[ggplot2:ggplot]{ggplot()}}.
+\item{stat}{The statistical transformation to use on the data (default:
+\link{StatStreamField}).}
 
-A \code{data.frame}, or other object, will override the plot
-data. All objects will be fortified to produce a data frame. See
-\code{\link[ggplot2:fortify]{fortify()}} for which variables will be created.
-
-A \code{function} will be called with a single argument,
-the plot data. The return value must be a \code{data.frame}, and
-will be used as the layer data. A \code{function} can be created
-from a \code{formula} (e.g. \code{~ head(.x, 10)}).}
-
-\item{stat}{The statistical transformation to use on the data for this layer.
-When using a \verb{geom_*()} function to construct a layer, the \code{stat}
-argument can be used the override the default coupling between geoms and
-stats. The \code{stat} argument accepts the following:
-\itemize{
-\item A \code{Stat} ggproto subclass, for example \code{StatCount}.
-\item A string naming the stat. To give the stat as a string, strip the
-function name of the \code{stat_} prefix. For example, to use \code{stat_count()},
-give the stat as \code{"count"}.
-\item For more information and other ways to specify the stat, see the
-\link[ggplot2:layer_stats]{layer stat} documentation.
-}}
-
-\item{position}{A position adjustment to use on the data for this layer. This
-can be used in various ways, including to prevent overplotting and
-improving the display. The \code{position} argument accepts the following:
-\itemize{
-\item The result of calling a position function, such as \code{position_jitter()}.
-This method allows for passing extra arguments to the position.
-\item A string naming the position adjustment. To give the position as a
-string, strip the function name of the \code{position_} prefix. For example,
-to use \code{position_jitter()}, give the position as \code{"jitter"}.
-\item For more information and other ways to specify the position, see the
-\link[ggplot2:layer_positions]{layer position} documentation.
-}}
+\item{position}{Position adjustment, either as a string or the result of a
+position adjustment function.}
 
 \item{...}{Other arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}} and the underlying
 geometry/stat.}
 
-\item{na.rm}{If \code{FALSE}, the default, missing values are removed with
-a warning. If \code{TRUE}, missing values are silently removed.}
+\item{na.rm}{Logical. If \code{FALSE} (the default), missing values are removed
+with a warning. If \code{TRUE}, missing values are silently removed.}
 
-\item{show.legend}{logical. Should this layer be included in the legends?
-\code{NA}, the default, includes if any aesthetics are mapped.
-\code{FALSE} never includes, and \code{TRUE} always includes.
-It can also be a named logical vector to finely select the aesthetics to
-display.}
+\item{show.legend}{Logical. Should this layer be included in the legends?}
 
-\item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
-rather than combining with them. This is most useful for helper functions
-that define both data and aesthetics and shouldn't inherit behaviour from
-the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
+\item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics
+rather than combining with them.}
 
 \item{fun}{A function of two variables, \code{fun(x, y)}, returning a two-element
-vector \eqn{(dx, dy)}. This defines the local "flow" direction at any point
-in the domain.}
+vector \eqn{(dx, dy)} that defines the local flow direction at any point.}
 
-\item{xlim, ylim}{Numeric vectors of length two specifying the domain limits
-in the \eqn{x}- and \eqn{y}-directions, respectively. Defaults to
-\eqn{c(-1, 1)} if not provided.}
+\item{xlim}{Numeric vector of length 2 specifying the domain limits in the
+\eqn{x}-direction. Defaults to \eqn{c(-1, 1)}.}
 
-\item{n}{Integer or two-element numeric vector. Grid resolution specifying
-the number of seed points along each axis. Defaults to \code{11}, resulting in
-an \eqn{11 \times 11} grid.}
+\item{ylim}{Numeric vector of length 2 specifying the domain limits in the
+\eqn{y}-direction. Defaults to \eqn{c(-1, 1)}.}
 
-\item{args}{List of additional arguments passed on to the function defined by
-\code{fun}.}
+\item{n}{Integer or two-element numeric vector specifying the grid resolution
+(number of seed points) along each axis. Defaults to \code{11}, producing an
+\eqn{11 \times 11} grid.}
 
-\item{max_it}{Integer. Maximum number of integration steps per streamline.
-Defaults to \code{1000}.}
+\item{args}{A list of additional arguments passed to \code{fun}.}
+
+\item{max_it}{Integer. Maximum number of integration steps per streamline
+(default: \code{1000}).}
 
 \item{T}{Numeric. Maximum integration time for each streamline. When
-\code{normalize = FALSE}, the integration runs until time \code{T} is reached.
-Defaults to \code{NULL}, in which case a default value of \code{1} is used when
-needed.}
+\code{normalize = FALSE}, integration runs until time \code{T} is reached. Defaults
+to \code{NULL} (in which case a default of \code{1} is used when needed).}
 
-\item{L}{Numeric. Maximum arc length for each streamline. When \code{normalize = TRUE}, the integration is halted once the cumulative arc length reaches
-\code{L}. Defaults to \code{NULL}, in which case a suitable default is computed from
-the grid spacing.}
+\item{L}{Numeric. Maximum arc length for each streamline. When \code{normalize = TRUE}, integration halts once the cumulative arc length reaches \code{L}.
+Defaults to \code{NULL} (a suitable default is computed from the grid spacing).}
 
-\item{center}{Logical. If \code{TRUE} (default), centers the seed points or the
-resulting streamlines so that the original (x, y) becomes the midpoint.}
+\item{center}{Logical. If \code{TRUE} (default), centers the seed points (or
+resulting streamlines) so that the original (x, y) becomes the midpoint.}
 
-\item{type}{Character. Either \code{"stream"} (default) or \code{"vector"}.
-\itemize{
-\item \code{"stream"} computes a full streamline by integrating in both directions (when \code{center = TRUE}).
-\item \code{"vector"} computes a single vector representing the field at the seed point.
-}}
+\item{type}{Character. Either \code{"stream"} (default) or \code{"vector"}. \code{"stream"}
+computes a full streamline by integrating in both directions (if \code{center = TRUE}), while \code{"vector"} computes a single vector.}
 
 \item{normalize}{Logical. If \code{TRUE} (default), streamlines are normalized
 based on grid spacing, using the \code{L} parameter to control maximum arc
-length. If \code{FALSE}, streamlines are computed for a fixed time determined by
-the \code{T} parameter.}
+length. If \code{FALSE}, streamlines are computed for a fixed integration time
+determined by \code{T}.}
 
 \item{tail_point}{Logical. If \code{TRUE}, draws a point at the tail (starting
 point) of each streamline. Defaults to \code{FALSE}.}
 
-\item{eval_point}{Logical. If \code{TRUE}, a point is drawn at the evaluation
-point where the gradient was computed. Default is \code{FALSE}.}
+\item{eval_point}{Logical. If \code{TRUE}, draws a point at the evaluation point
+where the field was computed. Defaults to \code{FALSE}.}
 
 \item{grid}{A data frame containing precomputed grid points for seed
-placement. If \code{NULL} (default), a regular Cartesian
-grid is generated based on \code{xlim}, \code{ylim}, and \code{n}.}
+placement. If \code{NULL} (default), a regular Cartesian grid is generated based
+on \code{xlim}, \code{ylim}, and \code{n}.}
 
-\item{method}{Character. Integration method, e.g., \code{"rk4"} for Runge-Kutta 4
-or \code{"euler"} for Euler's method. Defaults to \code{"rk4"}.}
+\item{method}{Character. Integration method (e.g. \code{"rk4"} for Runge-Kutta 4,
+\code{"euler"} for Euler's method). Defaults to \code{"rk4"}.}
 
 \item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification for adding arrowheads to the
-streamline. By default, a closed arrow with a 30° angle and a length of
-\code{0.02} npc is used.}
+streamlines. Defaults to a closed arrow with a 30° angle and length \code{0.02}
+npc.}
 
-\item{geom}{The geometric object used to render the streamline. Defaults to
-\link{GeomStream}.}
+\item{geom}{The geometric object used to render the streamlines (defaults to
+\link{GeomStream}).}
 }
 \value{
 A ggplot2 layer that computes and renders streamlines over the
-specified domain, optionally with arrowheads and tail points.
+specified domain.
 }
 \description{
 \code{\link[=geom_stream_field]{geom_stream_field()}} creates a ggplot2 layer that integrates a user-defined
 vector field function \eqn{f(x, y) \to (dx, dy)} over a grid of seed points
-within a specified domain \eqn{(x, y)}, producing streamlines that visualize
-the flow of the vector field. This is useful for visualizing vector fields,
-flow patterns, or trajectories in a variety of contexts such as fluid flows
-or gradient fields.
+within a specified domain. The function numerically integrates the field
+starting from these seeds, producing streamlines that visualize the flow.
+This is useful for visualizing vector fields, flow patterns, or trajectories,
+such as in fluid dynamics or gradient fields.
 }
-\details{
-The streamlines are generated by numerically integrating the vector
-field defined by \code{fun(x, y)}. The integration halts either when the
-cumulative arc length reaches \code{L} (if \code{normalize = TRUE}) or when the
-integration time reaches \code{T} (if \code{normalize = FALSE}). The computed
-streamlines are then passed to \link{GeomStream} for rendering.
-}
-\section{See Also}{
-
+\section{Aesthetics}{
+ \code{geom_stream_field()} (and its stat variant) inherit
+aesthetics from \link{GeomStream} and understand the following:
 \itemize{
-\item \code{\link[=geom_vector_field]{geom_vector_field()}} for straight arrows, i.e. \code{type = "vector"}
-\item \link{StatStreamField} for the underlying statistical transformation.
-\item \link{GeomStream} for the geometry that renders the resulting paths.
-\item \link[ggplot2:geom_path]{ggplot2::geom_path} as the base geometry on which \link{GeomStream} is built.
+\item \strong{\code{x}}: x-coordinate of the seed point.
+\item \strong{\code{y}}: y-coordinate of the seed point.
+\item \code{color}: Color, typically used to represent computed statistics (e.g. average speed).
+\item \code{linetype}: Type of line used to draw the streamlines.
+\item \code{linewidth}: Thickness of the streamlines.
+\item \code{alpha}: Transparency of the streamlines.
 }
+}
+
+\section{Details}{
+ The streamlines are generated by numerically integrating
+the vector field defined by \code{fun(x, y)}. When \code{normalize = TRUE},
+integration stops once the cumulative arc length reaches \code{L}; otherwise,
+integration runs until time \code{T} is reached. If both \code{T} and \code{L} are
+provided in incompatible combinations, one parameter is ignored. The
+computed paths are rendered by \link{GeomStream}.
 }
 
 \examples{
@@ -301,8 +261,6 @@ ggplot() + geom_stream_field(fun = f, xlim = c(-5, 5)) + coord_equal()
 ggplot() + geom_stream_field(fun = f, xlim = c(-5, 5), n = c(21, 11)) + coord_equal()
 ggplot() + geom_stream_field(fun = f)
 ggplot() + geom_stream_field(fun = f, grid = grid_hex(c(-1,1), c(-1,1), .2))
-
-
 
 # using other ggplot2 tools
 f <- efield_maker()

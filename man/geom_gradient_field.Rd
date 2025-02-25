@@ -5,8 +5,33 @@
 \alias{stat_gradient_field}
 \alias{geom_gradient_field2}
 \alias{stat_gradient_field2}
-\title{Gradient Field Layers for ggplot2}
+\title{Create a Gradient Field Layer in ggplot2}
 \usage{
+geom_gradient_field(
+  mapping = NULL,
+  data = NULL,
+  stat = StatStreamField,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = TRUE,
+  inherit.aes = TRUE,
+  fun,
+  xlim = NULL,
+  ylim = NULL,
+  n = 11,
+  max_it = 1000,
+  T = NULL,
+  L = NULL,
+  center = TRUE,
+  type = "stream",
+  normalize = TRUE,
+  tail_point = FALSE,
+  eval_point = FALSE,
+  grid = NULL,
+  arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"), type = "closed")
+)
+
 stat_gradient_field(
   mapping = NULL,
   data = NULL,
@@ -85,16 +110,17 @@ stat_gradient_field2(
 \arguments{
 \item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
 Additional aesthetics such as \code{color}, \code{size}, \code{linetype}, and \code{alpha} can
-be defined. In \strong{geom_gradient_field} the default mapping includes \code{color = after_stat(norm)}, whereas in \strong{geom_gradient_field2} the default
-mapping includes \code{length = after_stat(norm)}.}
+be defined. In
+\strong{geom_gradient_field} the default mapping includes \code{color = after_stat(norm)},
+whereas in \strong{geom_gradient_field2} the default mapping includes \code{length = after_stat(norm)}.}
 
 \item{data}{A data frame containing the input data.}
 
-\item{geom}{The geometric object used to draw the streamline. Defaults to
-\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
+\item{stat}{The statistical transformation to use on the data for this layer.
+Defaults to \link{StatStreamField}.}
 
 \item{position}{Position adjustment, either as a string or the result of a
-call to a position adjustment function.}
+position adjustment function.}
 
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
@@ -120,7 +146,7 @@ domain. Defaults to \code{c(-1, 1)}.}
 each axis. Higher values produce a denser gradient field. Defaults to \code{11}.}
 
 \item{max_it}{Integer. Maximum number of integration steps allowed when
-computing the gradient stream or vector. Defaults to 1000.}
+computing the gradient stream. Defaults to \code{1000}.}
 
 \item{T}{Numeric. Time increment used for numerical integration when
 \code{normalize} is FALSE. If not provided, it is computed automatically based
@@ -131,33 +157,32 @@ on grid spacing and the vector field’s magnitude.}
 provided, L is computed automatically from the grid spacing.}
 
 \item{center}{Logical. If \code{TRUE}, centers the seed points so that the
-original (x, y) becomes the midpoint. Defaults differ between the variants.}
+original (x, y) becomes the midpoint.}
 
 \item{type}{Character. Specifies the type of field to compute: use \code{"stream"}
 to generate integrated streamlines or \code{"vector"} for individual vector
-segments. Defaults to \code{"stream"}.
-gradient vectors. In \strong{geom_gradient_field} the default is a closed arrow
-with a 30° angle and length \code{0.02} npc; in \strong{geom_gradient_field2} the
-default is \code{NULL}.}
+segments. Defaults to \code{"stream"}.}
 
 \item{normalize}{Logical. If \code{TRUE}, gradient vectors are normalized based on
-grid spacing. If \code{TRUE}, it is converted internally to \code{"vector"}. Default
-is \code{TRUE}.}
+grid spacing. Defaults to \code{TRUE}.}
 
 \item{tail_point}{Logical. If \code{TRUE}, a point is drawn at the tail of each
-gradient vector. Defaults differ between the variants.}
+gradient vector.}
 
 \item{eval_point}{Logical. If \code{TRUE}, a point is drawn at the evaluation
-point where the gradient was computed. Default is \code{FALSE}.}
+point where the gradient was computed. Defaults to \code{FALSE}.}
 
 \item{grid}{A data frame containing precomputed grid points for seed
-placement. If \code{NULL} (default), a regular Cartesian
-grid is generated based on \code{xlim}, \code{ylim}, and \code{n}.}
+placement. If \code{NULL} (default), a regular Cartesian grid is generated based
+on \code{xlim}, \code{ylim}, and \code{n}.}
 
-\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the}
+\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the
+gradient vectors. In \strong{geom_gradient_field}, the default is a closed arrow
+with a 30° angle and length \code{0.02} npc; in \strong{geom_gradient_field2}, the
+default is \code{NULL}.}
 
-\item{stat}{The statistical transformation to use on the data for this layer.
-Defaults to \link{StatStreamField}.}
+\item{geom}{The geometric object used to render the streamline (only used in
+\code{stat_stream()}; defaults to \link{GeomStream}).}
 }
 \value{
 A ggplot2 layer that computes and plots a gradient field by
@@ -176,10 +201,23 @@ resulting vectors.
 Two variants are provided:
 \itemize{
 \item \strong{geom_gradient_field()} uses a default mapping that sets \code{color = after_stat(norm)}.
-\item \strong{geom_gradient_field2()} uses a default mapping that sets \code{length = after_stat(norm)} (with \code{color}
-unmapped by default).
+\item \strong{geom_gradient_field2()} uses a default mapping that sets \code{length = after_stat(norm)}
+(with \code{color} unmapped by default).
 }
 }
+\section{Aesthetics}{
+ \code{geom_gradient_field()} and \code{geom_gradient_field2()}
+understand the following aesthetics (required aesthetics are in \strong{bold}):
+\itemize{
+\item \strong{\code{x}}: The x-coordinate of the seed point.
+\item \strong{\code{y}}: The y-coordinate of the seed point.
+\item \strong{\code{color}}: In \strong{geom_gradient_field}, the color of the gradient vector.
+In \strong{geom_gradient_field2}, color is not mapped by default.
+\item \strong{\code{length}}: In \strong{geom_gradient_field2}, the computed vector norm.
+\item \code{size}, \code{linetype}, \code{alpha}: Additional aesthetics to control appearance.
+}
+}
+
 \examples{
 Si <- matrix(c(1, 0.75, 0.75, 1), nrow = 2)
 f <- function(u) exp(-as.numeric(u \%*\% solve(Si) \%*\% u) / 2) / (2 * pi * det(Si))

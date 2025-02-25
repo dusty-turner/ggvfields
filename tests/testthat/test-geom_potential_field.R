@@ -63,3 +63,4 @@ test_that("geom_potential warns when vector field is non-conservative", {
     regexp = "does not have a potential function"
   )
 })
+

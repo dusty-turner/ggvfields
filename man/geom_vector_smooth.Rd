@@ -4,12 +4,12 @@
 \name{geom_vector_smooth}
 \alias{geom_vector_smooth}
 \alias{stat_vector_smooth}
+\alias{geom_vector_smooth2}
+\alias{stat_vector_smooth2}
 \alias{StatVectorSmooth}
 \alias{GeomVectorSmooth}
 \title{Create a Smooth Vector Plot Layer}
 \format{
-An object of class \code{StatVectorSmooth} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 5.
-
 An object of class \code{GeomVectorSmooth} (inherits from \code{GeomSegment}, \code{Geom}, \code{ggproto}, \code{gg}) of length 6.
 }
 \usage{
@@ -33,143 +33,105 @@ geom_vector_smooth(
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
 )
 
-stat_vector_smooth(
-  mapping = NULL,
-  data = NULL,
-  geom = "vector_smooth",
-  position = "identity",
-  ...,
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  n = c(11, 11),
-  method = "lm",
-  se = TRUE,
-  se.circle = TRUE,
-  conf_level = c(0.95, NA),
-  pi_type = "ellipse",
-  formula = cbind(fx, fy) ~ x * y,
-  eval_points = NULL,
-  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
-)
-
-StatVectorSmooth
-
 GeomVectorSmooth
 }
 \arguments{
 \item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
-\strong{Required:} \code{x} and \code{y} must always be provided. In addition, either
-\code{xend} and \code{yend} or \code{angle} and \code{distance} must be supplied.}
+\strong{Required:} Must include \strong{\code{x}} and \strong{\code{y}}; vector displacements are defined by
+\strong{\code{fx}} and \strong{\code{fy}}.}
 
-\item{data}{A data frame containing the vector data in wide format.}
+\item{data}{A data frame containing the raw vector data.}
 
-\item{stat}{The statistical transformation to use on the data for this layer.
-Defaults to \link{StatVector}.}
+\item{stat}{The statistical transformation to use on the data (default:
+\code{"vector_smooth"}).}
 
 \item{position}{Position adjustment, either as a string or the result of a
-call to a position adjustment function.}
+position adjustment function.}
 
-\item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
-
-\item{na.rm}{Logical. If \code{FALSE} (the default), missing values are removed
-with a warning.}
-
-\item{show.legend}{Logical. Should this layer be included in the legends?}
-
-\item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics
-rather than combining with them.}
+\item{...}{Other arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}} and the underlying
+geometry/stat.}
 
 \item{n}{An integer vector specifying the number of grid points along each
 axis for smoothing.}
 
-\item{method}{Character; specifies the smoothing method to use. The only
-supported method is \code{"lm"}, which fits a multivariate linear model to predict
-the vector displacements \code{fx} and \code{fy} based on the coordinates \code{x} and \code{y}.}
+\item{method}{Character. Specifies the smoothing method. Currently, the only
+supported method is \code{"lm"}, which fits a multivariate linear model to
+predict the vector displacements (\code{fx}, \code{fy}) from \code{x} and \code{y}.}
 
-\item{se}{Logical; if \code{TRUE}, confidence intervals are plotted around the
-smoothed vectors.}
+\item{se}{Logical. If \code{TRUE}, prediction (confidence) intervals are computed
+and plotted.}
 
-\item{se.circle}{Logical; if \code{TRUE}, circles are drawn around the origin of
-the vectors to represent the radius of the confidence interval. This feature
-is useful when \code{se = TRUE}.}
+\item{se.circle}{Logical. If \code{TRUE}, circles are drawn around the origin of
+each vector to represent the radius of the prediction interval.}
 
-\item{pi_type}{Character; determines how prediction intervals are displayed
-around the smoothed vectors. Two options are available:
+\item{pi_type}{Character. Determines the display style for prediction
+intervals:
 \itemize{
-\item \code{"wedge"}: Displays angular wedges that indicate uncertainty in both the
-direction and magnitude of the vectors. Wedges show the range of possible
-vector orientations and lengths.
-\item \code{"ellipse"}: Uses ellipses to depict prediction intervals, reflecting
-the covariance between the vector components (\code{fx} and \code{fy}). Ellipses
-provide a visual representation of joint uncertainty in vector directions.
-The default is \code{"wedge"}. If \code{pi_type} is set to \code{"ellipse"} and \code{eval_points}
-is \code{NULL}, the function switches \code{pi_type} to \code{"wedge"} to ensure proper
-interval representation.
+\item \code{"wedge"} (default): Angular wedges are drawn.
+\item \code{"ellipse"}: Ellipses are used to represent the covariance of the predictions.
+If \code{pi_type} is set to \code{"ellipse"} and \code{eval_points} is \code{NULL}, it will
+revert to \code{"wedge"}.
 }}
 
-\item{conf_level}{Numeric vector; specifies the confidence levels for the
-prediction intervals when \code{se = TRUE}. \strong{Default is \code{conf_level = 0.95}}.}
+\item{conf_level}{Numeric. Specifies the confidence level for the prediction
+intervals. Default is \code{0.95}.}
 
-\item{formula}{A formula specifying the multivariate linear model used
-for smoothing. The default formula is \code{cbind(fx, fy) ~ x * y}.}
+\item{formula}{A formula specifying the multivariate linear model used for
+smoothing. The default is \code{cbind(fx, fy) ~ x * y}.}
 
-\item{eval_points}{Data frame of evaluation points, or \code{NULL}. When provided,
-it specifies the grid points where the smoothing model is evaluated. If
-\code{NULL}, the function generates a grid based on \code{n}.}
+\item{eval_points}{A data frame of evaluation points. If provided, these
+specify the grid where the smoothing model is evaluated. If \code{NULL}, a grid
+is generated based on \code{n}.}
 
-\item{arrow}{Arrow specification created by \code{grid::arrow()}. This parameter
-controls the appearance of arrowheads at the ends of vectors, including
-angle, length, and type.}
+\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification for arrowheads on the smoothed
+vectors.}
 
-\item{geom}{The geometric object used to draw the streamline. Defaults to
-\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
+\item{geom}{The geometric object used to render the smoothed vector field
+(defaults to \link{GeomVectorSmooth}).}
 }
 \value{
-A \code{ggplot2} layer that can be added to a ggplot object to create a
-smooth vector field plot.
+A ggplot2 layer that can be added to a plot to create a smooth vector
+field visualization.
 }
 \description{
-\code{geom_vector_smooth} generates a ggplot layer that visualizes a smooth vector
-field. It uses raw vector data and applies smoothing techniques to estimate
-the underlying vector field. This functionality is similar to \code{geom_smooth()}
-in ggplot2, but is designed specifically for vector data rather than scalar data.
-}
-\details{
-\strong{Multivariate Linear Model}:
-
-The \code{"lm"} method fits a multivariate linear model to predict vector displacements
-\code{fx} and \code{fy} based on the input coordinates \code{x} and \code{y}. This model includes
-interaction terms (\code{x * y}) to capture more complex relationships in the vector field.
-
-\strong{Prediction Intervals}:
-
-Two types of prediction intervals are supported:
-\itemize{
-\item \strong{Ellipse}: Ellipses are used to represent the covariance of predicted \code{fx}
-and \code{fy} values. The size and orientation of the ellipses illustrate both
-the uncertainty in vector magnitude and the correlation between vector components.
-\item \strong{Wedge}: Wedges are angular sectors that indicate the range of possible
-directions and lengths for the vectors. This type of prediction interval
-provides an intuitive visualization of uncertainty in vector orientation.
-}
-
-The intervals are computed using the confidence level specified by the \code{conf_level}
-parameter.
+\code{geom_vector_smooth()} creates a ggplot2 layer that visualizes a smooth
+vector field. It takes raw vector data and applies smoothing (via a
+multivariate linear model) to estimate the underlying vector field. This
+functionality is analogous to \code{geom_smooth()} in ggplot2 but is tailored for
+vector data rather than scalar responses.
 }
 \section{Aesthetics}{
-
-\code{geom_vector_smooth} supports the following aesthetics (required aesthetics are in bold):
+ \code{geom_vector_smooth()} supports the following aesthetics
+(required aesthetics are in \strong{bold}):
 \itemize{
 \item \strong{\code{x}}: The x-coordinate of the vector's starting point.
 \item \strong{\code{y}}: The y-coordinate of the vector's starting point.
-\item \strong{\code{fx}}: The vector's displacement along the x-axis.
-\item \strong{\code{fy}}: The vector's displacement along the y-axis.
-\item \code{color}: The color of the vector line.
-\item \code{linewidth}: The thickness of the vector line.
-\item \code{linetype}: The type of the vector line (e.g., solid or dashed).
-\item \code{alpha}: The transparency level of the vector.
-\item \code{arrow}: Specifies arrowheads for the vectors.
+\item \strong{\code{fx}}: The horizontal component of the vector displacement.
+\item \strong{\code{fy}}: The vertical component of the vector displacement.
+\item \code{color}: The color of the vector lines.
+\item \code{linewidth}: The thickness of the vector lines.
+\item \code{linetype}: The type of the vector lines (e.g., solid, dashed).
+\item \code{alpha}: The transparency level of the vectors.
+\item \code{arrow}: An aesthetic that can be used to modify arrowhead properties.
+}
+}
+
+\section{Details}{
+
+\strong{Multivariate Linear Model:}
+The \code{"lm"} method fits a multivariate linear model to predict vector
+displacements (\code{fx} and \code{fy}) based on the coordinates \code{x} and \code{y}, including
+interaction terms (\code{x * y}). This model smooths the raw vector data to
+provide an estimate of the underlying vector field.
+
+\strong{Prediction Intervals:}
+When \code{se = TRUE}, prediction intervals are computed for the smoothed vectors.
+Two types of intervals are supported:
+\itemize{
+\item \strong{Ellipse:} Ellipses represent the joint uncertainty (covariance) in the predicted \code{fx} and \code{fy}.
+\item \strong{Wedge:} Wedges (angular sectors) indicate the range of possible vector directions and magnitudes.
+The type of interval displayed is controlled by \code{pi_type}, and the confidence
+level is set via \code{conf_level}.
 }
 }
 
@@ -228,3 +190,4 @@ ggplot(sample_points, aes(x = x, y = y)) +
 
 }
 \keyword{datasets}
+\keyword{internal}

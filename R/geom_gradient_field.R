@@ -1,4 +1,4 @@
-#' Gradient Field Layers for ggplot2
+#' Create a Gradient Field Layer in ggplot2
 #'
 #' These functions provide convenient ggplot2 layers for drawing gradient fields
 #' by computing the gradient of a scalar field. A user-defined function (`fun`)
@@ -11,22 +11,23 @@
 #' Two variants are provided:
 #'
 #' - **geom_gradient_field()** uses a default mapping that sets `color = after_stat(norm)`.
-#' - **geom_gradient_field2()** uses a default mapping that sets `length = after_stat(norm)` (with `color`
-#' unmapped by default).
+#' - **geom_gradient_field2()** uses a default mapping that sets `length = after_stat(norm)`
+#' (with `color` unmapped by default).
 #'
-#' @inheritParams ggplot2::geom_path
-#' @inheritParams geom_stream
+#' @inheritParams geom_vector
+#' @inheritParams geom_stream_field
 #'
 #' @param mapping A set of aesthetic mappings created by [ggplot2::aes()].
 #'   Additional aesthetics such as `color`, `size`, `linetype`, and `alpha` can
-#'   be defined. In **geom_gradient_field** the default mapping includes `color
-#'   = after_stat(norm)`, whereas in **geom_gradient_field2** the default
-#'   mapping includes `length = after_stat(norm)`.
+#'   be defined. In
+#'   **geom_gradient_field** the default mapping includes `color = after_stat(norm)`,
+#'   whereas in **geom_gradient_field2** the default mapping includes `length =
+#'   after_stat(norm)`.
 #' @param data A data frame containing the input data.
 #' @param stat The statistical transformation to use on the data for this layer.
 #'   Defaults to [StatStreamField].
 #' @param position Position adjustment, either as a string or the result of a
-#'   call to a position adjustment function.
+#'   position adjustment function.
 #' @param na.rm Logical. If `FALSE` (the default), missing values are removed
 #'   with a warning.
 #' @param show.legend Logical. Should this layer be included in the legends?
@@ -42,20 +43,22 @@
 #' @param n Integer. Grid resolution specifying the number of seed points along
 #'   each axis. Higher values produce a denser gradient field. Defaults to `11`.
 #' @param center Logical. If `TRUE`, centers the seed points so that the
-#'   original (x, y) becomes the midpoint. Defaults differ between the variants.
+#'   original (x, y) becomes the midpoint.
 #' @param normalize Logical. If `TRUE`, gradient vectors are normalized based on
-#'   grid spacing. If `TRUE`, it is converted internally to `"vector"`. Default
-#'   is `TRUE`.
+#'   grid spacing. Defaults to `TRUE`.
 #' @param tail_point Logical. If `TRUE`, a point is drawn at the tail of each
-#'   gradient vector. Defaults differ between the variants.
+#'   gradient vector.
 #' @param eval_point Logical. If `TRUE`, a point is drawn at the evaluation
-#'   point where the gradient was computed. Default is `FALSE`.
+#'   point where the gradient was computed. Defaults to `FALSE`.
 #' @param grid A data frame containing precomputed grid points for seed
-#'   placement. If `NULL` (default), a regular Cartesian
-#'   grid is generated based on `xlim`, `ylim`, and `n`.
+#'   placement. If `NULL` (default), a regular Cartesian grid is generated based
+#'   on `xlim`, `ylim`, and `n`.
 #' @param arrow A [grid::arrow()] specification to add arrowheads to the
+#'   gradient vectors. In **geom_gradient_field**, the default is a closed arrow
+#'   with a 30° angle and length `0.02` npc; in **geom_gradient_field2**, the
+#'   default is `NULL`.
 #' @param max_it Integer. Maximum number of integration steps allowed when
-#'   computing the gradient stream or vector. Defaults to 1000.
+#'   computing the gradient stream. Defaults to `1000`.
 #' @param T Numeric. Time increment used for numerical integration when
 #'   `normalize` is FALSE. If not provided, it is computed automatically based
 #'   on grid spacing and the vector field’s magnitude.
@@ -65,10 +68,17 @@
 #' @param type Character. Specifies the type of field to compute: use `"stream"`
 #'   to generate integrated streamlines or `"vector"` for individual vector
 #'   segments. Defaults to `"stream"`.
-#'   gradient vectors. In **geom_gradient_field** the default is a closed arrow
-#'   with a 30° angle and length `0.02` npc; in **geom_gradient_field2** the
-#'   default is `NULL`.
 #' @param ... Other arguments passed on to [ggplot2::layer()].
+#'
+#' @section Aesthetics: `geom_gradient_field()` and `geom_gradient_field2()`
+#'   understand the following aesthetics (required aesthetics are in **bold**):
+#'
+#'   - **`x`**: The x-coordinate of the seed point.
+#'   - **`y`**: The y-coordinate of the seed point.
+#'   - **`color`**: In **geom_gradient_field**, the color of the gradient vector.
+#'   In **geom_gradient_field2**, color is not mapped by default.
+#'   - **`length`**: In **geom_gradient_field2**, the computed vector norm.
+#'   - `size`, `linetype`, `alpha`: Additional aesthetics to control appearance.
 #'
 #' @return A ggplot2 layer that computes and plots a gradient field by
 #'   numerically differentiating a scalar field.
@@ -106,11 +116,14 @@
 #'     geom_gradient_field(fun = f, xlim = c(-3, 3), ylim = c(-3, 3)) +
 #'     coord_equal()
 #' }
-#' @name geom_gradient_field
 #' @aliases geom_gradient_field stat_gradient_field geom_gradient_field2
 #'   stat_gradient_field2
+#' @name geom_gradient_field
 #' @export
 NULL
+
+#' @rdname geom_gradient_field
+#' @export
 geom_gradient_field <- function(
   mapping = NULL,
   data = NULL,
@@ -187,7 +200,6 @@ geom_gradient_field <- function(
     )
   )
 }
-
 
 #' @rdname geom_gradient_field
 #' @export
@@ -268,9 +280,6 @@ stat_gradient_field <- function(
 }
 
 
-
-
-
 #' @rdname geom_gradient_field
 #' @export
 geom_gradient_field2 <- function(
@@ -347,11 +356,6 @@ geom_gradient_field2 <- function(
     )
   )
 }
-
-
-
-
-
 
 
 #' @rdname geom_gradient_field

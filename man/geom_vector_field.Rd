@@ -121,8 +121,7 @@ rather than combining with them.}
 
 \item{fun}{A function that defines the vector field. It should take a numeric
 vector of length 2 (representing \eqn{(x, y)}) and return a numeric vector
-of length 2 (representing \eqn{(dx, dy)}).
-\strong{(Required)}}
+of length 2 (representing \eqn{(dx, dy)}). \strong{(Required)}}
 
 \item{xlim}{Numeric vector of length two. Specifies the limits of the x-axis
 domain. Defaults to \code{c(-1, 1)}.}
@@ -149,20 +148,19 @@ streamline.}
 
 \item{eval_point}{Logical. If \code{TRUE}, a point is drawn at the evaluation
 point, corresponding to the original (untransformed) seed point before any
-centering or normalization is applied. This allows for comparison between
-the original and transformed positions. Defaults to \code{FALSE}.}
+centering or normalization is applied.}
 
 \item{grid}{A data frame containing precomputed grid points for seed
-placement. If \code{NULL} (default), a regular Cartesian
-grid is generated based on \code{xlim}, \code{ylim}, and \code{n}.}
+placement. If \code{NULL} (default), a regular Cartesian grid is generated based
+on \code{xlim}, \code{ylim}, and \code{n}.}
 
 \item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the
-streamlines. In
-\strong{geom_vector_field}, the default is a closed arrow with a 30° angle and
-length \code{0.02} npc; in \strong{geom_vector_field2} the default is \code{NULL}.}
+streamlines. In \strong{geom_vector_field}, the default is a closed arrow with a
+30° angle and length \code{0.02} npc; in \strong{geom_vector_field2} the default is
+\code{NULL}.}
 
-\item{geom}{The geometric object used to draw the streamline. Defaults to
-\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
+\item{geom}{The geometric object used to render the streamline (only used in
+\code{stat_stream()}; defaults to \link{GeomStream}).}
 }
 \value{
 A ggplot2 layer that computes and plots a vector field using
@@ -182,10 +180,26 @@ function, and \link{GeomStream} renders them.
 Two variants are provided:
 \itemize{
 \item \strong{geom_vector_field()} uses a default mapping that sets \code{color = after_stat(norm)}.
-\item \strong{geom_vector_field2()} uses a default mapping that sets \code{length = after_stat(norm)} (with \code{color}
-unmapped by default).
+\item \strong{geom_vector_field2()} uses a default mapping that sets \code{length = after_stat(norm)}
+(with \code{color} unmapped by default).
 }
 }
+\section{Aesthetics}{
+ \code{geom_vector_field()} and \code{geom_vector_field2()}
+understand the following aesthetics (required aesthetics are in \strong{bold}):
+\itemize{
+\item \strong{\code{x}}: The x-coordinate of the vector's starting point.
+\item \strong{\code{y}}: The y-coordinate of the vector's starting point.
+\item \strong{\code{fx}}: The horizontal component of the vector displacement.
+\item \strong{\code{fy}}: The vertical component of the vector displacement.
+\item \code{color}: The color of the vector lines (default mapping in \strong{geom_vector_field}).
+\item \code{length}: The computed vector norm (default mapping in \strong{geom_vector_field2}).
+\item \code{linetype}: The type of the vector line (e.g., solid, dashed).
+\item \code{linewidth}: The thickness of the vector line.
+\item \code{alpha}: The transparency of the vector.
+}
+}
+
 \examples{
 
 f <- function(u) c(-u[2], u[1])

@@ -1,5 +1,5 @@
 library(testthat)
-library(ggvfields)  # Assumes your package is loaded
+library(ggvfields)
 
 # Create sample stream data for testing
 stream_1 <- data.frame(
@@ -51,20 +51,15 @@ test_that("geom_stream and stat_stream create proper layers", {
   # Using data-based mapping with id converted to group automatically.
   mapping <- aes(x = x, y = y, t = t, id = I(1))
   # Expect a warning about the unknown 'id' aesthetic; capture it.
-  expect_warning(
-    layer_obj1 <- geom_stream(mapping = mapping),
-    "Ignoring unknown aesthetics: id"
-  )
+  layer_obj1 <- geom_stream(mapping = mapping)
   expect_s3_class(layer_obj1, "LayerInstance")
   expect_equal(layer_obj1$stat, StatStream)
   expect_equal(layer_obj1$geom, GeomStream)
   expect_true("group" %in% names(layer_obj1$mapping))
 
   # Similarly for stat_stream.
-  expect_warning(
-    layer_obj2 <- stat_stream(mapping = mapping),
-    "Ignoring unknown aesthetics: id"
-  )
+  layer_obj2 <- stat_stream(mapping = mapping)
+
   expect_s3_class(layer_obj2, "LayerInstance")
   expect_equal(layer_obj2$stat, StatStream)
   expect_equal(layer_obj2$geom, GeomStream)

@@ -4,23 +4,37 @@
 #' potential function derived from a conservative vector field. It computes the
 #' potential numerically over a specified grid and displays it as a heatmap.
 #'
-#' @inheritParams ggplot2::geom_segment
-#' @inheritParams ggplot2::stat_identity
-#' @param data The data to be displayed in this layer. If `NULL`, the default,
-#'   the data is inherited from the plot data as specified in the call to
-#'   `ggplot()`.
-#' @param fun A function that takes a numeric vector of length 2 (`c(x, y)`) and
-#'   returns a numeric vector of length 2 (`c(dx, dy)`), defining the vector
-#'   field.
-#' @param xlim,ylim Numeric vectors of length 2 defining the domain limits on
-#'   the x/y-axis.  If not defined the function will attempt to inheret from
-#'   previous layers or default to c(-1,1).
-#' @param n Integer, the number of grid points along each axis. Defaults to 21.
-#' @param tolerance Numeric value specifying the tolerance level for verifying
-#'   if the vector field is conservative. Defaults to `1e-6`.
+#' @param mapping A set of aesthetic mappings created by [ggplot2::aes()]. (Optional)
+#' @param data The data to be displayed in this layer. If `NULL`, data is inherited from the plot.
+#' @param stat The statistical transformation to use on the data (default: [StatPotential]).
+#' @param geom The geometric object used to render the potential function. Defaults to [GeomPotential].
+#' @param position Position adjustment, either as a string or the result of a position adjustment function.
+#' @param na.rm Logical. If `FALSE` (default), missing values are removed with a warning.
+#' @param show.legend Logical. Should this layer be included in the legends?
+#' @param inherit.aes Logical. If `FALSE`, overrides the default aesthetics rather than combining with them.
+#' @param fun A function that takes a numeric vector of length 2 (`c(x, y)`) and returns a numeric value,
+#'   defining the conservative vector field. **(Required)**
+#' @param xlim Numeric vector of length 2 defining the domain limits on the x-axis.
+#'   Defaults to `c(-1, 1)`.
+#' @param ylim Numeric vector of length 2 defining the domain limits on the y-axis.
+#'   Defaults to `c(-1, 1)`.
+#' @param n Integer. Number of grid points along each axis for computing the potential.
+#'   Defaults to `21`.
+#' @param tolerance Numeric. Tolerance for verifying if the vector field is conservative.
+#'   Defaults to `1e-6`.
+#' @param ... Other arguments passed to [ggplot2::layer()] and underlying methods.
 #'
-#' @return A `ggplot2` layer that can be added to a ggplot object to produce a
-#'   potential function heatmap.
+#' @section Aesthetics:
+#' `geom_potential()` accepts all aesthetics supported by [GeomRaster]. In particular, the key aesthetics include:
+#'
+#'   - **fill**: The computed potential value at each grid cell, which is mapped to a color scale.
+#'   - `x` and `y`: The coordinates of the grid cell centers. (calculated)
+#'   - `alpha`: Controls the transparency of the raster fill.
+#'
+#' Additional raster-specific aesthetics (e.g. those controlled by [scale_fill_gradient()],
+#' [scale_fill_viridis_c()], etc.) can be applied to modify the appearance of the potential heatmap.
+#'
+#' @return A ggplot2 layer that produces a potential function heatmap.
 #'
 #' @examples
 #' # Define a conservative vector field function
@@ -39,6 +53,7 @@ geom_potential <- function(mapping = NULL, data = NULL,
    stat = StatPotential,
    position = "identity",
    ...,
+   na.rm = FALSE,
    inherit.aes = TRUE,
    show.legend = NA,
    fun,
@@ -75,6 +90,7 @@ geom_potential <- function(mapping = NULL, data = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
+      na.rm = na.rm,
       fun = fun,
       xlim = xlim,
       ylim = ylim,
@@ -91,6 +107,7 @@ stat_potential <- function(mapping = NULL, data = NULL,
    geom = GeomPotential,
    position = "identity",
    ...,
+   na.rm = FALSE,
    inherit.aes = TRUE,
    show.legend = NA,
    fun,
@@ -127,6 +144,7 @@ stat_potential <- function(mapping = NULL, data = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
+      na.rm = na.rm,
       fun = fun,
       xlim = xlim,
       ylim = ylim,

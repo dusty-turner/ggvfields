@@ -26,20 +26,19 @@ geom_stream_smooth(
 }
 \arguments{
 \item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
-\strong{Required:} \code{x} and \code{y} must always be provided. In addition, either
-\code{xend} and \code{yend} or \code{angle} and \code{distance} must be supplied.}
+\strong{Required:} Must include \strong{\code{x}} and \strong{\code{y}}; vector displacements are defined
+by \strong{\code{fx}} and \strong{\code{fy}}.}
 
-\item{data}{A data frame containing the vector data in wide format.}
+\item{data}{A data frame containing the raw vector data.}
 
-\item{stat}{The statistical transformation to use on the data for this layer.
-Defaults to \link{StatVector}.}
+\item{stat}{The statistical transformation to use on the data. Defaults to
+\code{"vector_smooth"}.}
 
 \item{position}{Position adjustment, either as a string or the result of a
-call to a position adjustment function.}
+position adjustment function.}
 
-\item{...}{Additional arguments passed on to the layer. In addition, if a
-fixed parameter \code{color} is not provided via \code{...}, then \code{color = "blue"} is
-used.}
+\item{...}{Additional arguments passed to the layer. If a fixed parameter
+\code{color} is not provided, then \code{color = "blue"} is used.}
 
 \item{na.rm}{Logical. If \code{FALSE} (the default), missing values are removed
 with a warning.}
@@ -49,32 +48,30 @@ with a warning.}
 \item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics
 rather than combining with them.}
 
-\item{n}{Integer or two-element numeric vector. Grid resolution specifying
-the number of seed points along each axis. Defaults to \code{11}, resulting in
-an \eqn{11 \times 11} grid.}
+\item{n}{An integer vector specifying the grid resolution for smoothing.}
 
-\item{xlim, ylim}{Numeric vectors of length two specifying the domain limits
-in the \eqn{x}- and \eqn{y}-directions, respectively. Defaults to
-\eqn{c(-1, 1)} if not provided.}
+\item{xlim}{Numeric vector of length 2 specifying the domain limits in the
+\eqn{x}-direction. Defaults to \eqn{c(-1, 1)}.}
 
-\item{normalize}{Logical. If \code{TRUE}, the vector endpoints are adjusted so
-that each vector has unit length.}
+\item{ylim}{Numeric vector of length 2 specifying the domain limits in the
+\eqn{y}-direction. Defaults to \eqn{c(-1, 1)}.}
+
+\item{normalize}{Logical. If \code{TRUE}, the vector endpoints are scaled to unit
+length before being scaled by \code{L} (default: \code{TRUE}).}
 
 \item{center}{Logical. If \code{TRUE}, the vector is recentered so that the
-original (x, y) becomes the midpoint of the vector. Default is \code{FALSE}.}
+original \verb{(x, y)} becomes the midpoint (default is \code{TRUE} for
+\code{geom_vector()} and \code{FALSE} for \code{geom_vector2()}).}
 
-\item{type}{Character. Either \code{"stream"} (default) or \code{"vector"}.
-\itemize{
-\item \code{"stream"} computes a full streamline by integrating in both directions (when \code{center = TRUE}).
-\item \code{"vector"} computes a single vector representing the field at the seed point.
-}}
+\item{type}{Character. Either \code{"stream"} (default) or \code{"vector"}. \code{"stream"}
+computes a full streamline by integrating in both directions (if \code{center = TRUE}), while \code{"vector"} computes a single vector.}
 
 \item{formula}{A formula specifying the multivariate linear model used for
 smoothing. Defaults to \code{cbind(fx, fy) ~ x * y}.}
 
-\item{eval_points}{Data frame of evaluation points, or \code{NULL}. When provided,
-it specifies the grid points where the smoothing model is evaluated. If
-\code{NULL}, the function generates a grid based on \code{n}.}
+\item{eval_points}{A data frame of evaluation points, or \code{NULL}. When
+provided, it specifies the grid where the smoothing model is evaluated; if
+\code{NULL}, a grid is generated based on \code{n}.}
 
 \item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to
 the vectors (default: \code{grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")}).}
@@ -84,30 +81,15 @@ A ggplot2 layer that can be added to a ggplot object to display a
 smoothed vector field.
 }
 \description{
-\code{geom_stream_smooth} creates a ggplot2 layer that visualizes a smooth vector
-field based on raw vector data. The function fits a multivariate linear model
-(by default, using the formula \code{cbind(fx, fy) ~ x * y}) to predict the vector
-displacements at any given location. It also handles different input formats
-by converting polar coordinates or endpoint data to vector displacements.
-}
-\details{
-\strong{Data Conversion:}
-If \code{xend}/\code{yend} are missing or all \code{NA}, then the function will attempt to
-compute them. First it checks for vector displacements (\code{fx} and \code{fy}); if
-these exist (and are not all missing), the endpoints are computed as:
-\deqn{xend = x + fx,\quad yend = y + fy.} If not, the function looks for
-polar coordinates (\code{angle} and \code{distance}) and computes: \deqn{xend = x +
-distance \times \cos(angle \times 180/\pi),\quad yend = y + distance \times
-\sin(angle \times 180/\pi).} If neither set is available, the function stops
-with an error.
-
-\strong{Smoothing:}
-The multivariate linear model is fitted using the provided \code{formula} and
-\code{data}. This model is then used to predict vector displacements at any
-specified grid point, generating a smooth approximation of the vector field.
+\code{geom_stream_smooth()} creates a ggplot2 layer that visualizes a smooth
+vector field based on raw vector data. The function fits a multivariate
+linear model (by default, using the formula \code{cbind(fx, fy) ~ x * y}) to
+predict the vector displacements at any given location. It also handles
+different input formats by converting polar coordinates or endpoint data to
+vector displacements.
 }
 \section{Aesthetics}{
- \code{geom_stream_smooth} supports the following aesthetics
+ \code{geom_stream_smooth()} supports the following aesthetics
 (required aesthetics are in \strong{bold}):
 \itemize{
 \item \strong{\code{x}}: The x-coordinate of the vector's starting point.
@@ -119,6 +101,31 @@ specified grid point, generating a smooth approximation of the vector field.
 \item \code{linetype}: The type of the vector line (e.g., solid or dashed).
 \item \code{alpha}: The transparency level of the vector.
 \item \code{arrow}: Specifies arrowheads for the vectors.
+}
+}
+
+\section{Details}{
+
+\strong{Data Conversion:}
+If \code{xend}/\code{yend} are missing or all \code{NA}, the function computes them. It
+first checks for vector displacements (\code{fx} and \code{fy}); if present, it
+computes \eqn{xend = x + fx,\quad yend = y + fy.} Otherwise, it checks for
+polar coordinates (\code{angle} and \code{distance}) and computes \eqn{xend = x +
+  distance \times \cos(angle \times 180/\pi),\quad yend = y + distance \times
+  \sin(angle \times 180/\pi).} An error is thrown if neither set is
+available.
+
+\strong{Smoothing:}
+The multivariate linear model is fitted using the provided \code{formula} and
+\code{data}. This model is then used to predict vector displacements at any
+specified grid point, generating a smooth approximation of the vector
+field.
+
+\strong{Prediction Intervals:}
+Two types of prediction intervals can be displayed:
+\itemize{
+\item \strong{Ellipse:} Depicts the joint uncertainty (covariance) in the predicted \code{fx} and \code{fy}.
+\item \strong{Wedge:} Indicates the range of possible vector directions and magnitudes.
 }
 }
 

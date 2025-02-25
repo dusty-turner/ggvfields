@@ -1,34 +1,43 @@
 #' Vector Layers for ggplot2
 #'
-#' These functions provide convenient ggplot2 layers for drawing vectors.
+#' Create layers for drawing vectors on ggplot2 plots. These functions accept
+#' wide-format data with the required aesthetics **`x`** and **`y`** plus either
+#' **`xend`** and **`yend`** or one of the alternative specifications: **`fx`**
+#' and **`fy`**, or **`angle`**/ **`angle_deg`** and **`distance`**.
 #'
-#' They accept wide-format data with the aesthetics `x` and `y` plus either
-#' (`xend`, `yend`) or (`angle`, `distance`). If the latter is supplied, the
-#' endpoints are computed as a translation of the starting point using polar
-#' coordinates (assuming the angle is in degrees). The data is then converted
-#' into long format (two rows per vector) using [StatVector] and plotted using
-#' [GeomStream]. Directional arrowheads can be added to indicate the vector
-#' direction.
+#' When specifying the vector direction using polar coordinates, you can provide
+#' either:
 #'
-#' Two variants are available:
+#' - **`angle`**: the vector direction in **radians**.
+#' - **`angle_deg`**: the vector direction in **degrees** (which is
+#' automatically converted to radians).
 #'
-#' - **geom_vector()** creates the layer with the user-supplied aesthetic
-#' mapping.
-#' - **geom_vector2()** uses the same underlying stat ([StatVector]) but adds a
-#' default mapping for `length = after_stat(norm)` so that the computed vector
-#' norm is available as an aesthetic.
+#' The endpoints are computed by translating the starting point using these
+#' polar coordinates along with the supplied **`distance`**.
+#'
+#' The data is converted to long format (two rows per vector) via [StatVector]
+#' and rendered with [GeomStream]. Optionally, arrowheads can be added to
+#' indicate direction.
+#'
+#' There are two variants:
+#'
+#' - `geom_vector()`: Uses the user-supplied aesthetic mapping.
+#' - `geom_vector2()`: Uses the same underlying stat ([StatVector]) but adds a
+#' default mapping for `length = after_stat(norm)`, making the computed vector
+#' norm available as an aesthetic.
 #'
 #' @inheritParams ggplot2::geom_path
 #' @inheritParams geom_stream
 #'
 #' @param mapping A set of aesthetic mappings created by [ggplot2::aes()].
-#'   **Required:** `x` and `y` must always be provided. In addition, either
-#'   `xend` and `yend` or `angle` and `distance` must be supplied.
+#'   **Required:** Must include **`x`** and **`y`**; in addition, either **`xend`**
+#'   and **`yend`** or one of the alternative specifications (**`fx`**/ **`fy`**
+#'   or **`angle`**/ **`angle_deg`** and **`distance`**) must be provided.
 #' @param data A data frame containing the vector data in wide format.
-#' @param stat The statistical transformation to use on the data for this layer.
-#'   Defaults to [StatVector].
+#' @param stat The statistical transformation to use on the data (default:
+#'   [StatVector]).
 #' @param position Position adjustment, either as a string or the result of a
-#'   call to a position adjustment function.
+#'   position adjustment function.
 #' @param na.rm Logical. If `FALSE` (the default), missing values are removed
 #'   with a warning.
 #' @param show.legend Logical. Should this layer be included in the legends?
@@ -38,40 +47,75 @@
 #'   the vectors (default: `grid::arrow(angle = 25, length = unit(0.025, "npc"),
 #'   type = "closed")`).
 #' @param center Logical. If `TRUE`, the vector is recentered so that the
-#'   original (x, y) becomes the midpoint of the vector. Default is `FALSE`.
-#' @param normalize Logical. If `TRUE`, the vector endpoints are adjusted so
-#'   that each vector has unit length.
-#' @param tail_point Logical. If `TRUE`, a point is drawn at the tail (i.e., the
-#'   starting point) of each vector. This can help to indicate the origin of the
-#'   vector. Default is `FALSE`.
+#'   original `(x, y)` becomes the midpoint (default is `TRUE` for
+#'   `geom_vector()` and `FALSE` for `geom_vector2()`).
+#' @param normalize Logical. If `TRUE`, the vector endpoints are scaled to unit
+#'   length before being scaled by `L` (default: `TRUE`).
+#' @param tail_point Logical. If `TRUE`, a point is drawn at the tail (the
+#'   starting point) of each vector (default is `FALSE` for `geom_vector()` and
+#'   `TRUE` for `geom_vector2()`).
 #' @param eval_point Logical. If `TRUE`, a point is drawn at the evaluation
-#'   point, corresponding to the original (untransformed) seed point before any
-#'   centering or normalization is applied. This allows for comparison between
-#'   the original and transformed positions. Default is `FALSE`.
-#' @param L Numeric scalar. The desired length for the vectors (in data units).
-#'   If `NULL` (the default), a default value is computed automatically based on
-#'   the plot’s x and y limits.
+#'   point corresponding to the original (untransformed) seed point before any
+#'   centering or normalization (default: `FALSE`).
+#' @param L Numeric scalar. The desired length for the vectors in data units. If
+#'   `NULL` (the default), a value is computed automatically based on the plot’s
+#'   x and y limits.
 #' @param ... Other arguments passed on to [ggplot2::layer()].
+#'
+#' @section Aesthetics:
+#'
+#'   `geom_vector()` and `geom_vector2()` understand the following aesthetics
+#'   (required aesthetics are in bold):
+#'
+#'   - **x**
+#'   - **y**
+#'   - xend
+#'   - yend
+#'   - fx (alternative specification)
+#'   - fy (alternative specification)
+#'   - angle (vector direction in radians; alternative specification)
+#'   - angle_deg (vector direction in degrees; alternative specification, converted to radians)
+#'   - distance (with angle/angle_deg, used to compute endpoints)
+#'   - alpha
+#'   - color
+#'   - fill
+#'   - group
+#'   - linetype
+#'   - size
 #'
 #' @return A ggplot2 layer that can be added to a plot.
 #'
 #' @examples
-#'
 #' set.seed(1234)
 #' n <- 10
 #'
-#' # generate wind data in polar coordinates
+#' # Generate wind data in polar coordinates
 #' data <- data.frame(
-#'   "x" = rnorm(n),
-#'   "y" = rnorm(n),
-#'   "dir" = runif(n, -pi, pi), # angle, in radians
-#'   "spd" = rchisq(n, df = 2)  # speed
+#'   x = rnorm(n),
+#'   y = rnorm(n),
+#'   dir = runif(n, -pi, pi), # angle in radians
+#'   spd = rchisq(n, df = 2)  # speed
 #' ) |>
-#'   transform( "fx" = spd*cos(dir), "fy" = spd*sin(dir) )
+#'   transform(fx = spd * cos(dir), fy = spd * sin(dir))
 #'
-#' ggplot(data, aes(x, y)) + geom_vector(aes(fx = fx, fy = fy))
-#' ggplot(data, aes(x, y)) + geom_vector(aes(angle = dir, distance = spd))
+#' # Using fx/fy to compute endpoints
+#' ggplot(data, aes(x, y)) +
+#'   geom_vector(aes(fx = fx, fy = fy))
 #'
+#' # Using angle (in radians) and distance to compute endpoints
+#' ggplot(data, aes(x, y)) +
+#'   geom_vector(aes(angle = dir, distance = spd))
+#'
+#' # Using angle_deg (in degrees) and distance to compute endpoints
+#' vectors3 <- data.frame(
+#'   x = c(0, 1, 2),
+#'   y = c(0, 1, 2),
+#'   angle_deg = c(0, 90, 45),
+#'   angle = c(0, pi/2, pi/4),
+#'   distance = c(3, 4, 5)
+#' )
+#' ggplot(vectors3, aes(x, y)) +
+#'   geom_vector(aes(angle_deg = angle_deg, distance = distance))
 #'
 #' # Basic usage with explicit start and end points:
 #' vectors1 <- data.frame(
@@ -83,33 +127,25 @@
 #' ggplot(vectors1, aes(x = x, y = y, xend = xend, yend = yend)) +
 #'   geom_vector()
 #'
-#' # Basic usage with angle and distance:
-#' vectors2 <- data.frame(
-#'   x        = c(0, 1, 2),
-#'   y        = c(0, 1, 2),
-#'   angle    = c(0, pi/2, pi/4),
-#'   distance = c(3, 4, 5)
-#' )
-#' ggplot(vectors2) +
-#'   geom_vector(aes(x = x, y = y, angle = angle, distance = distance))
-#'
-#' # Using center = TRUE to adjust vectors so that they originate from their midpoints:
+#' # Using center = TRUE to recenter vectors:
 #' ggplot(vectors1, aes(x = x, y = y, xend = xend, yend = yend)) +
 #'   geom_vector(center = TRUE)
 #'
-#' # Using normalize = TRUE to adjust vectors to have unit length:
-#' ggplot(vectors2, aes(x = x, y = y, angle = angle, distance = distance)) +
+#' # Using normalize = TRUE to adjust vectors to unit length:
+#' ggplot(vectors3, aes(x = x, y = y, angle = angle, distance = distance)) +
 #'   geom_vector(normalize = TRUE)
 #'
-#' # Using geom_vector2, which adds a default mapping for length:
+#' # Using geom_vector2, which adds a default mapping for `length`
 #' ggplot(vectors1, aes(x = x, y = y, xend = xend, yend = yend)) +
 #'   geom_vector2()
 #'
+#' @aliases geom_vector stat_vector geom_vector2 stat_vector2
 #' @name geom_vector
-#' @aliases geom_vector geom_vector2 stat_vector StatVector
 #' @export
 NULL
 
+#' @rdname geom_vector
+#' @export
 geom_vector <- function(
   mapping = NULL,
   data = NULL,
@@ -197,20 +233,26 @@ stat_vector <- function(mapping = NULL, data = NULL,
 }
 
 #' @rdname geom_vector
+#' @format NULL
+#' @usage NULL
 #' @export
 StatVector <- ggproto("StatVector", Stat,
+
   required_aes = c("x", "y"),
 
   default_aes = aes(xend = NA, yend = NA, distance = NA, angle = NA,
-                    fx = NA, fy = NA),
+                    angle_deg = NA, fx = NA, fy = NA),
 
   compute_group = function(data, scales, center, normalize, L,...) {
-# browser()
 
     n <- nrow(data)
 
     data$x0 <- data$x
     data$y0 <- data$y
+
+    if ("angle_deg" %in% names(data) && !all(is.na(data$angle_deg))) {
+      data$angle <- data$angle_deg * pi / 180
+    }
 
     # If xend/yend are not provided (or are all missing), try fx/fy, then angle/distance.
     if((!"xend" %in% names(data) || all(is.na(data$xend))) ||
@@ -224,8 +266,8 @@ StatVector <- ggproto("StatVector", Stat,
       } else if("angle" %in% names(data) && "distance" %in% names(data) &&
                 !(all(is.na(data$angle)) || all(is.na(data$distance)))) {
         # Use angle and distance to compute the endpoints.
-        data$xend <- data$x + data$distance * cos(data$angle * 180 / pi)
-        data$yend <- data$y + data$distance * sin(data$angle * 180 / pi)
+        data$xend <- data$x + data$distance * cos(data$angle)
+        data$yend <- data$y + data$distance * sin(data$angle)
       } else {
         stop("Either xend/yend or fx/fy or angle/distance must be provided.")
       }

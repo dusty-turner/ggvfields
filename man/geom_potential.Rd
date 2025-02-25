@@ -19,6 +19,7 @@ geom_potential(
   stat = StatPotential,
   position = "identity",
   ...,
+  na.rm = FALSE,
   inherit.aes = TRUE,
   show.legend = NA,
   fun,
@@ -34,6 +35,7 @@ stat_potential(
   geom = GeomPotential,
   position = "identity",
   ...,
+  na.rm = FALSE,
   inherit.aes = TRUE,
   show.legend = NA,
   fun,
@@ -48,115 +50,60 @@ StatPotential
 GeomPotential
 }
 \arguments{
-\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{aes()}}. If specified and
-\code{inherit.aes = TRUE} (the default), it is combined with the default mapping
-at the top level of the plot. You must supply \code{mapping} if there is no plot
-mapping.}
+\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}. (Optional)}
 
-\item{data}{The data to be displayed in this layer. If \code{NULL}, the default,
-the data is inherited from the plot data as specified in the call to
-\code{ggplot()}.}
+\item{data}{The data to be displayed in this layer. If \code{NULL}, data is inherited from the plot.}
 
-\item{stat}{The statistical transformation to use on the data for this layer.
-When using a \verb{geom_*()} function to construct a layer, the \code{stat}
-argument can be used the override the default coupling between geoms and
-stats. The \code{stat} argument accepts the following:
-\itemize{
-\item A \code{Stat} ggproto subclass, for example \code{StatCount}.
-\item A string naming the stat. To give the stat as a string, strip the
-function name of the \code{stat_} prefix. For example, to use \code{stat_count()},
-give the stat as \code{"count"}.
-\item For more information and other ways to specify the stat, see the
-\link[ggplot2:layer_stats]{layer stat} documentation.
-}}
+\item{stat}{The statistical transformation to use on the data (default: \link{StatPotential}).}
 
-\item{position}{A position adjustment to use on the data for this layer. This
-can be used in various ways, including to prevent overplotting and
-improving the display. The \code{position} argument accepts the following:
-\itemize{
-\item The result of calling a position function, such as \code{position_jitter()}.
-This method allows for passing extra arguments to the position.
-\item A string naming the position adjustment. To give the position as a
-string, strip the function name of the \code{position_} prefix. For example,
-to use \code{position_jitter()}, give the position as \code{"jitter"}.
-\item For more information and other ways to specify the position, see the
-\link[ggplot2:layer_positions]{layer position} documentation.
-}}
+\item{position}{Position adjustment, either as a string or the result of a position adjustment function.}
 
-\item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{layer()}}'s \code{params} argument. These
-arguments broadly fall into one of 4 categories below. Notably, further
-arguments to the \code{position} argument, or aesthetics that are required
-can \emph{not} be passed through \code{...}. Unknown arguments that are not part
-of the 4 categories below are ignored.
-\itemize{
-\item Static aesthetics that are not mapped to a scale, but are at a fixed
-value and apply to the layer as a whole. For example, \code{colour = "red"}
-or \code{linewidth = 3}. The geom's documentation has an \strong{Aesthetics}
-section that lists the available options. The 'required' aesthetics
-cannot be passed on to the \code{params}. Please note that while passing
-unmapped aesthetics as vectors is technically possible, the order and
-required length is not guaranteed to be parallel to the input data.
-\item When constructing a layer using
-a \verb{stat_*()} function, the \code{...} argument can be used to pass on
-parameters to the \code{geom} part of the layer. An example of this is
-\code{stat_density(geom = "area", outline.type = "both")}. The geom's
-documentation lists which parameters it can accept.
-\item Inversely, when constructing a layer using a
-\verb{geom_*()} function, the \code{...} argument can be used to pass on parameters
-to the \code{stat} part of the layer. An example of this is
-\code{geom_area(stat = "density", adjust = 0.5)}. The stat's documentation
-lists which parameters it can accept.
-\item The \code{key_glyph} argument of \code{\link[ggplot2:layer]{layer()}} may also be passed on through
-\code{...}. This can be one of the functions described as
-\link[ggplot2:draw_key]{key glyphs}, to change the display of the layer in the legend.
-}}
+\item{...}{Other arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}} and underlying methods.}
 
-\item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
-rather than combining with them. This is most useful for helper functions
-that define both data and aesthetics and shouldn't inherit behaviour from
-the default plot specification, e.g. \code{\link[ggplot2:borders]{borders()}}.}
+\item{na.rm}{Logical. If \code{FALSE} (default), missing values are removed with a warning.}
 
-\item{show.legend}{logical. Should this layer be included in the legends?
-\code{NA}, the default, includes if any aesthetics are mapped.
-\code{FALSE} never includes, and \code{TRUE} always includes.
-It can also be a named logical vector to finely select the aesthetics to
-display.}
+\item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics rather than combining with them.}
 
-\item{fun}{A function that takes a numeric vector of length 2 (\code{c(x, y)}) and
-returns a numeric vector of length 2 (\code{c(dx, dy)}), defining the vector
-field.}
+\item{show.legend}{Logical. Should this layer be included in the legends?}
 
-\item{xlim, ylim}{Numeric vectors of length 2 defining the domain limits on
-the x/y-axis.  If not defined the function will attempt to inheret from
-previous layers or default to c(-1,1).}
+\item{fun}{A function that takes a numeric vector of length 2 (\code{c(x, y)}) and returns a numeric value,
+defining the conservative vector field. \strong{(Required)}}
 
-\item{n}{Integer, the number of grid points along each axis. Defaults to 21.}
+\item{xlim}{Numeric vector of length 2 defining the domain limits on the x-axis.
+Defaults to \code{c(-1, 1)}.}
 
-\item{tolerance}{Numeric value specifying the tolerance level for verifying
-if the vector field is conservative. Defaults to \code{1e-6}.}
+\item{ylim}{Numeric vector of length 2 defining the domain limits on the y-axis.
+Defaults to \code{c(-1, 1)}.}
 
-\item{geom}{The geometric object to use to display the data for this layer.
-When using a \verb{stat_*()} function to construct a layer, the \code{geom} argument
-can be used to override the default coupling between stats and geoms. The
-\code{geom} argument accepts the following:
-\itemize{
-\item A \code{Geom} ggproto subclass, for example \code{GeomPoint}.
-\item A string naming the geom. To give the geom as a string, strip the
-function name of the \code{geom_} prefix. For example, to use \code{geom_point()},
-give the geom as \code{"point"}.
-\item For more information and other ways to specify the geom, see the
-\link[ggplot2:layer_geoms]{layer geom} documentation.
-}}
+\item{n}{Integer. Number of grid points along each axis for computing the potential.
+Defaults to \code{21}.}
+
+\item{tolerance}{Numeric. Tolerance for verifying if the vector field is conservative.
+Defaults to \code{1e-6}.}
+
+\item{geom}{The geometric object used to render the potential function. Defaults to \link{GeomPotential}.}
 }
 \value{
-A \code{ggplot2} layer that can be added to a ggplot object to produce a
-potential function heatmap.
+A ggplot2 layer that produces a potential function heatmap.
 }
 \description{
 \code{geom_potential()} adds a raster layer to a ggplot object, visualizing the
 potential function derived from a conservative vector field. It computes the
 potential numerically over a specified grid and displays it as a heatmap.
 }
+\section{Aesthetics}{
+
+\code{geom_potential()} accepts all aesthetics supported by \link{GeomRaster}. In particular, the key aesthetics include:
+\itemize{
+\item \strong{fill}: The computed potential value at each grid cell, which is mapped to a color scale.
+\item \code{x} and \code{y}: The coordinates of the grid cell centers. (calculated)
+\item \code{alpha}: Controls the transparency of the raster fill.
+}
+
+Additional raster-specific aesthetics (e.g. those controlled by \code{\link[=scale_fill_gradient]{scale_fill_gradient()}},
+\code{\link[=scale_fill_viridis_c]{scale_fill_viridis_c()}}, etc.) can be applied to modify the appearance of the potential heatmap.
+}
+
 \examples{
 # Define a conservative vector field function
 fun <- function(v) {

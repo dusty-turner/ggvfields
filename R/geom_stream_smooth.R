@@ -1,54 +1,68 @@
 #' Create a Smoothed Vector Field Layer
 #'
-#' `geom_stream_smooth` creates a ggplot2 layer that visualizes a smooth vector
-#' field based on raw vector data. The function fits a multivariate linear model
-#' (by default, using the formula `cbind(fx, fy) ~ x * y`) to predict the vector
-#' displacements at any given location. It also handles different input formats
-#' by converting polar coordinates or endpoint data to vector displacements.
+#' `geom_stream_smooth()` creates a ggplot2 layer that visualizes a smooth
+#' vector field based on raw vector data. The function fits a multivariate
+#' linear model (by default, using the formula `cbind(fx, fy) ~ x * y`) to
+#' predict the vector displacements at any given location. It also handles
+#' different input formats by converting polar coordinates or endpoint data to
+#' vector displacements.
 #'
 #' @inheritParams geom_vector
 #' @inheritParams geom_stream_field
-#' @inheritParams ggplot2::layer
+#'
+#' @param mapping A set of aesthetic mappings created by [ggplot2::aes()].
+#'   **Required:** Must include **`x`** and **`y`**; vector displacements are defined
+#'   by **`fx`** and **`fy`**.
+#' @param data A data frame containing the raw vector data.
+#' @param stat The statistical transformation to use on the data. Defaults to
+#'   `"vector_smooth"`.
+#' @param position Position adjustment, either as a string or the result of a
+#'   position adjustment function.
 #' @param formula A formula specifying the multivariate linear model used for
 #'   smoothing. Defaults to `cbind(fx, fy) ~ x * y`.
-#' @param eval_points Data frame of evaluation points, or `NULL`. When provided,
-#'   it specifies the grid points where the smoothing model is evaluated. If
-#'   `NULL`, the function generates a grid based on `n`.
-#' @param ... Additional arguments passed on to the layer. In addition, if a
-#'   fixed parameter `color` is not provided via `...`, then `color = "blue"` is
-#'   used.
+#' @param eval_points A data frame of evaluation points, or `NULL`. When
+#'   provided, it specifies the grid where the smoothing model is evaluated; if
+#'   `NULL`, a grid is generated based on `n`.
+#' @param n An integer vector specifying the grid resolution for smoothing.
+#' @param ... Additional arguments passed to the layer. If a fixed parameter
+#'   `color` is not provided, then `color = "blue"` is used.
+#'
+#' @section Aesthetics: `geom_stream_smooth()` supports the following aesthetics
+#'   (required aesthetics are in **bold**):
+#'
+#'   - **`x`**: The x-coordinate of the vector's starting point.
+#'   - **`y`**: The y-coordinate of the vector's starting point.
+#'   - **`fx`**: The displacement along the x-axis.
+#'   - **`fy`**: The displacement along the y-axis.
+#'   - `color`: The fixed color for the vector. Defaults to `"blue"`.
+#'   - `linewidth`: The thickness of the vector line.
+#'   - `linetype`: The type of the vector line (e.g., solid or dashed).
+#'   - `alpha`: The transparency level of the vector.
+#'   - `arrow`: Specifies arrowheads for the vectors.
+#'
+#' @section Details:
+#' **Data Conversion:**
+#'   If `xend`/`yend` are missing or all `NA`, the function computes them. It
+#'   first checks for vector displacements (`fx` and `fy`); if present, it
+#'   computes \eqn{xend = x + fx,\quad yend = y + fy.} Otherwise, it checks for
+#'   polar coordinates (`angle` and `distance`) and computes \eqn{xend = x +
+#'   distance \times \cos(angle \times 180/\pi),\quad yend = y + distance \times
+#'   \sin(angle \times 180/\pi).} An error is thrown if neither set is
+#'   available.
+#'
+#' **Smoothing:**
+#'   The multivariate linear model is fitted using the provided `formula` and
+#'   `data`. This model is then used to predict vector displacements at any
+#'   specified grid point, generating a smooth approximation of the vector
+#'   field.
+#'
+#' **Prediction Intervals:**
+#'   Two types of prediction intervals can be displayed:
+#'   - **Ellipse:** Depicts the joint uncertainty (covariance) in the predicted `fx` and `fy`.
+#'   - **Wedge:** Indicates the range of possible vector directions and magnitudes.
 #'
 #' @return A ggplot2 layer that can be added to a ggplot object to display a
 #'   smoothed vector field.
-#'
-#' @details
-#' **Data Conversion:**
-#' If `xend`/`yend` are missing or all `NA`, then the function will attempt to
-#' compute them. First it checks for vector displacements (`fx` and `fy`); if
-#' these exist (and are not all missing), the endpoints are computed as:
-#' \deqn{xend = x + fx,\quad yend = y + fy.} If not, the function looks for
-#' polar coordinates (`angle` and `distance`) and computes: \deqn{xend = x +
-#' distance \times \cos(angle \times 180/\pi),\quad yend = y + distance \times
-#' \sin(angle \times 180/\pi).} If neither set is available, the function stops
-#' with an error.
-#'
-#' **Smoothing:**
-#' The multivariate linear model is fitted using the provided `formula` and
-#' `data`. This model is then used to predict vector displacements at any
-#' specified grid point, generating a smooth approximation of the vector field.
-#'
-#' @section Aesthetics: `geom_stream_smooth` supports the following aesthetics
-#'   (required aesthetics are in **bold**):
-#'
-#' - **`x`**: The x-coordinate of the vector's starting point.
-#' - **`y`**: The y-coordinate of the vector's starting point.
-#' - **`fx`**: The displacement along the x-axis.
-#' - **`fy`**: The displacement along the y-axis.
-#' - `color`: The fixed color for the vector. Defaults to `"blue"`.
-#' - `linewidth`: The thickness of the vector line.
-#' - `linetype`: The type of the vector line (e.g., solid or dashed).
-#' - `alpha`: The transparency level of the vector.
-#' - `arrow`: Specifies arrowheads for the vectors.
 #'
 #' @examples
 #' # Define a true vector field function
@@ -112,6 +126,12 @@
 #'   geom_vector(aes(x, y, fx = fx, fy = fy), color = "black", normalize = FALSE) +
 #'   geom_stream_smooth(eval_points = eval_pts)
 #'
+#' @name geom_stream_smooth
+#' @aliases geom_stream_smooth
+#' @export
+NULL
+
+#' @rdname geom_stream_smooth
 #' @export
 geom_stream_smooth <- function(mapping = NULL, data = NULL,
                                stat = StatStreamField,

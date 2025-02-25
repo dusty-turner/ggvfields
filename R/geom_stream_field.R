@@ -2,74 +2,87 @@
 #'
 #' [geom_stream_field()] creates a ggplot2 layer that integrates a user-defined
 #' vector field function \eqn{f(x, y) \to (dx, dy)} over a grid of seed points
-#' within a specified domain \eqn{(x, y)}, producing streamlines that visualize
-#' the flow of the vector field. This is useful for visualizing vector fields,
-#' flow patterns, or trajectories in a variety of contexts such as fluid flows
-#' or gradient fields.
+#' within a specified domain. The function numerically integrates the field
+#' starting from these seeds, producing streamlines that visualize the flow.
+#' This is useful for visualizing vector fields, flow patterns, or trajectories,
+#' such as in fluid dynamics or gradient fields.
 #'
-#' @inheritParams ggplot2::geom_path
-#'
+#' @param mapping A set of aesthetic mappings created by [ggplot2::aes()].
+#'   (Optional)
+#' @param data A data frame or other object, as in [ggplot2::layer()].
+#'   (Optional)
+#' @param stat The statistical transformation to use on the data (default:
+#'   [StatStreamField]).
+#' @param geom The geometric object used to render the streamlines (defaults to
+#'   [GeomStream]).
+#' @param position Position adjustment, either as a string or the result of a
+#'   position adjustment function.
+#' @param na.rm Logical. If `FALSE` (the default), missing values are removed
+#'   with a warning. If `TRUE`, missing values are silently removed.
+#' @param show.legend Logical. Should this layer be included in the legends?
+#' @param inherit.aes Logical. If `FALSE`, overrides the default aesthetics
+#'   rather than combining with them.
 #' @param fun A function of two variables, `fun(x, y)`, returning a two-element
-#'   vector \eqn{(dx, dy)}. This defines the local "flow" direction at any point
-#'   in the domain.
-#' @param xlim,ylim Numeric vectors of length two specifying the domain limits
-#'   in the \eqn{x}- and \eqn{y}-directions, respectively. Defaults to
-#'   \eqn{c(-1, 1)} if not provided.
-#' @param n Integer or two-element numeric vector. Grid resolution specifying
-#'   the number of seed points along each axis. Defaults to `11`, resulting in
-#'   an \eqn{11 \times 11} grid.
-#' @param args List of additional arguments passed on to the function defined by
-#'   `fun`.
-#' @param max_it Integer. Maximum number of integration steps per streamline.
-#'   Defaults to `1000`.
+#'   vector \eqn{(dx, dy)} that defines the local flow direction at any point.
+#' @param xlim Numeric vector of length 2 specifying the domain limits in the
+#'   \eqn{x}-direction. Defaults to \eqn{c(-1, 1)}.
+#' @param ylim Numeric vector of length 2 specifying the domain limits in the
+#'   \eqn{y}-direction. Defaults to \eqn{c(-1, 1)}.
+#' @param n Integer or two-element numeric vector specifying the grid resolution
+#'   (number of seed points) along each axis. Defaults to `11`, producing an
+#'   \eqn{11 \times 11} grid.
+#' @param args A list of additional arguments passed to `fun`.
+#' @param max_it Integer. Maximum number of integration steps per streamline
+#'   (default: `1000`).
 #' @param T Numeric. Maximum integration time for each streamline. When
-#'   `normalize = FALSE`, the integration runs until time `T` is reached.
-#'   Defaults to `NULL`, in which case a default value of `1` is used when
-#'   needed.
+#'   `normalize = FALSE`, integration runs until time `T` is reached. Defaults
+#'   to `NULL` (in which case a default of `1` is used when needed).
 #' @param L Numeric. Maximum arc length for each streamline. When `normalize =
-#'   TRUE`, the integration is halted once the cumulative arc length reaches
-#'   `L`. Defaults to `NULL`, in which case a suitable default is computed from
-#'   the grid spacing.
-#' @param center Logical. If `TRUE` (default), centers the seed points or the
-#'   resulting streamlines so that the original (x, y) becomes the midpoint.
-#' @param type Character. Either `"stream"` (default) or `"vector"`.
-#'   - `"stream"` computes a full streamline by integrating in both directions (when `center = TRUE`).
-#'   - `"vector"` computes a single vector representing the field at the seed point.
+#'   TRUE`, integration halts once the cumulative arc length reaches `L`.
+#'   Defaults to `NULL` (a suitable default is computed from the grid spacing).
+#' @param center Logical. If `TRUE` (default), centers the seed points (or
+#'   resulting streamlines) so that the original (x, y) becomes the midpoint.
+#' @param type Character. Either `"stream"` (default) or `"vector"`. `"stream"`
+#'   computes a full streamline by integrating in both directions (if `center =
+#'   TRUE`), while `"vector"` computes a single vector.
 #' @param normalize Logical. If `TRUE` (default), streamlines are normalized
 #'   based on grid spacing, using the `L` parameter to control maximum arc
-#'   length. If `FALSE`, streamlines are computed for a fixed time determined by
-#' the `T` parameter.
-#' @param method Character. Integration method, e.g., `"rk4"` for Runge-Kutta 4
-#'   or `"euler"` for Euler's method. Defaults to `"rk4"`.
+#'   length. If `FALSE`, streamlines are computed for a fixed integration time
+#'   determined by `T`.
+#' @param method Character. Integration method (e.g. `"rk4"` for Runge-Kutta 4,
+#'   `"euler"` for Euler's method). Defaults to `"rk4"`.
 #' @param grid A data frame containing precomputed grid points for seed
-#'   placement. If `NULL` (default), a regular Cartesian
-#'   grid is generated based on `xlim`, `ylim`, and `n`.
+#'   placement. If `NULL` (default), a regular Cartesian grid is generated based
+#'   on `xlim`, `ylim`, and `n`.
 #' @param arrow A [grid::arrow()] specification for adding arrowheads to the
-#'   streamline. By default, a closed arrow with a 30° angle and a length of
-#'   `0.02` npc is used.
+#'   streamlines. Defaults to a closed arrow with a 30° angle and length `0.02`
+#'   npc.
 #' @param tail_point Logical. If `TRUE`, draws a point at the tail (starting
 #'   point) of each streamline. Defaults to `FALSE`.
-#' @param eval_point Logical. If `TRUE`, a point is drawn at the evaluation
-#'   point where the gradient was computed. Default is `FALSE`.
-#' @param geom The geometric object used to render the streamline. Defaults to
-#'   [GeomStream].
+#' @param eval_point Logical. If `TRUE`, draws a point at the evaluation point
+#'   where the field was computed. Defaults to `FALSE`.
 #' @param ... Other arguments passed to [ggplot2::layer()] and the underlying
 #'   geometry/stat.
 #'
+#' @section Aesthetics: `geom_stream_field()` (and its stat variant) inherit
+#'   aesthetics from [GeomStream] and understand the following:
+#'
+#'   - **`x`**: x-coordinate of the seed point.
+#'   - **`y`**: y-coordinate of the seed point.
+#'   - `color`: Color, typically used to represent computed statistics (e.g. average speed).
+#'   - `linetype`: Type of line used to draw the streamlines.
+#'   - `linewidth`: Thickness of the streamlines.
+#'   - `alpha`: Transparency of the streamlines.
+#'
+#' @section Details: The streamlines are generated by numerically integrating
+#'   the vector field defined by `fun(x, y)`. When `normalize = TRUE`,
+#'   integration stops once the cumulative arc length reaches `L`; otherwise,
+#'   integration runs until time `T` is reached. If both `T` and `L` are
+#'   provided in incompatible combinations, one parameter is ignored. The
+#'   computed paths are rendered by [GeomStream].
+#'
 #' @return A ggplot2 layer that computes and renders streamlines over the
-#'   specified domain, optionally with arrowheads and tail points.
-#'
-#' @details The streamlines are generated by numerically integrating the vector
-#'   field defined by `fun(x, y)`. The integration halts either when the
-#'   cumulative arc length reaches `L` (if `normalize = TRUE`) or when the
-#'   integration time reaches `T` (if `normalize = FALSE`). The computed
-#'   streamlines are then passed to [GeomStream] for rendering.
-#'
-#' @section See Also:
-#' - [geom_vector_field()] for straight arrows, i.e. `type = "vector"`
-#' - [StatStreamField] for the underlying statistical transformation.
-#' - [GeomStream] for the geometry that renders the resulting paths.
-#' - [ggplot2::geom_path] as the base geometry on which [GeomStream] is built.
+#'   specified domain.
 #'
 #' @examples
 #'
@@ -107,8 +120,6 @@
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-5, 5), n = c(21, 11)) + coord_equal()
 #' ggplot() + geom_stream_field(fun = f)
 #' ggplot() + geom_stream_field(fun = f, grid = grid_hex(c(-1,1), c(-1,1), .2))
-#'
-#'
 #'
 #' # using other ggplot2 tools
 #' f <- efield_maker()
@@ -172,8 +183,12 @@
 #'   )
 #'
 #'
+#' @aliases geom_stream_field stat_stream_field geom_stream_field2 stat_stream_field2 StatStreamField
 #' @name geom_stream_field
-#' @aliases stat_stream_field StatStreamField
+#' @export
+NULL
+
+#' @rdname geom_stream_field
 #' @export
 geom_stream_field <- function(
     mapping = NULL,
@@ -701,30 +716,7 @@ StatStreamField <- ggproto(
 
 )
 
-
-
-
-# compute divergence and curl by group (each group is identified by id)
-# df <- do.call(rbind, lapply(split(df, df$id), function(subdf) {
-#
-#   # calculate the gradient of the vector field at each point.
-#   grad <- t(apply(subdf[, c("x", "y")], 1, function(v) numDeriv::grad(fun, v)))
-#   grad_u <- grad[, 1]
-#   grad_v <- grad[, 2]
-#
-#   # compute divergence and curl.
-#   subdf$divergence <- grad_u + grad_v
-#   subdf$curl <- grad_v - grad_u
-#
-#   subdf
-# }))
-
-
-
-
-
-
-
+#' @keywords internal
 ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000,
                         method = "lsoda", center = FALSE) {
 
@@ -881,7 +873,7 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000,
 
 
 
-
+#' @keywords internal
 crop_stream_length <- function(data, L) {
   # data is assumed to have columns t, x, y, d, l
   # data is assumed to be ordered by t, but if you need to ensure this you
@@ -949,6 +941,7 @@ crop_stream_length <- function(data, L) {
 
 
 # this function behaves just like crop_stream_length(), see main comments there
+#' @keywords internal
 crop_stream_time <- function(data, T, centered = FALSE) {
   # when centered = FALSE, the stream is assumed to run from 0 to T, or rather
   # something more than T, and this function crops back the stream to 0 to T
@@ -1044,7 +1037,7 @@ crop_stream_time <- function(data, T, centered = FALSE) {
 
 
 
-
+#' @keywords internal
 stream_length <- function(data) {
 
   # data is assumed to have columns t, x, y
@@ -1064,7 +1057,7 @@ stream_length <- function(data) {
 
 
 
-
+#' @keywords internal
 stream_center <- function(data) {
   L <- stream_length(data)
   data <- crop_stream_length(data, L/2)

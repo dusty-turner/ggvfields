@@ -1,83 +1,82 @@
 #' Create a Smooth Vector Plot Layer
 #'
-#' `geom_vector_smooth` generates a ggplot layer that visualizes a smooth vector
-#' field. It uses raw vector data and applies smoothing techniques to estimate
-#' the underlying vector field. This functionality is similar to `geom_smooth()`
-#' in ggplot2, but is designed specifically for vector data rather than scalar data.
+#' `geom_vector_smooth()` creates a ggplot2 layer that visualizes a smooth
+#' vector field. It takes raw vector data and applies smoothing (via a
+#' multivariate linear model) to estimate the underlying vector field. This
+#' functionality is analogous to `geom_smooth()` in ggplot2 but is tailored for
+#' vector data rather than scalar responses.
 #'
-#' @inheritParams geom_vector
-#' @inheritParams ggplot2::stat_identity
-#' @param n An integer vector specifying the number of grid points along each
-#'   axis for smoothing.
-#' @param method Character; specifies the smoothing method to use. The only
-#'   supported method is `"lm"`, which fits a multivariate linear model to predict
-#'   the vector displacements `fx` and `fy` based on the coordinates `x` and `y`.
-#' @param se Logical; if `TRUE`, confidence intervals are plotted around the
-#'   smoothed vectors.
-#' @param se.circle Logical; if `TRUE`, circles are drawn around the origin of
-#'   the vectors to represent the radius of the confidence interval. This feature
-#'   is useful when `se = TRUE`.
-#' @param conf_level Numeric vector; specifies the confidence levels for the
-#'   prediction intervals when `se = TRUE`. **Default is `conf_level = 0.95`**.
-#' @param eval_points Data frame of evaluation points, or `NULL`. When provided,
-#'   it specifies the grid points where the smoothing model is evaluated. If
-#'   `NULL`, the function generates a grid based on `n`.
-#' @param pi_type Character; determines how prediction intervals are displayed
-#'   around the smoothed vectors. Two options are available:
-#'   - `"wedge"`: Displays angular wedges that indicate uncertainty in both the
-#'     direction and magnitude of the vectors. Wedges show the range of possible
-#'     vector orientations and lengths.
-#'   - `"ellipse"`: Uses ellipses to depict prediction intervals, reflecting
-#'     the covariance between the vector components (`fx` and `fy`). Ellipses
-#'     provide a visual representation of joint uncertainty in vector directions.
-#'   The default is `"wedge"`. If `pi_type` is set to `"ellipse"` and `eval_points`
-#'   is `NULL`, the function switches `pi_type` to `"wedge"` to ensure proper
-#'   interval representation.
-#' @param arrow Arrow specification created by `grid::arrow()`. This parameter
-#'   controls the appearance of arrowheads at the ends of vectors, including
-#'   angle, length, and type.
-#' @param formula A formula specifying the multivariate linear model used
-#'   for smoothing. The default formula is `cbind(fx, fy) ~ x * y`.
-#' @return A `ggplot2` layer that can be added to a ggplot object to create a
-#'   smooth vector field plot.
 #' @importFrom stats qt
 #' @importFrom stats integrate
-#' @name geom_vector_smooth
-#' @rdname geom_vector_smooth
 #'
-#' @section Aesthetics:
-#' `geom_vector_smooth` supports the following aesthetics (required aesthetics are in bold):
+#' @param mapping A set of aesthetic mappings created by [ggplot2::aes()].
+#'   **Required:** Must include **`x`** and **`y`**; vector displacements are defined by
+#'   **`fx`** and **`fy`**.
+#' @param data A data frame containing the raw vector data.
+#' @param stat The statistical transformation to use on the data (default:
+#'   `"vector_smooth"`).
+#' @param geom The geometric object used to render the smoothed vector field
+#'   (defaults to [GeomVectorSmooth]).
+#' @param position Position adjustment, either as a string or the result of a
+#'   position adjustment function.
+#' @param n An integer vector specifying the number of grid points along each
+#'   axis for smoothing.
+#' @param method Character. Specifies the smoothing method. Currently, the only
+#'   supported method is `"lm"`, which fits a multivariate linear model to
+#'   predict the vector displacements (`fx`, `fy`) from `x` and `y`.
+#' @param se Logical. If `TRUE`, prediction (confidence) intervals are computed
+#'   and plotted.
+#' @param se.circle Logical. If `TRUE`, circles are drawn around the origin of
+#'   each vector to represent the radius of the prediction interval.
+#' @param conf_level Numeric. Specifies the confidence level for the prediction
+#'   intervals. Default is `0.95`.
+#' @param eval_points A data frame of evaluation points. If provided, these
+#'   specify the grid where the smoothing model is evaluated. If `NULL`, a grid
+#'   is generated based on `n`.
+#' @param pi_type Character. Determines the display style for prediction
+#'   intervals:
+#'   - `"wedge"` (default): Angular wedges are drawn.
+#'   - `"ellipse"`: Ellipses are used to represent the covariance of the predictions.
+#'   If `pi_type` is set to `"ellipse"` and `eval_points` is `NULL`, it will
+#'   revert to `"wedge"`.
+#' @param arrow A [grid::arrow()] specification for arrowheads on the smoothed
+#'   vectors.
+#' @param formula A formula specifying the multivariate linear model used for
+#'   smoothing. The default is `cbind(fx, fy) ~ x * y`.
+#' @param ... Other arguments passed to [ggplot2::layer()] and the underlying
+#'   geometry/stat.
 #'
-#' - **`x`**: The x-coordinate of the vector's starting point.
-#' - **`y`**: The y-coordinate of the vector's starting point.
-#' - **`fx`**: The vector's displacement along the x-axis.
-#' - **`fy`**: The vector's displacement along the y-axis.
-#' - `color`: The color of the vector line.
-#' - `linewidth`: The thickness of the vector line.
-#' - `linetype`: The type of the vector line (e.g., solid or dashed).
-#' - `alpha`: The transparency level of the vector.
-#' - `arrow`: Specifies arrowheads for the vectors.
 #'
-#' @details
-#' **Multivariate Linear Model**:
+#' @section Aesthetics: `geom_vector_smooth()` supports the following aesthetics
+#'   (required aesthetics are in **bold**):
 #'
-#' The `"lm"` method fits a multivariate linear model to predict vector displacements
-#' `fx` and `fy` based on the input coordinates `x` and `y`. This model includes
-#' interaction terms (`x * y`) to capture more complex relationships in the vector field.
+#'   - **`x`**: The x-coordinate of the vector's starting point.
+#'   - **`y`**: The y-coordinate of the vector's starting point.
+#'   - **`fx`**: The horizontal component of the vector displacement.
+#'   - **`fy`**: The vertical component of the vector displacement.
+#'   - `color`: The color of the vector lines.
+#'   - `linewidth`: The thickness of the vector lines.
+#'   - `linetype`: The type of the vector lines (e.g., solid, dashed).
+#'   - `alpha`: The transparency level of the vectors.
+#'   - `arrow`: An aesthetic that can be used to modify arrowhead properties.
 #'
-#' **Prediction Intervals**:
+#' @section Details:
+#' **Multivariate Linear Model:**
+#' The `"lm"` method fits a multivariate linear model to predict vector
+#' displacements (`fx` and `fy`) based on the coordinates `x` and `y`, including
+#' interaction terms (`x * y`). This model smooths the raw vector data to
+#' provide an estimate of the underlying vector field.
 #'
-#' Two types of prediction intervals are supported:
+#' **Prediction Intervals:**
+#' When `se = TRUE`, prediction intervals are computed for the smoothed vectors.
+#' Two types of intervals are supported:
+#'   - **Ellipse:** Ellipses represent the joint uncertainty (covariance) in the predicted `fx` and `fy`.
+#'   - **Wedge:** Wedges (angular sectors) indicate the range of possible vector directions and magnitudes.
+#' The type of interval displayed is controlled by `pi_type`, and the confidence
+#' level is set via `conf_level`.
 #'
-#' - **Ellipse**: Ellipses are used to represent the covariance of predicted `fx`
-#'   and `fy` values. The size and orientation of the ellipses illustrate both
-#'   the uncertainty in vector magnitude and the correlation between vector components.
-#' - **Wedge**: Wedges are angular sectors that indicate the range of possible
-#'   directions and lengths for the vectors. This type of prediction interval
-#'   provides an intuitive visualization of uncertainty in vector orientation.
-#'
-#' The intervals are computed using the confidence level specified by the `conf_level`
-#' parameter.
+#' @return A ggplot2 layer that can be added to a plot to create a smooth vector
+#'   field visualization.
 #'
 #' @examples
 #' # Function to generate vectors
@@ -132,6 +131,9 @@
 #'   geom_vector_smooth(aes(fx = fx, fy = fy), eval_points = eval_points, pi_type = "ellipse") +
 #'   ggtitle("Smoothed Vector Field with Wedge Intervals")
 #'
+#' @aliases geom_vector_smooth stat_vector_smooth geom_vector_smooth2 stat_vector_smooth2 StatVectorSmooth
+#' @name geom_vector_smooth
+#' @export
 NULL
 
 #' @rdname geom_vector_smooth
@@ -179,7 +181,9 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
 }
 
 #' @rdname geom_vector_smooth
-#' @export
+#' @format NULL
+#' @usage NULL
+#' @keywords internal
 stat_vector_smooth <- function(mapping = NULL, data = NULL,
    geom = "vector_smooth",
    position = "identity",
@@ -222,9 +226,10 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
   )
 }
 
-
 #' @rdname geom_vector_smooth
-#' @export
+#' @format NULL
+#' @usage NULL
+#' @keywords internal
 StatVectorSmooth <- ggproto(
   "StatVectorSmooth",
   Stat,

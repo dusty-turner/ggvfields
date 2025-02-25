@@ -85,7 +85,7 @@ test_that("geom_vector computes endpoints correctly (angle/distance input)", {
 
 test_that("geom_vector computes endpoints correctly (explicit endpoints)", {
   p <- ggplot(vectors1, aes(x = x, y = y, xend = xend, yend = yend)) +
-    geom_vector2(center = FALSE, normalize = FALSE)
+    geom_vector2()
 
   pb <- ggplot_build(p)
   d <- pb$data[[1]]
@@ -129,7 +129,7 @@ test_that("geom_vector computes endpoints correctly (explicit endpoints)", {
 
 test_that("geom_vector computes endpoints correctly (explicit endpoints)", {
   p <- ggplot(vectors1, aes(x = x, y = y, xend = xend, yend = yend)) +
-    stat_vector2(center = FALSE, normalize = FALSE)
+    stat_vector2()
 
   pb <- ggplot_build(p)
   d <- pb$data[[1]]

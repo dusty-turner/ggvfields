@@ -3,15 +3,29 @@
 \docType{data}
 \name{geom_vector}
 \alias{geom_vector}
-\alias{geom_vector2}
 \alias{stat_vector}
-\alias{StatVector}
+\alias{geom_vector2}
 \alias{stat_vector2}
+\alias{StatVector}
 \title{Vector Layers for ggplot2}
-\format{
-An object of class \code{StatVector} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
-}
 \usage{
+geom_vector(
+  mapping = NULL,
+  data = NULL,
+  stat = StatVector,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  center = TRUE,
+  normalize = TRUE,
+  tail_point = FALSE,
+  eval_point = FALSE,
+  L = NULL,
+  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
+)
+
 stat_vector(
   mapping = NULL,
   data = NULL,
@@ -28,8 +42,6 @@ stat_vector(
   L = NULL,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 )
-
-StatVector
 
 geom_vector2(
   mapping = NULL,
@@ -65,16 +77,17 @@ stat_vector2(
 }
 \arguments{
 \item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
-\strong{Required:} \code{x} and \code{y} must always be provided. In addition, either
-\code{xend} and \code{yend} or \code{angle} and \code{distance} must be supplied.}
+\strong{Required:} Must include \strong{\code{x}} and \strong{\code{y}}; in addition, either \strong{\code{xend}}
+and \strong{\code{yend}} or one of the alternative specifications (\strong{\code{fx}}/ \strong{\code{fy}}
+or \strong{\code{angle}}/ \strong{\code{angle_deg}} and \strong{\code{distance}}) must be provided.}
 
 \item{data}{A data frame containing the vector data in wide format.}
 
-\item{geom}{The geometric object used to draw the streamline. Defaults to
-\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
+\item{stat}{The statistical transformation to use on the data (default:
+\link{StatVector}).}
 
 \item{position}{Position adjustment, either as a string or the result of a
-call to a position adjustment function.}
+position adjustment function.}
 
 \item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
@@ -87,71 +100,118 @@ with a warning.}
 rather than combining with them.}
 
 \item{center}{Logical. If \code{TRUE}, the vector is recentered so that the
-original (x, y) becomes the midpoint of the vector. Default is \code{FALSE}.}
+original \verb{(x, y)} becomes the midpoint (default is \code{TRUE} for
+\code{geom_vector()} and \code{FALSE} for \code{geom_vector2()}).}
 
-\item{normalize}{Logical. If \code{TRUE}, the vector endpoints are adjusted so
-that each vector has unit length.}
+\item{normalize}{Logical. If \code{TRUE}, the vector endpoints are scaled to unit
+length before being scaled by \code{L} (default: \code{TRUE}).}
 
-\item{tail_point}{Logical. If \code{TRUE}, a point is drawn at the tail (i.e., the
-starting point) of each vector. This can help to indicate the origin of the
-vector. Default is \code{FALSE}.}
+\item{tail_point}{Logical. If \code{TRUE}, a point is drawn at the tail (the
+starting point) of each vector (default is \code{FALSE} for \code{geom_vector()} and
+\code{TRUE} for \code{geom_vector2()}).}
 
 \item{eval_point}{Logical. If \code{TRUE}, a point is drawn at the evaluation
-point, corresponding to the original (untransformed) seed point before any
-centering or normalization is applied. This allows for comparison between
-the original and transformed positions. Default is \code{FALSE}.}
+point corresponding to the original (untransformed) seed point before any
+centering or normalization (default: \code{FALSE}).}
 
-\item{L}{Numeric scalar. The desired length for the vectors (in data units).
-If \code{NULL} (the default), a default value is computed automatically based on
-the plot’s x and y limits.}
+\item{L}{Numeric scalar. The desired length for the vectors in data units. If
+\code{NULL} (the default), a value is computed automatically based on the plot’s
+x and y limits.}
 
 \item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to
 the vectors (default: \code{grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")}).}
 
-\item{stat}{The statistical transformation to use on the data for this layer.
-Defaults to \link{StatVector}.}
+\item{geom}{The geometric object used to render the streamline (only used in
+\code{stat_stream()}; defaults to \link{GeomStream}).}
 }
 \value{
 A ggplot2 layer that can be added to a plot.
 }
 \description{
-These functions provide convenient ggplot2 layers for drawing vectors.
+Create layers for drawing vectors on ggplot2 plots. These functions accept
+wide-format data with the required aesthetics \strong{\code{x}} and \strong{\code{y}} plus either
+\strong{\code{xend}} and \strong{\code{yend}} or one of the alternative specifications: \strong{\code{fx}}
+and \strong{\code{fy}}, or \strong{\code{angle}}/ \strong{\code{angle_deg}} and \strong{\code{distance}}.
 }
 \details{
-They accept wide-format data with the aesthetics \code{x} and \code{y} plus either
-(\code{xend}, \code{yend}) or (\code{angle}, \code{distance}). If the latter is supplied, the
-endpoints are computed as a translation of the starting point using polar
-coordinates (assuming the angle is in degrees). The data is then converted
-into long format (two rows per vector) using \link{StatVector} and plotted using
-\link{GeomStream}. Directional arrowheads can be added to indicate the vector
-direction.
-
-Two variants are available:
+When specifying the vector direction using polar coordinates, you can provide
+either:
 \itemize{
-\item \strong{geom_vector()} creates the layer with the user-supplied aesthetic
-mapping.
-\item \strong{geom_vector2()} uses the same underlying stat (\link{StatVector}) but adds a
-default mapping for \code{length = after_stat(norm)} so that the computed vector
-norm is available as an aesthetic.
+\item \strong{\code{angle}}: the vector direction in \strong{radians}.
+\item \strong{\code{angle_deg}}: the vector direction in \strong{degrees} (which is
+automatically converted to radians).
 }
-}
-\examples{
 
+The endpoints are computed by translating the starting point using these
+polar coordinates along with the supplied \strong{\code{distance}}.
+
+The data is converted to long format (two rows per vector) via \link{StatVector}
+and rendered with \link{GeomStream}. Optionally, arrowheads can be added to
+indicate direction.
+
+There are two variants:
+\itemize{
+\item \code{geom_vector()}: Uses the user-supplied aesthetic mapping.
+\item \code{geom_vector2()}: Uses the same underlying stat (\link{StatVector}) but adds a
+default mapping for \code{length = after_stat(norm)}, making the computed vector
+norm available as an aesthetic.
+}
+}
+\section{Aesthetics}{
+
+
+\code{geom_vector()} and \code{geom_vector2()} understand the following aesthetics
+(required aesthetics are in bold):
+\itemize{
+\item \strong{x}
+\item \strong{y}
+\item xend
+\item yend
+\item fx (alternative specification)
+\item fy (alternative specification)
+\item angle (vector direction in radians; alternative specification)
+\item angle_deg (vector direction in degrees; alternative specification, converted to radians)
+\item distance (with angle/angle_deg, used to compute endpoints)
+\item alpha
+\item color
+\item fill
+\item group
+\item linetype
+\item size
+}
+}
+
+\examples{
 set.seed(1234)
 n <- 10
 
-# generate wind data in polar coordinates
+# Generate wind data in polar coordinates
 data <- data.frame(
-  "x" = rnorm(n),
-  "y" = rnorm(n),
-  "dir" = runif(n, -pi, pi), # angle, in radians
-  "spd" = rchisq(n, df = 2)  # speed
+  x = rnorm(n),
+  y = rnorm(n),
+  dir = runif(n, -pi, pi), # angle in radians
+  spd = rchisq(n, df = 2)  # speed
 ) |>
-  transform( "fx" = spd*cos(dir), "fy" = spd*sin(dir) )
+  transform(fx = spd * cos(dir), fy = spd * sin(dir))
 
-ggplot(data, aes(x, y)) + geom_vector(aes(fx = fx, fy = fy))
-ggplot(data, aes(x, y)) + geom_vector(aes(angle = dir, distance = spd))
+# Using fx/fy to compute endpoints
+ggplot(data, aes(x, y)) +
+  geom_vector(aes(fx = fx, fy = fy))
 
+# Using angle (in radians) and distance to compute endpoints
+ggplot(data, aes(x, y)) +
+  geom_vector(aes(angle = dir, distance = spd))
+
+# Using angle_deg (in degrees) and distance to compute endpoints
+vectors3 <- data.frame(
+  x = c(0, 1, 2),
+  y = c(0, 1, 2),
+  angle_deg = c(0, 90, 45),
+  angle = c(0, pi/2, pi/4),
+  distance = c(3, 4, 5)
+)
+ggplot(vectors3, aes(x, y)) +
+  geom_vector(aes(angle_deg = angle_deg, distance = distance))
 
 # Basic usage with explicit start and end points:
 vectors1 <- data.frame(
@@ -163,25 +223,15 @@ vectors1 <- data.frame(
 ggplot(vectors1, aes(x = x, y = y, xend = xend, yend = yend)) +
   geom_vector()
 
-# Basic usage with angle and distance:
-vectors2 <- data.frame(
-  x        = c(0, 1, 2),
-  y        = c(0, 1, 2),
-  angle    = c(0, pi/2, pi/4),
-  distance = c(3, 4, 5)
-)
-ggplot(vectors2) +
-  geom_vector(aes(x = x, y = y, angle = angle, distance = distance))
-
-# Using center = TRUE to adjust vectors so that they originate from their midpoints:
+# Using center = TRUE to recenter vectors:
 ggplot(vectors1, aes(x = x, y = y, xend = xend, yend = yend)) +
   geom_vector(center = TRUE)
 
-# Using normalize = TRUE to adjust vectors to have unit length:
-ggplot(vectors2, aes(x = x, y = y, angle = angle, distance = distance)) +
+# Using normalize = TRUE to adjust vectors to unit length:
+ggplot(vectors3, aes(x = x, y = y, angle = angle, distance = distance)) +
   geom_vector(normalize = TRUE)
 
-# Using geom_vector2, which adds a default mapping for length:
+# Using geom_vector2, which adds a default mapping for `length`
 ggplot(vectors1, aes(x = x, y = y, xend = xend, yend = yend)) +
   geom_vector2()
 

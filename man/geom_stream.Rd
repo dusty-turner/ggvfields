@@ -7,24 +7,7 @@
 \alias{StatStream}
 \alias{GeomStream}
 \title{Create a Streamline Plot Layer in ggplot2}
-\format{
-An object of class \code{StatStream} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 4.
-
-An object of class \code{GeomStream} (inherits from \code{GeomPath}, \code{Geom}, \code{ggproto}, \code{gg}) of length 5.
-}
 \usage{
-geom_stream(
-  mapping = NULL,
-  data = NULL,
-  stat = StatStream,
-  position = "identity",
-  ...,
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE,
-  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
-)
-
 stat_stream(
   mapping = NULL,
   data = NULL,
@@ -36,100 +19,76 @@ stat_stream(
   inherit.aes = TRUE,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 )
-
-StatStream
-
-GeomStream
 }
 \arguments{
-\item{mapping}{Set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
-\strong{Required}: \code{x}, \code{y}, \code{t}.
-\strong{Optional}: \code{group} (if multiple streams).
-If \code{id} is provided, it will be mapped to \code{group} automatically.}
+\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
+\strong{Required:} Must include \strong{\code{x}}, \strong{\code{y}}, and \strong{\code{t}}; additionally,
+\strong{\code{group}} is used to differentiate streams (if not provided, \code{id} will be mapped to
+\code{group} automatically).}
 
 \item{data}{A data frame or other object, as in \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
-\item{stat}{The statistical transformation to use on the data for this layer.
-When using a \verb{geom_*()} function to construct a layer, the \code{stat}
-argument can be used the override the default coupling between geoms and
-stats. The \code{stat} argument accepts the following:
-\itemize{
-\item A \code{Stat} ggproto subclass, for example \code{StatCount}.
-\item A string naming the stat. To give the stat as a string, strip the
-function name of the \code{stat_} prefix. For example, to use \code{stat_count()},
-give the stat as \code{"count"}.
-\item For more information and other ways to specify the stat, see the
-\link[ggplot2:layer_stats]{layer stat} documentation.
-}}
+\item{geom}{The geometric object used to render the streamline (only used in
+\code{stat_stream()}; defaults to \link{GeomStream}).}
 
-\item{position}{A position adjustment to use on the data for this layer. This
-can be used in various ways, including to prevent overplotting and
-improving the display. The \code{position} argument accepts the following:
-\itemize{
-\item The result of calling a position function, such as \code{position_jitter()}.
-This method allows for passing extra arguments to the position.
-\item A string naming the position adjustment. To give the position as a
-string, strip the function name of the \code{position_} prefix. For example,
-to use \code{position_jitter()}, give the position as \code{"jitter"}.
-\item For more information and other ways to specify the position, see the
-\link[ggplot2:layer_positions]{layer position} documentation.
-}}
+\item{position}{Position adjustment, either as a string or the result of a
+position adjustment function.}
 
-\item{...}{Other arguments passed to the respective \code{\link[ggplot2:geom_path]{ggplot2::geom_path()}} or
-\link[ggplot2:ggplot2-ggproto]{ggplot2::Stat} for customization (e.g., \code{linetype}, \code{color}, \code{linewidth}).}
+\item{...}{Other arguments passed to the underlying layers for further
+customization.}
 
-\item{na.rm}{If \code{FALSE} (default), missing values are removed with a warning.
-If \code{TRUE}, missing values are silently removed.}
+\item{na.rm}{Logical. If \code{FALSE} (the default), missing values are removed
+with a warning. If \code{TRUE}, missing values are silently removed.}
 
 \item{show.legend}{Logical. Should this layer be included in the legends?}
 
-\item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics rather than
-combining with them.}
+\item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics
+rather than combining with them.}
 
 \item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to place arrowheads on
-the streamline (e.g., to indicate direction).}
-
-\item{geom}{The geometric object used to draw the streamline. Defaults to
-\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} in \code{geom_stream()}, or \link{GeomStream} in \code{stat_stream()}.}
+the streamline.}
 }
 \value{
 A ggplot2 layer that can be added to a plot to produce a streamline
-visualization. Internally, this layer reorders data by \code{t} within each
-group, then draws a continuous path.
+visualization.
 }
 \description{
 \code{geom_stream()} generates a ggplot2 layer that visualizes data as continuous
-"streams" over a temporal variable \code{t}. Each stream is defined by \strong{x},
-\strong{y}, and \strong{t} aesthetics, and optionally grouped by \strong{group}. The data
-points within each group are automatically ordered by \code{t} to form a
-continuous streamline path.
+streams over a temporal variable \strong{\code{t}}. Each stream is defined by the
+required aesthetics \strong{\code{x}}, \strong{\code{y}}, and \strong{\code{t}}, and optionally grouped by
+\strong{\code{group}} (or mapped from \code{id}). Within each group, data points are
+automatically ordered by \code{t} to form a continuous path.
+}
+\details{
+There are two variants:
+\itemize{
+\item \code{geom_stream()}: A convenient wrapper that sets \code{stat = StatStream} and uses
+\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} by default.
+\item \code{stat_stream()}: Provides direct access to the reordering stat (i.e. \code{StatStream})
+for advanced customization, using \link{GeomStream} for drawing.
+}
 }
 \section{Aesthetics}{
  \code{geom_stream()} and \code{stat_stream()} understand the
 following aesthetics (required aesthetics are in \strong{bold}):
 \itemize{
-\item \strong{\code{x}}: Typically the horizontal axis (often mapped to time \code{t}).
-\item \strong{\code{y}}: The vertical axis (often magnitude or value at time \code{t}).
-\item \strong{\code{t}}: A temporal or ordered variable used to sequence the data.
-\item \code{group}: Grouping for multiple streams (mapped from \code{id} if present).
-\item \code{color}, \code{linetype}, \code{linewidth}, \code{alpha}, etc. (inherited from \link[ggplot2:geom_path]{ggplot2::geom_path}).
+\item \strong{\code{x}}: Horizontal position.
+\item \strong{\code{y}}: Vertical position.
+\item \strong{\code{t}}: Temporal or ordered variable used to sequence data points.
+\item \code{group}: Grouping variable for multiple streams (automatically mapped from \code{id} if absent).
+\item \code{color}: Color of the stream.
+\item \code{linetype}: Type of line used to draw the stream.
+\item \code{linewidth}: Thickness of the stream line.
+\item \code{alpha}: Transparency of the stream.
 }
 }
 
 \section{Details}{
 
 \itemize{
-\item \strong{Data Ordering}: If \code{t} is missing, an error is thrown. If present,
-points within each group are sorted by \code{t} before drawing.
-\item \strong{Stream vs. Stat}:
-\itemize{
-\item \code{geom_stream()} is a convenient wrapper for typical usage; it sets
-\code{stat = StatStream} and uses \link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} by default.
-\item \code{stat_stream()} provides direct access to the reordering stat, using
-GeomStream for drawing. This is useful for advanced customization.
-}
-\item \strong{Arrows}: Use the \code{arrow} parameter to indicate direction on each
-streamline. For more details, see \link[grid:arrow]{grid::arrow}.
+\item \strong{Data Ordering}: If \code{t} is not provided, an error is thrown. When present,
+points within each group are sorted by \code{t} prior to drawing the stream.
+\item \strong{Arrows}: The \code{arrow} parameter can be used to indicate direction along each stream.
 }
 }
 
@@ -158,13 +117,12 @@ streams <- rbind(
   cbind(stream_3, id = 3)
 )
 
+ggplot(stream_1) +
+  geom_stream(aes(x = x, y = y, t = t))
+
+# set group aes if multiple vectors
 ggplot(streams) +
   geom_stream(aes(x = x, y = y, t = t, group = id))
 
-
-}
-\seealso{
-\link[ggplot2:geom_path]{ggplot2::geom_path} for the underlying path geometry, and
-\link[grid:arrow]{grid::arrow} to customize arrowheads.
 }
 \keyword{datasets}
