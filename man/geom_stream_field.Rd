@@ -23,7 +23,8 @@ geom_stream_field(
   ylim = NULL,
   n = 11,
   args = list(),
-  max_it = 1000,
+  max_it = 1000L,
+  tol = sqrt(.Machine$double.eps),
   T = NULL,
   L = NULL,
   center = TRUE,
@@ -51,6 +52,7 @@ stat_stream_field(
   n = 11,
   args = list(),
   max_it = 1000,
+  tol = sqrt(.Machine$double.eps),
   T = NULL,
   L = NULL,
   center = TRUE,
@@ -78,6 +80,7 @@ geom_stream_field2(
   n = 11,
   args = list(),
   max_it = 1000,
+  tol = sqrt(.Machine$double.eps),
   L = NULL,
   center = FALSE,
   type = "stream",
@@ -102,6 +105,7 @@ stat_stream_field2(
   n = 11,
   args = list(),
   max_it = 1000,
+  tol = sqrt(.Machine$double.eps),
   L = NULL,
   center = FALSE,
   type = "stream",
@@ -150,8 +154,11 @@ vector \eqn{(dx, dy)} that defines the local flow direction at any point.}
 
 \item{args}{A list of additional arguments passed to \code{fun}.}
 
-\item{max_it}{Integer. Maximum number of integration steps per streamline
-(default: \code{1000}).}
+\item{max_it}{\code{integer(1)}; Maximum number of integration steps per
+streamline (default: \code{1000L}).}
+
+\item{tol}{\code{numeric(1)}; a tolerance used to determine if a sink has been
+hit, among other things (default: \code{sqrt(.Machine$double.eps)}).}
 
 \item{T}{Numeric. Maximum integration time for each streamline. When
 \code{normalize = FALSE}, integration runs until time \code{T} is reached. Defaults

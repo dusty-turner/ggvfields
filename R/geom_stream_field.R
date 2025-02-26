@@ -32,8 +32,10 @@
 #'   (number of seed points) along each axis. Defaults to `11`, producing an
 #'   \eqn{11 \times 11} grid.
 #' @param args A list of additional arguments passed to `fun`.
-#' @param max_it Integer. Maximum number of integration steps per streamline
-#'   (default: `1000`).
+#' @param max_it `integer(1)`; Maximum number of integration steps per
+#'   streamline (default: `1000L`).
+#' @param tol `numeric(1)`; a tolerance used to determine if a sink has been
+#'   hit, among other things (default: `sqrt(.Machine$double.eps)`).
 #' @param T Numeric. Maximum integration time for each streamline. When
 #'   `normalize = FALSE`, integration runs until time `T` is reached. Defaults
 #'   to `NULL` (in which case a default of `1` is used when needed).
@@ -205,7 +207,8 @@ geom_stream_field <- function(
     ylim = NULL,
     n = 11,
     args = list(),
-    max_it = 1000,
+    max_it = 1000L,
+    tol = sqrt(.Machine$double.eps),
     T = NULL,
     L = NULL,
     center = TRUE,
@@ -249,6 +252,7 @@ geom_stream_field <- function(
       method = method,
       na.rm = na.rm,
       max_it = max_it,
+      tol = tol,
       T = T,
       L = L,
       center = center,
@@ -281,6 +285,7 @@ stat_stream_field <- function(
     n = 11,
     args = list(),
     max_it = 1000,
+    tol = sqrt(.Machine$double.eps),
     T = NULL,
     L = NULL,
     center = TRUE,
@@ -326,6 +331,7 @@ stat_stream_field <- function(
       method = method,
       na.rm = na.rm,
       max_it = max_it,
+      tol = tol,
       T = T,
       L = L,
       center = center,
@@ -358,6 +364,7 @@ geom_stream_field2 <- function(
     n = 11,
     args = list(),
     max_it = 1000,
+    tol = sqrt(.Machine$double.eps),
     L = NULL,
     center = FALSE,
     type = "stream",
@@ -398,6 +405,7 @@ geom_stream_field2 <- function(
       method = method,
       na.rm = na.rm,
       max_it = max_it,
+      tol = tol,
       T = NULL,
       L = L,
       center = center,
@@ -430,6 +438,7 @@ stat_stream_field2 <- function(
     n = 11,
     args = list(),
     max_it = 1000,
+    tol = sqrt(.Machine$double.eps),
     L = NULL,
     center = FALSE,
     type = "stream",
@@ -470,6 +479,7 @@ stat_stream_field2 <- function(
       method = method,
       na.rm = na.rm,
       max_it = max_it,
+      tol = sqrt(.Machine$double.eps),
       T = NULL,
       L = L,
       center = center,
@@ -517,7 +527,8 @@ StatStreamField <- ggproto(
   },
 
   compute_group = function(data, scales, fun, xlim, ylim, n,
-                           method, max_it = 1000, T = NULL, L = NULL,
+                           method, max_it = 1000, tol = sqrt(.Machine$double.eps),
+                           T = NULL, L = NULL,
                            center, type, normalize, args = NULL, grid, ...) {
     ## pick the right limits.  may need updating but currently prioritizing
     # limit specified by user
@@ -556,7 +567,7 @@ StatStreamField <- ggproto(
       xlim <- range(grid[, "x"])
       ylim <- range(grid[, "y"])
     }
-# browser()
+
     # allow for additional args to be passed
     orig_fun <- fun
     fun <- function(v) rlang::inject(orig_fun(v, !!!args))
@@ -576,7 +587,7 @@ StatStreamField <- ggproto(
     if( type == "stream" && !normalize && !is.null(T) && !is.null(L)){
       cli::cli_inform("Specifying T and L with not normalized streams is incompatible.  Ignoreing T")
     }
-# browser()
+
     ## this combination implies that the user actually wants normalization
     if( type == "stream" && !normalize && !is.null(T) && is.null(L)){
       cli::cli_inform("Specifying T without L implies normalization.  Setting normalize to TRUE and ignoring L")
@@ -652,9 +663,9 @@ StatStreamField <- ggproto(
       }
       if (type == "stream") {
         if ( normalize ) {
-          stream <- ode_stepper(grid[i, ], fun, T = T, L = 1e6, max_it, method, center)
+          stream <- ode_stepper(grid[i, ], fun, T = T, L = 1e6, max_it, tol, method, center)
         } else {
-          stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, method, center)
+          stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
         }
 
         stream <- if(nrow(stream) >= 1) transform(stream, "id" = i) else next
@@ -717,7 +728,7 @@ StatStreamField <- ggproto(
 )
 
 #' @keywords internal
-ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000,
+ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.Machine$double.eps),
                         method = "lsoda", center = FALSE) {
 
   if ( center ) {
@@ -730,8 +741,8 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000,
     # if you df[nrow(df):1,] on a 0-row df, you get back a row of NAs
 
     # solve in both directions
-    df_negative <- ode_stepper(u0, neg_fun, T, L/2, max_it, method, center = FALSE)
-    df_positive <- ode_stepper(u0,     fun, T, L/2, max_it, method, center = FALSE)
+    df_negative <- ode_stepper(u0, neg_fun, T, L/2, max_it, tol, method, center = FALSE)
+    df_positive <- ode_stepper(u0,     fun, T, L/2, max_it, tol, method, center = FALSE)
 
     # format both for merging
     n_neg <- nrow(df_negative)
@@ -794,7 +805,10 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000,
     list( c( fu, "l" = norm(fu) ) )
   }
 
-  rootfun <- function(t, u, parms) u[3] - parms$L
+  rootfun <- function(t, u, parms) {
+    if (t > 0 && abs(u[1]) < tol && abs(u[2]) < tol) return(0)
+    u[3] - parms$L
+  }
 
   # initialize the data frame tracking evals of fun
   df <- data.frame()
@@ -814,7 +828,7 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000,
   for (i in 2:nrow(df)) {
     u <- as.numeric( df[i-1,] )
     v <- as.numeric( df[i  ,] )
-    row_is_duplicate[i] <- norm(u-v) <= 1e-5
+    row_is_duplicate[i] <- norm(u-v) <= tol
   }
   df <- df[!row_is_duplicate,]
   row.names(df) <- 1:nrow(df)
