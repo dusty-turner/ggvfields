@@ -288,9 +288,17 @@ StatVector <- ggproto("StatVector", Stat,
     data$norm <- sqrt((data$xend - data$x)^2 + (data$yend - data$y)^2)
 
     if (is.null(L)) {
-      # use x/ylim if provided by a previous layer, otherwise base it on data
-      xlim <- if (!is.null(scales$x$range$range)) scales$x$range$range else range(data$x, na.rm = TRUE)
-      ylim <- if (!is.null(scales$y$range$range)) scales$y$range$range else range(data$y, na.rm = TRUE)
+      # use x/ylim if provided by a previous layer (and make sure its no c(0,0)), otherwise base it on data
+      xlim <- if (!is.null(scales$x$range$range) && !all(scales$x$range$range == 0))
+        scales$x$range$range
+      else
+        range(c(data$x, data$xend), na.rm = TRUE)
+
+      ylim <- if (!is.null(scales$y$range$range) && !all(scales$y$range$range == 0))
+        scales$y$range$range
+      else
+        range(c(data$y, data$yend), na.rm = TRUE)
+
 
       # Set a default grid resolution (number of cells along the larger axis).
       # In geom_stream_field n is passed in; here we assume, say, 20.
