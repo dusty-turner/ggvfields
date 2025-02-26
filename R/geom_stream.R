@@ -31,6 +31,8 @@
 #'   rather than combining with them.
 #' @param arrow An optional [grid::arrow()] specification to place arrowheads on
 #'   the streamline.
+#' @param arrow.fill An optional parameter specifying the color of the arrow head.
+#'   Defaults to `NULL` and inherets fill/alpha of `aes()`.
 #' @param ... Other arguments passed to the underlying layers for further
 #'   customization.
 #'
@@ -109,13 +111,14 @@ NULL
 #' @rdname geom_stream
 #' @export
 geom_stream <- function(mapping = NULL, data = NULL,
-                        stat = StatStream,
-                        position = "identity",
-                        ...,
-                        na.rm = FALSE,
-                        show.legend = NA,
-                        inherit.aes = TRUE,
-                        arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
+  stat = StatStream,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  arrow.fill = NULL,
+  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 ) {
 
   # If 'id' is provided in mapping, map it to 'group'
@@ -134,6 +137,7 @@ geom_stream <- function(mapping = NULL, data = NULL,
     params = list(
       na.rm = na.rm,
       arrow = arrow,
+      arrow.fill = arrow.fill,
       type = "stream",
       ...
     )
@@ -143,13 +147,14 @@ geom_stream <- function(mapping = NULL, data = NULL,
 #' @rdname geom_stream
 #' @export
 stat_stream <- function(mapping = NULL, data = NULL,
-                        geom = GeomStream,
-                        position = "identity",
-                        ...,
-                        na.rm = FALSE,
-                        show.legend = NA,
-                        inherit.aes = TRUE,
-                        arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
+  geom = GeomStream,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  arrow.fill = NULL,
+  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 ) {
 
   # If 'id' is provided in mapping, map it to 'group'
@@ -168,6 +173,7 @@ stat_stream <- function(mapping = NULL, data = NULL,
     params = list(
       na.rm = na.rm,
       arrow = arrow,
+      arrow.fill = arrow.fill,
       type = "stream",
       ...
     )
@@ -179,25 +185,25 @@ stat_stream <- function(mapping = NULL, data = NULL,
 #' @usage NULL
 #' @export
 StatStream <- ggproto("StatStream", Stat,
-                      required_aes = c("x", "y", "t"),
+  required_aes = c("x", "y", "t"),
 
-                      optional_aes = c("id"),
+  optional_aes = c("id"),
 
-                      default_aes = aes(x = NA, y = NA, length = 1,
-                                        color = "black", fill = "black",
-                                        linewidth = 1, linetype = 1, alpha = 1),
+  default_aes = aes(x = NA, y = NA, length = 1,
+                    color = "black", fill = "black",
+                    linewidth = 1, linetype = 1, alpha = 1),
 
-                      compute_group = function(data, scales, ...) {
-                        # Ensure the data is ordered by the temporal variable 't'
-                        if (!"t" %in% names(data)) {
-                          stop("StatStream requires a 't' (time) aesthetic for ordering.")
-                        }
+  compute_group = function(data, scales, ...) {
+    # Ensure the data is ordered by the temporal variable 't'
+    if (!"t" %in% names(data)) {
+      stop("StatStream requires a 't' (time) aesthetic for ordering.")
+    }
 
-                        data$norm <- sqrt((diff(range(data$x)))^2 + (diff(range(data$y)))^2)
+    data$norm <- sqrt((diff(range(data$x)))^2 + (diff(range(data$y)))^2)
 
-                        data
+    data
 
-                      }
+  }
 )
 
 #' @keywords internal
@@ -229,275 +235,276 @@ draw_key_length <- function(data, params, size) {
 #' @usage NULL
 #' @export
 GeomStream <- ggproto("GeomStream", GeomPath,
-                      # required_aes = c("x", "y"),
-                      default_aes = modifyList(
-                        GeomPath$default_aes,
-                        list("alpha" = 1, "linewidth" = 1.1, "length" = after_stat(NA_real_), fx = NA, fy = NA)
-                      ),
+  # required_aes = c("x", "y"),
+  default_aes = modifyList(
+    GeomPath$default_aes,
+    list("alpha" = 1, "linewidth" = 1.1, "length" = after_stat(NA_real_), fx = NA, fy = NA)
+  ),
 
-                      setup_data = function(data, params){
+  setup_data = function(data, params){
 
-                        data <- data[!is.infinite(data$t), ]
-                        # we want to remove all points whose f(u) = c(0,0)
-                        if("l" %in% names(data)) {
+    data <- data[!is.infinite(data$t), ]
+    # we want to remove all points whose f(u) = c(0,0)
+    if("l" %in% names(data)) {
 
-                          group_of_zero_fun <- which( vapply(
-                            split(data, data$group),
-                            function(df) abs(df[nrow(df),"l"]) < 1e-6,
-                            logical(1)
-                          ) )
+      group_of_zero_fun <- which( vapply(
+        split(data, data$group),
+        function(df) abs(df[nrow(df),"l"]) < 1e-6,
+        logical(1)
+      ) )
 
-                          # remove zero-length groups
-                          if (length(group_of_zero_fun) > 0) {
-                            data <- subset(data, group != group_of_zero_fun)
-                          }
+      # remove zero-length groups
+      if (length(group_of_zero_fun) > 0) {
+        data <- subset(data, group != group_of_zero_fun)
+      }
 
-                        }
+    }
 
-                        data
+    data
 
-                      },
+  },
 
-                      # Override the draw_group method
-                      draw_panel = function(data, panel_params, coord, tail_point = FALSE, eval_point = FALSE, arrow, type) {
+  # Override the draw_group method
+  draw_panel = function(data, panel_params, coord, tail_point = FALSE, eval_point = FALSE, arrow, type, arrow.fill = NULL) {
 
-                        # prep grobs for future use
-                        grobs <- list()
-                        stream_grob <- grid::nullGrob()
-                        tail_point_grob <- grid::nullGrob()
-                        eval_point_grob <- grid::nullGrob()
+    # prep grobs for future use
+    grobs <- list()
+    stream_grob <- grid::nullGrob()
+    tail_point_grob <- grid::nullGrob()
+    eval_point_grob <- grid::nullGrob()
 
-                        ## do all work for stream grob seperate from vector grob.  have to munch here
-                        if(type == "stream"){
+    ## do all work for stream grob seperate from vector grob.  have to munch here
+    if(type == "stream"){
 
-                          fix_linewidth <- function(data, name) {
-                            if (is.null(data$linewidth) && !is.null(data$size)) {
-                              deprecate_soft0("3.4.0", I(paste0("Using the `size` aesthetic with ", name)), I("the `linewidth` aesthetic"))
-                              data$linewidth <- data$size
-                            }
-                            data
-                          }
+      fix_linewidth <- function(data, name) {
+        if (is.null(data$linewidth) && !is.null(data$size)) {
+          deprecate_soft0("3.4.0", I(paste0("Using the `size` aesthetic with ", name)), I("the `linewidth` aesthetic"))
+          data$linewidth <- data$size
+        }
+        data
+      }
 
-                          data <- fix_linewidth(data, snake_class(self))
-                          if (!anyDuplicated(data$group)) {
-                            cli::cli_inform(c(
-                              "{.fn {snake_class(self)}}: Each group consists of only one observation.",
-                              i = "Do you need to adjust the {.field group} aesthetic?"
-                            ))
-                          }
+      data <- fix_linewidth(data, snake_class(self))
+      if (!anyDuplicated(data$group)) {
+        cli::cli_inform(c(
+          "{.fn {snake_class(self)}}: Each group consists of only one observation.",
+          i = "Do you need to adjust the {.field group} aesthetic?"
+        ))
+      }
 
-                          # must be sorted on group
-                          data <- data[order(data$group), , drop = FALSE]
-                          munched <- coord_munch(coord, data, panel_params)
+      # must be sorted on group
+      data <- data[order(data$group), , drop = FALSE]
+      munched <- coord_munch(coord, data, panel_params)
 
-                          # Silently drop lines with less than two points, preserving order
-                          rows <- stats::ave(seq_len(nrow(munched)), munched$group, FUN = length)
-                          munched <- munched[rows >= 2, ]
-                          if (nrow(munched) < 2) return(zeroGrob())
+      # Silently drop lines with less than two points, preserving order
+      rows <- stats::ave(seq_len(nrow(munched)), munched$group, FUN = length)
+      munched <- munched[rows >= 2, ]
+      if (nrow(munched) < 2) return(zeroGrob())
 
-                          # Work out whether we should use lines or segments
-                          attr <- ggplot2:::dapply(munched, "group", function(df) {
-                            linetype <- ggplot2:::unique0(df$linetype)
-                            ggplot2:::data_frame0(
-                              solid = length(linetype) == 1 && (identical(linetype, "solid") || linetype == 1),
-                              constant = nrow(ggplot2:::unique0(df[, names(df) %in% c("alpha", "colour", "linewidth", "linetype")])) == 1,
-                              .size = 1
-                            )
-                          })
-                          solid_lines <- all(attr$solid)
-                          constant <- all(attr$constant)
-                          if (!solid_lines && !constant) {
-                            cli::cli_abort("{.fn {snake_class(self)}} can't have varying {.field colour}, {.field linewidth}, and/or {.field alpha} along the line when {.field linetype} isn't solid.")
-                          }
+      # Work out whether we should use lines or segments
+      attr <- ggplot2:::dapply(munched, "group", function(df) {
+        linetype <- ggplot2:::unique0(df$linetype)
+        ggplot2:::data_frame0(
+          solid = length(linetype) == 1 && (identical(linetype, "solid") || linetype == 1),
+          constant = nrow(ggplot2:::unique0(df[, names(df) %in% c("alpha", "colour", "linewidth", "linetype")])) == 1,
+          .size = 1
+        )
+      })
+      solid_lines <- all(attr$solid)
+      constant <- all(attr$constant)
+      if (!solid_lines && !constant) {
+        cli::cli_abort("{.fn {snake_class(self)}} can't have varying {.field colour}, {.field linewidth}, and/or {.field alpha} along the line when {.field linetype} isn't solid.")
+      }
 
-                          # Work out grouping variables for grobs
-                          n <- nrow(munched)
-                          group_diff <- munched$group[-1] != munched$group[-n]
-                          start <- c(TRUE, group_diff)
-                          end <-   c(group_diff, TRUE)
+      # Work out grouping variables for grobs
+      n <- nrow(munched)
+      group_diff <- munched$group[-1] != munched$group[-n]
+      start <- c(TRUE, group_diff)
+      end <-   c(group_diff, TRUE)
 
-                          # munched$fill <- arrow.fill %||% munched$colour
-                          munched$fill <- munched$colour
+      # munched$fill <- arrow.fill %||% munched$colour
+      # munched$fill <- munched$colour
+      munched$fill <- if (!is.null(arrow.fill)) arrow.fill else munched$colour
 
-                          n <- nrow(munched)
-                          group_diff <- munched$group[-1] != munched$group[-n]
-                          start <- c(TRUE, group_diff)
-                          end <-   c(group_diff, TRUE)
-
-
-                          arrow <- ggplot2:::repair_segment_arrow(arrow, munched$group)
-
-                          stream_grob <- grid::segmentsGrob(
-                            munched$x[!end], munched$y[!end], munched$x[!start], munched$y[!start],
-                            default.units = "native", arrow = arrow,
-                            gp =   grid::gpar(
-                              col = alpha(munched$colour, munched$alpha)[!end],
-                              fill = alpha(munched$fill, munched$alpha)[!end],
-                              lwd = munched$linewidth[!end],
-                              lty = munched$linetype[!end]
-                              # lineend = lineend,
-                              # linejoin = linejoin,
-                              # linemitre = linemitre
-                            )
-                          )
-
-                        }
+      n <- nrow(munched)
+      group_diff <- munched$group[-1] != munched$group[-n]
+      start <- c(TRUE, group_diff)
+      end <-   c(group_diff, TRUE)
 
 
-                        if(type == "vector"){
+      arrow <- ggplot2:::repair_segment_arrow(arrow, munched$group)
 
-                          ## need to undo normalizing if length is mapped - this happens under the following conditions
-                          if ("length" %in% names(data) && all(!is.na(data$length)) && "avg_spd" %in% names(data)) {
+      stream_grob <- grid::segmentsGrob(
+        munched$x[!end], munched$y[!end], munched$x[!start], munched$y[!start],
+        default.units = "native", arrow = arrow,
+        gp =   grid::gpar(
+          col = alpha(munched$colour, munched$alpha)[!end],
+          fill = alpha(munched$fill, munched$alpha)[!end],
+          lwd = munched$linewidth[!end],
+          lty = munched$linetype[!end]
+          # lineend = lineend,
+          # linejoin = linejoin,
+          # linemitre = linemitre
+        )
+      )
 
-                            df_out <- data  # Make a copy so we can modify in place
+    }
 
-                            # Loop over each group
-                            for (g in unique(df_out$group)) {
-                              # Identify the two rows for group g
-                              idx <- which(df_out$group == g)
-                              # row 1 = start, row 2 = end
-                              i1 <- idx[1]
-                              i2 <- idx[2]
 
-                              # Extract the start and end coords
-                              x1 <- df_out$x[i1]
-                              y1 <- df_out$y[i1]
-                              x2 <- df_out$x[i2]
-                              y2 <- df_out$y[i2]
+    if(type == "vector"){
 
-                              # Compute dx, dy
-                              dx <- x2 - x1
-                              dy <- y2 - y1
+      ## need to undo normalizing if length is mapped - this happens under the following conditions
+      if ("length" %in% names(data) && all(!is.na(data$length)) && "avg_spd" %in% names(data)) {
 
-                              # The direction angle (from start to end)
-                              angle <- atan2(dy, dx)
+        df_out <- data  # Make a copy so we can modify in place
 
-                              # Suppose we want to set the new length to df_out$avg_spd[i2]
-                              new_len <- df_out$avg_spd[i2]
+        # Loop over each group
+        for (g in unique(df_out$group)) {
+          # Identify the two rows for group g
+          idx <- which(df_out$group == g)
+          # row 1 = start, row 2 = end
+          i1 <- idx[1]
+          i2 <- idx[2]
 
-                              # If new_len is NA, skip or handle differently
-                              # We'll proceed if it's not NA
-                              if (!is.na(new_len)) {
-                                # Compute new dx, dy
-                                new_dx <- new_len * cos(angle)
-                                new_dy <- new_len * sin(angle)
+          # Extract the start and end coords
+          x1 <- df_out$x[i1]
+          y1 <- df_out$y[i1]
+          x2 <- df_out$x[i2]
+          y2 <- df_out$y[i2]
 
-                                # Update the end coords
-                                df_out$x[i2] <- x1 + new_dx
-                                df_out$y[i2] <- y1 + new_dy
-                              }
-                            }
+          # Compute dx, dy
+          dx <- x2 - x1
+          dy <- y2 - y1
 
-                            data <- df_out
+          # The direction angle (from start to end)
+          angle <- atan2(dy, dx)
 
-                          }
+          # Suppose we want to set the new length to df_out$avg_spd[i2]
+          new_len <- df_out$avg_spd[i2]
 
-                        }
-                        coords <- coord$transform(data, panel_params)
+          # If new_len is NA, skip or handle differently
+          # We'll proceed if it's not NA
+          if (!is.na(new_len)) {
+            # Compute new dx, dy
+            new_dx <- new_len * cos(angle)
+            new_dy <- new_len * sin(angle)
 
-                        # used for tail_point
-                        orig_coords <- coords
+            # Update the end coords
+            df_out$x[i2] <- x1 + new_dx
+            df_out$y[i2] <- y1 + new_dy
+          }
+        }
 
-                        # used for eval_point
-                        data_for_eval_coords <- data
-                        data_for_eval_coords$x <- data_for_eval_coords$x0
-                        data_for_eval_coords$y <- data_for_eval_coords$y0
-                        coords_for_eval_point <- coord$transform(data_for_eval_coords, panel_params)
+        data <- df_out
 
-                        # keep track of new fx/fy distance from x/y
-                        coords$offset_x <- 0
-                        coords$offset_y <- 0
+      }
 
-                        ## once data is transformed to coords then renormalize the data
-                        if (all(!is.na(data$length))) {
+    }
+    coords <- coord$transform(data, panel_params)
 
-                          unique_groups <- unique(coords$group)
+    # used for tail_point
+    orig_coords <- coords
 
-                          for(g in unique_groups) {
-                            idx <- which(coords$group == g)
+    # used for eval_point
+    data_for_eval_coords <- data
+    data_for_eval_coords$x <- data_for_eval_coords$x0
+    data_for_eval_coords$y <- data_for_eval_coords$y0
+    coords_for_eval_point <- coord$transform(data_for_eval_coords, panel_params)
 
-                            x1 <- coords$x[idx[1]]
-                            y1 <- coords$y[idx[1]]
-                            x2 <- coords$x[idx[2]]
-                            y2 <- coords$y[idx[2]]
+    # keep track of new fx/fy distance from x/y
+    coords$offset_x <- 0
+    coords$offset_y <- 0
 
-                            dx <- coords$x[idx[2]] - coords$x[idx[1]]
-                            dy <- coords$y[idx[2]] - coords$y[idx[1]]
+    ## once data is transformed to coords then renormalize the data
+    if (all(!is.na(data$length))) {
 
-                            dist <- sqrt(dx^2 + dy^2)
+      unique_groups <- unique(coords$group)
 
-                            angle <- atan2(dy, dx)
+      for(g in unique_groups) {
+        idx <- which(coords$group == g)
 
-                            # Desired length in cm, from the second row's 'length'
-                            # desired_length <- coords$avg_spd[idx[2]]
-                            desired_length <- coords$length[idx[2]]
+        x1 <- coords$x[idx[1]]
+        y1 <- coords$y[idx[1]]
+        x2 <- coords$x[idx[2]]
+        y2 <- coords$y[idx[2]]
 
-                            coords$x[idx[2]] <- coords$x[idx[1]]
-                            coords$y[idx[2]] <- coords$y[idx[1]]
+        dx <- coords$x[idx[2]] - coords$x[idx[1]]
+        dy <- coords$y[idx[2]] - coords$y[idx[1]]
 
-                            coords$offset_x[idx[1]] <- 0
-                            coords$offset_x[idx[2]] <- desired_length * cos(angle)
+        dist <- sqrt(dx^2 + dy^2)
 
-                            coords$offset_y[idx[1]] <- 0
-                            coords$offset_y[idx[2]] <- desired_length * sin(angle)
+        angle <- atan2(dy, dx)
 
-                          }
+        # Desired length in cm, from the second row's 'length'
+        # desired_length <- coords$avg_spd[idx[2]]
+        desired_length <- coords$length[idx[2]]
 
-                        }
+        coords$x[idx[2]] <- coords$x[idx[1]]
+        coords$y[idx[2]] <- coords$y[idx[1]]
 
-                        if(type == "vector"){
+        coords$offset_x[idx[1]] <- 0
+        coords$offset_x[idx[2]] <- desired_length * cos(angle)
 
-                          stream_grob <- grid::polylineGrob(
-                            x = grid::unit(coords$x, "npc") + grid::unit(coords$offset_x, "cm"),
-                            y = grid::unit(coords$y, "npc") + grid::unit(coords$offset_y, "cm"),
-                            id = coords$group,  # Handle grouping for multiple paths
-                            default.units = "native",  # Use native units for scaling
-                            gp = grid::gpar(
-                              col =  coords[!duplicated(coords$group), "colour"],
-                              fill = coords[!duplicated(coords$group), "colour"],
-                              lwd = coords[!duplicated(coords$group), "linewidth"],
-                              linetype = coords[!duplicated(coords$group), "linetype"],
-                              alpha = coords[!duplicated(coords$group), "alpha"]
-                            ), arrow = arrow
-                          )
-                        }
+        coords$offset_y[idx[1]] <- 0
+        coords$offset_y[idx[2]] <- desired_length * sin(angle)
 
-                        if (tail_point) {
+      }
 
-                          first_coords <- orig_coords[!duplicated(orig_coords$group),]
+    }
 
-                          tail_point_grob <- grid::pointsGrob(
-                            x = grid::unit(first_coords$x, "npc"),
-                            y = grid::unit(first_coords$y, "npc"),
-                            pch = 16,
-                            # solid circle; change as needed
-                            size = unit(coords$size %||% 1.35, "mm"),
-                            gp = grid::gpar(col = first_coords$colour, alpha = first_coords$alpha)
-                            # gp = grid::gpar(col = first_coords$colour, alpha = 1)
-                          )
-                        }
+    if(type == "vector"){
 
-                        if (eval_point) {
+      stream_grob <- grid::polylineGrob(
+        x = grid::unit(coords$x, "npc") + grid::unit(coords$offset_x, "cm"),
+        y = grid::unit(coords$y, "npc") + grid::unit(coords$offset_y, "cm"),
+        id = coords$group,  # Handle grouping for multiple paths
+        default.units = "native",  # Use native units for scaling
+        gp = grid::gpar(
+          col =  coords[!duplicated(coords$group), "colour"],
+          fill = coords[!duplicated(coords$group), "colour"],
+          lwd = coords[!duplicated(coords$group), "linewidth"],
+          linetype = coords[!duplicated(coords$group), "linetype"],
+          alpha = coords[!duplicated(coords$group), "alpha"]
+        ), arrow = arrow
+      )
+    }
 
-                          first_coords_for_eval_point <- coords_for_eval_point[!duplicated(coords_for_eval_point$group),]
+    if (tail_point) {
 
-                          eval_point_grob <- grid::pointsGrob(
-                            x = grid::unit(first_coords_for_eval_point$x, "npc"),
-                            y = grid::unit(first_coords_for_eval_point$y, "npc"),
-                            pch = 16, # solid circle
-                            size = unit(coords$size %||% 1.35, "mm"),
-                            gp = grid::gpar(col = first_coords_for_eval_point$colour,
-                                            alpha = first_coords_for_eval_point$alpha)
-                          )
-                        }
+      first_coords <- orig_coords[!duplicated(orig_coords$group),]
 
-                        # Combine the line and points grobs so that both are drawn.
-                        grobs <- list(stream_grob, tail_point_grob, eval_point_grob)
-                        grobs <- Filter(Negate(is.null), grobs)  # Remove NULL entries
-                        return(grid::grobTree(do.call(grid::gList, grobs)))
+      tail_point_grob <- grid::pointsGrob(
+        x = grid::unit(first_coords$x, "npc"),
+        y = grid::unit(first_coords$y, "npc"),
+        pch = 16,
+        # solid circle; change as needed
+        size = unit(coords$size %||% 1.35, "mm"),
+        gp = grid::gpar(col = first_coords$colour, alpha = first_coords$alpha)
+        # gp = grid::gpar(col = first_coords$colour, alpha = 1)
+      )
+    }
 
-                      },
-                      draw_key = draw_key_length
+    if (eval_point) {
+
+      first_coords_for_eval_point <- coords_for_eval_point[!duplicated(coords_for_eval_point$group),]
+
+      eval_point_grob <- grid::pointsGrob(
+        x = grid::unit(first_coords_for_eval_point$x, "npc"),
+        y = grid::unit(first_coords_for_eval_point$y, "npc"),
+        pch = 16, # solid circle
+        size = unit(coords$size %||% 1.35, "mm"),
+        gp = grid::gpar(col = first_coords_for_eval_point$colour,
+                        alpha = first_coords_for_eval_point$alpha)
+      )
+    }
+
+    # Combine the line and points grobs so that both are drawn.
+    grobs <- list(stream_grob, tail_point_grob, eval_point_grob)
+    grobs <- Filter(Negate(is.null), grobs)  # Remove NULL entries
+    return(grid::grobTree(do.call(grid::gList, grobs)))
+
+  },
+  draw_key = draw_key_length
 )
 
 #' Create a Continuous Scale for Vector Length

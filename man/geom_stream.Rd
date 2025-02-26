@@ -17,6 +17,7 @@ geom_stream(
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
+  arrow.fill = NULL,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 )
 
@@ -29,6 +30,7 @@ stat_stream(
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE,
+  arrow.fill = NULL,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 )
 }
@@ -56,6 +58,9 @@ with a warning. If \code{TRUE}, missing values are silently removed.}
 
 \item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics
 rather than combining with them.}
+
+\item{arrow.fill}{An optional parameter specifying the color of the arrow head.
+Defaults to \code{NULL} and inherets fill/alpha of \code{aes()}.}
 
 \item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to place arrowheads on
 the streamline.}
