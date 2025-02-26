@@ -240,7 +240,7 @@ geom_stream_field <- function(
 ) {
 
   # Define default mapping for geom_vector_field
-  default_mapping <- aes(color = after_stat(avg_spd))
+  default_mapping <- if (normalize) aes(color = after_stat(avg_spd)) else aes()
 
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
@@ -317,7 +317,7 @@ stat_stream_field <- function(
 ) {
 
   # Define default mapping for geom_vector_field
-  default_mapping <- aes( color = after_stat(avg_spd) )
+  default_mapping <- if (normalize) aes(color = after_stat(avg_spd)) else aes()
 
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
@@ -589,54 +589,56 @@ StatStreamField <- ggproto(
     # allow for additional args to be passed
     orig_fun <- fun
     fun <- function(v) rlang::inject(orig_fun(v, !!!args))
+# browser()
 
     ## protecting the user from themselves
-    if( type == "vector" && !normalize && !is.null(L)){
-      cli::cli_inform("Specifying L with non normalized vectors is incompatible.  Ignoreing L")
+
+    ## vector and not normalize
+    if (type == "vector" && !normalize) {
+      if (!is.null(L)) {
+        cli::cli_warn("Specifying L with non normalized vectors is incompatible. Ignoring L.")
+      }
+      ## T is not even an argument in geom_vector_field but needs to stay here because
+      ## one could select geom_stream_field(type = "vector")
+      if (!is.null(T)) {
+        cli::cli_inform("Specifying T with vectors is incompatible. Setting `T = 1`.")
+      }
+      T <- 1
     }
+
+    ## vector and normalize
     if( type == "vector" && normalize && !is.null(T)){
       if( T != 1 ){ ## this happens in geom_vector_field2
-        cli::cli_inform("Specifying T with normalized vectors is incompatible.  Ignoreing T")
+        cli::cli_warn("Specifying T with normalized vectors is incompatible.  Ignoring T.")
       }
     }
-    if( type == "stream" && normalize && !is.null(T) && !is.null(L)){
-      cli::cli_inform("Specifying T and L with normalized streams is incompatible.  Ignoreing L")
-    }
-    if( type == "stream" && !normalize && !is.null(T) && !is.null(L)){
-      cli::cli_inform("Specifying T and L with not normalized streams is incompatible.  Ignoreing T")
-    }
-
-    ## this combination implies that the user actually wants normalization
-    if( type == "stream" && !normalize && !is.null(T) && is.null(L)){
-      cli::cli_inform("Specifying T without L implies normalization.  Setting normalize to TRUE and ignoring L")
-      normalize <- TRUE
-    }
-
-    # compute default L value (normalizing only)
-    # this is computed either if 1) normalizing and L is computed automatically
-    # or 2) not normalizing and computing T automatically
     if ( (normalize && is.null(L)) && type == "vector") {
       L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
     }
 
-    if ( (normalize && is.null(T) && type == "stream") ) {
+    if (type == "stream" && normalize ) {
+      if(!is.null(T)) cli::cli_warn("Specifying T when normalizing streams is incompatable.  Ignoring T.")
       if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
       grid_norms <- apply(grid, 1, function(u) norm(fun(u)))
       fastest_vector_ndx <- which.max(grid_norms)
       T <- L / grid_norms[fastest_vector_ndx]
     }
 
-    if ( !normalize && type == "stream" && is.null(L) && is.null(T)){
-      L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
+
+    if( type == "stream" && !normalize && !is.null(T) && !is.null(L)){
+      cli::cli_warn("Specifying T and L with not normalized streams is incompatible.  Ignoring T.")
     }
 
-    # initialize T for !normalizing vectors; this will be an inefficient
-    # implementation as i will recompute fun on the grid later, but fine for now
-    if (type == "vector" && !normalize && is.null(T)) {
-      # grid_norms <- apply(grid, 1, function(u) norm(fun(u)))
-      # fastest_vector_ndx <- which.max(grid_norms)
-      # T <- L / grid_norms[fastest_vector_ndx]
-      T <- 1
+    ## this combination implies that the user actually wants normalization
+    if( type == "stream" && !normalize && !is.null(T) && is.null(L)){
+      cli::cli_warn("Specifying T without L implies normalization.  Setting normalize to TRUE and ignoring L.")
+      normalize <- TRUE
+    }
+
+
+
+    if ( !normalize && type == "stream" && is.null(L) && is.null(T)){
+      L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
     }
 
     # initialize the data frame
@@ -680,8 +682,10 @@ StatStreamField <- ggproto(
 
       }
       if (type == "stream") {
-        if ( normalize ) {
-          stream <- ode_stepper(grid[i, ], fun, T = T, L = 1e6, max_it, tol, method, center)
+        if ( !normalize ) {
+          ## currently doing this but may not be right
+          # stream <- ode_stepper(grid[i, ], fun, T = T, L = 1e6, max_it, tol, method, center)
+          stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
         } else {
           stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
         }

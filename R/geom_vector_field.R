@@ -135,16 +135,11 @@ geom_vector_field <- function(
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
   ) {
 
-  # Define default mapping for geom_vector_field
   default_mapping <- aes(color = after_stat(norm))
 
-  # Merge user-provided mapping with default mapping
-  # User mapping takes precedence
-  if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
-  } else {
-    mapping <- default_mapping
-  }
+  default_mapping <- if (normalize) aes(color = after_stat(norm)) else aes()
+  mapping <- modifyList(default_mapping, mapping %||% aes())
+
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
@@ -203,16 +198,8 @@ stat_vector_field <- function(
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
   ) {
 
-  # Define default mapping for geom_vector_field
-  default_mapping <- aes(color = after_stat(norm))
-
-  # Merge user-provided mapping with default mapping
-  # User mapping takes precedence
-  if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
-  } else {
-    mapping <- default_mapping
-  }
+  default_mapping <- if (normalize) aes(color = after_stat(norm)) else aes()
+  mapping <- modifyList(default_mapping, mapping %||% aes())
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
