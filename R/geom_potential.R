@@ -34,6 +34,18 @@
 #' Additional raster-specific aesthetics (e.g. those controlled by [scale_fill_gradient()],
 #' [scale_fill_viridis_c()], etc.) can be applied to modify the appearance of the potential heatmap.
 #'
+#' @section Computed Variables:
+#'
+#' The following variable is computed internally by [StatPotential] during the
+#' potential function calculation:
+#'
+#' \describe{
+#'   \item{Potential}{The scalar potential value computed numerically at each grid point.
+#'     It represents the accumulated potential from a reference point (typically the lower
+#'     bounds of \code{xlim} and \code{ylim}) to the given point. This value is mapped to
+#'     the \code{fill} aesthetic in the raster layer.}
+#' }
+#'
 #' @return A ggplot2 layer that produces a potential function heatmap.
 #'
 #' @examples

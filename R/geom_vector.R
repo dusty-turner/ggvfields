@@ -83,6 +83,18 @@
 #'   - linetype
 #'   - size
 #'
+#' @section Computed Variables:
+#'
+#' These are calculated by the 'stat' part of layers and can be accessed with
+#'   delayed evaluation.
+#'
+#' \describe{
+#'   \item{norm}{Calculated as the Euclidean distance between the starting point
+#'     (\code{x}, \code{y}) and the computed endpoint (\code{xend}, \code{yend}). This
+#'     value is used to normalize the vector length when the \code{normalize} parameter
+#'     is set to \code{TRUE}.}
+#' }
+#'
 #' @return A ggplot2 layer that can be added to a plot.
 #'
 #' @examples

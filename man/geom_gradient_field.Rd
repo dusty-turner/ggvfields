@@ -218,6 +218,23 @@ In \strong{geom_gradient_field2}, color is not mapped by default.
 }
 }
 
+\section{Computed Variables}{
+
+
+The following variables are computed internally by \link{StatStreamField} when
+generating the gradient field from a scalar function:
+
+\describe{
+\item{norm}{The Euclidean norm of the gradient vector, calculated as
+\eqn{\sqrt{fx^2 + fy^2}}. This value is used, by default, for mapping color or scaling
+arrow lengths in the visualization.}
+
+\item{avg_spd}{This variable may represent an average speed computed
+from the gradient magnitude. In the default mapping for \strong{geom_gradient_field}, the
+color aesthetic is mapped to \code{after_stat(avg_spd)}.}
+}
+}
+
 \examples{
 Si <- matrix(c(1, 0.75, 0.75, 1), nrow = 2)
 f <- function(u) exp(-as.numeric(u \%*\% solve(Si) \%*\% u) / 2) / (2 * pi * det(Si))

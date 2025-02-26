@@ -57,12 +57,26 @@
 #'   field.
 #'
 #' **Prediction Intervals:**
-#'   Two types of prediction intervals can be displayed:
+#' Two types of prediction intervals can be displayed:
 #'   - **Ellipse:** Depicts the joint uncertainty (covariance) in the predicted `fx` and `fy`.
 #'   - **Wedge:** Indicates the range of possible vector directions and magnitudes.
 #'
 #' @return A ggplot2 layer that can be added to a ggplot object to display a
 #'   smoothed vector field.
+#'
+#' \describe{
+#'  \item{norm}{Computed as the Euclidean norm of the displacement,
+#'     \eqn{\sqrt{fx^2 + fy^2}}, this variable is used to normalize and scale the
+#'     vector lengths.}
+#'
+#'   \item{t}{The integration time or evaluation time at each computed point along
+#'     the smoothed field (when applicable).}
+#'
+#'   \item{d}{The incremental distance between consecutive computed points.}
+#'
+#'   \item{l}{The cumulative arc length along the smoothed vector field, calculated
+#'     as the cumulative sum of \code{d}.}
+#' }
 #'
 #' @examples
 #' # Define a true vector field function

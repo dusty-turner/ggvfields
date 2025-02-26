@@ -79,6 +79,20 @@ the vectors (default: \code{grid::arrow(angle = 25, length = unit(0.025, "npc"),
 \value{
 A ggplot2 layer that can be added to a ggplot object to display a
 smoothed vector field.
+
+\describe{
+\item{norm}{Computed as the Euclidean norm of the displacement,
+\eqn{\sqrt{fx^2 + fy^2}}, this variable is used to normalize and scale the
+vector lengths.}
+
+\item{t}{The integration time or evaluation time at each computed point along
+the smoothed field (when applicable).}
+
+\item{d}{The incremental distance between consecutive computed points.}
+
+\item{l}{The cumulative arc length along the smoothed vector field, calculated
+as the cumulative sum of \code{d}.}
+}
 }
 \description{
 \code{geom_stream_smooth()} creates a ggplot2 layer that visualizes a smooth

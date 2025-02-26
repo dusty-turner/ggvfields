@@ -8,6 +8,18 @@
 \alias{GeomStream}
 \title{Create a Streamline Plot Layer in ggplot2}
 \usage{
+geom_stream(
+  mapping = NULL,
+  data = NULL,
+  stat = StatStream,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
+)
+
 stat_stream(
   mapping = NULL,
   data = NULL,
@@ -28,8 +40,8 @@ stat_stream(
 
 \item{data}{A data frame or other object, as in \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
 
-\item{geom}{The geometric object used to render the streamline (only used in
-\code{stat_stream()}; defaults to \link{GeomStream}).}
+\item{stat}{The statistical transformation to use on the data for this layer;
+defaults to \link{StatStream}.}
 
 \item{position}{Position adjustment, either as a string or the result of a
 position adjustment function.}
@@ -47,6 +59,9 @@ rather than combining with them.}
 
 \item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to place arrowheads on
 the streamline.}
+
+\item{geom}{The geometric object used to render the streamline (only used in
+\code{stat_stream()}; defaults to \link{GeomStream}).}
 }
 \value{
 A ggplot2 layer that can be added to a plot to produce a streamline
@@ -89,6 +104,23 @@ following aesthetics (required aesthetics are in \strong{bold}):
 \item \strong{Data Ordering}: If \code{t} is not provided, an error is thrown. When present,
 points within each group are sorted by \code{t} prior to drawing the stream.
 \item \strong{Arrows}: The \code{arrow} parameter can be used to indicate direction along each stream.
+}
+}
+
+\section{Computed Variables}{
+
+
+These are calculated by the 'stat' part of layers and can be accessed with
+delayed evaluation.
+
+\describe{
+\item{norm}{This variable is calculated as the Euclidean distance derived
+from the ranges of the \code{x} and \code{y} values. It serves as a
+normalization factor for vector lengths when the \code{normalize}
+parameter is active.}
+
+\item{avg_spd}{Represents the average speed, which is defined as the length
+of the stream divided by the time it took to traverse that distance.}
 }
 }
 

@@ -165,6 +165,12 @@ streamlines. In \strong{geom_vector_field}, the default is a closed arrow with a
 \value{
 A ggplot2 layer that computes and plots a vector field using
 streamlines.
+
+\describe{
+\item{norm}{Calculated as the Euclidean distance between the starting point
+(\code{x}, \code{y}) and the computed endpoint. Used to normalize the
+vector.}
+}
 }
 \description{
 These functions provide convenient ggplot2 layers for drawing vector fields

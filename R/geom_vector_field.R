@@ -81,6 +81,12 @@
 #' @return A ggplot2 layer that computes and plots a vector field using
 #'   streamlines.
 #'
+#' \describe{
+#'   \item{norm}{Calculated as the Euclidean distance between the starting point
+#'     (\code{x}, \code{y}) and the computed endpoint. Used to normalize the
+#'     vector.}
+#' }
+#'
 #' @seealso [geom_stream_field()]
 #'
 #' @examples

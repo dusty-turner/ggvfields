@@ -20,6 +20,8 @@
 #' @param data A data frame or other object, as in [ggplot2::layer()].
 #' @param geom The geometric object used to render the streamline (only used in
 #'   `stat_stream()`; defaults to [GeomStream]).
+#' @param stat The statistical transformation to use on the data for this layer;
+#' defaults to [StatStream].
 #' @param position Position adjustment, either as a string or the result of a
 #'   position adjustment function.
 #' @param na.rm Logical. If `FALSE` (the default), missing values are removed
@@ -51,6 +53,21 @@
 #'
 #' @return A ggplot2 layer that can be added to a plot to produce a streamline
 #'   visualization.
+#'
+#' @section Computed Variables:
+#'
+#'   These are calculated by the 'stat' part of layers and can be accessed with
+#'   delayed evaluation.
+#'
+#' \describe{
+#'   \item{norm}{This variable is calculated as the Euclidean distance derived
+#'      from the ranges of the \code{x} and \code{y} values. It serves as a
+#'      normalization factor for vector lengths when the \code{normalize}
+#'      parameter is active.}
+#'
+#'   \item{avg_spd}{Represents the average speed, which is defined as the length
+#'      of the stream divided by the time it took to traverse that distance.}
+#' }
 #'
 #' @examples
 #' stream_1 <- data.frame(
@@ -88,6 +105,9 @@
 #' @name geom_stream
 #' @export
 NULL
+
+#' @rdname geom_stream
+#' @export
 geom_stream <- function(mapping = NULL, data = NULL,
                         stat = StatStream,
                         position = "identity",

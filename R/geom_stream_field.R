@@ -84,6 +84,24 @@
 #' @return A ggplot2 layer that computes and renders streamlines over the
 #'   specified domain.
 #'
+#' @section Computed Variables:
+#'
+#' The following variables are computed internally by [StatStreamField] during the
+#' integration of the vector field:
+#'
+#' \describe{
+#'   \item{avg_spd}{For vector fields, this is computed as the total arc length divided
+#'     by the integration time, providing an estimate of the average speed. It is used to
+#'     scale the vector lengths when mapping \code{length = after_stat(norm)}.}
+#'
+#'   \item{t}{The integration time at each computed point along a streamline.}
+#'
+#'   \item{d}{The distance between consecutive points along the computed path.}
+#'
+#'   \item{l}{The cumulative arc length along the streamline, calculated as the cumulative
+#'     sum of \code{d}.}
+#' }
+#'
 #' @examples
 #'
 #' f <- function(u) c(-u[2], u[1])

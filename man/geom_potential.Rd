@@ -104,6 +104,20 @@ Additional raster-specific aesthetics (e.g. those controlled by \code{\link[=sca
 \code{\link[=scale_fill_viridis_c]{scale_fill_viridis_c()}}, etc.) can be applied to modify the appearance of the potential heatmap.
 }
 
+\section{Computed Variables}{
+
+
+The following variable is computed internally by \link{StatPotential} during the
+potential function calculation:
+
+\describe{
+\item{Potential}{The scalar potential value computed numerically at each grid point.
+It represents the accumulated potential from a reference point (typically the lower
+bounds of \code{xlim} and \code{ylim}) to the given point. This value is mapped to
+the \code{fill} aesthetic in the raster layer.}
+}
+}
+
 \examples{
 # Define a conservative vector field function
 fun <- function(v) {
