@@ -471,7 +471,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                             y = grid::unit(first_coords$y, "npc"),
                             pch = 16,
                             # solid circle; change as needed
-                            size = unit(coords$size %||% 2, "mm"),
+                            size = unit(coords$size %||% 1.35, "mm"),
                             gp = grid::gpar(col = first_coords$colour, alpha = first_coords$alpha)
                             # gp = grid::gpar(col = first_coords$colour, alpha = 1)
                           )
@@ -485,7 +485,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
                             x = grid::unit(first_coords_for_eval_point$x, "npc"),
                             y = grid::unit(first_coords_for_eval_point$y, "npc"),
                             pch = 16, # solid circle
-                            size = unit(coords$size %||% 2, "mm"),
+                            size = unit(coords$size %||% 1.35, "mm"),
                             gp = grid::gpar(col = first_coords_for_eval_point$colour,
                                             alpha = first_coords_for_eval_point$alpha)
                           )
