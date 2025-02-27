@@ -227,7 +227,7 @@ geom_stream_field <- function(
     args = list(),
     max_it = 1000L,
     tol = sqrt(.Machine$double.eps),
-    T = NULL,
+    # T = NULL,
     L = NULL,
     center = TRUE,
     type = "stream",
@@ -271,7 +271,7 @@ geom_stream_field <- function(
       na.rm = na.rm,
       max_it = max_it,
       tol = tol,
-      T = T,
+      # T = T,
       L = L,
       center = center,
       type = type,
@@ -304,7 +304,7 @@ stat_stream_field <- function(
     args = list(),
     max_it = 1000,
     tol = sqrt(.Machine$double.eps),
-    T = NULL,
+    # T = NULL,
     L = NULL,
     center = TRUE,
     type = "stream",
@@ -350,7 +350,7 @@ stat_stream_field <- function(
       na.rm = na.rm,
       max_it = max_it,
       tol = tol,
-      T = T,
+      # T = T,
       L = L,
       center = center,
       type = type,
@@ -424,7 +424,6 @@ geom_stream_field2 <- function(
       na.rm = na.rm,
       max_it = max_it,
       tol = tol,
-      T = NULL,
       L = L,
       center = center,
       type = type,
@@ -498,7 +497,6 @@ stat_stream_field2 <- function(
       na.rm = na.rm,
       max_it = max_it,
       tol = sqrt(.Machine$double.eps),
-      T = NULL,
       L = L,
       center = center,
       type = type,
@@ -612,38 +610,17 @@ StatStreamField <- ggproto(
         cli::cli_warn("Specifying T with normalized vectors is incompatible.  Ignoring T.")
       }
     }
-    if ( (normalize && is.null(L)) && type == "vector") {
+    if (type == "vector" && normalize && is.null(L)) {
       L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
     }
-    if (type == "stream" && normalize ) {
-      if(!is.null(T)) cli::cli_warn("Specifying T when normalizing streams is incompatable.  Ignoring T.")
+
+    ## stream and normalize
+    if (type == "stream" && normalize && is.null(L)) {
       if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
     }
 
-browser()
-    if (type == "stream" && !normalize && is.null(T) ) {
-      # if(!is.null(T)) cli::cli_warn("Specifying T when normalizing streams is incompatable.  Ignoring T.")
+    if (type == "stream" && !normalize) {
       if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
-      # grid_norms <- apply(grid, 1, function(u) norm(fun(u)))
-      # fastest_vector_ndx <- which.max(grid_norms)
-      # T <- L / grid_norms[fastest_vector_ndx]
-    }
-
-
-    if( type == "stream" && !normalize && !is.null(T) && !is.null(L)){
-      cli::cli_warn("Specifying T and L with not normalized streams is incompatible.  Ignoring T.")
-    }
-
-    ## this combination implies that the user actually wants normalization
-    if( type == "stream" && !normalize && !is.null(T) && is.null(L)){
-      cli::cli_warn("Specifying T without L implies normalization.  Setting normalize to TRUE and ignoring L.")
-      normalize <- TRUE
-    }
-
-
-
-    if ( !normalize && type == "stream" && is.null(L) && is.null(T)){
-      L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
     }
 
     # initialize the data frame
@@ -710,7 +687,7 @@ browser()
 
 
     # temporally crop back streams if not normalizing and T not specified
-    if ( !normalize && is.null(T) && type == "stream" ) {
+    if ( !normalize && type == "stream" ) {
 
       # compute how long it takes for each stream to get to L
       times_to_L_by_stream <- vapply(
