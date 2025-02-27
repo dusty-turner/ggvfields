@@ -93,7 +93,7 @@
 #'
 #' f <- function(u) c(-u[2], u[1])
 #' ggplot() + geom_vector_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-#'
+#' \dontrun{
 #' # xlim and ylim default to (-1,1), so for ease of illustration we remove them
 #'
 #' ggplot() + geom_vector_field(fun = f)
@@ -105,6 +105,7 @@
 #' f <- efield_maker()
 #' ggplot() + geom_vector_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 #' ggplot() + geom_vector_field2(fun = f, xlim = c(-2,2), ylim = c(-2,2))
+#' }
 #'
 #' @name geom_vector_field
 #' @aliases geom_vector_field stat_vector_field geom_vector_field2

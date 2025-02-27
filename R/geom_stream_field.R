@@ -36,9 +36,6 @@
 #'   streamline (default: `1000L`).
 #' @param tol `numeric(1)`; a tolerance used to determine if a sink has been
 #'   hit, among other things (default: `sqrt(.Machine$double.eps)`).
-#' @param T Numeric. Maximum integration time for each streamline. When
-#'   `normalize = FALSE`, integration runs until time `T` is reached. Defaults
-#'   to `NULL` (in which case a default of `1` is used when needed).
 #' @param L Numeric. Maximum arc length for each streamline. When `normalize =
 #'   TRUE`, integration halts once the cumulative arc length reaches `L`.
 #'   Defaults to `NULL` (a suitable default is computed from the grid spacing).
@@ -110,7 +107,7 @@
 #'
 #' # the basic usage involves providing a fun, xlim, and ylim
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-#'
+#' \dontrun{
 #' # if unspecified, xlim and ylim default to c(-1,1). we use this in what
 #' # follows to focus on other parts of the code
 #' ggplot() + geom_stream_field(fun = f)
@@ -201,7 +198,7 @@
 #'     fun = f, xlim = c(-1,1), ylim = c(-1,1),
 #'     linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
 #'   )
-#'
+#' }
 #'
 #' @aliases geom_stream_field stat_stream_field geom_stream_field2 stat_stream_field2 StatStreamField
 #' @name geom_stream_field
@@ -240,7 +237,7 @@ geom_stream_field <- function(
 ) {
 
   # Define default mapping for geom_vector_field
-  default_mapping <- if (normalize) aes(color = after_stat(avg_spd)) else aes()
+  default_mapping <- aes(color = after_stat(avg_spd))
 
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
@@ -317,7 +314,7 @@ stat_stream_field <- function(
 ) {
 
   # Define default mapping for geom_vector_field
-  default_mapping <- if (normalize) aes(color = after_stat(avg_spd)) else aes()
+  default_mapping <- aes(color = after_stat(avg_spd))
 
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
@@ -587,39 +584,27 @@ StatStreamField <- ggproto(
     # allow for additional args to be passed
     orig_fun <- fun
     fun <- function(v) rlang::inject(orig_fun(v, !!!args))
-# browser()
 
-    ## protecting the user from themselves
+    ## vector and normalize
+    if (type == "vector" && normalize) {
+      if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
+    }
 
     ## vector and not normalize
     if (type == "vector" && !normalize) {
       if (!is.null(L)) {
         cli::cli_warn("Specifying L with non normalized vectors is incompatible. Ignoring L.")
       }
-      ## T is not even an argument in geom_vector_field but needs to stay here because
-      ## one could select geom_stream_field(type = "vector")
-      if (!is.null(T)) {
-        cli::cli_inform("Specifying T with vectors is incompatible. Setting `T = 1`.")
-      }
       T <- 1
     }
 
-    ## vector and normalize
-    if( type == "vector" && normalize && !is.null(T)){
-      if( T != 1 ){ ## this happens in geom_vector_field2
-        cli::cli_warn("Specifying T with normalized vectors is incompatible.  Ignoring T.")
-      }
-    }
-    if (type == "vector" && normalize && is.null(L)) {
-      L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
-    }
-
-    ## stream and normalize
-    if (type == "stream" && normalize && is.null(L)) {
-      if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
-    }
-
-    if (type == "stream" && !normalize) {
+    ## stream - L gets calculated if not given either way
+    ## if normalize, all streams grow to length L
+    ## if !normalize,
+    ## - all streams grow to length L
+    ## - find the fastest stream to L
+    ## - take that time and trim back all streams to that time
+    if (type == "stream") {
       if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
     }
 
@@ -664,13 +649,14 @@ StatStreamField <- ggproto(
 
       }
       if (type == "stream") {
-        if ( !normalize ) {
-          ## currently doing this but may not be right
-          # stream <- ode_stepper(grid[i, ], fun, T = T, L = 1e6, max_it, tol, method, center)
-          stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
-        } else {
-          stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
-        }
+        stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
+        # if ( !normalize ) {
+        #   ## currently doing this but may not be right
+        #   # stream <- ode_stepper(grid[i, ], fun, T = T, L = 1e6, max_it, tol, method, center)
+        #   stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
+        # } else {
+        #   stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
+        # }
 
         stream <- if(nrow(stream) >= 1) transform(stream, "id" = i) else next
 

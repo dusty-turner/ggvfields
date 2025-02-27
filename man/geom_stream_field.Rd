@@ -25,7 +25,6 @@ geom_stream_field(
   args = list(),
   max_it = 1000L,
   tol = sqrt(.Machine$double.eps),
-  T = NULL,
   L = NULL,
   center = TRUE,
   type = "stream",
@@ -53,7 +52,6 @@ stat_stream_field(
   args = list(),
   max_it = 1000,
   tol = sqrt(.Machine$double.eps),
-  T = NULL,
   L = NULL,
   center = TRUE,
   type = "stream",
@@ -160,10 +158,6 @@ streamline (default: \code{1000L}).}
 \item{tol}{\code{numeric(1)}; a tolerance used to determine if a sink has been
 hit, among other things (default: \code{sqrt(.Machine$double.eps)}).}
 
-\item{T}{Numeric. Maximum integration time for each streamline. When
-\code{normalize = FALSE}, integration runs until time \code{T} is reached. Defaults
-to \code{NULL} (in which case a default of \code{1} is used when needed).}
-
 \item{L}{Numeric. Maximum arc length for each streamline. When \code{normalize = TRUE}, integration halts once the cumulative arc length reaches \code{L}.
 Defaults to \code{NULL} (a suitable default is computed from the grid spacing).}
 
@@ -258,7 +252,7 @@ f <- function(u) c(-u[2], u[1])
 
 # the basic usage involves providing a fun, xlim, and ylim
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-
+\dontrun{
 # if unspecified, xlim and ylim default to c(-1,1). we use this in what
 # follows to focus on other parts of the code
 ggplot() + geom_stream_field(fun = f)
@@ -349,7 +343,7 @@ ggplot() +
     fun = f, xlim = c(-1,1), ylim = c(-1,1),
     linewidth = .75, arrow = arrow(length = unit(0.015, "npc"))
   )
-
+}
 
 }
 \keyword{datasets}
