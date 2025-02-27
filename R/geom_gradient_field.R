@@ -105,6 +105,7 @@
 #' ggplot() +
 #'   geom_gradient_field(fun = f, xlim = c(-3, 3), ylim = c(-3, 3))
 #'
+#' \dontrun{
 #' df <- expand.grid(x = seq(-3, 3, 0.1), y = seq(-3, 3, 0.1)) |>
 #'   transform(fxy = apply(cbind(x, y), 1, f))
 #'
@@ -120,7 +121,6 @@
 #'   geom_gradient_field(fun = f, xlim = c(-3,3), ylim = c(-3,3)) +
 #'   coord_equal()
 #'
-#' \dontrun{
 #'   library("ggdensity")
 #'   fxy <- function(x, y) apply(cbind(x, y), 1, f)
 #'   fxy(1, 2)

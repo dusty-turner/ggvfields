@@ -25,6 +25,7 @@ geom_stream_field(
   args = list(),
   max_it = 1000L,
   tol = sqrt(.Machine$double.eps),
+  T = NULL,
   L = NULL,
   center = TRUE,
   type = "stream",
@@ -52,6 +53,7 @@ stat_stream_field(
   args = list(),
   max_it = 1000,
   tol = sqrt(.Machine$double.eps),
+  T = NULL,
   L = NULL,
   center = TRUE,
   type = "stream",
@@ -158,8 +160,17 @@ streamline (default: \code{1000L}).}
 \item{tol}{\code{numeric(1)}; a tolerance used to determine if a sink has been
 hit, among other things (default: \code{sqrt(.Machine$double.eps)}).}
 
-\item{L}{Numeric. Maximum arc length for each streamline. When \code{normalize = TRUE}, integration halts once the cumulative arc length reaches \code{L}.
-Defaults to \code{NULL} (a suitable default is computed from the grid spacing).}
+\item{T}{Numeric. When \code{normalize = FALSE}, each streamline is integrated for
+a fixed time \code{T} before being cropped to match the duration of the fastest
+streamline reaching the arc length \code{L}. When \code{normalize = TRUE},
+integration instead stops when the cumulative arc length reaches \code{L}, and
+the parameter \code{T} is ignored.}
+
+\item{L}{Numeric. Maximum arc length for each streamline. When \code{normalize = TRUE}, integration stops once the cumulative arc length reaches \code{L}. When
+\code{normalize = FALSE}, streamlines are initially computed for a fixed time
+\code{T} and then cropped so that all are truncated to the duration it takes the
+fastest streamline to reach the arc length \code{L}. Defaults to \code{NULL} (a
+suitable default is computed from the grid spacing).}
 
 \item{center}{Logical. If \code{TRUE} (default), centers the seed points (or
 resulting streamlines) so that the original (x, y) becomes the midpoint.}
@@ -167,10 +178,14 @@ resulting streamlines) so that the original (x, y) becomes the midpoint.}
 \item{type}{Character. Either \code{"stream"} (default) or \code{"vector"}. \code{"stream"}
 computes a full streamline by integrating in both directions (if \code{center = TRUE}), while \code{"vector"} computes a single vector.}
 
-\item{normalize}{Logical. If \code{TRUE} (default), streamlines are normalized
-based on grid spacing, using the \code{L} parameter to control maximum arc
-length. If \code{FALSE}, streamlines are computed for a fixed integration time
-determined by \code{T}.}
+\item{normalize}{Logical.
+When \code{normalize = TRUE} (the default), each streamline is integrated until its
+cumulative arc length reaches the specified value \code{L}, ensuring that all streams
+have a uniform, normalized length based on grid spacing.
+When \code{normalize = FALSE}, the integration runs for a fixed time (\code{T}), and afterward,
+all streamlines are cropped to the duration it takes for the fastest one to reach
+the length \code{L}, allowing for variations in arc lengths that reflect differences in
+flow speeds.}
 
 \item{tail_point}{Logical. If \code{TRUE}, draws a point at the tail (starting
 point) of each streamline. Defaults to \code{FALSE}.}

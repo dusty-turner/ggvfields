@@ -37,17 +37,29 @@
 #' @param tol `numeric(1)`; a tolerance used to determine if a sink has been
 #'   hit, among other things (default: `sqrt(.Machine$double.eps)`).
 #' @param L Numeric. Maximum arc length for each streamline. When `normalize =
-#'   TRUE`, integration halts once the cumulative arc length reaches `L`.
-#'   Defaults to `NULL` (a suitable default is computed from the grid spacing).
+#'   TRUE`, integration stops once the cumulative arc length reaches `L`. When
+#'   `normalize = FALSE`, streamlines are initially computed for a fixed time
+#'   `T` and then cropped so that all are truncated to the duration it takes the
+#'   fastest streamline to reach the arc length `L`. Defaults to `NULL` (a
+#'   suitable default is computed from the grid spacing).
+#' @param T Numeric. When `normalize = FALSE`, each streamline is integrated for
+#'   a fixed time `T` before being cropped to match the duration of the fastest
+#'   streamline reaching the arc length `L`. When `normalize = TRUE`,
+#'   integration instead stops when the cumulative arc length reaches `L`, and
+#'   the parameter `T` is ignored.
 #' @param center Logical. If `TRUE` (default), centers the seed points (or
 #'   resulting streamlines) so that the original (x, y) becomes the midpoint.
 #' @param type Character. Either `"stream"` (default) or `"vector"`. `"stream"`
 #'   computes a full streamline by integrating in both directions (if `center =
 #'   TRUE`), while `"vector"` computes a single vector.
-#' @param normalize Logical. If `TRUE` (default), streamlines are normalized
-#'   based on grid spacing, using the `L` parameter to control maximum arc
-#'   length. If `FALSE`, streamlines are computed for a fixed integration time
-#'   determined by `T`.
+#' @param normalize Logical.
+#'   When `normalize = TRUE` (the default), each streamline is integrated until its
+#'   cumulative arc length reaches the specified value `L`, ensuring that all streams
+#'   have a uniform, normalized length based on grid spacing.
+#'   When `normalize = FALSE`, the integration runs for a fixed time (`T`), and afterward,
+#'   all streamlines are cropped to the duration it takes for the fastest one to reach
+#'   the length `L`, allowing for variations in arc lengths that reflect differences in
+#'   flow speeds.
 #' @param method Character. Integration method (e.g. `"rk4"` for Runge-Kutta 4,
 #'   `"euler"` for Euler's method). Defaults to `"rk4"`.
 #' @param grid A data frame containing precomputed grid points for seed
@@ -224,7 +236,7 @@ geom_stream_field <- function(
     args = list(),
     max_it = 1000L,
     tol = sqrt(.Machine$double.eps),
-    # T = NULL,
+    T = NULL,
     L = NULL,
     center = TRUE,
     type = "stream",
@@ -268,7 +280,7 @@ geom_stream_field <- function(
       na.rm = na.rm,
       max_it = max_it,
       tol = tol,
-      # T = T,
+      T = T,
       L = L,
       center = center,
       type = type,
@@ -301,7 +313,7 @@ stat_stream_field <- function(
     args = list(),
     max_it = 1000,
     tol = sqrt(.Machine$double.eps),
-    # T = NULL,
+    T = NULL,
     L = NULL,
     center = TRUE,
     type = "stream",
@@ -347,7 +359,7 @@ stat_stream_field <- function(
       na.rm = na.rm,
       max_it = max_it,
       tol = tol,
-      # T = T,
+      T = T,
       L = L,
       center = center,
       type = type,
@@ -584,28 +596,37 @@ StatStreamField <- ggproto(
     # allow for additional args to be passed
     orig_fun <- fun
     fun <- function(v) rlang::inject(orig_fun(v, !!!args))
-
+# browser()
     ## vector and normalize
-    if (type == "vector" && normalize) {
+    if ( type == "vector" && normalize ) {
       if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
     }
 
     ## vector and not normalize
-    if (type == "vector" && !normalize) {
+    if ( type == "vector" && !normalize ) {
       if (!is.null(L)) {
         cli::cli_warn("Specifying L with non normalized vectors is incompatible. Ignoring L.")
       }
       T <- 1
     }
 
-    ## stream - L gets calculated if not given either way
-    ## if normalize, all streams grow to length L
-    ## if !normalize,
-    ## - all streams grow to length L
-    ## - find the fastest stream to L
-    ## - take that time and trim back all streams to that time
-    if (type == "stream") {
-      if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
+    ## stream and normalize
+    if ( type == "stream" && normalize ) {
+        if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
+        if( !is.null(T) ) cli::cli_alert("Specifying T for normalized sterams is not compatible. Ignoreing T")
+    }
+
+    ## stream and not normalize
+    ## If only L is given, grow all streams to L, find stream that got there in the shortest time, trim all steams back to that time
+    ## If only T is given, grow all streams to T
+    ## If both are given, ignore L and growl all streams to T
+    if ( type == "stream" && !normalize ) {
+      if( is.null(T)) {## user didn't specify T so we need to calculate L first, if L isn't given
+        if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
+      }
+      if( !is.null(T) && !is.null(L) ) {
+        cli::cli_inform("Specifying L and T for non normalized streams is not compatible. Ignoring L.")
+      }
     }
 
     # initialize the data frame
@@ -649,14 +670,13 @@ StatStreamField <- ggproto(
 
       }
       if (type == "stream") {
-        stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
-        # if ( !normalize ) {
-        #   ## currently doing this but may not be right
-        #   # stream <- ode_stepper(grid[i, ], fun, T = T, L = 1e6, max_it, tol, method, center)
-        #   stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
-        # } else {
-        #   stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
-        # }
+        # stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
+        if ( !normalize && !is.null(T) ) {
+          stream <- ode_stepper(grid[i, ], fun, T = T, L = 1e6, max_it, tol, method, center)
+          # stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
+        } else {
+          stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
+        }
 
         stream <- if(nrow(stream) >= 1) transform(stream, "id" = i) else next
 
@@ -673,7 +693,7 @@ StatStreamField <- ggproto(
 
 
     # temporally crop back streams if not normalizing and T not specified
-    if ( !normalize && type == "stream" ) {
+    if ( !normalize && type == "stream" && is.null(T)) {
 
       # compute how long it takes for each stream to get to L
       times_to_L_by_stream <- vapply(
