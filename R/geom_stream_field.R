@@ -615,13 +615,18 @@ StatStreamField <- ggproto(
     if ( (normalize && is.null(L)) && type == "vector") {
       L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
     }
-
     if (type == "stream" && normalize ) {
       if(!is.null(T)) cli::cli_warn("Specifying T when normalizing streams is incompatable.  Ignoring T.")
       if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
-      grid_norms <- apply(grid, 1, function(u) norm(fun(u)))
-      fastest_vector_ndx <- which.max(grid_norms)
-      T <- L / grid_norms[fastest_vector_ndx]
+    }
+
+browser()
+    if (type == "stream" && !normalize && is.null(T) ) {
+      # if(!is.null(T)) cli::cli_warn("Specifying T when normalizing streams is incompatable.  Ignoring T.")
+      if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
+      # grid_norms <- apply(grid, 1, function(u) norm(fun(u)))
+      # fastest_vector_ndx <- which.max(grid_norms)
+      # T <- L / grid_norms[fastest_vector_ndx]
     }
 
 
@@ -705,7 +710,7 @@ StatStreamField <- ggproto(
 
 
     # temporally crop back streams if not normalizing and T not specified
-    if ( !normalize && is.null(T) ) {
+    if ( !normalize && is.null(T) && type == "stream" ) {
 
       # compute how long it takes for each stream to get to L
       times_to_L_by_stream <- vapply(
