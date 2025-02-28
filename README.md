@@ -173,8 +173,6 @@ f <- function(v) c(-v[2], v[1]) # Define a function for the vector field
 
 ggplot() +
   geom_vector_field(fun = f) 
-#> Warning: No xlim provided or inherited; defaulting to c(-1, 1).
-#> Warning: No ylim provided or inherited; defaulting to c(-1, 1).
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
@@ -185,8 +183,6 @@ ggplot() +
 ``` r
 ggplot() +
   geom_vector_field2(fun = f) 
-#> Warning: No xlim provided or inherited; defaulting to c(-1, 1).
-#> Warning: No ylim provided or inherited; defaulting to c(-1, 1).
 ```
 
 <img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
@@ -412,195 +408,85 @@ ggplot() +
 
 <img src="man/figures/README-unnamed-chunk-23-1.png" width="100%" />
 
-### `geom_streamplot`
-
-The `geom_streamplot` function generates a stream plot layer of a
-user-defined vector field function. The lines in the plot represent the
-flow of data points through the vector field.
-
-``` r
-f <- function(v) {
-  x <- v[1]
-  y <- v[2]
-  c(-1 - x^2 + y, 1 + x - y^2)
-}
-
-ggplot() +
-  geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3)) 
-```
-
-<img src="man/figures/README-unnamed-chunk-24-1.png" width="100%" />
-
-The `chop` parameter (defaulted to `TRUE`) allows you to chop the
-trajectories into segments. This can be useful for better visualization
-of the streamlines when they are long and complex.
-
-It may be useful to not break up the streamlines.
-
-``` r
-ggplot() +
-  geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3), chop = FALSE) 
-```
-
-<img src="man/figures/README-unnamed-chunk-25-1.png" width="100%" />
-
-It may also be useful to break up the streamlines into more segments.
-The scale_stream parameter (defaults to 1) adjusts the segmentation of
-streamlines by specifying the proportion of the streamline length used
-to divide it into smaller segments.
-
-``` r
-ggplot() +
-  geom_streamplot(
-    fun = f, xlim = c(-3, 3), ylim = c(-3, 3),
-    chop = TRUE, scale_stream = .9,
-  ) 
-```
-
-<img src="man/figures/README-unnamed-chunk-26-1.png" width="100%" />
-
-### `geom_flow`
-
-The `geom_flow` function generates a flow plot layer for a user-defined
-vector field function. The lines in the plot represent the flow of data
-points through the vector field, visualizing the trajectory of particles
-over time. Each flow line traces where a “marble” would move through the
-vector field if dropped at a specific starting point, making this an
-intuitive way to visualize dynamic systems.
-
-By default, the color of each flow line corresponds to time (`t`),
-meaning the color transitions along the path represent the progression
-of time. As the flow line evolves, it shows how a particle would move
-over time if following the vector field. You can change the coloring by
-mapping aesthetics to other computed measures if needed, but time
-remains the default.
-
-Flows are computed using the deSolve package’s ODE solver, with the rk4
-method (a fourth-order Runge-Kutta method) used for numerical
-integration. This solver ensures accurate and efficient computation of
-flow lines, abstracting away complex calculations for the user.
-
-``` r
-ggplot() +
-  geom_flow(fun = f, xlim = c(-10, 10), ylim = c(-10, 10))
-```
-
-<img src="man/figures/README-unnamed-chunk-27-1.png" width="100%" />
-
-In this example, flow lines evolve according to the vector field defined
-by `f`. The color along each line will show how the particle moves over
-time (`t`) within the vector field.
-
-#### Adaptive Parameters
-
-Several parameters in `geom_flow()` are adaptive, meaning they adjust
-automatically based on the characteristics of the vector field and the
-plot limits. These adaptive parameters help optimize the flow
-visualization without requiring manual tuning:
-
-- **`threshold_distance`**: This parameter controls the minimum distance
-  between adjacent flow lines to prevent them from overlapping. If not
-  specified, it is calculated automatically as half the Euclidean
-  distance between adjacent grid points. This ensures the plot remains
-  uncluttered, with flow lines spaced appropriately based on the grid
-  dimensions (`n`) and the axis limits (`xlim`, `ylim`).
-
-- **`iterations`**: This parameter defines the number of time steps for
-  the ODE solver to use when tracing the flow lines. A higher number of
-  iterations results in smoother and more detailed flows. If
-  `iterations` is left as `NULL`, it is computed adaptively based on the
-  value of `T`, ensuring that longer time spans result in more
-  iterations for smoother paths.
-
-These adaptive parameters allow `geom_flow()` to create a well-balanced
-plot by dynamically adjusting the precision and spacing of flow lines,
-based on the underlying vector field and plot limits.
-
-#### Example with Custom Parameters
-
-Below is an example where we customize the grid size, number of
-iterations, and the threshold distance between flow lines:
-
-``` r
-ggplot() +
-  geom_flow(
-    fun = f, n = c(21, 21), xlim = c(-10, 10), ylim = c(-10, 10),
-    iterations = 1000, threshold_distance = 0.5
-  ) 
-```
-
-<img src="man/figures/README-unnamed-chunk-28-1.png" width="100%" />
-
-## Other Features
-
-This package provides other tools to analyze and visualize mathematical
-properties of vector fields. These features allow users to map various
-mathematical characteristics to visual aesthetics like length and color.
-
-We already introduced mapping norm to color in `geom_vector`,
-`geom_vector_field`, and `geom_gradient_field` and mapping norm to
-length in each function’s ‘2’ alternates. We also provide similar
-ability with a functions curl and divergence.
-
-### Divergence
-
-Divergence is an operation on a vector field that describes how the
-field behaves at a point—whether vectors “spread out” from a point or
-“converge” toward it. Locally, the divergence of a vector field
-$\mathbf{F}$ in $\mathbb{R}^2$ at a particular point measures the
-“outflowing-ness” or rate of expansion of the vector field around that
-point. The divergence is a scalar value that can indicate sources
-(positive divergence) or sinks (negative divergence).
-
-If $\mathbf{F} = \langle F_x(x,y), F_y(x,y) \rangle$ is a vector field,
-its divergence is defined as:
-
-$$
-\text{div} \, \mathbf{F} = \frac{\partial F_x}{\partial x} + \frac{\partial F_y}{\partial y}
-$$
-
-To visualize the divergence of the vector field, you can map the
-divergence to the color aesthetic.
-
-``` r
-ggplot() +
-  geom_vector_field(
-    aes(color = after_stat(divergence)), 
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
-  ) 
-```
-
-<img src="man/figures/README-unnamed-chunk-29-1.png" width="100%" />
-
-### Curl
-
-Curl is a measure of the rotation or swirling behavior of a vector field
-at a given point. In two dimensions, the curl of a vector field
-$\mathbf{F}$ in $\mathbb{R}^2$ is a scalar value that quantifies how
-much the vectors tend to rotate or circulate around a point. Positive
-curl values indicate counterclockwise rotation, while negative values
-represent clockwise rotation.
-
-If $\mathbf{F} = \langle F_x(x,y), F_y(x,y) \rangle$ is a vector field,
-its curl is defined as:
-
-$$
-\text{curl} \, \mathbf{F} = \frac{\partial F_y}{\partial x} - \frac{\partial F_x}{\partial y}
-$$
-
-To visualize the curl of the vector field, you can map the curl to the
-color aesthetic.
-
-``` r
-ggplot() +
-  geom_streamplot(
-    aes(color = after_stat(curl)), 
-    fun = f, xlim = c(-10, 10), ylim = c(-10, 10)
-  ) 
-```
-
-<img src="man/figures/README-unnamed-chunk-30-1.png" width="100%" />
-
+<!-- ### `geom_streamplot` -->
+<!-- The `geom_streamplot` function generates a stream plot layer of a user-defined vector field function. The lines in the plot represent the flow of data points through the vector field. -->
+<!-- ```{r} -->
+<!-- f <- function(v) { -->
+<!--   x <- v[1] -->
+<!--   y <- v[2] -->
+<!--   c(-1 - x^2 + y, 1 + x - y^2) -->
+<!-- } -->
+<!-- ggplot() + -->
+<!--   geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3))  -->
+<!-- ``` -->
+<!-- The `chop` parameter (defaulted to `TRUE`) allows you to chop the trajectories into segments. This can be useful for better visualization of the streamlines when they are long and complex. -->
+<!-- It may be useful to not break up the streamlines. -->
+<!-- ```{r} -->
+<!-- ggplot() + -->
+<!--   geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3), chop = FALSE)  -->
+<!-- ``` -->
+<!-- It may also be useful to break up the streamlines into more segments. The scale_stream parameter (defaults to 1) adjusts the segmentation of streamlines by specifying the proportion of the streamline length used to divide it into smaller segments. -->
+<!-- ```{r} -->
+<!-- ggplot() + -->
+<!--   geom_streamplot( -->
+<!--     fun = f, xlim = c(-3, 3), ylim = c(-3, 3), -->
+<!--     chop = TRUE, scale_stream = .9, -->
+<!--   )  -->
+<!-- ``` -->
+<!-- ### `geom_flow` -->
+<!-- The `geom_flow` function generates a flow plot layer for a user-defined vector field function. The lines in the plot represent the flow of data points through the vector field, visualizing the trajectory of particles over time. Each flow line traces where a “marble” would move through the vector field if dropped at a specific starting point, making this an intuitive way to visualize dynamic systems. -->
+<!-- By default, the color of each flow line corresponds to time (`t`), meaning the color transitions along the path represent the progression of time. As the flow line evolves, it shows how a particle would move over time if following the vector field. You can change the coloring by mapping aesthetics to other computed measures if needed, but time remains the default. -->
+<!-- Flows are computed using the deSolve package’s ODE solver, with the rk4 method (a fourth-order Runge-Kutta method) used for numerical integration. This solver ensures accurate and efficient computation of flow lines, abstracting away complex calculations for the user. -->
+<!-- ```{r} -->
+<!-- ggplot() + -->
+<!--   geom_flow(fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) -->
+<!-- ``` -->
+<!-- In this example, flow lines evolve according to the vector field defined by `f`. The color along each line will show how the particle moves over time (`t`) within the vector field. -->
+<!-- #### Adaptive Parameters -->
+<!-- Several parameters in `geom_flow()` are adaptive, meaning they adjust automatically based on the characteristics of the vector field and the plot limits. These adaptive parameters help optimize the flow visualization without requiring manual tuning: -->
+<!-- - **`threshold_distance`**: This parameter controls the minimum distance between adjacent flow lines to prevent them from overlapping. If not specified, it is calculated automatically as half the Euclidean distance between adjacent grid points. This ensures the plot remains uncluttered, with flow lines spaced appropriately based on the grid dimensions (`n`) and the axis limits (`xlim`, `ylim`). -->
+<!-- - **`iterations`**: This parameter defines the number of time steps for the ODE solver to use when tracing the flow lines. A higher number of iterations results in smoother and more detailed flows. If `iterations` is left as `NULL`, it is computed adaptively based on the value of `T`, ensuring that longer time spans result in more iterations for smoother paths. -->
+<!-- These adaptive parameters allow `geom_flow()` to create a well-balanced plot by dynamically adjusting the precision and spacing of flow lines, based on the underlying vector field and plot limits. -->
+<!-- #### Example with Custom Parameters -->
+<!-- Below is an example where we customize the grid size, number of iterations, and the threshold distance between flow lines: -->
+<!-- ```{r} -->
+<!-- ggplot() + -->
+<!--   geom_flow( -->
+<!--     fun = f, n = c(21, 21), xlim = c(-10, 10), ylim = c(-10, 10), -->
+<!--     iterations = 1000, threshold_distance = 0.5 -->
+<!--   )  -->
+<!-- ``` -->
+<!-- ## Other Features -->
+<!-- This package provides other tools to analyze and visualize mathematical properties of vector fields.  These features allow users to map various mathematical characteristics to visual aesthetics like length and color. -->
+<!-- We already introduced mapping norm to color in `geom_vector`, `geom_vector_field`, and `geom_gradient_field` and mapping norm to length in each function's '2' alternates.  We also provide similar ability with a functions curl and divergence. -->
+<!-- ### Divergence -->
+<!-- Divergence is an operation on a vector field that describes how the field behaves at a point—whether vectors "spread out" from a point or "converge" toward it. Locally, the divergence of a vector field $\mathbf{F}$ in $\mathbb{R}^2$ at a particular point measures the "outflowing-ness" or rate of expansion of the vector field around that point. The divergence is a scalar value that can indicate sources (positive divergence) or sinks (negative divergence). -->
+<!-- If $\mathbf{F} = \langle F_x(x,y), F_y(x,y) \rangle$ is a vector field, its divergence is defined as: -->
+<!-- $$ -->
+<!-- \text{div} \, \mathbf{F} = \frac{\partial F_x}{\partial x} + \frac{\partial F_y}{\partial y} -->
+<!-- $$ -->
+<!-- To visualize the divergence of the vector field, you can map the divergence to the color aesthetic. -->
+<!-- ```{r} -->
+<!-- ggplot() + -->
+<!--   geom_vector_field( -->
+<!--     aes(color = after_stat(divergence)),  -->
+<!--     fun = f, xlim = c(-10, 10), ylim = c(-10, 10) -->
+<!--   )  -->
+<!-- ``` -->
+<!-- ### Curl -->
+<!-- Curl is a measure of the rotation or swirling behavior of a vector field at a given point. In two dimensions, the curl of a vector field $\mathbf{F}$ in $\mathbb{R}^2$ is a scalar value that quantifies how much the vectors tend to rotate or circulate around a point. Positive curl values indicate counterclockwise rotation, while negative values represent clockwise rotation. -->
+<!-- If $\mathbf{F} = \langle F_x(x,y), F_y(x,y) \rangle$ is a vector field, its curl is defined as: -->
+<!-- $$ -->
+<!-- \text{curl} \, \mathbf{F} = \frac{\partial F_y}{\partial x} - \frac{\partial F_x}{\partial y} -->
+<!-- $$ -->
+<!-- To visualize the curl of the vector field, you can map the curl to the color aesthetic. -->
+<!-- ```{r} -->
+<!-- ggplot() + -->
+<!--   geom_streamplot( -->
+<!--     aes(color = after_stat(curl)),  -->
+<!--     fun = f, xlim = c(-10, 10), ylim = c(-10, 10) -->
+<!--   )  -->
+<!-- ``` -->
 <!-- ## Features in Development -->
 <!-- ### Animation with `geom_streamplot` -->
 <!-- ```{r animation, cache = TRUE, eval = TRUE} -->

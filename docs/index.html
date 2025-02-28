@@ -184,9 +184,7 @@
 <code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="co"># Define a function for the vector field</span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span><span class="op">)</span> </span>
-<span><span class="co">#&gt; Warning: No xlim provided or inherited; defaulting to c(-1, 1).</span></span>
-<span><span class="co">#&gt; Warning: No ylim provided or inherited; defaulting to c(-1, 1).</span></span></code></pre></div>
+<span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-10-1.png" width="100%"></p>
 <ul>
 <li>
@@ -194,9 +192,7 @@
 </ul>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field2</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span><span class="op">)</span> </span>
-<span><span class="co">#&gt; Warning: No xlim provided or inherited; defaulting to c(-1, 1).</span></span>
-<span><span class="co">#&gt; Warning: No ylim provided or inherited; defaulting to c(-1, 1).</span></span></code></pre></div>
+<span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field2</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-11-1.png" width="100%"></p>
 <div class="section level4">
 <h4 id="automatic-limit-detection">Automatic Limit Detection<a class="anchor" aria-label="anchor" href="#automatic-limit-detection"></a>
@@ -362,111 +358,85 @@ $$</span></p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_potential.html">geom_potential</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">conservative_fun</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-23-1.png" width="100%"></p>
-</div>
-<div class="section level3">
-<h3 id="geom_streamplot">
-<code>geom_streamplot</code><a class="anchor" aria-label="anchor" href="#geom_streamplot"></a>
-</h3>
-<p>The <code>geom_streamplot</code> function generates a stream plot layer of a user-defined vector field function. The lines in the plot represent the flow of data points through the vector field.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
-<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">-</span> <span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">y</span>, <span class="fl">1</span> <span class="op">+</span> <span class="va">x</span> <span class="op">-</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-24-1.png" width="100%"></p>
-<p>The <code>chop</code> parameter (defaulted to <code>TRUE</code>) allows you to chop the trajectories into segments. This can be useful for better visualization of the streamlines when they are long and complex.</p>
-<p>It may be useful to not break up the streamlines.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, chop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> </span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-25-1.png" width="100%"></p>
-<p>It may also be useful to break up the streamlines into more segments. The scale_stream parameter (defaults to 1) adjusts the segmentation of streamlines by specifying the proportion of the streamline length used to divide it into smaller segments.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span></span>
-<span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>,</span>
-<span>    chop <span class="op">=</span> <span class="cn">TRUE</span>, scale_stream <span class="op">=</span> <span class="fl">.9</span>,</span>
-<span>  <span class="op">)</span> </span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-26-1.png" width="100%"></p>
-</div>
-<div class="section level3">
-<h3 id="geom_flow">
-<code>geom_flow</code><a class="anchor" aria-label="anchor" href="#geom_flow"></a>
-</h3>
-<p>The <code>geom_flow</code> function generates a flow plot layer for a user-defined vector field function. The lines in the plot represent the flow of data points through the vector field, visualizing the trajectory of particles over time. Each flow line traces where a “marble” would move through the vector field if dropped at a specific starting point, making this an intuitive way to visualize dynamic systems.</p>
-<p>By default, the color of each flow line corresponds to time (<code>t</code>), meaning the color transitions along the path represent the progression of time. As the flow line evolves, it shows how a particle would move over time if following the vector field. You can change the coloring by mapping aesthetics to other computed measures if needed, but time remains the default.</p>
-<p>Flows are computed using the deSolve package’s ODE solver, with the rk4 method (a fourth-order Runge-Kutta method) used for numerical integration. This solver ensures accurate and efficient computation of flow lines, abstracting away complex calculations for the user.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_flow.html">geom_flow</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-27-1.png" width="100%"></p>
-<p>In this example, flow lines evolve according to the vector field defined by <code>f</code>. The color along each line will show how the particle moves over time (<code>t</code>) within the vector field.</p>
-<div class="section level4">
-<h4 id="adaptive-parameters">Adaptive Parameters<a class="anchor" aria-label="anchor" href="#adaptive-parameters"></a>
-</h4>
-<p>Several parameters in <code><a href="reference/geom_flow.html">geom_flow()</a></code> are adaptive, meaning they adjust automatically based on the characteristics of the vector field and the plot limits. These adaptive parameters help optimize the flow visualization without requiring manual tuning:</p>
-<ul>
-<li><p><strong><code>threshold_distance</code></strong>: This parameter controls the minimum distance between adjacent flow lines to prevent them from overlapping. If not specified, it is calculated automatically as half the Euclidean distance between adjacent grid points. This ensures the plot remains uncluttered, with flow lines spaced appropriately based on the grid dimensions (<code>n</code>) and the axis limits (<code>xlim</code>, <code>ylim</code>).</p></li>
-<li><p><strong><code>iterations</code></strong>: This parameter defines the number of time steps for the ODE solver to use when tracing the flow lines. A higher number of iterations results in smoother and more detailed flows. If <code>iterations</code> is left as <code>NULL</code>, it is computed adaptively based on the value of <code>T</code>, ensuring that longer time spans result in more iterations for smoother paths.</p></li>
-</ul>
-<p>These adaptive parameters allow <code><a href="reference/geom_flow.html">geom_flow()</a></code> to create a well-balanced plot by dynamically adjusting the precision and spacing of flow lines, based on the underlying vector field and plot limits.</p>
-</div>
-<div class="section level4">
-<h4 id="example-with-custom-parameters">Example with Custom Parameters<a class="anchor" aria-label="anchor" href="#example-with-custom-parameters"></a>
-</h4>
-<p>Below is an example where we customize the grid size, number of iterations, and the threshold distance between flow lines:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_flow.html">geom_flow</a></span><span class="op">(</span></span>
-<span>    fun <span class="op">=</span> <span class="va">f</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">21</span>, <span class="fl">21</span><span class="op">)</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>,</span>
-<span>    iterations <span class="op">=</span> <span class="fl">1000</span>, threshold_distance <span class="op">=</span> <span class="fl">0.5</span></span>
-<span>  <span class="op">)</span> </span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-28-1.png" width="100%"></p>
-</div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="other-features">Other Features<a class="anchor" aria-label="anchor" href="#other-features"></a>
-</h2>
-<p>This package provides other tools to analyze and visualize mathematical properties of vector fields. These features allow users to map various mathematical characteristics to visual aesthetics like length and color.</p>
-<p>We already introduced mapping norm to color in <code>geom_vector</code>, <code>geom_vector_field</code>, and <code>geom_gradient_field</code> and mapping norm to length in each function’s ‘2’ alternates. We also provide similar ability with a functions curl and divergence.</p>
-<div class="section level3">
-<h3 id="divergence">Divergence<a class="anchor" aria-label="anchor" href="#divergence"></a>
-</h3>
-<p>Divergence is an operation on a vector field that describes how the field behaves at a point—whether vectors “spread out” from a point or “converge” toward it. Locally, the divergence of a vector field <span class="math inline"><strong>F</strong></span> in <span class="math inline">ℝ<sup>2</sup></span> at a particular point measures the “outflowing-ness” or rate of expansion of the vector field around that point. The divergence is a scalar value that can indicate sources (positive divergence) or sinks (negative divergence).</p>
-<p>If <span class="math inline"><strong>F</strong> = ⟨<em>F</em><sub><em>x</em></sub>(<em>x</em>, <em>y</em>), <em>F</em><sub><em>y</em></sub>(<em>x</em>, <em>y</em>)⟩</span> is a vector field, its divergence is defined as:</p>
-<p><span class="math display">$$
-\text{div} \, \mathbf{F} = \frac{\partial F_x}{\partial x} + \frac{\partial F_y}{\partial y}
-$$</span></p>
-<p>To visualize the divergence of the vector field, you can map the divergence to the color aesthetic.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">divergence</span><span class="op">)</span><span class="op">)</span>, </span>
-<span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> </span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-29-1.png" width="100%"></p>
-</div>
-<div class="section level3">
-<h3 id="curl">Curl<a class="anchor" aria-label="anchor" href="#curl"></a>
-</h3>
-<p>Curl is a measure of the rotation or swirling behavior of a vector field at a given point. In two dimensions, the curl of a vector field <span class="math inline"><strong>F</strong></span> in <span class="math inline">ℝ<sup>2</sup></span> is a scalar value that quantifies how much the vectors tend to rotate or circulate around a point. Positive curl values indicate counterclockwise rotation, while negative values represent clockwise rotation.</p>
-<p>If <span class="math inline"><strong>F</strong> = ⟨<em>F</em><sub><em>x</em></sub>(<em>x</em>, <em>y</em>), <em>F</em><sub><em>y</em></sub>(<em>x</em>, <em>y</em>)⟩</span> is a vector field, its curl is defined as:</p>
-<p><span class="math display">$$
-\text{curl} \, \mathbf{F} = \frac{\partial F_y}{\partial x} - \frac{\partial F_x}{\partial y}
-$$</span></p>
-<p>To visualize the curl of the vector field, you can map the curl to the color aesthetic.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_streamplot.html">geom_streamplot</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html">after_stat</a></span><span class="op">(</span><span class="va">curl</span><span class="op">)</span><span class="op">)</span>, </span>
-<span>    fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> </span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-30-1.png" width="100%"></p>
+<!-- ### `geom_streamplot` -->
+<!-- The `geom_streamplot` function generates a stream plot layer of a user-defined vector field function. The lines in the plot represent the flow of data points through the vector field. -->
+<!-- ```{r} -->
+<!-- f <- function(v) { -->
+<!--   x <- v[1] -->
+<!--   y <- v[2] -->
+<!--   c(-1 - x^2 + y, 1 + x - y^2) -->
+<!-- } -->
+<!-- ggplot() + -->
+<!--   geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3))  -->
+<!-- ``` -->
+<!-- The `chop` parameter (defaulted to `TRUE`) allows you to chop the trajectories into segments. This can be useful for better visualization of the streamlines when they are long and complex. -->
+<!-- It may be useful to not break up the streamlines. -->
+<!-- ```{r} -->
+<!-- ggplot() + -->
+<!--   geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3), chop = FALSE)  -->
+<!-- ``` -->
+<!-- It may also be useful to break up the streamlines into more segments. The scale_stream parameter (defaults to 1) adjusts the segmentation of streamlines by specifying the proportion of the streamline length used to divide it into smaller segments. -->
+<!-- ```{r} -->
+<!-- ggplot() + -->
+<!--   geom_streamplot( -->
+<!--     fun = f, xlim = c(-3, 3), ylim = c(-3, 3), -->
+<!--     chop = TRUE, scale_stream = .9, -->
+<!--   )  -->
+<!-- ``` -->
+<!-- ### `geom_flow` -->
+<!-- The `geom_flow` function generates a flow plot layer for a user-defined vector field function. The lines in the plot represent the flow of data points through the vector field, visualizing the trajectory of particles over time. Each flow line traces where a “marble” would move through the vector field if dropped at a specific starting point, making this an intuitive way to visualize dynamic systems. -->
+<!-- By default, the color of each flow line corresponds to time (`t`), meaning the color transitions along the path represent the progression of time. As the flow line evolves, it shows how a particle would move over time if following the vector field. You can change the coloring by mapping aesthetics to other computed measures if needed, but time remains the default. -->
+<!-- Flows are computed using the deSolve package’s ODE solver, with the rk4 method (a fourth-order Runge-Kutta method) used for numerical integration. This solver ensures accurate and efficient computation of flow lines, abstracting away complex calculations for the user. -->
+<!-- ```{r} -->
+<!-- ggplot() + -->
+<!--   geom_flow(fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) -->
+<!-- ``` -->
+<!-- In this example, flow lines evolve according to the vector field defined by `f`. The color along each line will show how the particle moves over time (`t`) within the vector field. -->
+<!-- #### Adaptive Parameters -->
+<!-- Several parameters in `geom_flow()` are adaptive, meaning they adjust automatically based on the characteristics of the vector field and the plot limits. These adaptive parameters help optimize the flow visualization without requiring manual tuning: -->
+<!-- - **`threshold_distance`**: This parameter controls the minimum distance between adjacent flow lines to prevent them from overlapping. If not specified, it is calculated automatically as half the Euclidean distance between adjacent grid points. This ensures the plot remains uncluttered, with flow lines spaced appropriately based on the grid dimensions (`n`) and the axis limits (`xlim`, `ylim`). -->
+<!-- - **`iterations`**: This parameter defines the number of time steps for the ODE solver to use when tracing the flow lines. A higher number of iterations results in smoother and more detailed flows. If `iterations` is left as `NULL`, it is computed adaptively based on the value of `T`, ensuring that longer time spans result in more iterations for smoother paths. -->
+<!-- These adaptive parameters allow `geom_flow()` to create a well-balanced plot by dynamically adjusting the precision and spacing of flow lines, based on the underlying vector field and plot limits. -->
+<!-- #### Example with Custom Parameters -->
+<!-- Below is an example where we customize the grid size, number of iterations, and the threshold distance between flow lines: -->
+<!-- ```{r} -->
+<!-- ggplot() + -->
+<!--   geom_flow( -->
+<!--     fun = f, n = c(21, 21), xlim = c(-10, 10), ylim = c(-10, 10), -->
+<!--     iterations = 1000, threshold_distance = 0.5 -->
+<!--   )  -->
+<!-- ``` -->
+<!-- ## Other Features -->
+<!-- This package provides other tools to analyze and visualize mathematical properties of vector fields.  These features allow users to map various mathematical characteristics to visual aesthetics like length and color. -->
+<!-- We already introduced mapping norm to color in `geom_vector`, `geom_vector_field`, and `geom_gradient_field` and mapping norm to length in each function's '2' alternates.  We also provide similar ability with a functions curl and divergence. -->
+<!-- ### Divergence -->
+<!-- Divergence is an operation on a vector field that describes how the field behaves at a point—whether vectors "spread out" from a point or "converge" toward it. Locally, the divergence of a vector field $\mathbf{F}$ in $\mathbb{R}^2$ at a particular point measures the "outflowing-ness" or rate of expansion of the vector field around that point. The divergence is a scalar value that can indicate sources (positive divergence) or sinks (negative divergence). -->
+<!-- If $\mathbf{F} = \langle F_x(x,y), F_y(x,y) \rangle$ is a vector field, its divergence is defined as: -->
+<!-- $$ -->
+<!-- \text{div} \, \mathbf{F} = \frac{\partial F_x}{\partial x} + \frac{\partial F_y}{\partial y} -->
+<!-- $$ -->
+<!-- To visualize the divergence of the vector field, you can map the divergence to the color aesthetic. -->
+<!-- ```{r} -->
+<!-- ggplot() + -->
+<!--   geom_vector_field( -->
+<!--     aes(color = after_stat(divergence)),  -->
+<!--     fun = f, xlim = c(-10, 10), ylim = c(-10, 10) -->
+<!--   )  -->
+<!-- ``` -->
+<!-- ### Curl -->
+<!-- Curl is a measure of the rotation or swirling behavior of a vector field at a given point. In two dimensions, the curl of a vector field $\mathbf{F}$ in $\mathbb{R}^2$ is a scalar value that quantifies how much the vectors tend to rotate or circulate around a point. Positive curl values indicate counterclockwise rotation, while negative values represent clockwise rotation. -->
+<!-- If $\mathbf{F} = \langle F_x(x,y), F_y(x,y) \rangle$ is a vector field, its curl is defined as: -->
+<!-- $$ -->
+<!-- \text{curl} \, \mathbf{F} = \frac{\partial F_y}{\partial x} - \frac{\partial F_x}{\partial y} -->
+<!-- $$ -->
+<!-- To visualize the curl of the vector field, you can map the curl to the color aesthetic. -->
+<!-- ```{r} -->
+<!-- ggplot() + -->
+<!--   geom_streamplot( -->
+<!--     aes(color = after_stat(curl)),  -->
+<!--     fun = f, xlim = c(-10, 10), ylim = c(-10, 10) -->
+<!--   )  -->
+<!-- ``` -->
 <!-- ## Features in Development -->
 <!-- ### Animation with `geom_streamplot` -->
 <!-- ```{r animation, cache = TRUE, eval = TRUE} -->

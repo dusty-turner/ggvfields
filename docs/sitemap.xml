@@ -19,24 +19,6 @@
     <loc>/reference/efield.html</loc>
   </url>
   <url>
-    <loc>/reference/generate_hexagonal_lattice.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_complex_function.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_flow.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_function_1d2d.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_function_1d_2d.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_function_2d.html</loc>
-  </url>
-  <url>
     <loc>/reference/geom_gradient_field.html</loc>
   </url>
   <url>
@@ -44,9 +26,6 @@
   </url>
   <url>
     <loc>/reference/geom_stream.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_streamplot.html</loc>
   </url>
   <url>
     <loc>/reference/geom_stream_field.html</loc>
@@ -65,6 +44,9 @@
   </url>
   <url>
     <loc>/reference/ggvfields.html</loc>
+  </url>
+  <url>
+    <loc>/reference/grid_hex.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>

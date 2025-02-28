@@ -7,11 +7,6 @@
 \alias{StatPotential}
 \alias{GeomPotential}
 \title{Compute and Plot Potential Function from a Conservative Vector Field}
-\format{
-An object of class \code{StatPotential} (inherits from \code{Stat}, \code{ggproto}, \code{gg}) of length 3.
-
-An object of class \code{GeomPotential} (inherits from \code{GeomRaster}, \code{Geom}, \code{ggproto}, \code{gg}) of length 5.
-}
 \usage{
 geom_potential(
   mapping = NULL,
@@ -44,10 +39,6 @@ stat_potential(
   n = 11,
   tolerance = 1e-06
 )
-
-StatPotential
-
-GeomPotential
 }
 \arguments{
 \item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}. (Optional)}

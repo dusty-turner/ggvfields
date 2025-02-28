@@ -84,7 +84,7 @@ geom_potential <- function(mapping = NULL, data = NULL,
   }
 
   # Default aesthetic mapping for fill
-  default_mapping <- aes(fill = after_stat(Potential))
+  default_mapping <- aes(fill = after_stat(potential))
 
   # Merge user-provided mappings with defaults
   if (is.null(mapping)) {
@@ -138,7 +138,7 @@ stat_potential <- function(mapping = NULL, data = NULL,
   }
 
   # Default aesthetic mapping for fill
-  default_mapping <- aes(fill = after_stat(Potential))
+  default_mapping <- aes(fill = after_stat(potential))
 
   # Merge user-provided mappings with defaults
   if (is.null(mapping)) {
@@ -170,6 +170,8 @@ stat_potential <- function(mapping = NULL, data = NULL,
 
 
 #' @rdname geom_potential
+#' @format NULL
+#' @usage NULL
 #' @export
 StatPotential <- ggproto(
   "StatPotential",
@@ -177,7 +179,7 @@ StatPotential <- ggproto(
 
   # required_aes = c("x", "y"),
 
-  default_aes = aes(fill = after_stat(Potential)),
+  default_aes = aes(fill = after_stat(potential)),
 
   compute_group = function(data, scales, fun = NULL, xlim = NULL, ylim = NULL, n, tolerance = 1e-6, ...) {
 
@@ -215,16 +217,18 @@ StatPotential <- ggproto(
     }
 
     # Apply the numerical potential computation to all points
-    grid_data$Potential <- apply(grid_data[, c("x", "y")], 1, function(v) compute_potential(point = v, fun =  fun, x0 = xlim[1], y0 =  ylim[1]))
+    grid_data$potential <- apply(grid_data[, c("x", "y")], 1, function(v) compute_potential(point = v, fun =  fun, x0 = xlim[1], y0 =  ylim[1]))
 
     # Remove points where potential couldn't be computed
-    grid_data <- grid_data[!is.na(grid_data$Potential), ]
+    grid_data <- grid_data[!is.na(grid_data$potential), ]
 
     return(grid_data)
   }
 )
 
 #' @rdname geom_potential
+#' @format NULL
+#' @usage NULL
 #' @export
 GeomPotential <- ggproto(
   "GeomPotential",

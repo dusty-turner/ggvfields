@@ -596,7 +596,7 @@ StatStreamField <- ggproto(
     # allow for additional args to be passed
     orig_fun <- fun
     fun <- function(v) rlang::inject(orig_fun(v, !!!args))
-# browser()
+
     ## vector and normalize
     if ( type == "vector" && normalize ) {
       if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85

@@ -5,7 +5,7 @@ specifies the behavior of the scalar field by taking a numeric vector of
 length 2 (representing \((x, y)\)) and returning a single numeric value.
 The underlying StatStreamField computes the gradient via numerical
 differentiation (using numDeriv::grad()) and GeomStream renders the
-resulting vectors."><title>Gradient Field Layers for ggplot2 — geom_gradient_field • ggvfields</title><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Gradient Field Layers for ggplot2 — geom_gradient_field"><meta property="og:description" content="These functions provide convenient ggplot2 layers for drawing gradient fields
+resulting vectors."><title>Create a Gradient Field Layer in ggplot2 — geom_gradient_field • ggvfields</title><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Create a Gradient Field Layer in ggplot2 — geom_gradient_field"><meta property="og:description" content="These functions provide convenient ggplot2 layers for drawing gradient fields
 by computing the gradient of a scalar field. A user-defined function (fun)
 specifies the behavior of the scalar field by taking a numeric vector of
 length 2 (representing \((x, y)\)) and returning a single numeric value.
@@ -49,7 +49,7 @@ resulting vectors."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
 </nav><div class="container template-reference-topic">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Gradient Field Layers for ggplot2</h1>
+      <img src="" class="logo" alt=""><h1>Create a Gradient Field Layer in ggplot2</h1>
       <small class="dont-index">Source: <a href="https://github.com/dusty-turner/ggvfields/blob/HEAD/R/geom_gradient_field.R"><code>R/geom_gradient_field.R</code></a></small>
       <div class="d-none name"><code>geom_gradient_field.Rd</code></div>
     </div>
@@ -66,7 +66,32 @@ resulting vectors.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">stat_gradient_field</span><span class="op">(</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">geom_gradient_field</span><span class="op">(</span></span>
+<span>  mapping <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  stat <span class="op">=</span> <span class="va">StatStreamField</span>,</span>
+<span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  show.legend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">fun</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">11</span>,</span>
+<span>  max_it <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  T <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  L <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"stream"</span>,</span>
+<span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, length <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.02</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">stat_gradient_field</span><span class="op">(</span></span>
 <span>  mapping <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  geom <span class="op">=</span> <span class="va">GeomStream</span>,</span>
@@ -147,22 +172,23 @@ resulting vectors.</p>
     <dl><dt>mapping</dt>
 <dd><p>A set of aesthetic mappings created by <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">ggplot2::aes()</a></code>.
 Additional aesthetics such as <code>color</code>, <code>size</code>, <code>linetype</code>, and <code>alpha</code> can
-be defined. In <strong>geom_gradient_field</strong> the default mapping includes <code>color = after_stat(norm)</code>, whereas in <strong>geom_gradient_field2</strong> the default
-mapping includes <code>length = after_stat(norm)</code>.</p></dd>
+be defined. In
+<strong>geom_gradient_field</strong> the default mapping includes <code>color = after_stat(norm)</code>,
+whereas in <strong>geom_gradient_field2</strong> the default mapping includes <code>length = after_stat(norm)</code>.</p></dd>
 
 
 <dt>data</dt>
 <dd><p>A data frame containing the input data.</p></dd>
 
 
-<dt>geom</dt>
-<dd><p>The geometric object used to draw the streamline. Defaults to
-<a href="https://ggplot2.tidyverse.org/reference/ggplot2-ggproto.html">ggplot2::GeomPath</a> in <code><a href="geom_stream.html">geom_stream()</a></code>, or <a href="geom_stream.html">GeomStream</a> in <code><a href="geom_stream.html">stat_stream()</a></code>.</p></dd>
+<dt>stat</dt>
+<dd><p>The statistical transformation to use on the data for this layer.
+Defaults to <a href="geom_stream_field.html">StatStreamField</a>.</p></dd>
 
 
 <dt>position</dt>
 <dd><p>Position adjustment, either as a string or the result of a
-call to a position adjustment function.</p></dd>
+position adjustment function.</p></dd>
 
 
 <dt>...</dt>
@@ -206,7 +232,7 @@ each axis. Higher values produce a denser gradient field. Defaults to <code>11</
 
 <dt>max_it</dt>
 <dd><p>Integer. Maximum number of integration steps allowed when
-computing the gradient stream or vector. Defaults to 1000.</p></dd>
+computing the gradient stream. Defaults to <code>1000</code>.</p></dd>
 
 
 <dt>T</dt>
@@ -223,47 +249,46 @@ provided, L is computed automatically from the grid spacing.</p></dd>
 
 <dt>center</dt>
 <dd><p>Logical. If <code>TRUE</code>, centers the seed points so that the
-original (x, y) becomes the midpoint. Defaults differ between the variants.</p></dd>
+original (x, y) becomes the midpoint.</p></dd>
 
 
 <dt>type</dt>
 <dd><p>Character. Specifies the type of field to compute: use <code>"stream"</code>
 to generate integrated streamlines or <code>"vector"</code> for individual vector
-segments. Defaults to <code>"stream"</code>.
-gradient vectors. In <strong>geom_gradient_field</strong> the default is a closed arrow
-with a 30° angle and length <code>0.02</code> npc; in <strong>geom_gradient_field2</strong> the
-default is <code>NULL</code>.</p></dd>
+segments. Defaults to <code>"stream"</code>.</p></dd>
 
 
 <dt>normalize</dt>
 <dd><p>Logical. If <code>TRUE</code>, gradient vectors are normalized based on
-grid spacing. If <code>TRUE</code>, it is converted internally to <code>"vector"</code>. Default
-is <code>TRUE</code>.</p></dd>
+grid spacing. Defaults to <code>TRUE</code>.</p></dd>
 
 
 <dt>tail_point</dt>
 <dd><p>Logical. If <code>TRUE</code>, a point is drawn at the tail of each
-gradient vector. Defaults differ between the variants.</p></dd>
+gradient vector.</p></dd>
 
 
 <dt>eval_point</dt>
 <dd><p>Logical. If <code>TRUE</code>, a point is drawn at the evaluation
-point where the gradient was computed. Default is <code>FALSE</code>.</p></dd>
+point where the gradient was computed. Defaults to <code>FALSE</code>.</p></dd>
 
 
 <dt>grid</dt>
 <dd><p>A data frame containing precomputed grid points for seed
-placement. If <code>NULL</code> (default), a regular Cartesian
-grid is generated based on <code>xlim</code>, <code>ylim</code>, and <code>n</code>.</p></dd>
+placement. If <code>NULL</code> (default), a regular Cartesian grid is generated based
+on <code>xlim</code>, <code>ylim</code>, and <code>n</code>.</p></dd>
 
 
 <dt>arrow</dt>
-<dd><p>A <code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code> specification to add arrowheads to the</p></dd>
+<dd><p>A <code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code> specification to add arrowheads to the
+gradient vectors. In <strong>geom_gradient_field</strong>, the default is a closed arrow
+with a 30° angle and length <code>0.02</code> npc; in <strong>geom_gradient_field2</strong>, the
+default is <code>NULL</code>.</p></dd>
 
 
-<dt>stat</dt>
-<dd><p>The statistical transformation to use on the data for this layer.
-Defaults to <a href="geom_stream_field.html">StatStreamField</a>.</p></dd>
+<dt>geom</dt>
+<dd><p>The geometric object used to render the streamline (only used in
+<code><a href="geom_stream.html">stat_stream()</a></code>; defaults to <a href="geom_stream.html">GeomStream</a>).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -276,9 +301,39 @@ numerically differentiating a scalar field.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Two variants are provided:</p><ul><li><p><strong>geom_gradient_field()</strong> uses a default mapping that sets <code>color = after_stat(norm)</code>.</p></li>
-<li><p><strong>geom_gradient_field2()</strong> uses a default mapping that sets <code>length = after_stat(norm)</code> (with <code>color</code>
-unmapped by default).</p></li>
+<li><p><strong>geom_gradient_field2()</strong> uses a default mapping that sets <code>length = after_stat(norm)</code>
+(with <code>color</code> unmapped by default).</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="aesthetics">Aesthetics<a class="anchor" aria-label="anchor" href="#aesthetics"></a></h2>
+    <p><code>geom_gradient_field()</code> and <code>geom_gradient_field2()</code>
+understand the following aesthetics (required aesthetics are in <strong>bold</strong>):</p><ul><li><p><strong><code>x</code></strong>: The x-coordinate of the seed point.</p></li>
+<li><p><strong><code>y</code></strong>: The y-coordinate of the seed point.</p></li>
+<li><p><strong><code>color</code></strong>: In <strong>geom_gradient_field</strong>, the color of the gradient vector.
+In <strong>geom_gradient_field2</strong>, color is not mapped by default.</p></li>
+<li><p><strong><code>length</code></strong>: In <strong>geom_gradient_field2</strong>, the computed vector norm.</p></li>
+<li><p><code>size</code>, <code>linetype</code>, <code>alpha</code>: Additional aesthetics to control appearance.</p></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="computed-variables">Computed Variables<a class="anchor" aria-label="anchor" href="#computed-variables"></a></h2>
+    
+
+
+<p>The following variables are computed internally by <a href="geom_stream_field.html">StatStreamField</a> when
+generating the gradient field from a scalar function:</p>
+<dl><dt>norm</dt>
+<dd><p>The Euclidean norm of the gradient vector, calculated as
+\(\sqrt{fx^2 + fy^2}\). This value is used, by default, for mapping color or scaling
+arrow lengths in the visualization.</p></dd>
+
+
+<dt>avg_spd</dt>
+<dd><p>This variable may represent an average speed computed
+from the gradient magnitude. In the default mapping for <strong>geom_gradient_field</strong>, the
+color aesthetic is mapped to <code>after_stat(avg_spd)</code>.</p></dd>
+
+
+</dl></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -287,9 +342,9 @@ unmapped by default).</p></li>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu">geom_gradient_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>longer object length is not a multiple of shorter object length</span>
 <span class="r-plt img"><img src="geom_gradient_field-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html">expand.grid</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">0.1</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/transform.html">transform</a></span><span class="op">(</span>fxy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, <span class="fl">1</span>, <span class="va">f</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -297,8 +352,6 @@ unmapped by default).</p></li>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html">geom_raster</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fill <span class="op">=</span> <span class="va">fxy</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu">geom_gradient_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>longer object length is not a multiple of shorter object length</span>
-<span class="r-plt img"><img src="geom_gradient_field-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">fxy</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span>, <span class="fl">1</span>, <span class="va">f</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -306,10 +359,7 @@ unmapped by default).</p></li>
 <span class="r-in"><span>  <span class="fu">ggdensity</span><span class="fu">::</span><span class="fu"><a href="https://jamesotto852.github.io/ggdensity/reference/geom_hdr_fun.html">geom_hdr_fun</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">fxy</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu">geom_gradient_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>longer object length is not a multiple of shorter object length</span>
-<span class="r-plt img"><img src="geom_gradient_field-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="st"><a href="https://jamesotto852.github.io/ggdensity/">"ggdensity"</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">fxy</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, <span class="fl">1</span>, <span class="va">f</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu">fxy</span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span></span>

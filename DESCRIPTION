@@ -35,7 +35,6 @@ Imports:
     grid,
     utils,
     scales,
-    boot,
     cli
 URL: https://github.com/dusty-turner/ggvfields
 BugReports: https://github.com/dusty-turner/ggvfields/issues

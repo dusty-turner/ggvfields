@@ -30,14 +30,10 @@ reference:
       - stat_gradient_field
       - geom_gradient_field2
       - stat_gradient_field2
-      - geom_function_1d_2d
-      - stat_function_1d_2d
       - geom_stream_smooth
       - geom_vector_smooth
       - geom_potential
       - scale_length_continuous
       - ggvfields
       - efield
-      - generate_hexagonal_lattice
-      - geom_flow
-      - geom_streamplot
+      - grid_hex

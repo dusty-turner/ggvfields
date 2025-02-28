@@ -51,7 +51,29 @@ using streamlines.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">stat_vector_field</span><span class="op">(</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">geom_vector_field</span><span class="op">(</span></span>
+<span>  mapping <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  stat <span class="op">=</span> <span class="va">StatStreamField</span>,</span>
+<span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  inherit.aes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">fun</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">11</span>,</span>
+<span>  args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.02</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">stat_vector_field</span><span class="op">(</span></span>
 <span>  mapping <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  stat <span class="op">=</span> <span class="va">StatStreamField</span>,</span>
@@ -89,7 +111,6 @@ using streamlines.</p>
 <span>  n <span class="op">=</span> <span class="fl">11</span>,</span>
 <span>  args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  tail_point <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -111,7 +132,6 @@ using streamlines.</p>
 <span>  n <span class="op">=</span> <span class="fl">11</span>,</span>
 <span>  args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  tail_point <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -136,11 +156,6 @@ whereas in <strong>geom_vector_field2</strong> the default mapping includes <cod
 <dt>stat</dt>
 <dd><p>The statistical transformation to use on the data for this layer.
 Defaults to <a href="geom_stream_field.html">StatStreamField</a>.</p></dd>
-
-
-<dt>geom</dt>
-<dd><p>The geometric object used to draw the streamline. Defaults to
-<a href="https://ggplot2.tidyverse.org/reference/ggplot2-ggproto.html">ggplot2::GeomPath</a> in <code><a href="geom_stream.html">geom_stream()</a></code>, or <a href="geom_stream.html">GeomStream</a> in <code><a href="geom_stream.html">stat_stream()</a></code>.</p></dd>
 
 
 <dt>position</dt>
@@ -169,8 +184,7 @@ rather than combining with them.</p></dd>
 <dt>fun</dt>
 <dd><p>A function that defines the vector field. It should take a numeric
 vector of length 2 (representing \((x, y)\)) and return a numeric vector
-of length 2 (representing \((dx, dy)\)).
-<strong>(Required)</strong></p></dd>
+of length 2 (representing \((dx, dy)\)). <strong>(Required)</strong></p></dd>
 
 
 <dt>xlim</dt>
@@ -213,21 +227,25 @@ streamline.</p></dd>
 <dt>eval_point</dt>
 <dd><p>Logical. If <code>TRUE</code>, a point is drawn at the evaluation
 point, corresponding to the original (untransformed) seed point before any
-centering or normalization is applied. This allows for comparison between
-the original and transformed positions. Defaults to <code>FALSE</code>.</p></dd>
+centering or normalization is applied.</p></dd>
 
 
 <dt>grid</dt>
 <dd><p>A data frame containing precomputed grid points for seed
-placement. If <code>NULL</code> (default), a regular Cartesian
-grid is generated based on <code>xlim</code>, <code>ylim</code>, and <code>n</code>.</p></dd>
+placement. If <code>NULL</code> (default), a regular Cartesian grid is generated based
+on <code>xlim</code>, <code>ylim</code>, and <code>n</code>.</p></dd>
 
 
 <dt>arrow</dt>
 <dd><p>A <code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code> specification to add arrowheads to the
-streamlines. In
-<strong>geom_vector_field</strong>, the default is a closed arrow with a 30° angle and length <code>0.02</code> npc;
-in <strong>geom_vector_field2</strong> the default is <code>NULL</code>.</p></dd>
+streamlines. In <strong>geom_vector_field</strong>, the default is a closed arrow with a
+30° angle and length <code>0.02</code> npc; in <strong>geom_vector_field2</strong> the default is
+<code>NULL</code>.</p></dd>
+
+
+<dt>geom</dt>
+<dd><p>The geometric object used to render the streamline (only used in
+<code><a href="geom_stream.html">stat_stream()</a></code>; defaults to <a href="geom_stream.html">GeomStream</a>).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -236,7 +254,15 @@ in <strong>geom_vector_field2</strong> the default is <code>NULL</code>.</p></dd
 
 <p>A ggplot2 layer that computes and plots a vector field using
 streamlines.</p>
-    </div>
+
+
+<dl><dt>norm</dt>
+<dd><p>Calculated as the Euclidean distance between the starting point
+(<code>x</code>, <code>y</code>) and the computed endpoint. Used to normalize the
+vector.</p></dd>
+
+
+</dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>A user-defined function (<code>fun</code>) specifies the behavior of the vector field by
@@ -245,28 +271,46 @@ a numeric vector of length 2 (representing \((dx, dy)\)). The underlying
 <a href="geom_stream_field.html">StatStreamField</a> computes the streamlines based on the vector field
 function, and <a href="geom_stream.html">GeomStream</a> renders them.</p>
 <p>Two variants are provided:</p><ul><li><p><strong>geom_vector_field()</strong> uses a default mapping that sets <code>color = after_stat(norm)</code>.</p></li>
-<li><p><strong>geom_vector_field2()</strong> uses a default mapping that sets <code>length = after_stat(norm)</code> (with <code>color</code>
-unmapped by default).</p></li>
+<li><p><strong>geom_vector_field2()</strong> uses a default mapping that sets <code>length = after_stat(norm)</code>
+(with <code>color</code> unmapped by default).</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="aesthetics">Aesthetics<a class="anchor" aria-label="anchor" href="#aesthetics"></a></h2>
+    <p><code>geom_vector_field()</code> and <code>geom_vector_field2()</code>
+understand the following aesthetics (required aesthetics are in <strong>bold</strong>):</p><ul><li><p><strong><code>x</code></strong>: The x-coordinate of the vector's starting point.</p></li>
+<li><p><strong><code>y</code></strong>: The y-coordinate of the vector's starting point.</p></li>
+<li><p><strong><code>fx</code></strong>: The horizontal component of the vector displacement.</p></li>
+<li><p><strong><code>fy</code></strong>: The vertical component of the vector displacement.</p></li>
+<li><p><code>color</code>: The color of the vector lines (default mapping in <strong>geom_vector_field</strong>).</p></li>
+<li><p><code>length</code>: The computed vector norm (default mapping in <strong>geom_vector_field2</strong>).</p></li>
+<li><p><code>linetype</code>: The type of the vector line (e.g., solid, dashed).</p></li>
+<li><p><code>linewidth</code>: The thickness of the vector line.</p></li>
+<li><p><code>alpha</code>: The transparency of the vector.</p></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="geom_stream_field.html">geom_stream_field()</a></code></p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">u</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">u</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_vector_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 2 rows containing missing values or values outside the scale range</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> (`geom_stream()`).</span>
 <span class="r-plt img"><img src="geom_vector_field-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_vector_field2</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 1 row containing missing values or values outside the scale range</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> (`geom_stream()`).</span>
-<span class="r-plt img"><img src="geom_vector_field-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># xlim and ylim default to (-1,1), so for ease of illustration we remove them</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_vector_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_vector_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, grid <span class="op">=</span> <span class="st">"hex"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_vector_field2</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_vector_field2</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, grid <span class="op">=</span> <span class="st">"hex"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="efield.html">efield_maker</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_vector_field</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="geom_vector_field-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_vector_field2</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="geom_vector_field-4.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
