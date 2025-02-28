@@ -253,11 +253,9 @@ GeomStream <- ggproto("GeomStream", GeomPath,
         logical(1)
       ) )
 
-      # remove zero-length groups
       if (length(group_of_zero_fun) > 0) {
-        data <- subset(data, group != group_of_zero_fun)
+        data <- subset(data, !(group %in% group_of_zero_fun))
       }
-
     }
 
     data
