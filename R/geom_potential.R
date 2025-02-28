@@ -183,13 +183,13 @@ StatPotential <- ggproto(
 
     xlim <- xlim %||% scales$x$range$range
     if (is.null(xlim)) {
-      cli::cli_warn("No xlim provided or inherited; defaulting to c(-1, 1).")
+      # cli::cli_warn("No xlim provided or inherited; defaulting to c(-1, 1).")
       xlim <- c(-1, 1)
     }
 
     ylim <- ylim %||% scales$y$range$range
     if (is.null(ylim)) {
-      cli::cli_warn("No ylim provided or inherited; defaulting to c(-1, 1).")
+      # cli::cli_warn("No ylim provided or inherited; defaulting to c(-1, 1).")
       ylim <- c(-1, 1)
     }
 
