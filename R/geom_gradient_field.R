@@ -168,7 +168,14 @@ geom_gradient_field <- function(
 
   n <- ensure_length_two(n)
 
-  default_mapping <- aes(color = after_stat(avg_spd))
+  if (type == "stream") {
+    default_mapping <- aes(color = after_stat(avg_spd))
+  } else if (type == "vector") {
+    default_mapping <- aes(color = after_stat(norm))
+  } else {
+    cli::cli_abort("`type` must be either 'stream' or 'vector', not {.val {type}}")
+  }
+
 
   if (!is.null(mapping)) {
     if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
@@ -244,9 +251,17 @@ stat_gradient_field <- function(
 ) {
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
+
   n <- ensure_length_two(n)
 
-  default_mapping <- aes(color = after_stat(norm))
+  if (type == "stream") {
+    default_mapping <- aes(color = after_stat(avg_spd))
+  } else if (type == "vector") {
+    default_mapping <- aes(color = after_stat(norm))
+  } else {
+    cli::cli_abort("`type` must be either 'stream' or 'vector', not {.val {type}}")
+  }
+
 
   if (!is.null(mapping)) {
     if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
@@ -255,14 +270,14 @@ stat_gradient_field <- function(
   }
 
   if (missing(fun) || !is.function(fun)) {
-    stop("Please provide a valid scalar function 'fun' that takes a numeric vector (x, y) and returns a single numeric value.")
+    stop("Please provide a valid scalar function `fun` that takes a numeric vector and returns a single numeric value.")
   }
 
-  gradient_fun <- function(v) {
-    if (!is.numeric(v) || length(v) != 2) {
-      stop("Input to the gradient function must be a numeric vector of length 2 (x, y).")
+  gradient_fun <- function(u) {
+    if (!is.numeric(u) || length(u) != 2) {
+      stop("Input to the gradient function must be a numeric vector of length 2.")
     }
-    numDeriv::grad(func = fun, x = v)
+    numDeriv::grad(func = fun, x = u)
   }
 
   layer(
