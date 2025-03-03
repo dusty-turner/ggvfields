@@ -203,7 +203,14 @@ stat_vector_field <- function(
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
   ) {
 
-  default_mapping <- if (normalize) aes(color = after_stat(norm)) else aes()
+  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
+
+  if (!user_fixed_color) {
+    default_mapping <- aes(color = after_stat(norm))
+  } else {
+    default_mapping <- aes()
+  }
+
   mapping <- modifyList(default_mapping, mapping %||% aes())
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
