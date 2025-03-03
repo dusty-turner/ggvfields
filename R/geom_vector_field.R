@@ -136,11 +136,15 @@ geom_vector_field <- function(
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
   ) {
 
-  default_mapping <- aes(color = after_stat(norm))
+  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
 
-  default_mapping <- if (normalize) aes(color = after_stat(norm)) else aes()
+  if (!user_fixed_color) {
+    default_mapping <- aes(color = after_stat(norm))
+  } else {
+    default_mapping <- aes()
+  }
+
   mapping <- modifyList(default_mapping, mapping %||% aes())
-
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
