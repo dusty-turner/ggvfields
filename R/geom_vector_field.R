@@ -267,7 +267,7 @@ geom_vector_field2 <- function(
    arrow = NULL) {
 
   # Define default mapping for stat_stream_field2
-  default_mapping <- ggplot2::aes(color = after_stat(NULL), length = after_stat(norm))
+  default_mapping <- ggplot2::aes(length = after_stat(norm))
 
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
@@ -311,26 +311,28 @@ geom_vector_field2 <- function(
 
 #' @rdname geom_vector_field
 #' @export
-stat_vector_field2 <- function(mapping = NULL, data = NULL,
-   geom = GeomStream,
-   position = "identity",
-   ...,
-   na.rm = FALSE,
-   show.legend = TRUE,
-   inherit.aes = FALSE,
-   fun,
-   xlim = NULL,
-   ylim = NULL,
-   n = 11,
-   args = list(),
-   center = FALSE,
-   tail_point = TRUE,
-   eval_point = FALSE,
-   grid = NULL,
-   arrow = NULL) {
+stat_vector_field2 <- function(
+    mapping = NULL,
+    data = NULL,
+    geom = GeomStream,
+    position = "identity",
+    ...,
+    na.rm = FALSE,
+    show.legend = TRUE,
+    inherit.aes = FALSE,
+    fun,
+    xlim = NULL,
+    ylim = NULL,
+    n = 11,
+    args = list(),
+    center = FALSE,
+    tail_point = TRUE,
+    eval_point = FALSE,
+    grid = NULL,
+    arrow = NULL) {
 
   # Define default mapping for stat_stream_field2
-  default_mapping <- ggplot2::aes(color = after_stat(NULL), length = after_stat(norm))
+  default_mapping <- ggplot2::aes(length = after_stat(norm))
 
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
@@ -344,8 +346,8 @@ stat_vector_field2 <- function(mapping = NULL, data = NULL,
   n <- ensure_length_two(n)
 
   ggplot2::layer(
-    stat = StatStreamField,
     geom = geom,
+    stat = StatStreamField,
     data = data,
     mapping = mapping,
     position = position,
