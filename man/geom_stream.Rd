@@ -130,6 +130,24 @@ of the stream divided by the time it took to traverse that distance.}
 }
 
 \examples{
+
+n <- 25
+s <- seq(0, 1, length.out = n+1)[-(n+1)]
+df <- data.frame( "t" = s, "x" = cos(2*pi*s), "y" = sin(2*pi*s) )
+
+ggplot(df) +
+  geom_stream(aes(x, y, t = t)) +
+  coord_equal()
+
+ggplot(df) +
+  geom_stream(aes(x, y, t = t, alpha = t), size = 5) +
+  coord_equal()
+
+ggplot(df) +
+  geom_path(aes(x, y, alpha = t), size = 5) +
+  coord_equal()
+
+
 stream_1 <- data.frame(
   x = c(0, 3),
   y = c(0, 0),
