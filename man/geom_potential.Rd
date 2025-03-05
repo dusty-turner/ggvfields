@@ -22,7 +22,7 @@ geom_potential(
   ylim = NULL,
   n = 51,
   tol = 1e-06,
-  validate_potential = FALSE
+  verify_conservative = FALSE
 )
 
 stat_potential(
@@ -39,7 +39,7 @@ stat_potential(
   ylim = NULL,
   n = 51,
   tol = 1e-06,
-  validate_potential = FALSE
+  verify_conservative = FALSE
 )
 }
 \arguments{
@@ -130,7 +130,7 @@ f <- function(u) {
 
 # Create the potential function heatmap
 ggplot() + geom_potential(fun = f)
-ggplot() + geom_potential(fun = f, validate_potential = TRUE)
+ggplot() + geom_potential(fun = f, verify_conservative = TRUE)
 
 }
 \keyword{datasets}

@@ -67,7 +67,7 @@
 #'
 #' # Create the potential function heatmap
 #' ggplot() + geom_potential(fun = f)
-#' ggplot() + geom_potential(fun = f, validate_potential = TRUE)
+#' ggplot() + geom_potential(fun = f, verify_conservative = TRUE)
 #'
 #' @export
 geom_potential <- function(
@@ -84,7 +84,7 @@ geom_potential <- function(
   ylim = NULL,
   n = 51,
   tol = 1e-6,
-  validate_potential = FALSE
+  verify_conservative = FALSE
 ) {
 
   if (is.null(data)) {
@@ -121,7 +121,7 @@ geom_potential <- function(
       ylim = ylim,
       n = n,
       tol = tol,
-      validate_potential = validate_potential,
+      verify_conservative = verify_conservative,
       ...
     )
   )
@@ -143,7 +143,7 @@ stat_potential <- function(
   ylim = NULL,
   n = 51,
   tol = 1e-6,
-  validate_potential = FALSE
+  verify_conservative = FALSE
 ) {
 
   if (is.null(data)) {
@@ -180,7 +180,7 @@ stat_potential <- function(
       ylim = ylim,
       n = n,
       tol = tol,
-      validate_potential = validate_potential,
+      verify_conservative = verify_conservative,
       ...
     )
   )
@@ -201,7 +201,7 @@ StatPotential <- ggproto(
   default_aes = aes(fill = after_stat(potential)),
 
   compute_group = function(data, scales, fun = NULL, xlim = NULL, ylim = NULL,
-                           n, tol = 1e-6, validate_potential = FALSE, ...) {
+                           n, tol = 1e-6, verify_conservative = FALSE, ...) {
 
     xlim <- xlim %||% scales$x$range$range
     if (is.null(xlim)) {
@@ -227,7 +227,7 @@ StatPotential <- ggproto(
     )
 
     # Verify if the vector field is conservative
-    if (validate_potential) {
+    if (verify_conservative) {
 
       grid_data$curl <- apply(
         grid_data[, c("x", "y")], 1, verify_potential, fun = fun, tol = tol
