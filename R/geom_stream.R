@@ -253,8 +253,8 @@ draw_key_length <- function(data, params, size) {
     x0 = x0, y0 = y0,
     x1 = x1, y1 = y1,
     gp = grid::gpar(
-      col   = scales::alpha(data$colour, 1),
-      # col   = scales::alpha(data$colour, data$alpha),
+      # col   = scales::alpha(data$colour, 1),
+      col   = scales::alpha(data$colour, data$alpha),
       lwd   = data$linewidth,
       lty   = data$linetype
     )
@@ -271,7 +271,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
   # required_aes = c("x", "y"),
   default_aes = modifyList(
     GeomPath$default_aes,
-    list("alpha" = 1, "linewidth" = 1.1, "length" = after_stat(NA_real_), fx = NA, fy = NA)
+    list("alpha" = 1, "linewidth" = 1, "length" = after_stat(NA_real_), fx = NA, fy = NA)
   ),
 
   setup_data = function(data, params){
@@ -536,7 +536,15 @@ GeomStream <- ggproto("GeomStream", GeomPath,
     return(grid::grobTree(do.call(grid::gList, grobs)))
 
   },
-  draw_key = draw_key_length
+  # draw_key = draw_key_length
+  draw_key = function(data, params, size) {
+    if (!is.na(data$length[1])) {
+      draw_key_length(data, params, size)
+    } else {
+      ggplot2::draw_key_path(data, params, size)
+    }
+  }
+
 )
 
 #' Create a Continuous Scale for Vector Length
