@@ -26,19 +26,14 @@ jobs:
           extra-packages: any::covr
           needs: coverage
 
-     - name: Test and upload coverage
+      - name: Test coverage
         run: |
-          Rscript -e 'covr::codecov(quiet = FALSE, clean = FALSE)'
-        shell: bash
-
-      # - name: Test coverage
-      #   run: |
-      #     covr::codecov(
-      #       quiet = FALSE,
-      #       clean = FALSE,
-      #       install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
-      #     )
-      #   shell: Rscript {0}
+          covr::codecov(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
+          )
+        shell: Rscript {0}
 
       - name: Show testthat output
         if: always()
