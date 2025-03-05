@@ -20,8 +20,9 @@ geom_potential(
   fun,
   xlim = NULL,
   ylim = NULL,
-  n = 11,
-  tolerance = 1e-06
+  n = 51,
+  tol = 1e-06,
+  validate_potential = FALSE
 )
 
 stat_potential(
@@ -36,43 +37,53 @@ stat_potential(
   fun,
   xlim = NULL,
   ylim = NULL,
-  n = 11,
-  tolerance = 1e-06
+  n = 51,
+  tol = 1e-06,
+  validate_potential = FALSE
 )
 }
 \arguments{
-\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}. (Optional)}
+\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
+(Optional)}
 
-\item{data}{The data to be displayed in this layer. If \code{NULL}, data is inherited from the plot.}
+\item{data}{The data to be displayed in this layer. If \code{NULL}, data is
+inherited from the plot.}
 
-\item{stat}{The statistical transformation to use on the data (default: \link{StatPotential}).}
+\item{stat}{The statistical transformation to use on the data (default:
+\link{StatPotential}).}
 
-\item{position}{Position adjustment, either as a string or the result of a position adjustment function.}
+\item{position}{Position adjustment, either as a string or the result of a
+position adjustment function.}
 
-\item{...}{Other arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}} and underlying methods.}
+\item{...}{Other arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}} and underlying
+methods.}
 
-\item{na.rm}{Logical. If \code{FALSE} (default), missing values are removed with a warning.}
+\item{na.rm}{Logical. If \code{FALSE} (default), missing values are removed with a
+warning.}
 
-\item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics rather than combining with them.}
+\item{inherit.aes}{Logical. If \code{FALSE}, overrides the default aesthetics
+rather than combining with them.}
 
 \item{show.legend}{Logical. Should this layer be included in the legends?}
 
-\item{fun}{A function that takes a numeric vector of length 2 (\code{c(x, y)}) and returns a numeric value,
-defining the conservative vector field. \strong{(Required)}}
+\item{fun}{A function that takes a numeric vector of length 2 (\code{c(x, y)}) and
+returns a numeric value, defining the conservative vector field.
+\strong{(Required)}}
 
-\item{xlim}{Numeric vector of length 2 defining the domain limits on the x-axis.
-Defaults to \code{c(-1, 1)}.}
+\item{xlim}{Numeric vector of length 2 defining the domain limits on the
+x-axis. Defaults to \code{c(-1, 1)}.}
 
-\item{ylim}{Numeric vector of length 2 defining the domain limits on the y-axis.
-Defaults to \code{c(-1, 1)}.}
+\item{ylim}{Numeric vector of length 2 defining the domain limits on the
+y-axis. Defaults to \code{c(-1, 1)}.}
 
-\item{n}{Integer. Number of grid points along each axis for computing the potential.
-Defaults to \code{21}.}
+\item{n}{Integer. Number of grid points along each axis for computing the
+potential. Defaults to \code{21}.}
 
-\item{tolerance}{Numeric. Tolerance for verifying if the vector field is conservative.
-Defaults to \code{1e-6}.}
+\item{tol}{Numeric. Tolerance for verifying if the vector field is
+conservative. Defaults to \code{1e-6}.}
 
-\item{geom}{The geometric object used to render the potential function. Defaults to \link{GeomPotential}.}
+\item{geom}{The geometric object used to render the potential function.
+Defaults to \link{GeomPotential}.}
 }
 \value{
 A ggplot2 layer that produces a potential function heatmap.
@@ -83,16 +94,17 @@ potential function derived from a conservative vector field. It computes the
 potential numerically over a specified grid and displays it as a heatmap.
 }
 \section{Aesthetics}{
-
-\code{geom_potential()} accepts all aesthetics supported by \link{GeomRaster}. In particular, the key aesthetics include:
+ \code{geom_potential()} accepts all aesthetics supported by
+\link{GeomRaster}. In particular, the key aesthetics include:
 \itemize{
 \item \strong{fill}: The computed potential value at each grid cell, which is mapped to a color scale.
 \item \code{x} and \code{y}: The coordinates of the grid cell centers. (calculated)
 \item \code{alpha}: Controls the transparency of the raster fill.
 }
 
-Additional raster-specific aesthetics (e.g. those controlled by \code{\link[=scale_fill_gradient]{scale_fill_gradient()}},
-\code{\link[=scale_fill_viridis_c]{scale_fill_viridis_c()}}, etc.) can be applied to modify the appearance of the potential heatmap.
+Additional raster-specific aesthetics (e.g. those controlled by
+\code{\link[=scale_fill_gradient]{scale_fill_gradient()}}, \code{\link[=scale_fill_viridis_c]{scale_fill_viridis_c()}}, etc.) can be applied to
+modify the appearance of the potential heatmap.
 }
 
 \section{Computed Variables}{
@@ -111,15 +123,14 @@ the \code{fill} aesthetic in the raster layer.}
 
 \examples{
 # Define a conservative vector field function
-fun <- function(v) {
-  x <- v[1]
-  y <- v[2]
+f <- function(u) {
+  x <- u[1]; y <- u[2]
   c(sin(x) + y, x - sin(y))
 }
 
 # Create the potential function heatmap
-ggplot() +
-  geom_potential(fun = fun)
+ggplot() + geom_potential(fun = f)
+ggplot() + geom_potential(fun = f, validate_potential = TRUE)
 
 }
 \keyword{datasets}

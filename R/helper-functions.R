@@ -357,63 +357,6 @@ predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL, conf_level
   }
 }
 
-## ----------- geom_potential ---------------------
-# Define the numerical potential computation function with proper vectorization
-compute_potential <- function(point, fun, x0, y0) {
-  x <- point[1]
-  y <- point[2]
-
-  # Path 1: Integrate F_x from x0 to x with y = y0
-  F_x_func <- function(s) {
-    sapply(s, function(si) fun(c(si, y0))[1])
-  }
-
-  # Perform the integration for F_x
-  integral_x <- integrate(F_x_func, lower = x0, upper = x)$value
-
-  # Path 2: Integrate F_y from y0 to y with x = x
-  F_y_func <- function(t) {
-    sapply(t, function(ti) fun(c(x, ti))[2])
-  }
-
-  # Perform the integration for F_y
-  integral_y <- integrate(F_y_func, lower = y0, upper = y)$value
-
-  # Sum the integrals to get the potential
-  f_xy <- integral_x + integral_y
-
-  return(f_xy)
-}
-
-# Verify if the vector field is conservative
-verify_potential <- function(point, fun, tolerance) {
-  # Compute the Jacobian matrix numerically
-
-  jacobian_matrix <- numDeriv::jacobian(fun, point)
-
-  # Extract partial derivatives
-  df1_dy <- jacobian_matrix[1, 2]  # ∂F_x/∂y
-  df2_dx <- jacobian_matrix[2, 1]  # ∂F_y/∂x
-
-  # Check if df1_dy is approximately equal to df2_dx
-  symmetric <- abs(df1_dy - df2_dx) <= tolerance
-
-  return(symmetric)
-}
-
-## for gradient field - geom_gradient_field
-gradient_fun <- function(fun) {
-  # This returned function is what geom_vector_field() will actually use
-  function(v) {
-    # Ensure v is a numeric vector (x, y)
-    if (!is.numeric(v) || length(v) != 2) {
-      stop("Input to the gradient function must be a numeric vector of length 2 (x, y).")
-    }
-    # Compute the gradient using numDeriv
-    grad_val <- numDeriv::grad(func = fun, x = v)
-    return(grad_val)
-  }
-}
 
 # geom_stream_field
 matrix_to_df_with_names <- function(mat, col_names = NULL) {
