@@ -68,6 +68,9 @@
 #' @param type Character. Specifies the type of field to compute: use `"stream"`
 #'   to generate integrated streamlines or `"vector"` for individual vector
 #'   segments. Defaults to `"stream"`.
+#' @param lineend Line end style (round, butt, square).
+#' @param linejoin Line join style (round, mitre, bevel).
+#' @param linemitre Line mitre limit (number greater than 1).
 #' @param ... Other arguments passed on to [ggplot2::layer()].
 #'
 #' @section Aesthetics: `geom_gradient_field()` and `geom_gradient_field2()`
@@ -156,11 +159,14 @@ geom_gradient_field <- function(
   T = NULL,
   L = NULL,
   center = TRUE,
-  type = "stream",
+  type = "vector",
   normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
   grid = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"), type = "closed")
 ) {
 
@@ -217,6 +223,9 @@ geom_gradient_field <- function(
       tail_point = tail_point,
       eval_point = eval_point,
       grid = grid,
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
       arrow = arrow,
       ...
     )
@@ -242,11 +251,14 @@ stat_gradient_field <- function(
   T = NULL,
   L = NULL,
   center = TRUE,
-  type = "stream",
+  type = "vector",
   normalize = TRUE,
   tail_point = FALSE,
   eval_point = FALSE,
   grid = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"), type = "closed")
 ) {
 
@@ -303,6 +315,9 @@ stat_gradient_field <- function(
       tail_point = tail_point,
       eval_point = eval_point,
       grid = grid,
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
       arrow = arrow,
       ...
     )
@@ -328,12 +343,15 @@ geom_gradient_field2 <- function(
   max_it = 1000,
   T = NULL,
   L = NULL,
-  center = TRUE,
+  center = FALSE,
   type = "stream",
   normalize = TRUE,
-  tail_point = FALSE,
+  tail_point = TRUE,
   eval_point = FALSE,
   grid = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = NULL
 ) {
   if (is.null(data)) data <- ensure_nonempty_data(data)
@@ -381,6 +399,9 @@ geom_gradient_field2 <- function(
       tail_point = tail_point,
       eval_point = eval_point,
       grid = grid,
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
       arrow = arrow,
       ...
     )
@@ -406,12 +427,15 @@ stat_gradient_field2 <- function(
   max_it = 1000,
   T = NULL,
   L = NULL,
-  center = TRUE,
+  center = FALSE,
   type = "stream",
   normalize = TRUE,
-  tail_point = FALSE,
+  tail_point = TRUE,
   eval_point = FALSE,
   grid = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = NULL
 ) {
   if (is.null(data)) data <- ensure_nonempty_data(data)
@@ -459,6 +483,9 @@ stat_gradient_field2 <- function(
       tail_point = tail_point,
       eval_point = eval_point,
       grid = grid,
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
       arrow = arrow,
       ...
     )

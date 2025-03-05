@@ -24,6 +24,9 @@
 #'   provided, it specifies the grid where the smoothing model is evaluated; if
 #'   `NULL`, a grid is generated based on `n`.
 #' @param n An integer vector specifying the grid resolution for smoothing.
+#' @param lineend Line end style (round, butt, square).
+#' @param linejoin Line join style (round, mitre, bevel).
+#' @param linemitre Line mitre limit (number greater than 1).
 #' @param ... Additional arguments passed to the layer. If a fixed parameter
 #'   `color` is not provided, then `color = "blue"` is used.
 #'
@@ -148,23 +151,24 @@ NULL
 #' @rdname geom_stream_smooth
 #' @export
 geom_stream_smooth <- function(mapping = NULL, data = NULL,
-                               stat = StatStreamField,
-                               position = "identity",
-                               ...,
-                               na.rm = FALSE,
-                               show.legend = NA,
-                               inherit.aes = TRUE,
-                               n = 11,
-                               xlim = NULL,
-                               ylim = NULL,
-                               normalize = TRUE,
-                               center = FALSE,
-                               type = "vector",
-                               formula = cbind(fx, fy) ~ x * y,
-                               eval_points = NULL,
-                               arrow = grid::arrow(angle = 20,
-                                                   length = unit(0.015, "npc"),
-                                                   type = "closed")
+   stat = StatStreamField,
+   position = "identity",
+   ...,
+   na.rm = FALSE,
+   show.legend = NA,
+   inherit.aes = TRUE,
+   n = 11,
+   xlim = NULL,
+   ylim = NULL,
+   normalize = TRUE,
+   center = FALSE,
+   type = "vector",
+   formula = cbind(fx, fy) ~ x * y,
+   eval_points = NULL,
+   lineend = "butt",
+   linejoin = "round",
+   linemitre = 10,
+   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
 ) {
 
 
@@ -220,7 +224,11 @@ geom_stream_smooth <- function(mapping = NULL, data = NULL,
         ylim = ylim,
         grid = eval_points,
         type = type,
-        arrow = arrow
+        lineend = lineend,
+        linejoin = linejoin,
+        linemitre = linemitre,
+        arrow = arrow,
+        ...
       ),
       dots
     )

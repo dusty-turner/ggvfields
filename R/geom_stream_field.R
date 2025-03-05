@@ -72,6 +72,9 @@
 #'   point) of each streamline. Defaults to `FALSE`.
 #' @param eval_point Logical. If `TRUE`, draws a point at the evaluation point
 #'   where the field was computed. Defaults to `FALSE`.
+#' @param lineend Line end style (round, butt, square).
+#' @param linejoin Line join style (round, mitre, bevel).
+#' @param linemitre Line mitre limit (number greater than 1).
 #' @param ... Other arguments passed to [ggplot2::layer()] and the underlying
 #'   geometry/stat.
 #'
@@ -245,6 +248,9 @@ geom_stream_field <- function(
     eval_point = FALSE,
     grid = NULL,
     method = "rk4",
+    lineend = "butt",
+    linejoin = "round",
+    linemitre = 10,
     arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
 
@@ -288,6 +294,9 @@ geom_stream_field <- function(
       tail_point = tail_point,
       eval_point = eval_point,
       grid = grid,
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
       arrow = arrow,
       ...
     )
@@ -322,6 +331,9 @@ stat_stream_field <- function(
     eval_point = FALSE,
     grid = NULL,
     method = "rk4",
+    lineend = "butt",
+    linejoin = "round",
+    linemitre = 10,
     arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
 
@@ -367,6 +379,9 @@ stat_stream_field <- function(
       tail_point = tail_point,
       eval_point = eval_point,
       grid = grid,
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
       arrow = arrow,
       ...
     )
@@ -398,6 +413,9 @@ geom_stream_field2 <- function(
     tail_point = TRUE,
     eval_point = FALSE,
     grid = NULL,
+    lineend = "butt",
+    linejoin = "round",
+    linemitre = 10,
     method = "rk4"
     ) {
 
@@ -440,6 +458,9 @@ geom_stream_field2 <- function(
       tail_point = tail_point,
       eval_point = eval_point,
       grid = grid,
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
       arrow = NULL,
       ...
     )
@@ -471,6 +492,9 @@ stat_stream_field2 <- function(
     tail_point = TRUE,
     eval_point = FALSE,
     grid = NULL,
+    lineend = "butt",
+    linejoin = "round",
+    linemitre = 10,
     method = "rk4"
     ) {
 
@@ -513,6 +537,9 @@ stat_stream_field2 <- function(
       tail_point = tail_point,
       eval_point = eval_point,
       grid = grid,
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
       arrow = NULL,
       ...
     )

@@ -15,7 +15,7 @@ get_potential_data <- function(p) {
 
 test_that("geom_potential computes potential and includes required aesthetics", {
   p <- ggplot() +
-    geom_potential(fun = f_conservative, xlim = c(-1, 1), ylim = c(-1, 1), n = 21)
+    geom_potential(fun = f_conservative, xlim = c(-1, 1), ylim = c(-1, 1), n = 21, verify_conservative = TRUE)
 
   d <- get_potential_data(p)
 
@@ -35,7 +35,7 @@ test_that("geom_potential computes potential and includes required aesthetics", 
 
 test_that("stat_potential computes potential and includes required aesthetics", {
   p <- ggplot() +
-    stat_potential(fun = f_conservative, xlim = c(-1, 1), ylim = c(-1, 1), n = 21)
+    stat_potential(fun = f_conservative, xlim = c(-1, 1), ylim = c(-1, 1), n = 21, verify_conservative = TRUE)
 
   d <- get_potential_data(p)
   expect_true(all(c("x", "y", "potential", "curl") %in% names(d)))
@@ -56,7 +56,7 @@ f_nonconservative <- function(v) {
 
 test_that("geom_potential warns when vector field is non-conservative", {
   p <- ggplot() +
-    geom_potential(fun = f_nonconservative, xlim = c(-1, 1), ylim = c(-1, 1), n = 21)
+    geom_potential(fun = f_nonconservative, xlim = c(-1, 1), ylim = c(-1, 1), n = 21, verify_conservative = TRUE)
 
   expect_warning(
     ggplot_build(p),

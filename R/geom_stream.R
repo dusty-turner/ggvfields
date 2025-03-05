@@ -33,6 +33,9 @@
 #'   the streamline.
 #' @param arrow.fill An optional parameter specifying the color of the arrow head.
 #'   Defaults to `NULL` and inherets fill/alpha of `aes()`.
+#' @param lineend Line end style (round, butt, square).
+#' @param linejoin Line join style (round, mitre, bevel).
+#' @param linemitre Line mitre limit (number greater than 1).
 #' @param ... Other arguments passed to the underlying layers for further
 #'   customization.
 #'
@@ -136,6 +139,9 @@ geom_stream <- function(mapping = NULL, data = NULL,
   show.legend = NA,
   inherit.aes = TRUE,
   arrow.fill = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 ) {
 
@@ -157,6 +163,9 @@ geom_stream <- function(mapping = NULL, data = NULL,
       arrow = arrow,
       arrow.fill = arrow.fill,
       type = "stream",
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
       ...
     )
   )
@@ -172,6 +181,9 @@ stat_stream <- function(mapping = NULL, data = NULL,
   show.legend = NA,
   inherit.aes = TRUE,
   arrow.fill = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 ) {
 
@@ -191,8 +203,11 @@ stat_stream <- function(mapping = NULL, data = NULL,
     params = list(
       na.rm = na.rm,
       arrow = arrow,
-      arrow.fill = arrow.fill,
       type = "stream",
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
+      arrow.fill = arrow.fill,
       ...
     )
   )
@@ -281,7 +296,8 @@ GeomStream <- ggproto("GeomStream", GeomPath,
   },
 
   # Override the draw_group method
-  draw_panel = function(data, panel_params, coord, tail_point = FALSE, eval_point = FALSE, arrow, type, arrow.fill = NULL) {
+  draw_panel = function(data, panel_params, coord, tail_point = FALSE, eval_point = FALSE, arrow, type, arrow.fill = NULL,
+                        lineend = "butt", linejoin = "round", linemitre = 10) {
 
     # prep grobs for future use
     grobs <- list()
@@ -357,10 +373,10 @@ GeomStream <- ggproto("GeomStream", GeomPath,
           col = alpha(munched$colour, munched$alpha)[!end],
           fill = alpha(munched$fill, munched$alpha)[!end],
           lwd = munched$linewidth[!end],
-          lty = munched$linetype[!end]
-          # lineend = lineend,
-          # linejoin = linejoin,
-          # linemitre = linemitre
+          lty = munched$linetype[!end],
+          lineend = lineend,
+          linejoin = linejoin,
+          linemitre = linemitre
         )
       )
 

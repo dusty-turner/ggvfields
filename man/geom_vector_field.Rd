@@ -26,6 +26,9 @@ geom_vector_field(
   tail_point = FALSE,
   eval_point = FALSE,
   grid = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 )
 
@@ -49,6 +52,9 @@ stat_vector_field(
   tail_point = FALSE,
   eval_point = FALSE,
   grid = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 )
 
@@ -70,6 +76,9 @@ geom_vector_field2(
   tail_point = TRUE,
   eval_point = FALSE,
   grid = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = NULL
 )
 
@@ -91,6 +100,9 @@ stat_vector_field2(
   tail_point = TRUE,
   eval_point = FALSE,
   grid = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = NULL
 )
 }
@@ -153,6 +165,12 @@ centering or normalization is applied.}
 \item{grid}{A data frame containing precomputed grid points for seed
 placement. If \code{NULL} (default), a regular Cartesian grid is generated based
 on \code{xlim}, \code{ylim}, and \code{n}.}
+
+\item{lineend}{Line end style (round, butt, square).}
+
+\item{linejoin}{Line join style (round, mitre, bevel).}
+
+\item{linemitre}{Line mitre limit (number greater than 1).}
 
 \item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the
 streamlines. In \strong{geom_vector_field}, the default is a closed arrow with a

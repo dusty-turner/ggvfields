@@ -21,6 +21,9 @@ geom_stream_smooth(
   type = "vector",
   formula = cbind(fx, fy) ~ x * y,
   eval_points = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
 )
 }
@@ -72,6 +75,12 @@ smoothing. Defaults to \code{cbind(fx, fy) ~ x * y}.}
 \item{eval_points}{A data frame of evaluation points, or \code{NULL}. When
 provided, it specifies the grid where the smoothing model is evaluated; if
 \code{NULL}, a grid is generated based on \code{n}.}
+
+\item{lineend}{Line end style (round, butt, square).}
+
+\item{linejoin}{Line join style (round, mitre, bevel).}
+
+\item{linemitre}{Line mitre limit (number greater than 1).}
 
 \item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to
 the vectors (default: \code{grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")}).}

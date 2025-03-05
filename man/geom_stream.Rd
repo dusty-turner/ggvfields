@@ -18,6 +18,9 @@ geom_stream(
   show.legend = NA,
   inherit.aes = TRUE,
   arrow.fill = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 )
 
@@ -31,6 +34,9 @@ stat_stream(
   show.legend = NA,
   inherit.aes = TRUE,
   arrow.fill = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 )
 }
@@ -61,6 +67,12 @@ rather than combining with them.}
 
 \item{arrow.fill}{An optional parameter specifying the color of the arrow head.
 Defaults to \code{NULL} and inherets fill/alpha of \code{aes()}.}
+
+\item{lineend}{Line end style (round, butt, square).}
+
+\item{linejoin}{Line join style (round, mitre, bevel).}
+
+\item{linemitre}{Line mitre limit (number greater than 1).}
 
 \item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to place arrowheads on
 the streamline.}

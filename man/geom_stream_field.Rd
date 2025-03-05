@@ -34,6 +34,9 @@ geom_stream_field(
   eval_point = FALSE,
   grid = NULL,
   method = "rk4",
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 )
 
@@ -62,6 +65,9 @@ stat_stream_field(
   eval_point = FALSE,
   grid = NULL,
   method = "rk4",
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 )
 
@@ -87,6 +93,9 @@ geom_stream_field2(
   tail_point = TRUE,
   eval_point = FALSE,
   grid = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   method = "rk4"
 )
 
@@ -112,6 +121,9 @@ stat_stream_field2(
   tail_point = TRUE,
   eval_point = FALSE,
   grid = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   method = "rk4"
 )
 }
@@ -199,6 +211,12 @@ on \code{xlim}, \code{ylim}, and \code{n}.}
 
 \item{method}{Character. Integration method (e.g. \code{"rk4"} for Runge-Kutta 4,
 \code{"euler"} for Euler's method). Defaults to \code{"rk4"}.}
+
+\item{lineend}{Line end style (round, butt, square).}
+
+\item{linejoin}{Line join style (round, mitre, bevel).}
+
+\item{linemitre}{Line mitre limit (number greater than 1).}
 
 \item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification for adding arrowheads to the
 streamlines. Defaults to a closed arrow with a 30° angle and length \code{0.02}

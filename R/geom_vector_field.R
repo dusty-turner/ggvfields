@@ -59,6 +59,9 @@
 #' @param grid A data frame containing precomputed grid points for seed
 #'   placement. If `NULL` (default), a regular Cartesian grid is generated based
 #'   on `xlim`, `ylim`, and `n`.
+#' @param lineend Line end style (round, butt, square).
+#' @param linejoin Line join style (round, mitre, bevel).
+#' @param linemitre Line mitre limit (number greater than 1).
 #' @param arrow A [grid::arrow()] specification to add arrowheads to the
 #'   streamlines. In **geom_vector_field**, the default is a closed arrow with a
 #'   30° angle and length `0.02` npc; in **geom_vector_field2** the default is
@@ -133,6 +136,9 @@ geom_vector_field <- function(
   tail_point = FALSE,
   eval_point = FALSE,
   grid = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
   ) {
 
@@ -172,6 +178,9 @@ geom_vector_field <- function(
       tail_point = tail_point,
       eval_point = eval_point,
       grid = grid,
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
       arrow = arrow,
       ...
     )
@@ -200,6 +209,9 @@ stat_vector_field <- function(
   tail_point = FALSE,
   eval_point = FALSE,
   grid = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
   ) {
 
@@ -238,6 +250,9 @@ stat_vector_field <- function(
       tail_point = tail_point,
       eval_point = eval_point,
       grid = grid,
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
       arrow = arrow,
       ...
     )
@@ -264,6 +279,9 @@ geom_vector_field2 <- function(
    tail_point = TRUE,
    eval_point = FALSE,
    grid = NULL,
+   lineend = "butt",
+   linejoin = "round",
+   linemitre = 10,
    arrow = NULL) {
 
   # Define default mapping for stat_stream_field2
@@ -303,6 +321,9 @@ geom_vector_field2 <- function(
       eval_point = eval_point,
       T = 1,
       grid = grid,
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
       arrow = arrow,
       ...
     )
@@ -329,6 +350,9 @@ stat_vector_field2 <- function(
     tail_point = TRUE,
     eval_point = FALSE,
     grid = NULL,
+    lineend = "butt",
+    linejoin = "round",
+    linemitre = 10,
     arrow = NULL) {
 
   # Define default mapping for stat_stream_field2
@@ -368,6 +392,9 @@ stat_vector_field2 <- function(
       eval_point = eval_point,
       T = 1,
       grid = grid,
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
       arrow = arrow,
       ...
     )

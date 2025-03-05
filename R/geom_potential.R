@@ -30,6 +30,12 @@
 #'   potential. Defaults to `21`.
 #' @param tol Numeric. Tolerance for verifying if the vector field is
 #'   conservative. Defaults to `1e-6`.
+#' @param verify_conservative Logical. If `TRUE`, the function verifies that the
+#'   provided vector field is conservative (i.e., that the mixed partial
+#'   derivatives are equal within the specified tolerance). Defaults to `FALSE`.
+#' @param lineend Line end style (round, butt, square).
+#' @param linejoin Line join style (round, mitre, bevel).
+#' @param linemitre Line mitre limit (number greater than 1).
 #' @param ... Other arguments passed to [ggplot2::layer()] and underlying
 #'   methods.
 #'
@@ -84,7 +90,10 @@ geom_potential <- function(
   ylim = NULL,
   n = 51,
   tol = 1e-6,
-  verify_conservative = FALSE
+  verify_conservative = FALSE,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10
 ) {
 
   if (is.null(data)) {
@@ -122,6 +131,9 @@ geom_potential <- function(
       n = n,
       tol = tol,
       verify_conservative = verify_conservative,
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
       ...
     )
   )
@@ -143,7 +155,10 @@ stat_potential <- function(
   ylim = NULL,
   n = 51,
   tol = 1e-6,
-  verify_conservative = FALSE
+  verify_conservative = FALSE,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10
 ) {
 
   if (is.null(data)) {
@@ -181,6 +196,9 @@ stat_potential <- function(
       n = n,
       tol = tol,
       verify_conservative = verify_conservative,
+      lineend = lineend,
+      linejoin = linejoin,
+      linemitre = linemitre,
       ...
     )
   )
