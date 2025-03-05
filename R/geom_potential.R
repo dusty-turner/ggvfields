@@ -90,11 +90,7 @@ geom_potential <- function(
   ylim = NULL,
   n = 51,
   tol = 1e-6,
-  verify_conservative = FALSE,
-  lineend = "butt",
-  linejoin = "round",
-  linemitre = 10
-) {
+  verify_conservative = FALSE) {
 
   if (is.null(data)) {
     data <- data.frame(x = NA_real_, y = NA_real_)
@@ -131,9 +127,6 @@ geom_potential <- function(
       n = n,
       tol = tol,
       verify_conservative = verify_conservative,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
       ...
     )
   )
@@ -155,11 +148,8 @@ stat_potential <- function(
   ylim = NULL,
   n = 51,
   tol = 1e-6,
-  verify_conservative = FALSE,
-  lineend = "butt",
-  linejoin = "round",
-  linemitre = 10
-) {
+  verify_conservative = FALSE
+  ) {
 
   if (is.null(data)) {
     data <- data.frame(x = NA_real_, y = NA_real_)
@@ -196,9 +186,6 @@ stat_potential <- function(
       n = n,
       tol = tol,
       verify_conservative = verify_conservative,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
       ...
     )
   )
