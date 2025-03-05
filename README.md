@@ -42,7 +42,7 @@ n <- 10
 wind_data <- data.frame(
   lon = rnorm(n), 
   lat = rnorm(n), 
-  dir = runif(n, -pi/4, pi/4),
+  dir = runif(n, -pi/2, pi/2),
   spd = rchisq(n, df = 2)
 ) |> 
   within({
@@ -54,16 +54,16 @@ wind_data <- data.frame(
 
 round(wind_data, digits = 2) 
 #>      lon   lat   dir   spd  yend  xend    fy    fx
-#> 1  -1.21 -0.48  0.08  3.55 -0.18  2.33  0.30  3.53
-#> 2   0.28 -1.00  0.23  2.19 -0.50  2.41  0.50  2.13
-#> 3   1.08 -0.78 -0.30  2.99 -1.65  3.94 -0.87  2.86
-#> 4  -2.35  0.06  0.19 10.81  2.12  8.26  2.06 10.61
-#> 5   0.43  0.96 -0.27  3.45  0.05  3.75 -0.91  3.33
-#> 6   0.51 -0.11  0.00  3.91 -0.10  4.41  0.01  3.91
-#> 7  -0.57 -0.51  0.28  0.16 -0.47 -0.42  0.04  0.15
-#> 8  -0.55 -0.91 -0.02  0.42 -0.92 -0.12 -0.01  0.42
-#> 9  -0.56 -0.84 -0.40  0.42 -1.00 -0.18 -0.16  0.38
-#> 10 -0.89  2.42  0.42  4.17  4.11  2.92  1.69  3.81
+#> 1  -1.21 -0.48  0.17  3.55  0.11  2.29  0.59  3.50
+#> 2   0.28 -1.00  0.46  2.19 -0.03  2.24  0.97  1.96
+#> 3   1.08 -0.78 -0.59  2.99 -2.44  3.56 -1.66  2.48
+#> 4  -2.35  0.06  0.38 10.81  4.10  7.68  4.04 10.03
+#> 5   0.43  0.96 -0.53  3.45 -0.80  3.40 -1.76  2.97
+#> 6   0.51 -0.11  0.01  3.91 -0.09  4.41  0.02  3.91
+#> 7  -0.57 -0.51  0.56  0.16 -0.43 -0.44  0.08  0.13
+#> 8  -0.55 -0.91 -0.05  0.42 -0.93 -0.12 -0.02  0.42
+#> 9  -0.56 -0.84 -0.80  0.42 -1.14 -0.28 -0.30  0.29
+#> 10 -0.89  2.42  0.83  4.17  5.51  1.91  3.09  2.80
 ```
 
 ------------------------------------------------------------------------
@@ -168,19 +168,93 @@ ggplot(wind_data) +
 
 <img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
 
+### `geom_stream_field` and `geom_stream_field2`
+
+- **`geom_stream_field`**: Computes stream fields from a user-defined
+  function and maps the average speed to color.
+
+``` r
+f <- function(v) c(-v[2], v[1]) # Define a function for the field
+
+ggplot() +
+  geom_stream_field(fun = f) 
+```
+
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+
+- **`geom_stream_field2`**: Similar to `geom_stream_field`, but removes
+  mapping, arrow heads, and designates stream origins with a dot.
+
+``` r
+ggplot() +
+  geom_stream_field2(fun = f) 
+```
+
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+
+- **`geom_stream_field` options**
+
+**Grid Density**: The user can control the density of the grid by using
+the `n` parameter.
+
+``` r
+ggplot() +
+  geom_stream_field(fun = f, n = 4) 
+```
+
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
+
+**Length**
+
+By adjusting the `L` parameter, we can control the length of each
+stream.
+
+``` r
+ggplot() +
+  geom_stream_field(fun = f, n = 4, L = .8) 
+```
+
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
+
+**Normalization**
+
+By default, the lengths of each stream is normalized to be the same
+length. By turning normalization off, each stream becomes time
+normalized. In other words, each stream grows for the same amount of
+time.
+
+``` r
+ggplot() +
+  geom_stream_field(fun = f, n = 4, normalize = FALSE) 
+```
+
+<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
+
+**Time**
+
+When normalization is turned off, we can grow each stream for the same
+amount of time by using the `T` parameter.
+
+``` r
+ggplot() +
+  geom_stream_field(fun = f, n = 4, normalize = FALSE, T = .5) 
+```
+
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
+
 ### `geom_vector_field` and `geom_vector_field2`
+
+Vector fields can be seen as special cases of streams.
 
 - **`geom_vector_field`**: Computes vector fields from a user-defined
   function and maps the norm to color.
 
 ``` r
-f <- function(v) c(-v[2], v[1]) # Define a function for the vector field
-
 ggplot() +
   geom_vector_field(fun = f) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
 
 - **`geom_vector_field2`**: Similar to `geom_vector_field`, but maps the
   norm of vectors to their lengths instead of color.
@@ -190,11 +264,37 @@ ggplot() +
   geom_vector_field2(fun = f) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
+
+- **`geom_vector_field` options**
+
+**Length**
+
+As with streams, we can set the `L` parameter to grow vectors to a
+specified length.
+
+``` r
+ggplot() +
+  geom_vector_field(fun = f, n = 4, L = 2) 
+```
+
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
+
+**Center**
+
+If we turn off normalization and centering, we get a raw look at the
+vector field data.
+
+``` r
+ggplot() +
+  geom_vector_field(fun = f, n = 4, normalize = FALSE, center = FALSE) 
+```
+
+<img src="man/figures/README-unnamed-chunk-19-1.png" width="100%" />
 
 #### Automatic Limit Detection
 
-Both `geom_vector_field` and `geom_vector_field2` can automatically
+Both `geom_stream_field` and `geom_vector_field` can automatically
 determine plot limits based on the function provided. This happens when
 data exists in previous layers or in the base ggplot object. This allows
 the limits to be inferred from context. Customize limits with the `xlim`
@@ -203,10 +303,34 @@ and `ylim` parameters if needed for more control.
 ``` r
 ggplot(data = wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector() +
-  geom_vector_field(fun = f) # Automatically determines limits based on existing data
+  geom_stream_field(fun = f) # Automatically determines limits based on existing data
 ```
 
-<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-20-1.png" width="100%" />
+
+#### Custom Grids
+
+The `geom_*_field` functions allow the user to plot with custom
+evaluation locations. The user can specify specific points to be
+evaluated over the field or can also use a “hex” pattern.
+
+``` r
+ggplot() +
+  geom_stream_field(fun = f, grid = "hex")
+```
+
+<img src="man/figures/README-unnamed-chunk-21-1.png" width="100%" />
+
+This shows a custom grid.
+
+``` r
+custom <- data.frame(x = c(1,3,5), y = c(3,4,5))
+
+ggplot() +
+  geom_stream_field(fun = f, grid = custom, normalize = FALSE, center = FALSE, L = 4)
+```
+
+<img src="man/figures/README-unnamed-chunk-22-1.png" width="100%" />
 
 ------------------------------------------------------------------------
 
@@ -230,6 +354,26 @@ Key capabilities include:
 - **Mathematical Feature Mapping**: Display vector norms, divergence,
   and curl to highlight flow strength, expansion, and rotational
   behavior.
+
+**ggvfields** offers two techniques for smoothing noisey vector field
+data. `geom_stream_smooth` and `geom_vector_smooth`
+
+`geom_stream_smooth` uses a dynamical systems approach and
+`geom_vector_smooth` offers a miltivariate regression approach that
+accounts for uncertainty.
+
+### `geom_stream_smooth`
+
+``` r
+ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
+  geom_vector(normalize = FALSE) +
+  geom_stream_smooth(aes(x = lon, y = lat, fx = fx, fy = fy)) +
+  lims(x = c(-3,3), y = c(-1.5,3))
+#> Warning: Removed 3 rows containing missing values or values outside the scale range
+#> (`geom_stream()`).
+```
+
+<img src="man/figures/README-unnamed-chunk-23-1.png" width="100%" />
 
 ### `geom_vector_smooth`
 
@@ -261,24 +405,24 @@ or ellipses to indicate uncertainty.
 eval_point <- data.frame(x = .5, y = .5) 
 
 ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
-  geom_vector(aes(color = after_stat(NULL)), normalize = FALSE) +
+  geom_vector(normalize = FALSE) +
   geom_vector_smooth(eval_points = eval_point) +
   lims(x = c(-7,10), y = c(-3,3))
 #> Warning: Removed 2 rows containing missing values or values outside the scale range
 #> (`geom_stream()`).
 ```
 
-<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-24-1.png" width="100%" />
 
 - **Using Wedges to Visualize Uncertainty**:
 
 ``` r
 ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
-  geom_vector(aes(color = after_stat(NULL)), normalize = FALSE) +
+  geom_vector(normalize = FALSE) +
   geom_vector_smooth(eval_points = eval_point, pi_type = "wedge") 
 ```
 
-<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-25-1.png" width="100%" />
 
 - **Grid-Based Smoothing**:
 
@@ -288,7 +432,7 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector() 
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-26-1.png" width="100%" />
 
 - **Custom Grid Resolution**:
 
@@ -297,7 +441,7 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector_smooth(n = 6, pi_type = "wedge") 
 ```
 
-<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-27-1.png" width="100%" />
 
 - **Altering Confidence Level**
 
@@ -306,12 +450,12 @@ another value by using the `conf_level` argument.
 
 ``` r
 ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
-  geom_vector(aes(color = after_stat(NULL)), normalize = FALSE) +
+  geom_vector(normalize = FALSE) +
   geom_vector_smooth(eval_points = eval_point, pi_type = "wedge") +
   geom_vector_smooth(eval_points = eval_point, pi_type = "wedge", conf_level = .7) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-28-1.png" width="100%" />
 
 ### `geom_gradient_field` and `geom_gradient_field2`
 
@@ -340,7 +484,7 @@ ggplot() +
   geom_gradient_field(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
 ```
 
-<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-29-1.png" width="100%" />
 
 - **Gradient Field with Norm to Length**:
 
@@ -349,7 +493,7 @@ ggplot() +
   geom_gradient_field2(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
 ```
 
-<img src="man/figures/README-unnamed-chunk-19-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-30-1.png" width="100%" />
 
 - **Adjusting Grid Density**:
 
@@ -363,7 +507,7 @@ ggplot() +
   geom_gradient_field(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10), n = 5)
 ```
 
-<img src="man/figures/README-unnamed-chunk-20-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-31-1.png" width="100%" />
 
 ### `geom_potential`
 
@@ -388,11 +532,9 @@ conservative_fun <- function(v) {
 
 ggplot() +
   geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi))
-#> Warning in geom_potential(fun = conservative_fun, xlim = c(-2 * pi, 2 * :
-#> Ignoring unknown parameters: `lineend`, `linejoin`, and `linemitre`
 ```
 
-<img src="man/figures/README-unnamed-chunk-21-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-32-1.png" width="100%" />
 
 The tolerance parameter can be adjusted to control the sensitivity of
 the conservativeness check. Decreasing the tolerance makes the check
@@ -400,12 +542,10 @@ stricter, while increasing it allows for more numerical error.
 
 ``` r
 ggplot() +
-  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), tolerance = 1e-4)
-#> Warning in geom_potential(fun = conservative_fun, xlim = c(-2 * pi, 2 * : Ignoring unknown parameters: `lineend`, `linejoin`, `linemitre`, and
-#> `tolerance`
+  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), tol = 1e-4)
 ```
 
-<img src="man/figures/README-unnamed-chunk-22-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-33-1.png" width="100%" />
 
 As with other functions, we can increase the granulatity of the
 visualization with the `n` parameter.
@@ -413,11 +553,9 @@ visualization with the `n` parameter.
 ``` r
 ggplot() +
   geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), n = 50)
-#> Warning in geom_potential(fun = conservative_fun, xlim = c(-2 * pi, 2 * :
-#> Ignoring unknown parameters: `lineend`, `linejoin`, and `linemitre`
 ```
 
-<img src="man/figures/README-unnamed-chunk-23-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-34-1.png" width="100%" />
 
 ## License
 
@@ -434,3 +572,5 @@ issue](https://github.com/dusty-turner/ggvfields/issues/new).
   for vector fields.
 - [ggarchery](https://github.com/mdhall272/ggarchery): Arrow segment
   visualizations.
+- [ggfields](https://github.com/pepijn-devries/ggfields): Vector field
+  layers similar to `geom_spoke`.

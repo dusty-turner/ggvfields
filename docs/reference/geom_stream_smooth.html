@@ -80,6 +80,9 @@ vector displacements.</p>
 <span>  type <span class="op">=</span> <span class="st">"vector"</span>,</span>
 <span>  formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>,</span>
 <span>  eval_points <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lineend <span class="op">=</span> <span class="st">"butt"</span>,</span>
+<span>  linejoin <span class="op">=</span> <span class="st">"round"</span>,</span>
+<span>  linemitre <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -164,6 +167,18 @@ smoothing. Defaults to <code>cbind(fx, fy) ~ x * y</code>.</p></dd>
 <dd><p>A data frame of evaluation points, or <code>NULL</code>. When
 provided, it specifies the grid where the smoothing model is evaluated; if
 <code>NULL</code>, a grid is generated based on <code>n</code>.</p></dd>
+
+
+<dt>lineend</dt>
+<dd><p>Line end style (round, butt, square).</p></dd>
+
+
+<dt>linejoin</dt>
+<dd><p>Line join style (round, mitre, bevel).</p></dd>
+
+
+<dt>linemitre</dt>
+<dd><p>Line mitre limit (number greater than 1).</p></dd>
 
 
 <dt>arrow</dt>

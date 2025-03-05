@@ -33,9 +33,6 @@
 #' @param verify_conservative Logical. If `TRUE`, the function verifies that the
 #'   provided vector field is conservative (i.e., that the mixed partial
 #'   derivatives are equal within the specified tolerance). Defaults to `FALSE`.
-#' @param lineend Line end style (round, butt, square).
-#' @param linejoin Line join style (round, mitre, bevel).
-#' @param linemitre Line mitre limit (number greater than 1).
 #' @param ... Other arguments passed to [ggplot2::layer()] and underlying
 #'   methods.
 #'

@@ -66,8 +66,9 @@ potential numerically over a specified grid and displays it as a heatmap.</p>
 <span>  <span class="va">fun</span>,</span>
 <span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  n <span class="op">=</span> <span class="fl">11</span>,</span>
-<span>  tolerance <span class="op">=</span> <span class="fl">1e-06</span></span>
+<span>  n <span class="op">=</span> <span class="fl">51</span>,</span>
+<span>  tol <span class="op">=</span> <span class="fl">1e-06</span>,</span>
+<span>  verify_conservative <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">stat_potential</span><span class="op">(</span></span>
@@ -82,39 +83,47 @@ potential numerically over a specified grid and displays it as a heatmap.</p>
 <span>  <span class="va">fun</span>,</span>
 <span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  n <span class="op">=</span> <span class="fl">11</span>,</span>
-<span>  tolerance <span class="op">=</span> <span class="fl">1e-06</span></span>
+<span>  n <span class="op">=</span> <span class="fl">51</span>,</span>
+<span>  tol <span class="op">=</span> <span class="fl">1e-06</span>,</span>
+<span>  verify_conservative <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>mapping</dt>
-<dd><p>A set of aesthetic mappings created by <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">ggplot2::aes()</a></code>. (Optional)</p></dd>
+<dd><p>A set of aesthetic mappings created by <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">ggplot2::aes()</a></code>.
+(Optional)</p></dd>
 
 
 <dt>data</dt>
-<dd><p>The data to be displayed in this layer. If <code>NULL</code>, data is inherited from the plot.</p></dd>
+<dd><p>The data to be displayed in this layer. If <code>NULL</code>, data is
+inherited from the plot.</p></dd>
 
 
 <dt>stat</dt>
-<dd><p>The statistical transformation to use on the data (default: StatPotential).</p></dd>
+<dd><p>The statistical transformation to use on the data (default:
+StatPotential).</p></dd>
 
 
 <dt>position</dt>
-<dd><p>Position adjustment, either as a string or the result of a position adjustment function.</p></dd>
+<dd><p>Position adjustment, either as a string or the result of a
+position adjustment function.</p></dd>
 
 
 <dt>...</dt>
-<dd><p>Other arguments passed to <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">ggplot2::layer()</a></code> and underlying methods.</p></dd>
+<dd><p>Other arguments passed to <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">ggplot2::layer()</a></code> and underlying
+methods.</p></dd>
 
 
 <dt>na.rm</dt>
-<dd><p>Logical. If <code>FALSE</code> (default), missing values are removed with a warning.</p></dd>
+<dd><p>Logical. If <code>FALSE</code> (default), missing values are removed with a
+warning.</p></dd>
 
 
 <dt>inherit.aes</dt>
-<dd><p>Logical. If <code>FALSE</code>, overrides the default aesthetics rather than combining with them.</p></dd>
+<dd><p>Logical. If <code>FALSE</code>, overrides the default aesthetics
+rather than combining with them.</p></dd>
 
 
 <dt>show.legend</dt>
@@ -122,32 +131,40 @@ potential numerically over a specified grid and displays it as a heatmap.</p>
 
 
 <dt>fun</dt>
-<dd><p>A function that takes a numeric vector of length 2 (<code>c(x, y)</code>) and returns a numeric value,
-defining the conservative vector field. <strong>(Required)</strong></p></dd>
+<dd><p>A function that takes a numeric vector of length 2 (<code>c(x, y)</code>) and
+returns a numeric value, defining the conservative vector field.
+<strong>(Required)</strong></p></dd>
 
 
 <dt>xlim</dt>
-<dd><p>Numeric vector of length 2 defining the domain limits on the x-axis.
-Defaults to <code>c(-1, 1)</code>.</p></dd>
+<dd><p>Numeric vector of length 2 defining the domain limits on the
+x-axis. Defaults to <code>c(-1, 1)</code>.</p></dd>
 
 
 <dt>ylim</dt>
-<dd><p>Numeric vector of length 2 defining the domain limits on the y-axis.
-Defaults to <code>c(-1, 1)</code>.</p></dd>
+<dd><p>Numeric vector of length 2 defining the domain limits on the
+y-axis. Defaults to <code>c(-1, 1)</code>.</p></dd>
 
 
 <dt>n</dt>
-<dd><p>Integer. Number of grid points along each axis for computing the potential.
-Defaults to <code>21</code>.</p></dd>
+<dd><p>Integer. Number of grid points along each axis for computing the
+potential. Defaults to <code>21</code>.</p></dd>
 
 
-<dt>tolerance</dt>
-<dd><p>Numeric. Tolerance for verifying if the vector field is conservative.
-Defaults to <code>1e-6</code>.</p></dd>
+<dt>tol</dt>
+<dd><p>Numeric. Tolerance for verifying if the vector field is
+conservative. Defaults to <code>1e-6</code>.</p></dd>
+
+
+<dt>verify_conservative</dt>
+<dd><p>Logical. If <code>TRUE</code>, the function verifies that the
+provided vector field is conservative (i.e., that the mixed partial
+derivatives are equal within the specified tolerance). Defaults to <code>FALSE</code>.</p></dd>
 
 
 <dt>geom</dt>
-<dd><p>The geometric object used to render the potential function. Defaults to GeomPotential.</p></dd>
+<dd><p>The geometric object used to render the potential function.
+Defaults to GeomPotential.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -158,13 +175,13 @@ Defaults to <code>1e-6</code>.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="aesthetics">Aesthetics<a class="anchor" aria-label="anchor" href="#aesthetics"></a></h2>
-    
-
-<p><code>geom_potential()</code> accepts all aesthetics supported by <a href="https://ggplot2.tidyverse.org/reference/ggplot2-ggproto.html">GeomRaster</a>. In particular, the key aesthetics include:</p><ul><li><p><strong>fill</strong>: The computed potential value at each grid cell, which is mapped to a color scale.</p></li>
+    <p><code>geom_potential()</code> accepts all aesthetics supported by
+<a href="https://ggplot2.tidyverse.org/reference/ggplot2-ggproto.html">GeomRaster</a>. In particular, the key aesthetics include:</p><ul><li><p><strong>fill</strong>: The computed potential value at each grid cell, which is mapped to a color scale.</p></li>
 <li><p><code>x</code> and <code>y</code>: The coordinates of the grid cell centers. (calculated)</p></li>
 <li><p><code>alpha</code>: Controls the transparency of the raster fill.</p></li>
-</ul><p>Additional raster-specific aesthetics (e.g. those controlled by <code><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_fill_gradient()</a></code>,
-<code><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">scale_fill_viridis_c()</a></code>, etc.) can be applied to modify the appearance of the potential heatmap.</p>
+</ul><p>Additional raster-specific aesthetics (e.g. those controlled by
+<code><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_fill_gradient()</a></code>, <code><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">scale_fill_viridis_c()</a></code>, etc.) can be applied to
+modify the appearance of the potential heatmap.</p>
     </div>
     <div class="section level2">
     <h2 id="computed-variables">Computed Variables<a class="anchor" aria-label="anchor" href="#computed-variables"></a></h2>
@@ -185,16 +202,16 @@ the <code>fill</code> aesthetic in the raster layer.</p></dd>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Define a conservative vector field function</span></span></span>
-<span class="r-in"><span><span class="va">fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></span>
-<span class="r-in"><span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">u</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>; <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">u</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="va">y</span>, <span class="va">x</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Create the potential function heatmap</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_potential</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">fun</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_potential</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="geom_potential-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_potential</span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, verify_conservative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_potential-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

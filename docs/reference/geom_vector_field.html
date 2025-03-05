@@ -70,6 +70,9 @@ using streamlines.</p>
 <span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lineend <span class="op">=</span> <span class="st">"butt"</span>,</span>
+<span>  linejoin <span class="op">=</span> <span class="st">"round"</span>,</span>
+<span>  linemitre <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.02</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -93,6 +96,9 @@ using streamlines.</p>
 <span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lineend <span class="op">=</span> <span class="st">"butt"</span>,</span>
+<span>  linejoin <span class="op">=</span> <span class="st">"round"</span>,</span>
+<span>  linemitre <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.02</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -114,6 +120,9 @@ using streamlines.</p>
 <span>  tail_point <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lineend <span class="op">=</span> <span class="st">"butt"</span>,</span>
+<span>  linejoin <span class="op">=</span> <span class="st">"round"</span>,</span>
+<span>  linemitre <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -135,6 +144,9 @@ using streamlines.</p>
 <span>  tail_point <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lineend <span class="op">=</span> <span class="st">"butt"</span>,</span>
+<span>  linejoin <span class="op">=</span> <span class="st">"round"</span>,</span>
+<span>  linemitre <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  arrow <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -234,6 +246,18 @@ centering or normalization is applied.</p></dd>
 <dd><p>A data frame containing precomputed grid points for seed
 placement. If <code>NULL</code> (default), a regular Cartesian grid is generated based
 on <code>xlim</code>, <code>ylim</code>, and <code>n</code>.</p></dd>
+
+
+<dt>lineend</dt>
+<dd><p>Line end style (round, butt, square).</p></dd>
+
+
+<dt>linejoin</dt>
+<dd><p>Line join style (round, mitre, bevel).</p></dd>
+
+
+<dt>linemitre</dt>
+<dd><p>Line mitre limit (number greater than 1).</p></dd>
 
 
 <dt>arrow</dt>

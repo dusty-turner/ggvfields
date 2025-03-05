@@ -49,7 +49,7 @@ n <- 10
 wind_data <- data.frame(
   lon = rnorm(n), 
   lat = rnorm(n), 
-  dir = runif(n, -pi/4, pi/4),
+  dir = runif(n, -pi/2, pi/2),
   spd = rchisq(n, df = 2)
 ) |> 
   within({
@@ -127,13 +127,67 @@ ggplot(wind_data) +
 ```
 
 
+### `geom_stream_field` and `geom_stream_field2`
+
+- **`geom_stream_field`**: Computes stream fields from a user-defined function and maps the average speed to color.
+
+```{r}
+f <- function(v) c(-v[2], v[1]) # Define a function for the field
+
+ggplot() +
+  geom_stream_field(fun = f) 
+```
+
+- **`geom_stream_field2`**: Similar to `geom_stream_field`, but removes mapping, arrow heads, and designates stream origins with a dot.
+
+```{r}
+ggplot() +
+  geom_stream_field2(fun = f) 
+```
+
+- **`geom_stream_field` options**
+
+**Grid Density**: The user can control the density of the grid by using the `n` parameter.
+
+```{r}
+ggplot() +
+  geom_stream_field(fun = f, n = 4) 
+```
+
+**Length**
+
+By adjusting the `L` parameter, we can control the length of each stream.
+
+```{r}
+ggplot() +
+  geom_stream_field(fun = f, n = 4, L = .8) 
+```
+
+**Normalization**
+
+By default, the lengths of each stream is normalized to be the same length.  By turning normalization off, each stream becomes time normalized.  In other words, each stream grows for the same amount of time. 
+
+```{r}
+ggplot() +
+  geom_stream_field(fun = f, n = 4, normalize = FALSE) 
+```
+
+**Time**
+
+When normalization is turned off, we can grow each stream for the same amount of time by using the `T` parameter. 
+
+```{r}
+ggplot() +
+  geom_stream_field(fun = f, n = 4, normalize = FALSE, T = .5) 
+```
+
 ### `geom_vector_field` and `geom_vector_field2`
+
+Vector fields can be seen as special cases of streams.
 
 - **`geom_vector_field`**: Computes vector fields from a user-defined function and maps the norm to color.
 
 ```{r}
-f <- function(v) c(-v[2], v[1]) # Define a function for the vector field
-
 ggplot() +
   geom_vector_field(fun = f) 
 ```
@@ -145,16 +199,55 @@ ggplot() +
   geom_vector_field2(fun = f) 
 ```
 
+- **`geom_vector_field` options**
+
+**Length**
+
+As with streams, we can set the `L` parameter to grow vectors to a specified length. 
+
+```{r}
+ggplot() +
+  geom_vector_field(fun = f, n = 4, L = 2) 
+```
+
+**Center**
+
+If we turn off normalization and centering, we get a raw look at the vector field data.
+
+```{r}
+ggplot() +
+  geom_vector_field(fun = f, n = 4, normalize = FALSE, center = FALSE) 
+```
 
 #### Automatic Limit Detection
 
-Both `geom_vector_field` and `geom_vector_field2` can automatically determine plot limits based on the function provided. This happens when data exists in previous layers or in the base ggplot object.  This allows the limits to be inferred from context. Customize limits with the `xlim` and `ylim` parameters if needed for more control.
+Both `geom_stream_field` and `geom_vector_field` can automatically determine plot limits based on the function provided. This happens when data exists in previous layers or in the base ggplot object.  This allows the limits to be inferred from context. Customize limits with the `xlim` and `ylim` parameters if needed for more control.
 
 ```{r}
 ggplot(data = wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector() +
-  geom_vector_field(fun = f) # Automatically determines limits based on existing data
+  geom_stream_field(fun = f) # Automatically determines limits based on existing data
+
 ```
+
+#### Custom Grids
+
+The `geom_*_field` functions allow the user to plot with custom evaluation locations.  The user can specify specific points to be evaluated over the field or can also use a "hex" pattern.
+
+```{r}
+ggplot() +
+  geom_stream_field(fun = f, grid = "hex")
+```
+
+This shows a custom grid.
+
+```{r}
+custom <- data.frame(x = c(1,3,5), y = c(3,4,5))
+
+ggplot() +
+  geom_stream_field(fun = f, grid = custom, normalize = FALSE, center = FALSE, L = 4)
+```
+
 
 ---
   
@@ -168,6 +261,19 @@ Key capabilities include:
 - **Gradient and Potential Analysis**: Derive gradient fields to study scalar variations and visualize potential functions to identify conservative fields.  
 - **Dynamic Flow and Stream Plots**: Model particle trajectories and visualize dynamic behavior in time-dependent fields.  
 - **Mathematical Feature Mapping**: Display vector norms, divergence, and curl to highlight flow strength, expansion, and rotational behavior.  
+
+**ggvfields** offers two techniques for smoothing noisey vector field data. `geom_stream_smooth` and `geom_vector_smooth`
+
+`geom_stream_smooth` uses a dynamical systems approach and `geom_vector_smooth` offers a miltivariate regression approach that accounts for uncertainty. 
+
+### `geom_stream_smooth`
+
+```{r}
+ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
+  geom_vector(normalize = FALSE) +
+  geom_stream_smooth(aes(x = lon, y = lat, fx = fx, fy = fy)) +
+  lims(x = c(-3,3), y = c(-1.5,3))
+```
 
 ### `geom_vector_smooth`
   
@@ -192,7 +298,7 @@ When evaluation points are provided, smoothing is performed at those locations a
 eval_point <- data.frame(x = .5, y = .5) 
 
 ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
-  geom_vector(aes(color = after_stat(NULL)), normalize = FALSE) +
+  geom_vector(normalize = FALSE) +
   geom_vector_smooth(eval_points = eval_point) +
   lims(x = c(-7,10), y = c(-3,3))
 ```
@@ -201,7 +307,7 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
 
 ```{r}
 ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
-  geom_vector(aes(color = after_stat(NULL)), normalize = FALSE) +
+  geom_vector(normalize = FALSE) +
   geom_vector_smooth(eval_points = eval_point, pi_type = "wedge") 
 ```
 
@@ -226,7 +332,7 @@ For all options, you can change the confidence level from the default to another
 
 ```{r}
 ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
-  geom_vector(aes(color = after_stat(NULL)), normalize = FALSE) +
+  geom_vector(normalize = FALSE) +
   geom_vector_smooth(eval_points = eval_point, pi_type = "wedge") +
   geom_vector_smooth(eval_points = eval_point, pi_type = "wedge", conf_level = .7) 
 ```
@@ -291,7 +397,7 @@ The tolerance parameter can be adjusted to control the sensitivity of the conser
 
 ```{r}
 ggplot() +
-  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), tolerance = 1e-4)
+  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), tol = 1e-4)
 ```
 
 As with other functions, we can increase the granulatity of the visualization with the `n` parameter.
@@ -313,3 +419,4 @@ For questions or feedback, please [open an issue](https://github.com/dusty-turne
 
 - [ggquiver](http://pkg.mitchelloharawild.com/ggquiver/): Quiver plots for vector fields.
 - [ggarchery](https://github.com/mdhall272/ggarchery): Arrow segment visualizations.
+- [ggfields](https://github.com/pepijn-devries/ggfields): Vector field layers similar to `geom_spoke`.

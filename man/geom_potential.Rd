@@ -22,10 +22,7 @@ geom_potential(
   ylim = NULL,
   n = 51,
   tol = 1e-06,
-  verify_conservative = FALSE,
-  lineend = "butt",
-  linejoin = "round",
-  linemitre = 10
+  verify_conservative = FALSE
 )
 
 stat_potential(
@@ -42,10 +39,7 @@ stat_potential(
   ylim = NULL,
   n = 51,
   tol = 1e-06,
-  verify_conservative = FALSE,
-  lineend = "butt",
-  linejoin = "round",
-  linemitre = 10
+  verify_conservative = FALSE
 )
 }
 \arguments{
@@ -91,12 +85,6 @@ conservative. Defaults to \code{1e-6}.}
 \item{verify_conservative}{Logical. If \code{TRUE}, the function verifies that the
 provided vector field is conservative (i.e., that the mixed partial
 derivatives are equal within the specified tolerance). Defaults to \code{FALSE}.}
-
-\item{lineend}{Line end style (round, butt, square).}
-
-\item{linejoin}{Line join style (round, mitre, bevel).}
-
-\item{linemitre}{Line mitre limit (number greater than 1).}
 
 \item{geom}{The geometric object used to render the potential function.
 Defaults to \link{GeomPotential}.}
