@@ -6,6 +6,11 @@
 [![Project Status: Active - The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![](https://img.shields.io/github/languages/code-size/dusty-turner/ggvfields.svg)](https://github.com/dusty-turner/ggvfields)
+[![](https://codecov.io/gh/dusty-turner/ggvfields/branch/main/graph/badge.svg)](https://app.codecov.io/gh/dusty-turner/ggvfields)
+
+<!-- badger::badge_cran_download() -->
+<!-- badger::badge_doi() -->
 
 **ggvfields** is a powerful package for visualizing vector fields,
 stream plots, and related visualizations. It provides tools to explore
@@ -82,7 +87,7 @@ ggplot(wind_data) +
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
 `geom_vector` also supports both `xend`/`yend` format as well as
-`dx`/`dy` format.
+`fx`/`fy` format.
 
 ``` r
 ggplot(wind_data) +
@@ -118,7 +123,7 @@ and ensures consistent interpretation.
 
 Both `geom_vector` and `geom_vector2` also support polar coordinates,
 where vectors are specified using magnitude (`distance`) and direction
-(`angle`). Instead of providing Cartesian components (`dx`, `dy` or
+(`angle`). Instead of providing Cartesian components (`fx`, `fy` or
 `xend`, `yend`), users can directly supply polar data. This feature
 simplifies workflows for directional data and works for all subsequent
 relevant functions that handle polar coordinates.
@@ -383,6 +388,8 @@ conservative_fun <- function(v) {
 
 ggplot() +
   geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi))
+#> Warning in geom_potential(fun = conservative_fun, xlim = c(-2 * pi, 2 * :
+#> Ignoring unknown parameters: `lineend`, `linejoin`, and `linemitre`
 ```
 
 <img src="man/figures/README-unnamed-chunk-21-1.png" width="100%" />
@@ -394,6 +401,8 @@ stricter, while increasing it allows for more numerical error.
 ``` r
 ggplot() +
   geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), tolerance = 1e-4)
+#> Warning in geom_potential(fun = conservative_fun, xlim = c(-2 * pi, 2 * : Ignoring unknown parameters: `lineend`, `linejoin`, `linemitre`, and
+#> `tolerance`
 ```
 
 <img src="man/figures/README-unnamed-chunk-22-1.png" width="100%" />
@@ -404,156 +413,11 @@ visualization with the `n` parameter.
 ``` r
 ggplot() +
   geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), n = 50)
+#> Warning in geom_potential(fun = conservative_fun, xlim = c(-2 * pi, 2 * :
+#> Ignoring unknown parameters: `lineend`, `linejoin`, and `linemitre`
 ```
 
 <img src="man/figures/README-unnamed-chunk-23-1.png" width="100%" />
-
-<!-- ### `geom_streamplot` -->
-<!-- The `geom_streamplot` function generates a stream plot layer of a user-defined vector field function. The lines in the plot represent the flow of data points through the vector field. -->
-<!-- ```{r} -->
-<!-- f <- function(v) { -->
-<!--   x <- v[1] -->
-<!--   y <- v[2] -->
-<!--   c(-1 - x^2 + y, 1 + x - y^2) -->
-<!-- } -->
-<!-- ggplot() + -->
-<!--   geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3))  -->
-<!-- ``` -->
-<!-- The `chop` parameter (defaulted to `TRUE`) allows you to chop the trajectories into segments. This can be useful for better visualization of the streamlines when they are long and complex. -->
-<!-- It may be useful to not break up the streamlines. -->
-<!-- ```{r} -->
-<!-- ggplot() + -->
-<!--   geom_streamplot(fun = f, xlim = c(-3, 3), ylim = c(-3, 3), chop = FALSE)  -->
-<!-- ``` -->
-<!-- It may also be useful to break up the streamlines into more segments. The scale_stream parameter (defaults to 1) adjusts the segmentation of streamlines by specifying the proportion of the streamline length used to divide it into smaller segments. -->
-<!-- ```{r} -->
-<!-- ggplot() + -->
-<!--   geom_streamplot( -->
-<!--     fun = f, xlim = c(-3, 3), ylim = c(-3, 3), -->
-<!--     chop = TRUE, scale_stream = .9, -->
-<!--   )  -->
-<!-- ``` -->
-<!-- ### `geom_flow` -->
-<!-- The `geom_flow` function generates a flow plot layer for a user-defined vector field function. The lines in the plot represent the flow of data points through the vector field, visualizing the trajectory of particles over time. Each flow line traces where a “marble” would move through the vector field if dropped at a specific starting point, making this an intuitive way to visualize dynamic systems. -->
-<!-- By default, the color of each flow line corresponds to time (`t`), meaning the color transitions along the path represent the progression of time. As the flow line evolves, it shows how a particle would move over time if following the vector field. You can change the coloring by mapping aesthetics to other computed measures if needed, but time remains the default. -->
-<!-- Flows are computed using the deSolve package’s ODE solver, with the rk4 method (a fourth-order Runge-Kutta method) used for numerical integration. This solver ensures accurate and efficient computation of flow lines, abstracting away complex calculations for the user. -->
-<!-- ```{r} -->
-<!-- ggplot() + -->
-<!--   geom_flow(fun = f, xlim = c(-10, 10), ylim = c(-10, 10)) -->
-<!-- ``` -->
-<!-- In this example, flow lines evolve according to the vector field defined by `f`. The color along each line will show how the particle moves over time (`t`) within the vector field. -->
-<!-- #### Adaptive Parameters -->
-<!-- Several parameters in `geom_flow()` are adaptive, meaning they adjust automatically based on the characteristics of the vector field and the plot limits. These adaptive parameters help optimize the flow visualization without requiring manual tuning: -->
-<!-- - **`threshold_distance`**: This parameter controls the minimum distance between adjacent flow lines to prevent them from overlapping. If not specified, it is calculated automatically as half the Euclidean distance between adjacent grid points. This ensures the plot remains uncluttered, with flow lines spaced appropriately based on the grid dimensions (`n`) and the axis limits (`xlim`, `ylim`). -->
-<!-- - **`iterations`**: This parameter defines the number of time steps for the ODE solver to use when tracing the flow lines. A higher number of iterations results in smoother and more detailed flows. If `iterations` is left as `NULL`, it is computed adaptively based on the value of `T`, ensuring that longer time spans result in more iterations for smoother paths. -->
-<!-- These adaptive parameters allow `geom_flow()` to create a well-balanced plot by dynamically adjusting the precision and spacing of flow lines, based on the underlying vector field and plot limits. -->
-<!-- #### Example with Custom Parameters -->
-<!-- Below is an example where we customize the grid size, number of iterations, and the threshold distance between flow lines: -->
-<!-- ```{r} -->
-<!-- ggplot() + -->
-<!--   geom_flow( -->
-<!--     fun = f, n = c(21, 21), xlim = c(-10, 10), ylim = c(-10, 10), -->
-<!--     iterations = 1000, threshold_distance = 0.5 -->
-<!--   )  -->
-<!-- ``` -->
-<!-- ## Other Features -->
-<!-- This package provides other tools to analyze and visualize mathematical properties of vector fields.  These features allow users to map various mathematical characteristics to visual aesthetics like length and color. -->
-<!-- We already introduced mapping norm to color in `geom_vector`, `geom_vector_field`, and `geom_gradient_field` and mapping norm to length in each function's '2' alternates.  We also provide similar ability with a functions curl and divergence. -->
-<!-- ### Divergence -->
-<!-- Divergence is an operation on a vector field that describes how the field behaves at a point—whether vectors "spread out" from a point or "converge" toward it. Locally, the divergence of a vector field $\mathbf{F}$ in $\mathbb{R}^2$ at a particular point measures the "outflowing-ness" or rate of expansion of the vector field around that point. The divergence is a scalar value that can indicate sources (positive divergence) or sinks (negative divergence). -->
-<!-- If $\mathbf{F} = \langle F_x(x,y), F_y(x,y) \rangle$ is a vector field, its divergence is defined as: -->
-<!-- $$ -->
-<!-- \text{div} \, \mathbf{F} = \frac{\partial F_x}{\partial x} + \frac{\partial F_y}{\partial y} -->
-<!-- $$ -->
-<!-- To visualize the divergence of the vector field, you can map the divergence to the color aesthetic. -->
-<!-- ```{r} -->
-<!-- ggplot() + -->
-<!--   geom_vector_field( -->
-<!--     aes(color = after_stat(divergence)),  -->
-<!--     fun = f, xlim = c(-10, 10), ylim = c(-10, 10) -->
-<!--   )  -->
-<!-- ``` -->
-<!-- ### Curl -->
-<!-- Curl is a measure of the rotation or swirling behavior of a vector field at a given point. In two dimensions, the curl of a vector field $\mathbf{F}$ in $\mathbb{R}^2$ is a scalar value that quantifies how much the vectors tend to rotate or circulate around a point. Positive curl values indicate counterclockwise rotation, while negative values represent clockwise rotation. -->
-<!-- If $\mathbf{F} = \langle F_x(x,y), F_y(x,y) \rangle$ is a vector field, its curl is defined as: -->
-<!-- $$ -->
-<!-- \text{curl} \, \mathbf{F} = \frac{\partial F_y}{\partial x} - \frac{\partial F_x}{\partial y} -->
-<!-- $$ -->
-<!-- To visualize the curl of the vector field, you can map the curl to the color aesthetic. -->
-<!-- ```{r} -->
-<!-- ggplot() + -->
-<!--   geom_streamplot( -->
-<!--     aes(color = after_stat(curl)),  -->
-<!--     fun = f, xlim = c(-10, 10), ylim = c(-10, 10) -->
-<!--   )  -->
-<!-- ``` -->
-<!-- ## Features in Development -->
-<!-- ### Animation with `geom_streamplot` -->
-<!-- ```{r animation, cache = TRUE, eval = TRUE} -->
-<!-- p <- ggplot() + -->
-<!--  geom_streamplot( -->
-<!--    aes(rownum = after_stat(rownum)),  -->
-<!--     fun = f, xlim = c(-3, 3), ylim = c(-3, 3), -->
-<!--  ) + -->
-<!--  coord_fixed() + -->
-<!--  theme_bw() -->
-<!-- anim <- animation_transition(plot = p) +    -->
-<!--  gganimate::transition_reveal(rownum) + -->
-<!--  gganimate::ease_aes('linear') -->
-<!-- gganimate::animate( -->
-<!--   anim, nframes = 25, fps = 5, end_pause = 0, renderer = gganimate::gifski_renderer() -->
-<!--   ) -->
-<!-- ``` -->
-<!-- The `mask_shape_type` parameter allows you to specify the mask shape used for streamline generation which influences how the streamlines are placed and how closely they can approach each other. The default mask shape is `"square"`, but you can also use `"diamond"`, `"inset_square"`, or `"circle"`.  During streamline generation, when a streamline enters the specified shape, no other streamlines will enter that region.  -->
-<!-- - **Square Mask (default)**: Streamlines are restricted to a grid where each cell is a square. This generally results in evenly spaced streamlines. -->
-<!-- - **Diamond Mask**: Streamlines are restricted to a square grid with diamonds inset within each square.  This can create a more dense pattern which can have better visualizations for some functions. - **Inset Square Mask**: Streamlines are restricted to a grid with smaller squares inset within larger squares. This can create a denser and more detailed pattern of streamlines. -->
-<!-- - **Diamond Mask**: Streamlines are restricted to a square grid with diamonds inset within each square.  This can create a more dense pattern which can have better visualizations for some functions. - **Circle Mask**: Streamlines are restricted to a grid with inset circles inside the square grid. -->
-<!-- ```{r} -->
-<!-- ggplot() + -->
-<!--   geom_streamplot(aes(group = after_stat(id)), -->
-<!--                   fun = f, xlim = c(-3, 3), ylim = c(-3, 3), max_length = 10000, -->
-<!--                   max_steps = 10000, ds = .05, min_dist = .25,  -->
-<!--                   mask_shape_type = "diamond") + -->
-<!--   coord_fixed() + -->
-<!--   theme_minimal() -->
-<!-- ``` -->
-<!-- ### `geom_complex_function()`{.R} -->
-<!-- The `geom_complex_function()`{.R} function generates a vector field plot layer using a user-defined function to compute the vector components. This function abstracts away the mathematical computations required to generate the vector field, so the user does not need to manually calculate and input the vector components into `geom_segment()`{.R}. It simplifies the process, making it easier to create vector field visualizations without dealing with the underlying math. -->
-<!-- ```{r} -->
-<!-- f <- function(z) (z^2 + 1) / (z^2 - 1) -->
-<!-- ggplot() + -->
-<!--   geom_complex_function(fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100) + -->
-<!--   labs(x = "Real", y = "Imaginary") + -->
-<!--   coord_fixed() + -->
-<!--   theme(legend.box = "horizontal") -->
-<!-- ``` -->
-<!-- We can enhance this plot with a little help from biscale. -->
-<!-- Using biscale, we can apply a bivariate color scale to the plot, which allows us to represent two variables—angle (direction) and magnitude (intensity)—simultaneously. This makes it easier to visualize how these properties change across the field. -->
-<!-- ```{r} -->
-<!-- library(biscale) -->
-<!-- library(cowplot) -->
-<!-- plot <- -->
-<!--   ggplot() + -->
-<!--   geom_complex_function(aes(fill = after_stat(bi_class)), -->
-<!--     fun = f, relim = c(-2, 2), imlim = c(-2, 2), n = 100 -->
-<!--     ) + -->
-<!--     bi_scale_fill(pal = "DkBlue") + -->
-<!--     labs( -->
-<!--       title = "", -->
-<!--       x = "Real (Re)", -->
-<!--       y = "Imaginary (Im)" -->
-<!--     ) + -->
-<!--     bi_theme(base_size = 16) + -->
-<!--     theme(legend.position = "none") + -->
-<!--   coord_fixed()  -->
-<!-- legend <- bi_legend(pal = "DkBlue", -->
-<!--                     xlab = "Angle", -->
-<!--                     ylab = "Magnitude", -->
-<!--                     size = 6) -->
-<!-- ggdraw() + -->
-<!--   draw_plot(plot, 0, 0, .8, 1) +   -->
-<!--   draw_plot(legend, x = .55, y = .6, width = .3, height = 0.3) -->
-<!-- ``` -->
 
 ## License
 

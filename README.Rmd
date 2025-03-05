@@ -18,20 +18,10 @@ knitr::opts_chunk$set(
 
 # ggvfields  <img src="man/figures/ggvfields_hex.png"  align="right"  width="120" style="padding-left:10px;background-color:white;" />
 
-`r badger::badge_repostatus("Active")`
+`r badger::badge_repostatus("Active")`  `r badger::badge_code_size()`  `r badger::badge_codecov()`
 
-<!-- `r badge_cran_release("badger", "orange")` -->
-<!-- `r badge_cran_download("badger", "grand-total", "blue")` -->
-<!-- `r badge_cran_download("badger", "last-month", "green")` -->
-<!-- `r badge_cran_download("badger", "last-week", "yellow")` -->
-<!-- `r badge_doi("10.1111/2041-210X.12628", "yellow")` -->
-<!-- `r badge_cran_checks("badger")` -->
-
-<!-- [![test-coverage](https://codecov.io/gh/jamesotto852/ggdensity/branch/main/graph/badge.svg)](https://app.codecov.io/gh/jamesotto852/ggdensity?branch=main) -->
-<!-- [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version-ago/ggdensity)](https://cran.r-project.org/package=ggdensity) -->
-<!-- [![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/ggdensity)](https://cran.r-project.org/package=ggdensity) -->
-
-
+<!-- badger::badge_cran_download() -->
+<!-- badger::badge_doi() -->
 
 **ggvfields** is a powerful package for visualizing vector fields, stream plots, and related visualizations. It provides tools to explore directional data, including options for vector smoothing, gradient fields, potential visualizations, and dynamic flow representations.
 
