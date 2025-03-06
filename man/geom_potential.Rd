@@ -97,6 +97,11 @@ A ggplot2 layer that produces a potential function heatmap.
 potential function derived from a conservative vector field. It computes the
 potential numerically over a specified grid and displays it as a heatmap.
 }
+\details{
+Note: the potential is only known up to a constant. The point of reference
+used is the lower left corner \code{c(xlim[1], ylim[1])}, where the potential is
+assumed to be 0.
+}
 \section{Aesthetics}{
  \code{geom_potential()} accepts all aesthetics supported by
 \link{GeomRaster}. In particular, the key aesthetics include:
@@ -126,15 +131,23 @@ the \code{fill} aesthetic in the raster layer.}
 }
 
 \examples{
-# Define a conservative vector field function
-f <- function(u) {
+
+scalar_field <- function(u){
   x <- u[1]; y <- u[2]
-  c(sin(x) + y, x - sin(y))
+  (x + y)^2 + 4*(x - y)^2 - 8*(.5)^2
 }
 
-# Create the potential function heatmap
-ggplot() + geom_potential(fun = f)
-ggplot() + geom_potential(fun = f, verify_conservative = TRUE)
+gradient_field <- function(u) numDeriv::grad(scalar_field, u)
+
+s <- seq(-1, 1, length.out = 51)
+
+expand.grid("x" = s, "y" = s) |>
+  transform(phi = apply(cbind(x, y), 1, scalar_field)) |>
+  ggplot(aes(x, y)) + geom_raster(aes(fill = phi))
+
+ggplot() + geom_potential(fun = gradient_field)
+
+ggplot() + geom_potential(fun = gradient_field, verify_conservative = TRUE)
 
 }
 \keyword{datasets}

@@ -4,6 +4,10 @@
 #' potential function derived from a conservative vector field. It computes the
 #' potential numerically over a specified grid and displays it as a heatmap.
 #'
+#' Note: the potential is only known up to a constant. The point of reference
+#' used is the lower left corner `c(xlim[1], ylim[1])`, where the potential is
+#' assumed to be 0.
+#'
 #' @param mapping A set of aesthetic mappings created by [ggplot2::aes()].
 #'   (Optional)
 #' @param data The data to be displayed in this layer. If `NULL`, data is
@@ -62,15 +66,23 @@
 #' @return A ggplot2 layer that produces a potential function heatmap.
 #'
 #' @examples
-#' # Define a conservative vector field function
-#' f <- function(u) {
+#'
+#' scalar_field <- function(u){
 #'   x <- u[1]; y <- u[2]
-#'   c(sin(x) + y, x - sin(y))
+#'   (x + y)^2 + 4*(x - y)^2 - 8*(.5)^2
 #' }
 #'
-#' # Create the potential function heatmap
-#' ggplot() + geom_potential(fun = f)
-#' ggplot() + geom_potential(fun = f, verify_conservative = TRUE)
+#' gradient_field <- function(u) numDeriv::grad(scalar_field, u)
+#'
+#' s <- seq(-1, 1, length.out = 51)
+#'
+#' expand.grid("x" = s, "y" = s) |>
+#'   transform(phi = apply(cbind(x, y), 1, scalar_field)) |>
+#'   ggplot(aes(x, y)) + geom_raster(aes(fill = phi))
+#'
+#' ggplot() + geom_potential(fun = gradient_field)
+#'
+#' ggplot() + geom_potential(fun = gradient_field, verify_conservative = TRUE)
 #'
 #' @export
 geom_potential <- function(
@@ -223,10 +235,9 @@ StatPotential <- ggproto(
     }
 
     # Generate grid
-    grid_data <- expand.grid(
-      x = seq(xlim[1], xlim[2], length.out = n),
-      y = seq(ylim[1], ylim[2], length.out = n)
-    )
+    xs <- seq(xlim[1], xlim[2], length.out = n); dx <- xs[2] - xs[1]
+    ys <- seq(ylim[1], ylim[2], length.out = n); dy <- ys[2] - ys[1]
+    grid_data <- expand.grid( "x" = xs, "y" = ys )
 
     # Verify if the vector field is conservative
     if (verify_conservative) {
@@ -244,19 +255,43 @@ StatPotential <- ggproto(
 
     }
 
+    # initialize matrices and evaluate the field once, storing fx and fy
+    potential <- fy_mat <- fx_mat <- matrix(0, nrow = n, ncol = n)
 
-    # Apply the numerical potential computation to all points
-    grid_data$potential <- apply(
-      grid_data[, c("x", "y")],  1, compute_potential,
-      fun =  fun, x0 = xlim[1], y0 =  ylim[1]
-    )
+    for(i in 1:n){
+      for(j in 1:n){
+        fxy <- fun(c(xs[i], ys[j]))
+        fx_mat[i,j] <- fxy[1]
+        fy_mat[i,j] <- fxy[2]
+      }
+    }
 
-    # Remove points where potential couldn't be computed
-    grid_data <- grid_data[!is.na(grid_data$potential), ]
 
-    return(grid_data)
+    # integrate along bottom edge (y = y0)
+    for(i in 2:n) potential[i,1] <- potential[i-1,1] + 0.5*(fx_mat[i,1] + fx_mat[i-1,1])*dx
+
+
+    # integrate upwards for each column
+    for(i in 1:n) {
+      for(j in 2:n) {
+        potential[i,j] <- potential[i,j-1] + 0.5*(fy_mat[i,j] + fy_mat[i,j-1])*dy
+      }
+    }
+
+
+    # flatten matrices back to grid_data
+    grid_data$fx <- as.vector(fx_mat)
+    grid_data$fy <- as.vector(fy_mat)
+    grid_data$potential <- as.vector(potential)
+
+
+    # remove points where potential couldn't be computed
+    grid_data[!is.na(grid_data$potential), ]
+
   }
 )
+
+
 
 #' @rdname geom_potential
 #' @format NULL
@@ -284,40 +319,10 @@ GeomPotential <- ggproto(
 
 
 
-compute_potential <- function(point, fun, x0, y0) {
-  x <- point[1]
-  y <- point[2]
-
-  # Path 1: Integrate F_x from x0 to x with y = y0
-  F_x_func <- function(s) {
-    sapply(s, function(si) fun(c(si, y0))[1])
-  }
-
-  # Perform the integration for F_x
-  integral_x <- integrate(F_x_func, lower = x0, upper = x)$value
-
-  # Path 2: Integrate F_y from y0 to y with x = x
-  F_y_func <- function(t) {
-    sapply(t, function(ti) fun(c(x, ti))[2])
-  }
-
-  # Perform the integration for F_y
-  integral_y <- integrate(F_y_func, lower = y0, upper = y)$value
-
-  # Sum the integrals to get the potential
-  f_xy <- integral_x + integral_y
-
-  return(f_xy)
-}
-
-
-
-
-
 # Verify if the vector field is conservative
-verify_potential <- function(point, fun, tol) {
-  # Compute the Jacobian matrix numerically
+verify_potential <- function(point, fun, tol = sqrt(.Machine$double.eps)) {
 
+  # Compute the Jacobian matrix numerically
   jacobian_matrix <- numDeriv::jacobian(fun, point)
 
   # Extract partial derivatives
@@ -325,9 +330,8 @@ verify_potential <- function(point, fun, tol) {
   df2_dx <- jacobian_matrix[2, 1]  # ∂F_y/∂x
 
   # Check if df1_dy is approximately equal to df2_dx
-  symmetric <- abs(df1_dy - df2_dx) <= tol
+  abs(jacobian_matrix[1, 2] - jacobian_matrix[2, 1]) <= tol
 
-  return(symmetric)
 }
 
 
