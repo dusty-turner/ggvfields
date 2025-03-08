@@ -659,6 +659,7 @@ StatStreamField <- ggproto(
     # initialize the data frame
     list_of_streams <- vector(mode = "list", length = nrow(grid))
     # iterate computing streams/vectors
+
     for (i in 1:nrow(grid)) {
 
       # compute the stream for the current grid point using ode_stepper()
@@ -767,7 +768,6 @@ StatStreamField <- ggproto(
 #' @keywords internal
 ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.Machine$double.eps),
                         method = "lsoda", center = FALSE) {
-
   if ( center ) {
 
     # define a few helpers
@@ -834,6 +834,7 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
   # x'(t) = fun(u)[1], y'(t) = fun(u)[2], l'(t) = sqrt(x'(t)^2 + y'(t)).
   # this system is interrupted by the "root" function that is 0 when l(t) = L
   fun_wrapper <- function(t, u, parms) {
+
     fu <- fun(u[1:2])
     df <<- rbind(
       df,
