@@ -182,11 +182,12 @@ geom_gradient_field <- function(
     cli::cli_abort("`type` must be either 'stream' or 'vector', not {.val {type}}")
   }
 
+  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
 
-  if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
+  if (!user_fixed_color) {
+    default_mapping <- aes(color = after_stat(norm))
   } else {
-    mapping <- default_mapping
+    default_mapping <- aes()
   }
 
   if (missing(fun) || !is.function(fun)) {
@@ -287,10 +288,12 @@ stat_gradient_field <- function(
   }
 
 
-  if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
+  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
+
+  if (!user_fixed_color) {
+    default_mapping <- aes(color = after_stat(norm))
   } else {
-    mapping <- default_mapping
+    default_mapping <- aes()
   }
 
   if (missing(fun) || !is.function(fun)) {
@@ -371,10 +374,12 @@ geom_gradient_field2 <- function(
 
   default_mapping <- aes(length = after_stat(norm))
 
-  if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
+  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
+
+  if (!user_fixed_color) {
+    default_mapping <- aes(color = after_stat(norm))
   } else {
-    mapping <- default_mapping
+    default_mapping <- aes()
   }
 
   if (missing(fun) || !is.function(fun)) {
@@ -455,10 +460,12 @@ stat_gradient_field2 <- function(
 
   default_mapping <- aes(length = after_stat(norm))
 
-  if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
+  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
+
+  if (!user_fixed_color) {
+    default_mapping <- aes(color = after_stat(norm))
   } else {
-    mapping <- default_mapping
+    default_mapping <- aes()
   }
 
   if (missing(fun) || !is.function(fun)) {

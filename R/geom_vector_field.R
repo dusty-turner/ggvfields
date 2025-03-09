@@ -289,10 +289,12 @@ geom_vector_field2 <- function(
 
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
-  if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
+  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
+
+  if (!user_fixed_color) {
+    default_mapping <- aes(color = after_stat(norm))
   } else {
-    mapping <- default_mapping
+    default_mapping <- aes()
   }
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
@@ -360,10 +362,12 @@ stat_vector_field2 <- function(
 
   # Merge user-provided mapping with default mapping
   # User mapping takes precedence
-  if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
+  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
+
+  if (!user_fixed_color) {
+    default_mapping <- aes(color = after_stat(norm))
   } else {
-    mapping <- default_mapping
+    default_mapping <- aes()
   }
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
