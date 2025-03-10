@@ -43,7 +43,7 @@ stat_potential(
 )
 }
 \arguments{
-\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
+\item{mapping}{A set of aesthetic mappings created by \code{ggplot2::aes()}.
 (Optional)}
 
 \item{data}{The data to be displayed in this layer. If \code{NULL}, data is
@@ -55,7 +55,7 @@ inherited from the plot.}
 \item{position}{Position adjustment, either as a string or the result of a
 position adjustment function.}
 
-\item{...}{Other arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}} and underlying
+\item{...}{Other arguments passed to \code{grid::layer()} and underlying
 methods.}
 
 \item{na.rm}{Logical. If \code{FALSE} (default), missing values are removed with a
@@ -104,7 +104,7 @@ assumed to be 0.
 }
 \section{Aesthetics}{
  \code{geom_potential()} accepts all aesthetics supported by
-\link{GeomRaster}. In particular, the key aesthetics include:
+\code{GeomRaster}. In particular, the key aesthetics include:
 \itemize{
 \item \strong{fill}: The computed potential value at each grid cell, which is mapped to a color scale.
 \item \code{x} and \code{y}: The coordinates of the grid cell centers. (calculated)
@@ -112,7 +112,7 @@ assumed to be 0.
 }
 
 Additional raster-specific aesthetics (e.g. those controlled by
-\code{\link[=scale_fill_gradient]{scale_fill_gradient()}}, \code{\link[=scale_fill_viridis_c]{scale_fill_viridis_c()}}, etc.) can be applied to
+\code{scale_fill_gradient()}, \code{scale_fill_viridis_c()}, etc.) can be applied to
 modify the appearance of the potential heatmap.
 }
 
@@ -132,6 +132,7 @@ the \code{fill} aesthetic in the raster layer.}
 
 \examples{
 
+\dontrun{
 scalar_field <- function(u){
   x <- u[1]; y <- u[2]
   (x + y)^2 + 4*(x - y)^2 - 8*(.5)^2
@@ -148,6 +149,7 @@ expand.grid("x" = s, "y" = s) |>
 ggplot() + geom_potential(fun = gradient_field)
 
 ggplot() + geom_potential(fun = gradient_field, verify_conservative = TRUE)
+}
 
 }
 \keyword{datasets}

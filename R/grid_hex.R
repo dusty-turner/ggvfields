@@ -23,7 +23,7 @@
 #' str( grid )
 #' plot( grid, asp = 1 )
 #'
-#' grid$x |> unique() |> sort() |> diff()
+#' diff(sort(unique(grid$x)))
 #'
 #'
 grid_hex <- function(xlim, ylim, d) {

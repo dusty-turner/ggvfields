@@ -13,11 +13,11 @@
 #' - `stat_stream()`: Provides direct access to the reordering stat (i.e. `StatStream`)
 #' for advanced customization, using [GeomStream] for drawing.
 #'
-#' @param mapping A set of aesthetic mappings created by [ggplot2::aes()].
+#' @param mapping A set of aesthetic mappings created by \code{ggplot2::aes()}.
 #'   **Required:** Must include **`x`**, **`y`**, and **`t`**; additionally,
 #'   **`group`** is used to differentiate streams (if not provided, `id` will be mapped to
 #'   `group` automatically).
-#' @param data A data frame or other object, as in [ggplot2::layer()].
+#' @param data A data frame or other object, as in \code{grid::layer()}.
 #' @param geom The geometric object used to render the streamline (only used in
 #'   `stat_stream()`; defaults to [GeomStream]).
 #' @param stat The statistical transformation to use on the data for this layer;
@@ -556,7 +556,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 #' @param max_range The maximum value to which the input is rescaled. Numeric
 #'   scalar specifying the upper bound of the output range. Should be between 0
 #'   and 1.
-#' @param ... Other arguments passed to [continuous_scale()].
+#' @param ... Other arguments passed to \code{continuous_scale()}.
 #' @export
 scale_length_continuous <- function(max_range = 0.5, ...) {
 

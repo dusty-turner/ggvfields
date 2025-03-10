@@ -9,3 +9,5 @@ dusty_files*
 ^\\.github$
 .github
 ^LICENSE\.md$
+^cran-comments\.md$
+^CRAN-SUBMISSION$

@@ -29,7 +29,7 @@
 #' @inheritParams ggplot2::geom_path
 #' @inheritParams geom_stream
 #'
-#' @param mapping A set of aesthetic mappings created by [ggplot2::aes()].
+#' @param mapping A set of aesthetic mappings created by \code{ggplot2::aes()}.
 #'   **Required:** Must include **`x`** and **`y`**; in addition, either **`xend`**
 #'   and **`yend`** or one of the alternative specifications (**`fx`**/ **`fy`**
 #'   or **`angle`**/ **`angle_deg`** and **`distance`**) must be provided.
@@ -43,7 +43,7 @@
 #' @param show.legend Logical. Should this layer be included in the legends?
 #' @param inherit.aes Logical. If `FALSE`, overrides the default aesthetics
 #'   rather than combining with them.
-#' @param arrow An optional [grid::arrow()] specification to add arrowheads to
+#' @param arrow An optional \code{grid::arrow()} specification to add arrowheads to
 #'   the vectors (default: `grid::arrow(angle = 25, length = unit(0.025, "npc"),
 #'   type = "closed")`).
 #' @param center Logical. If `TRUE`, the vector is recentered so that the
@@ -60,7 +60,7 @@
 #' @param L Numeric scalar. The desired length for the vectors in data units. If
 #'   `NULL` (the default), a value is computed automatically based on the plot’s
 #'   x and y limits.
-#' @param ... Other arguments passed on to [ggplot2::layer()].
+#' @param ... Other arguments passed on to \code{grid::layer()}.
 #'
 #' @section Aesthetics:
 #'

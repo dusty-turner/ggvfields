@@ -62,11 +62,11 @@
 #' @param lineend Line end style (round, butt, square).
 #' @param linejoin Line join style (round, mitre, bevel).
 #' @param linemitre Line mitre limit (number greater than 1).
-#' @param arrow A [grid::arrow()] specification to add arrowheads to the
+#' @param arrow A \code{grid::arrow()} specification to add arrowheads to the
 #'   streamlines. In **geom_vector_field**, the default is a closed arrow with a
 #'   30° angle and length `0.02` npc; in **geom_vector_field2** the default is
 #'   `NULL`.
-#' @param ... Other arguments passed on to [ggplot2::layer()].
+#' @param ... Other arguments passed on to \code{grid::layer()}.
 #'
 #' @section Aesthetics: `geom_vector_field()` and `geom_vector_field2()`
 #'   understand the following aesthetics (required aesthetics are in **bold**):

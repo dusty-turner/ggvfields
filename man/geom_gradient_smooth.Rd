@@ -62,7 +62,7 @@ stat_gradient_smooth(
 )
 }
 \arguments{
-\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
+\item{mapping}{A set of aesthetic mappings created by \code{ggplot2::aes()}.
 \strong{Required:} Must include \strong{\code{x}} and \strong{\code{y}}; vector displacements are defined
 by \strong{\code{fx}} and \strong{\code{fy}}.}
 
@@ -123,7 +123,7 @@ length before being scaled by \code{L} (default: \code{TRUE}).}
 
 \item{linemitre}{Line mitre limit (number greater than 1).}
 
-\item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to
+\item{arrow}{An optional \code{grid::arrow()} specification to add arrowheads to
 the vectors (default: \code{grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")}).}
 
 \item{geom}{The geometric object used to render the streamline (only used in
@@ -136,7 +136,7 @@ A ggplot2 layer that can be added to a ggplot object.
 \code{geom_gradient_smooth()} creates a ggplot2 layer that visualizes the gradient
 of a scalar field computed from raw data. A linear model is fitted using the
 supplied \code{formula} (default: \code{z ~ x + y + I(x^2) + I(y^2)}) on the raw data,
-and the numerical gradient is computed using \code{\link[numDeriv:grad]{numDeriv::grad()}}. The computed
+and the numerical gradient is computed using numDeriv::grad(). The computed
 gradient field is then visualized using \code{\link[=GeomStream]{GeomStream()}}.
 }
 \section{Aesthetics}{
@@ -156,7 +156,7 @@ selected \code{type}.
 \strong{Gradient Calculation:}
 A linear model is fitted using the provided \code{formula} and the raw data. The scalar
 field defined by the model is then differentiated numerically with
-\code{\link[numDeriv:grad]{numDeriv::grad()}} to yield gradient vectors.
+\code{numDeriv::grad()} to yield gradient vectors.
 
 \strong{Visualization:}
 The resulting gradient field is visualized using \code{\link[=GeomStream]{GeomStream()}}. Since \code{z} is only

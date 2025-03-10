@@ -121,7 +121,7 @@ Defaults to \link{StatStreamField}.}
 \item{position}{Position adjustment, either as a string or the result of a
 call to a position adjustment function.}
 
-\item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
+\item{...}{Other arguments passed on to \code{grid::layer()}.}
 
 \item{na.rm}{Logical. If \code{FALSE} (the default), missing values are removed
 with a warning.}
@@ -172,7 +172,7 @@ on \code{xlim}, \code{ylim}, and \code{n}.}
 
 \item{linemitre}{Line mitre limit (number greater than 1).}
 
-\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the
+\item{arrow}{A \code{grid::arrow()} specification to add arrowheads to the
 streamlines. In \strong{geom_vector_field}, the default is a closed arrow with a
 30° angle and length \code{0.02} npc; in \strong{geom_vector_field2} the default is
 \code{NULL}.}

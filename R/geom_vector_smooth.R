@@ -9,14 +9,12 @@
 #' @importFrom stats qt
 #' @importFrom stats integrate
 #'
-#' @param mapping A set of aesthetic mappings created by [ggplot2::aes()].
+#' @param mapping A set of aesthetic mappings created by \code{ggplot2::aes()}.
 #'   **Required:** Must include **`x`** and **`y`**; vector displacements are defined by
 #'   **`fx`** and **`fy`**.
 #' @param data A data frame containing the raw vector data.
 #' @param stat The statistical transformation to use on the data (default:
 #'   `"vector_smooth"`).
-#' @param geom The geometric object used to render the smoothed vector field
-#'   (defaults to [GeomVectorSmooth]).
 #' @param position Position adjustment, either as a string or the result of a
 #'   position adjustment function.
 #' @param n An integer vector specifying the number of grid points along each
@@ -39,11 +37,11 @@
 #'   - `"ellipse"`: Ellipses are used to represent the covariance of the predictions.
 #'   If `pi_type` is set to `"ellipse"` and `eval_points` is `NULL`, it will
 #'   revert to `"wedge"`.
-#' @param arrow A [grid::arrow()] specification for arrowheads on the smoothed
+#' @param arrow A \code{grid::arrow()} specification for arrowheads on the smoothed
 #'   vectors.
 #' @param formula A formula specifying the multivariate linear model used for
 #'   smoothing. The default is `cbind(fx, fy) ~ x * y`.
-#' @param ... Other arguments passed to [ggplot2::layer()] and the underlying
+#' @param ... Other arguments passed to \code{ggplot2::layer()} and the underlying
 #'   geometry/stat.
 #'
 #'

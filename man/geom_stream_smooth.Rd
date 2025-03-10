@@ -52,7 +52,7 @@ stat_stream_smooth(
 )
 }
 \arguments{
-\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
+\item{mapping}{A set of aesthetic mappings created by \code{ggplot2::aes()}.
 \strong{Required:} Must include \strong{\code{x}} and \strong{\code{y}}; vector displacements are defined
 by \strong{\code{fx}} and \strong{\code{fy}}.}
 
@@ -106,7 +106,7 @@ provided, it specifies the grid where the smoothing model is evaluated; if
 
 \item{linemitre}{Line mitre limit (number greater than 1).}
 
-\item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to
+\item{arrow}{An optional \code{grid::arrow()} specification to add arrowheads to
 the vectors (default: \code{grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")}).}
 
 \item{geom}{The geometric object used to render the streamline (only used in
@@ -180,6 +180,8 @@ Two types of prediction intervals can be displayed:
 }
 
 \examples{
+
+\dontrun{
 # Define a true vector field function
 f <- function(u) {
   x <- u[1]; y <- u[2]
@@ -240,5 +242,6 @@ eval_pts <- data.frame(x = c(0, 1), y = c(2, -1))
 ggplot(data = df) +
   geom_vector(aes(x, y, fx = fx, fy = fy), color = "black", normalize = FALSE) +
   geom_stream_smooth(eval_points = eval_pts)
+}
 
 }

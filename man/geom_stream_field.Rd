@@ -128,10 +128,10 @@ stat_stream_field2(
 )
 }
 \arguments{
-\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
+\item{mapping}{A set of aesthetic mappings created by \code{ggplot2::aes()}.
 (Optional)}
 
-\item{data}{A data frame or other object, as in \code{\link[ggplot2:layer]{ggplot2::layer()}}.
+\item{data}{A data frame or other object, as in \code{ggplot2::layer()}.
 (Optional)}
 
 \item{stat}{The statistical transformation to use on the data (default:
@@ -140,7 +140,7 @@ stat_stream_field2(
 \item{position}{Position adjustment, either as a string or the result of a
 position adjustment function.}
 
-\item{...}{Other arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}} and the underlying
+\item{...}{Other arguments passed to \code{ggplot2::layer()} and the underlying
 geometry/stat.}
 
 \item{na.rm}{Logical. If \code{FALSE} (the default), missing values are removed
@@ -218,7 +218,7 @@ on \code{xlim}, \code{ylim}, and \code{n}.}
 
 \item{linemitre}{Line mitre limit (number greater than 1).}
 
-\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification for adding arrowheads to the
+\item{arrow}{A \code{grid::arrow()} specification for adding arrowheads to the
 streamlines. Defaults to a closed arrow with a 30° angle and length \code{0.02}
 npc.}
 

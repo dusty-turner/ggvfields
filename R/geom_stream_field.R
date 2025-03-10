@@ -7,9 +7,9 @@
 #' This is useful for visualizing vector fields, flow patterns, or trajectories,
 #' such as in fluid dynamics or gradient fields.
 #'
-#' @param mapping A set of aesthetic mappings created by [ggplot2::aes()].
+#' @param mapping A set of aesthetic mappings created by \code{ggplot2::aes()}.
 #'   (Optional)
-#' @param data A data frame or other object, as in [ggplot2::layer()].
+#' @param data A data frame or other object, as in \code{ggplot2::layer()}.
 #'   (Optional)
 #' @param stat The statistical transformation to use on the data (default:
 #'   [StatStreamField]).
@@ -65,7 +65,7 @@
 #' @param grid A data frame containing precomputed grid points for seed
 #'   placement. If `NULL` (default), a regular Cartesian grid is generated based
 #'   on `xlim`, `ylim`, and `n`.
-#' @param arrow A [grid::arrow()] specification for adding arrowheads to the
+#' @param arrow A \code{grid::arrow()} specification for adding arrowheads to the
 #'   streamlines. Defaults to a closed arrow with a 30° angle and length `0.02`
 #'   npc.
 #' @param tail_point Logical. If `TRUE`, draws a point at the tail (starting
@@ -75,7 +75,7 @@
 #' @param lineend Line end style (round, butt, square).
 #' @param linejoin Line join style (round, mitre, bevel).
 #' @param linemitre Line mitre limit (number greater than 1).
-#' @param ... Other arguments passed to [ggplot2::layer()] and the underlying
+#' @param ... Other arguments passed to \code{ggplot2::layer()} and the underlying
 #'   geometry/stat.
 #'
 #' @section Aesthetics: `geom_stream_field()` (and its stat variant) inherit

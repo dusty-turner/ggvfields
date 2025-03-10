@@ -36,7 +36,7 @@ geom_vector_smooth(
 GeomVectorSmooth
 }
 \arguments{
-\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
+\item{mapping}{A set of aesthetic mappings created by \code{ggplot2::aes()}.
 \strong{Required:} Must include \strong{\code{x}} and \strong{\code{y}}; vector displacements are defined by
 \strong{\code{fx}} and \strong{\code{fy}}.}
 
@@ -48,7 +48,7 @@ GeomVectorSmooth
 \item{position}{Position adjustment, either as a string or the result of a
 position adjustment function.}
 
-\item{...}{Other arguments passed to \code{\link[ggplot2:layer]{ggplot2::layer()}} and the underlying
+\item{...}{Other arguments passed to \code{ggplot2::layer()} and the underlying
 geometry/stat.}
 
 \item{n}{An integer vector specifying the number of grid points along each
@@ -83,11 +83,8 @@ smoothing. The default is \code{cbind(fx, fy) ~ x * y}.}
 specify the grid where the smoothing model is evaluated. If \code{NULL}, a grid
 is generated based on \code{n}.}
 
-\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification for arrowheads on the smoothed
+\item{arrow}{A \code{grid::arrow()} specification for arrowheads on the smoothed
 vectors.}
-
-\item{geom}{The geometric object used to render the smoothed vector field
-(defaults to \link{GeomVectorSmooth}).}
 }
 \value{
 A ggplot2 layer that can be added to a plot to create a smooth vector

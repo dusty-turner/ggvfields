@@ -11,7 +11,7 @@ scale_length_continuous(max_range = 0.5, ...)
 scalar specifying the upper bound of the output range. Should be between 0
 and 1.}
 
-\item{...}{Other arguments passed to \code{\link[=continuous_scale]{continuous_scale()}}.}
+\item{...}{Other arguments passed to \code{continuous_scale()}.}
 }
 \description{
 \code{\link[=scale_length_continuous]{scale_length_continuous()}} provides a continuous scale for controlling the

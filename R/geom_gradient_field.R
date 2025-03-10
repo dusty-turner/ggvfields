@@ -5,7 +5,7 @@
 #' specifies the behavior of the scalar field by taking a numeric vector of
 #' length 2 (representing \eqn{(x, y)}) and returning a single numeric value.
 #' The underlying [StatStreamField] computes the gradient via numerical
-#' differentiation (using [numDeriv::grad()]) and [GeomStream] renders the
+#' differentiation (using \code{numDeriv::grad()}) and [GeomStream] renders the
 #' resulting vectors.
 #'
 #' Two variants are provided:
@@ -17,7 +17,7 @@
 #' @inheritParams geom_vector
 #' @inheritParams geom_stream_field
 #'
-#' @param mapping A set of aesthetic mappings created by [ggplot2::aes()].
+#' @param mapping A set of aesthetic mappings created by \code{ggplot2::aes()}.
 #'   Additional aesthetics such as `color`, `size`, `linetype`, and `alpha` can
 #'   be defined. In
 #'   **geom_gradient_field** the default mapping includes `color = after_stat(norm)`,
@@ -53,9 +53,9 @@
 #' @param grid A data frame containing precomputed grid points for seed
 #'   placement. If `NULL` (default), a regular Cartesian grid is generated based
 #'   on `xlim`, `ylim`, and `n`.
-#' @param arrow A [grid::arrow()] specification to add arrowheads to the
+#' @param arrow A \code{grid::arrow()} specification to add arrowheads to the
 #'   gradient vectors. In **geom_gradient_field**, the default is a closed arrow
-#'   with a 30° angle and length `0.02` npc; in **geom_gradient_field2**, the
+#'   with a 30° angle and length `0.02` npc; in `geom_gradient_field2()`, the
 #'   default is `NULL`.
 #' @param max_it Integer. Maximum number of integration steps allowed when
 #'   computing the gradient stream. Defaults to `1000`.
@@ -71,7 +71,7 @@
 #' @param lineend Line end style (round, butt, square).
 #' @param linejoin Line join style (round, mitre, bevel).
 #' @param linemitre Line mitre limit (number greater than 1).
-#' @param ... Other arguments passed on to [ggplot2::layer()].
+#' @param ... Other arguments passed on to \code{grid::layer()}.
 #'
 #' @section Aesthetics: `geom_gradient_field()` and `geom_gradient_field2()`
 #'   understand the following aesthetics (required aesthetics are in **bold**):

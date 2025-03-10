@@ -85,11 +85,11 @@ round(wind_data, digits = 2)
 
 ## Core Features
 
-### `geom_vector` and `geom_vector2`
+### `geom_vector()` and `geom_vector2()`
 
 These functions allow for flexible visualizations of vector data.
 
-- **`geom_vector`**: By default, this maps the norm (magnitude) of a
+- **`geom_vector()`**: By default, this maps the norm (magnitude) of a
   vector to its color. This helps compare relative magnitudes visually
   through color gradients. Users do not need to explicitly specify this
   unless overriding the default behavior.
@@ -101,7 +101,7 @@ ggplot(wind_data) +
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
-`geom_vector` also supports both `xend`/`yend` format as well as
+`geom_vector()` also supports both `xend`/`yend` format as well as
 `fx`/`fy` format.
 
 ``` r
@@ -111,9 +111,9 @@ ggplot(wind_data) +
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
-- **`geom_vector2`**: Maps the norm of a vector directly to its length.
-  This provides a more intuitive representation of magnitude. This is
-  done by mapping `length = after_stat(norm)` by default.
+- **`geom_vector2()`**: Maps the norm of a vector directly to its
+  length. This provides a more intuitive representation of magnitude.
+  This is done by mapping `length = after_stat(norm)` by default.
 
 ``` r
 ggplot(wind_data) +
@@ -130,18 +130,18 @@ understand magnitude differences without relying solely on color.
 The norm $\mathbf{w} = (u, v)$ is calculated
 $$|\mathbf{w}| = \sqrt{u^2 + v^2}$$ .
 
-This feature of `geom_vector2` enhances interpretability by using actual
-vector lengths to represent magnitude. The legend reflects the scaling
-and ensures consistent interpretation.
+This feature of `geom_vector2()` enhances interpretability by using
+actual vector lengths to represent magnitude. The legend reflects the
+scaling and ensures consistent interpretation.
 
 #### Polar Coordinates Support
 
-Both `geom_vector` and `geom_vector2` also support polar coordinates,
-where vectors are specified using magnitude (`distance`) and direction
-(`angle`). Instead of providing Cartesian components (`fx`, `fy` or
-`xend`, `yend`), users can directly supply polar data. This feature
-simplifies workflows for directional data and works for all subsequent
-relevant functions that handle polar coordinates.
+Both `geom_vector()` and `geom_vector2()` also support polar
+coordinates, where vectors are specified using magnitude (`distance`)
+and direction (`angle`). Instead of providing Cartesian components
+(`fx`, `fy` or `xend`, `yend`), users can directly supply polar data.
+This feature simplifies workflows for directional data and works for all
+subsequent relevant functions that handle polar coordinates.
 
 Polar coordinates can be visualized like this:
 
@@ -154,7 +154,7 @@ ggplot(wind_data) +
 
 #### Normalize and Center
 
-Two important options in `geom_vector` and subsequent functions are
+Two important options in `geom_vector()` and subsequent functions are
 `normalize` and `center` - both of which default to `TRUE.` These
 options help control the visual representation of vectors:
 

@@ -76,7 +76,7 @@ stat_vector2(
 )
 }
 \arguments{
-\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
+\item{mapping}{A set of aesthetic mappings created by \code{ggplot2::aes()}.
 \strong{Required:} Must include \strong{\code{x}} and \strong{\code{y}}; in addition, either \strong{\code{xend}}
 and \strong{\code{yend}} or one of the alternative specifications (\strong{\code{fx}}/ \strong{\code{fy}}
 or \strong{\code{angle}}/ \strong{\code{angle_deg}} and \strong{\code{distance}}) must be provided.}
@@ -89,7 +89,7 @@ or \strong{\code{angle}}/ \strong{\code{angle_deg}} and \strong{\code{distance}}
 \item{position}{Position adjustment, either as a string or the result of a
 position adjustment function.}
 
-\item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
+\item{...}{Other arguments passed on to \code{grid::layer()}.}
 
 \item{na.rm}{Logical. If \code{FALSE} (the default), missing values are removed
 with a warning.}
@@ -118,7 +118,7 @@ centering or normalization (default: \code{FALSE}).}
 \code{NULL} (the default), a value is computed automatically based on the plot’s
 x and y limits.}
 
-\item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to
+\item{arrow}{An optional \code{grid::arrow()} specification to add arrowheads to
 the vectors (default: \code{grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")}).}
 
 \item{geom}{The geometric object used to render the streamline (only used in

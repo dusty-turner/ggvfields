@@ -10,7 +10,7 @@
 #' @inheritParams geom_vector
 #' @inheritParams geom_stream_field
 #'
-#' @param mapping A set of aesthetic mappings created by [ggplot2::aes()].
+#' @param mapping A set of aesthetic mappings created by \code{ggplot2::aes()}.
 #'   **Required:** Must include **`x`** and **`y`**; vector displacements are defined
 #'   by **`fx`** and **`fy`**.
 #' @param data A data frame containing the raw vector data.
@@ -82,6 +82,8 @@
 #' }
 #'
 #' @examples
+#'
+#' \dontrun{
 #' # Define a true vector field function
 #' f <- function(u) {
 #'   x <- u[1]; y <- u[2]
@@ -142,6 +144,7 @@
 #' ggplot(data = df) +
 #'   geom_vector(aes(x, y, fx = fx, fy = fy), color = "black", normalize = FALSE) +
 #'   geom_stream_smooth(eval_points = eval_pts)
+#' }
 #'
 #' @name geom_stream_smooth
 #' @aliases geom_stream_smooth stat_stream_smooth

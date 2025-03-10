@@ -120,7 +120,7 @@ stat_gradient_field2(
 )
 }
 \arguments{
-\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
+\item{mapping}{A set of aesthetic mappings created by \code{ggplot2::aes()}.
 Additional aesthetics such as \code{color}, \code{size}, \code{linetype}, and \code{alpha} can
 be defined. In
 \strong{geom_gradient_field} the default mapping includes \code{color = after_stat(norm)},
@@ -134,7 +134,7 @@ Defaults to \link{StatStreamField}.}
 \item{position}{Position adjustment, either as a string or the result of a
 position adjustment function.}
 
-\item{...}{Other arguments passed on to \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
+\item{...}{Other arguments passed on to \code{grid::layer()}.}
 
 \item{na.rm}{Logical. If \code{FALSE} (the default), missing values are removed
 with a warning.}
@@ -194,9 +194,9 @@ on \code{xlim}, \code{ylim}, and \code{n}.}
 
 \item{linemitre}{Line mitre limit (number greater than 1).}
 
-\item{arrow}{A \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to the
+\item{arrow}{A \code{grid::arrow()} specification to add arrowheads to the
 gradient vectors. In \strong{geom_gradient_field}, the default is a closed arrow
-with a 30° angle and length \code{0.02} npc; in \strong{geom_gradient_field2}, the
+with a 30° angle and length \code{0.02} npc; in \code{geom_gradient_field2()}, the
 default is \code{NULL}.}
 
 \item{geom}{The geometric object used to render the streamline (only used in
@@ -212,7 +212,7 @@ by computing the gradient of a scalar field. A user-defined function (\code{fun}
 specifies the behavior of the scalar field by taking a numeric vector of
 length 2 (representing \eqn{(x, y)}) and returning a single numeric value.
 The underlying \link{StatStreamField} computes the gradient via numerical
-differentiation (using \code{\link[numDeriv:grad]{numDeriv::grad()}}) and \link{GeomStream} renders the
+differentiation (using \code{numDeriv::grad()}) and \link{GeomStream} renders the
 resulting vectors.
 }
 \details{

@@ -16,17 +16,17 @@ Authors@R:
            role = c("aut"),
            email = "rodney_sturdivant@baylor.edu"))
 Maintainer: Dusty Turner <dusty.s.turner@gmail.com>
-Description: A ggplot2 extension for visualizing vector fields in two-dimensional 
+Description: A 'ggplot2' extension for visualizing vector fields in two-dimensional 
            space. Provides flexible tools for creating vector and stream field layers, 
            visualizing gradients and potential fields, and smoothing vector and 
-           scalar data to estimate underlying directional patterns. 
+           scalar data to estimate underlying patterns. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Depends: 
-    R (>= 3.5.0),
+    R (>= 4.1.0),
     ggplot2 (>= 3.3.0)
 Imports:
     farver,
@@ -44,6 +44,6 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
-VignetteBuilder: knitr
-Date: 2024-06-27
+Date: 2025-03-08
 Config/testthat/edition: 3
+BuildVignettes: true

@@ -3,7 +3,7 @@
 #' `geom_gradient_smooth()` creates a ggplot2 layer that visualizes the gradient
 #' of a scalar field computed from raw data. A linear model is fitted using the
 #' supplied `formula` (default: `z ~ x + y + I(x^2) + I(y^2)`) on the raw data,
-#' and the numerical gradient is computed using [numDeriv::grad()]. The computed
+#' and the numerical gradient is computed using numDeriv::grad(). The computed
 #' gradient field is then visualized using [GeomStream()].
 #'
 #' @inheritParams geom_stream_smooth
@@ -30,7 +30,7 @@
 #' **Gradient Calculation:**
 #' A linear model is fitted using the provided `formula` and the raw data. The scalar
 #' field defined by the model is then differentiated numerically with
-#' [numDeriv::grad()] to yield gradient vectors.
+#' \code{numDeriv::grad()} to yield gradient vectors.
 #'
 #' **Visualization:**
 #' The resulting gradient field is visualized using [GeomStream()]. Since `z` is only

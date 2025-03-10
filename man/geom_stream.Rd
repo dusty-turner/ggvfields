@@ -41,12 +41,12 @@ stat_stream(
 )
 }
 \arguments{
-\item{mapping}{A set of aesthetic mappings created by \code{\link[ggplot2:aes]{ggplot2::aes()}}.
+\item{mapping}{A set of aesthetic mappings created by \code{ggplot2::aes()}.
 \strong{Required:} Must include \strong{\code{x}}, \strong{\code{y}}, and \strong{\code{t}}; additionally,
 \strong{\code{group}} is used to differentiate streams (if not provided, \code{id} will be mapped to
 \code{group} automatically).}
 
-\item{data}{A data frame or other object, as in \code{\link[ggplot2:layer]{ggplot2::layer()}}.}
+\item{data}{A data frame or other object, as in \code{grid::layer()}.}
 
 \item{stat}{The statistical transformation to use on the data for this layer;
 defaults to \link{StatStream}.}

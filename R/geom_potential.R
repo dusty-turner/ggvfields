@@ -8,7 +8,7 @@
 #' used is the lower left corner `c(xlim[1], ylim[1])`, where the potential is
 #' assumed to be 0.
 #'
-#' @param mapping A set of aesthetic mappings created by [ggplot2::aes()].
+#' @param mapping A set of aesthetic mappings created by \code{ggplot2::aes()}.
 #'   (Optional)
 #' @param data The data to be displayed in this layer. If `NULL`, data is
 #'   inherited from the plot.
@@ -37,18 +37,18 @@
 #' @param verify_conservative Logical. If `TRUE`, the function verifies that the
 #'   provided vector field is conservative (i.e., that the mixed partial
 #'   derivatives are equal within the specified tolerance). Defaults to `FALSE`.
-#' @param ... Other arguments passed to [ggplot2::layer()] and underlying
+#' @param ... Other arguments passed to \code{grid::layer()} and underlying
 #'   methods.
 #'
 #' @section Aesthetics: `geom_potential()` accepts all aesthetics supported by
-#'   [GeomRaster]. In particular, the key aesthetics include:
+#'   \code{GeomRaster}. In particular, the key aesthetics include:
 #'
 #'   - **fill**: The computed potential value at each grid cell, which is mapped to a color scale.
 #'   - `x` and `y`: The coordinates of the grid cell centers. (calculated)
 #'   - `alpha`: Controls the transparency of the raster fill.
 #'
 #'   Additional raster-specific aesthetics (e.g. those controlled by
-#'   [scale_fill_gradient()], [scale_fill_viridis_c()], etc.) can be applied to
+#'   \code{scale_fill_gradient()}, \code{scale_fill_viridis_c()}, etc.) can be applied to
 #'   modify the appearance of the potential heatmap.
 #'
 #' @section Computed Variables:
@@ -67,6 +67,7 @@
 #'
 #' @examples
 #'
+#' \dontrun{
 #' scalar_field <- function(u){
 #'   x <- u[1]; y <- u[2]
 #'   (x + y)^2 + 4*(x - y)^2 - 8*(.5)^2
@@ -83,6 +84,7 @@
 #' ggplot() + geom_potential(fun = gradient_field)
 #'
 #' ggplot() + geom_potential(fun = gradient_field, verify_conservative = TRUE)
+#' }
 #'
 #' @export
 geom_potential <- function(
