@@ -1,57 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>/reference/efield.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_gradient_field.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_potential.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_stream.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_stream_field.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_stream_smooth.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_vector.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_vector_field.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_vector_smooth.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ggvfields.html</loc>
-  </url>
-  <url>
-    <loc>/reference/grid_hex.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/scale_length_continuous.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/LICENSE.html</loc></url>
+<url><loc>/reference/efield.html</loc></url>
+<url><loc>/reference/geom_gradient_field.html</loc></url>
+<url><loc>/reference/geom_gradient_smooth.html</loc></url>
+<url><loc>/reference/geom_potential.html</loc></url>
+<url><loc>/reference/geom_stream.html</loc></url>
+<url><loc>/reference/geom_stream_field.html</loc></url>
+<url><loc>/reference/geom_stream_smooth.html</loc></url>
+<url><loc>/reference/geom_vector.html</loc></url>
+<url><loc>/reference/geom_vector_field.html</loc></url>
+<url><loc>/reference/geom_vector_smooth.html</loc></url>
+<url><loc>/reference/ggvfields.html</loc></url>
+<url><loc>/reference/grid_hex.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/scale_length_continuous.html</loc></url>
 </urlset>
+

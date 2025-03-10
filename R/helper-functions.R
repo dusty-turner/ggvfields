@@ -377,4 +377,4 @@ matrix_to_df_with_names <- function(mat, col_names = NULL) {
   return(df)
 }
 
-utils::globalVariables(c("potential", "fun", "f", "l", "max_t", "avg_spd", "x", "y", "fx", "fy", "normalize"))
+utils::globalVariables(c("potential", "fun", "f", "l", "max_t", "avg_spd", "x", "y", "fx", "fy", "normalize", "z"))

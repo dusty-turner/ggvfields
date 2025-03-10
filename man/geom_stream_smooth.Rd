@@ -2,12 +2,36 @@
 % Please edit documentation in R/geom_stream_smooth.R
 \name{geom_stream_smooth}
 \alias{geom_stream_smooth}
+\alias{stat_stream_smooth}
 \title{Create a Smoothed Vector Field Layer}
 \usage{
 geom_stream_smooth(
   mapping = NULL,
   data = NULL,
   stat = StatStreamField,
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  n = 11,
+  xlim = NULL,
+  ylim = NULL,
+  normalize = TRUE,
+  center = FALSE,
+  type = "vector",
+  formula = cbind(fx, fy) ~ x * y,
+  eval_points = NULL,
+  lineend = "butt",
+  linejoin = "round",
+  linemitre = 10,
+  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
+)
+
+stat_stream_smooth(
+  mapping = NULL,
+  data = NULL,
+  geom = GeomStream,
   position = "identity",
   ...,
   na.rm = FALSE,
@@ -84,6 +108,9 @@ provided, it specifies the grid where the smoothing model is evaluated; if
 
 \item{arrow}{An optional \code{\link[grid:arrow]{grid::arrow()}} specification to add arrowheads to
 the vectors (default: \code{grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")}).}
+
+\item{geom}{The geometric object used to render the streamline (only used in
+\code{stat_stream()}; defaults to \link{GeomStream}).}
 }
 \value{
 A ggplot2 layer that can be added to a ggplot object to display a

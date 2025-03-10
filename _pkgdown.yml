@@ -31,8 +31,13 @@ reference:
       - geom_gradient_field2
       - stat_gradient_field2
       - geom_stream_smooth
+      - stat_stream_smooth
       - geom_vector_smooth
+      - stat_vector_smooth
+      - geom_gradient_smooth
+      - stat_gradient_smooth
       - geom_potential
+      - stat_potential
       - scale_length_continuous
       - ggvfields
       - efield

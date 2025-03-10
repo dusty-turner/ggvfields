@@ -582,11 +582,11 @@ StatStreamField <- ggproto(
                            method, max_it = 1000, tol = sqrt(.Machine$double.eps),
                            T = NULL, L = NULL,
                            center, type, normalize, args = NULL, grid, ...) {
+
     ## pick the right limits.  may need updating but currently prioritizing
     # limit specified by user
     # range of data received from ggplot layer or in this layer
     # range inherited from previous layer's scales
-
     if( is.null(grid) || (!is.data.frame(grid) && grid == "hex") ){
 
       xlim <- xlim %||%
@@ -752,6 +752,7 @@ StatStreamField <- ggproto(
     ## fix remove aes warning
     list_of_streams$fx <- NA_real_
     list_of_streams$fy <- NA_real_
+    list_of_streams$z <- NA_real_
     list_of_streams$distance <- NA_real_
     list_of_streams$angle <- NA_real_
 

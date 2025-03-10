@@ -271,7 +271,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
   # required_aes = c("x", "y"),
   default_aes = modifyList(
     GeomPath$default_aes,
-    list("alpha" = 1, "linewidth" = 1, "length" = after_stat(NA_real_), fx = NA, fy = NA)
+    list("alpha" = 1, "linewidth" = 1, "length" = after_stat(NA_real_), fx = NA, fy = NA, z = NA)
   ),
 
   setup_data = function(data, params){
