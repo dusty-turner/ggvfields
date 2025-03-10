@@ -169,7 +169,7 @@ geom_gradient_field <- function(
   linemitre = 10,
   arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"), type = "closed")
 ) {
-# browser()
+
   if (is.null(data)) data <- ensure_nonempty_data(data)
 
   n <- ensure_length_two(n)
@@ -194,19 +194,20 @@ geom_gradient_field <- function(
     stop("Please provide a valid scalar function `fun` that takes a numeric vector and returns a single numeric value.")
   }
 
-  if (is.null(xlim) && !is.null(data) && "x" %in% names(data)) {
-    xlim <- range(data$x, na.rm = TRUE)
-  } else if (is.null(xlim)) {
-    xlim <- c(-10, 10)  # Fallback default range
-  }
+  # if (is.null(xlim) && !is.null(data) && "x" %in% names(data)) {
+  #   xlim <- range(data$x, na.rm = TRUE)
+  # } else if (is.null(xlim)) {
+  #   xlim <- c(-10, 10)  # Fallback default range
+  # }
+  #
+  # if (is.null(ylim) && !is.null(data) && "y" %in% names(data)) {
+  #   ylim <- range(data$y, na.rm = TRUE)
+  # } else if (is.null(ylim)) {
+  #   ylim <- c(-10, 10)  # Fallback default range
+  # }
 
-  if (is.null(ylim) && !is.null(data) && "y" %in% names(data)) {
-    ylim <- range(data$y, na.rm = TRUE)
-  } else if (is.null(ylim)) {
-    ylim <- c(-10, 10)  # Fallback default range
-  }
-# browser()
   gradient_fun <- function(u) {
+
     if (!is.numeric(u) || length(u) != 2) {
       stop("Input to the gradient function must be a numeric vector of length 2.")
     }

@@ -144,13 +144,14 @@
 #'   geom_stream_smooth(eval_points = eval_pts)
 #'
 #' @name geom_stream_smooth
-#' @aliases geom_stream_smooth
+#' @aliases geom_stream_smooth stat_stream_smooth
 #' @export
 NULL
 
 #' @rdname geom_stream_smooth
 #' @export
-geom_stream_smooth <- function(mapping = NULL, data = NULL,
+geom_stream_smooth <- function(mapping = NULL,
+  data = NULL,
    stat = StatStreamField,
    position = "identity",
    ...,
@@ -170,7 +171,6 @@ geom_stream_smooth <- function(mapping = NULL, data = NULL,
    linemitre = 10,
    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
 ) {
-
 
   # Inspect the LHS of the formula. If it is cbind(xend, yend), then change it
   lhs <- formula[[2]]
@@ -194,6 +194,7 @@ geom_stream_smooth <- function(mapping = NULL, data = NULL,
   # Define the vector field function. It retrieves the prepared data from the
   # parent environment (which comes from the stat after setup_data()).
   vec_field <- function(u) {
+
     group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
 
     # if (inherits(group_data, "try-error") || is.null(group_data)) {
@@ -210,6 +211,95 @@ geom_stream_smooth <- function(mapping = NULL, data = NULL,
     data = data,
     mapping = mapping,
     geom = GeomStream,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = c(
+      list(
+        na.rm = na.rm,
+        n = n,
+        normalize = normalize,
+        center = center,
+        fun = vec_field,
+        xlim = xlim,
+        ylim = ylim,
+        grid = eval_points,
+        type = type,
+        lineend = lineend,
+        linejoin = linejoin,
+        linemitre = linemitre,
+        arrow = arrow,
+        ...
+      ),
+      dots
+    )
+  )
+}
+
+
+#' @rdname geom_stream_smooth
+#' @export
+stat_stream_smooth <- function(mapping = NULL,
+  data = NULL,
+   geom = GeomStream,
+   position = "identity",
+   ...,
+   na.rm = FALSE,
+   show.legend = NA,
+   inherit.aes = TRUE,
+   n = 11,
+   xlim = NULL,
+   ylim = NULL,
+   normalize = TRUE,
+   center = FALSE,
+   type = "vector",
+   formula = cbind(fx, fy) ~ x * y,
+   eval_points = NULL,
+   lineend = "butt",
+   linejoin = "round",
+   linemitre = 10,
+   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
+) {
+
+  # Inspect the LHS of the formula. If it is cbind(xend, yend), then change it
+  lhs <- formula[[2]]
+  if (is.call(lhs) && identical(lhs[[1]], as.name("cbind"))) {
+    lhs_vars <- sapply(as.list(lhs[-1]), as.character)
+    if (all(lhs_vars %in% c("xend", "yend")) ||
+        all(lhs_vars %in% c("distance", "angle"))) {
+      # Change to use fx and fy instead
+      formula[[2]] <- substitute(cbind(fx, fy))
+    }
+  }
+
+  if (is.null(mapping)) mapping <- aes(x = x, y = y, fx = fx, fy = fy)
+
+  n <- ensure_length_two(n)
+  dots <- list(...)
+  if (!("color" %in% names(dots))) {
+    dots$color <- "blue"
+  }
+
+  # Define the vector field function. It retrieves the prepared data from the
+  # parent environment (which comes from the stat after setup_data()).
+  vec_field <- function(u) {
+
+    group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
+
+    # if (inherits(group_data, "try-error") || is.null(group_data)) {
+    #   stop("Could not retrieve group data for vector field calculation.")
+    # }
+    # Fit the regression using the (possibly modified) formula.
+    model <- lm(formula, data = group_data)
+    newdata <- data.frame(x = u[1], y = u[2])
+    as.numeric(predict(model, newdata = newdata))
+  }
+
+  layer(
+    stat = StatStreamField,
+    data = data,
+    mapping = mapping,
+    geom = geom,
     position = position,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
