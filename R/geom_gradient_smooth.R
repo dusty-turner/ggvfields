@@ -4,13 +4,17 @@
 #' of a scalar field computed from raw data. A linear model is fitted using the
 #' supplied `formula` (default: `z ~ x + y + I(x^2) + I(y^2)`) on the raw data,
 #' and the numerical gradient is computed using [numDeriv::grad()]. The computed
-#' gradient field is then visualized using [GeomStream()]. Note that the `z`
-#' aesthetic is used only for the internal gradient calculation and is not mapped
-#' to any visual property.
+#' gradient field is then visualized using [GeomStream()].
 #'
 #' @inheritParams geom_stream_smooth
 #' @param formula A formula specifying the linear model for the scalar field.
 #'   Defaults to `z ~ x + y + I(x^2) + I(y^2)`.
+#' @param max_it Maximum number of iterations for field integration (when used in streamlines).
+#' @param T If `normalize = FALSE`, this controls the time length for growing streams.
+#' @param L If `normalize = TRUE`, this controls the fixed length of streams or vectors.
+#' @param tail_point Logical. If `TRUE`, draws the tail point of vectors/streams (default: `FALSE`).
+#' @param eval_point Logical. If `TRUE`, marks the evaluation points used to fit gradients.
+#' @param grid A user-supplied data frame or pattern (e.g., "hex") for specifying custom evaluation points.
 #' @param ... Additional arguments passed to the layer.
 #'
 #' @section Aesthetics:
@@ -141,7 +145,6 @@ geom_gradient_smooth <- function(
 
   gradient_field <- function(u) {
     group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
-
     local_scalar_field <- function(u) {
       model <- lm(formula, data = group_data)
       newdata <- data.frame(x = u[1], y = u[2])

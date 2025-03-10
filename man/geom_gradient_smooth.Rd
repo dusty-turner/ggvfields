@@ -95,6 +95,12 @@ Defaults to \code{z ~ x + y + I(x^2) + I(y^2)}.}
 
 \item{n}{An integer vector specifying the grid resolution for smoothing.}
 
+\item{max_it}{Maximum number of iterations for field integration (when used in streamlines).}
+
+\item{T}{If \code{normalize = FALSE}, this controls the time length for growing streams.}
+
+\item{L}{If \code{normalize = TRUE}, this controls the fixed length of streams or vectors.}
+
 \item{center}{Logical. If \code{TRUE}, the vector is recentered so that the
 original \verb{(x, y)} becomes the midpoint (default is \code{TRUE} for
 \code{geom_vector()} and \code{FALSE} for \code{geom_vector2()}).}
@@ -104,6 +110,12 @@ computes a full streamline by integrating in both directions (if \code{center = 
 
 \item{normalize}{Logical. If \code{TRUE}, the vector endpoints are scaled to unit
 length before being scaled by \code{L} (default: \code{TRUE}).}
+
+\item{tail_point}{Logical. If \code{TRUE}, draws the tail point of vectors/streams (default: \code{FALSE}).}
+
+\item{eval_point}{Logical. If \code{TRUE}, marks the evaluation points used to fit gradients.}
+
+\item{grid}{A user-supplied data frame or pattern (e.g., "hex") for specifying custom evaluation points.}
 
 \item{lineend}{Line end style (round, butt, square).}
 
@@ -125,9 +137,7 @@ A ggplot2 layer that can be added to a ggplot object.
 of a scalar field computed from raw data. A linear model is fitted using the
 supplied \code{formula} (default: \code{z ~ x + y + I(x^2) + I(y^2)}) on the raw data,
 and the numerical gradient is computed using \code{\link[numDeriv:grad]{numDeriv::grad()}}. The computed
-gradient field is then visualized using \code{\link[=GeomStream]{GeomStream()}}. Note that the \code{z}
-aesthetic is used only for the internal gradient calculation and is not mapped
-to any visual property.
+gradient field is then visualized using \code{\link[=GeomStream]{GeomStream()}}.
 }
 \section{Aesthetics}{
 

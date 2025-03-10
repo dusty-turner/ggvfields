@@ -1,7 +1,7 @@
 Package: ggvfields
 Type: Package
 Title: Vector Field Visualizations with ggplot2
-Version: 0.0.0
+Version: 1.0.0
 Authors@R: 
     c(person(given = "Dusty",
            family = "Turner",
@@ -16,9 +16,10 @@ Authors@R:
            role = c("aut"),
            email = "rodney_sturdivant@baylor.edu"))
 Maintainer: Dusty Turner <dusty.s.turner@gmail.com>
-Description: A ggplot2 extension for visualizing vector fields in a two-dimensional space. 
-             Provides functions to create vector field layers using user-defined vector field functions
-             and the `grid` package for rendering vector fields as graphical objects.
+Description: A ggplot2 extension for visualizing vector fields in two-dimensional 
+           space. Provides flexible tools for creating vector and stream field layers, 
+           visualizing gradients and potential fields, and smoothing vector and 
+           scalar data to estimate underlying directional patterns. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

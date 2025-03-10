@@ -33,6 +33,21 @@ library("ggvfields")
 options(ggplot2.continuous.colour="viridis")
 ```
 
+<!-- - [Installation](#installation) -->
+<!-- - [Core Features](#core-features) -->
+<!--   - [geom_vector and geom_vector2](#geom_vector-and-geom_vector2) -->
+<!--   - [geom_stream_field and geom_stream_field2](#geom_stream_field-and-geom_stream_field2) -->
+<!--   - [geom_vector_field and geom_vector_field2](#geom_vector_field-and-geom_vector_field2) -->
+<!--   - [geom_gradient_field and geom_gradient_field2](#geom_gradient_field-and-geom_gradient_field2) -->
+<!--   - [geom_potential](#geom_potential) -->
+<!-- - [Advanced Features](#advanced-features) -->
+<!--   - [geom_stream_smooth](#geom_stream_smooth) -->
+<!--   - [geom_vector_smooth](#geom_vector_smooth) -->
+<!--   - [geom_gradient_smooth](#geom_gradient_smooth) -->
+<!-- - [Other Features](#other-features) -->
+<!--   - [Automatic Limit Detection](#automatic-limit-detection) -->
+<!--   - [Custom Grids](#custom-grids) -->
+
 Generate sample wind data:
 
 ``` r
@@ -168,9 +183,9 @@ ggplot(wind_data) +
 
 <img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
 
-### `geom_stream_field` and `geom_stream_field2`
+### `geom_stream_field()` and `geom_stream_field2()`
 
-- **`geom_stream_field`**: Computes stream fields from a user-defined
+- **`geom_stream_field()`**: Computes stream fields from a user-defined
   function and maps the average speed to color.
 
 ``` r
@@ -182,8 +197,9 @@ ggplot() +
 
 <img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
 
-- **`geom_stream_field2`**: Similar to `geom_stream_field`, but removes
-  mapping, arrow heads, and designates stream origins with a dot.
+- **`geom_stream_field2()`**: Similar to `geom_stream_field()`, but
+  removes mapping, arrow heads, and designates stream origins with a
+  dot.
 
 ``` r
 ggplot() +
@@ -192,7 +208,7 @@ ggplot() +
 
 <img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
-- **`geom_stream_field` options**
+- **`geom_stream_field()` options**
 
 **Grid Density**: The user can control the density of the grid by using
 the `n` parameter.
@@ -242,11 +258,11 @@ ggplot() +
 
 <img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
 
-### `geom_vector_field` and `geom_vector_field2`
+### `geom_vector_field()` and `geom_vector_field2()`
 
 Vector fields can be seen as special cases of streams.
 
-- **`geom_vector_field`**: Computes vector fields from a user-defined
+- **`geom_vector_field()`**: Computes vector fields from a user-defined
   function and maps the norm to color.
 
 ``` r
@@ -256,8 +272,8 @@ ggplot() +
 
 <img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
 
-- **`geom_vector_field2`**: Similar to `geom_vector_field`, but maps the
-  norm of vectors to their lengths instead of color.
+- **`geom_vector_field2()`**: Similar to `geom_vector_field()`, but maps
+  the norm of vectors to their lengths instead of color.
 
 ``` r
 ggplot() +
@@ -266,7 +282,7 @@ ggplot() +
 
 <img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
 
-- **`geom_vector_field` options**
+- **`geom_vector_field()` options**
 
 **Length**
 
@@ -292,45 +308,105 @@ ggplot() +
 
 <img src="man/figures/README-unnamed-chunk-19-1.png" width="100%" />
 
-#### Automatic Limit Detection
+### `geom_gradient_field()` and `geom_gradient_field2()`
 
-Both `geom_stream_field` and `geom_vector_field` can automatically
-determine plot limits based on the function provided. This happens when
-data exists in previous layers or in the base ggplot object. This allows
-the limits to be inferred from context. Customize limits with the `xlim`
-and `ylim` parameters if needed for more control.
+The geom_gradient_field function computes and visualizes gradient fields
+derived from scalar functions and displays the gradient vector field of
+a scalar function, $f(x, y)$. The gradient is given by:
+
+$$
+\nabla f(x, y) = \left( \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right)
+$$
+
+This vector field points in the direction of the greatest rate of
+increase of the scalar function. The function numerically evaluates
+these partial derivatives and visualizes the resulting vectors.
+
+- **Gradient Field with Norm to Color**:
 
 ``` r
-ggplot(data = wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
-  geom_vector() +
-  geom_stream_field(fun = f) # Automatically determines limits based on existing data
+paraboloid_field <- function(v) {
+  x <- v[1]
+  y <- v[2]
+  x^2 + y^2
+}
+
+ggplot() +
+  geom_gradient_field(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
 ```
 
 <img src="man/figures/README-unnamed-chunk-20-1.png" width="100%" />
 
-#### Custom Grids
-
-The `geom_*_field` functions allow the user to plot with custom
-evaluation locations. The user can specify specific points to be
-evaluated over the field or can also use a “hex” pattern.
+- **Gradient Field with Norm to Length**:
 
 ``` r
 ggplot() +
-  geom_stream_field(fun = f, grid = "hex")
+  geom_gradient_field2(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
 ```
 
 <img src="man/figures/README-unnamed-chunk-21-1.png" width="100%" />
 
-This shows a custom grid.
+- **Adjusting Grid Density**:
+
+The `n` parameter adjusts the density of the grid used to evaluate the
+gradient field. Decreasing `n` reduces the number of vectors which
+producing a coarser grid while increasing `n` results in a finer grid
+with more vectors.
 
 ``` r
-custom <- data.frame(x = c(1,3,5), y = c(3,4,5))
-
 ggplot() +
-  geom_stream_field(fun = f, grid = custom, normalize = FALSE, center = FALSE, L = 4)
+  geom_gradient_field(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10), n = 5)
 ```
 
 <img src="man/figures/README-unnamed-chunk-22-1.png" width="100%" />
+
+### `geom_potential()`
+
+A potential function represents a scalar field whose gradient produces a
+vector field. It is used to describe conservative vector fields which
+exist when the curl of the vector field is 0.
+
+The `geom_potential()` function computes and visualizes the scalar
+potential function for a given conservative vector field. The input
+function must represent a 2D vector field and the output is the
+corresponding potential function. If the input field is not
+conservative, the function checks this condition numerically based on a
+tolerance parameter. The tolerance determines how strictly the field
+must satisfy the conservation condition.
+
+``` r
+conservative_fun <- function(v) {
+ x <- v[1]
+ y <- v[2]
+ c(sin(x) + y, x - sin(y))
+}
+
+ggplot() +
+  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi))
+```
+
+<img src="man/figures/README-unnamed-chunk-23-1.png" width="100%" />
+
+The tolerance parameter can be adjusted to control the sensitivity of
+the conservativeness check. Decreasing the tolerance makes the check
+stricter, while increasing it allows for more numerical error.
+
+``` r
+ggplot() +
+  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), tol = 1e-4)
+```
+
+<img src="man/figures/README-unnamed-chunk-24-1.png" width="100%" />
+
+As with other functions, we can increase the granularity of the
+visualization with the `n` parameter.
+
+``` r
+ggplot() +
+  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), n = 50)
+```
+
+<img src="man/figures/README-unnamed-chunk-25-1.png" width="100%" />
 
 ------------------------------------------------------------------------
 
@@ -346,36 +422,27 @@ Key capabilities include:
 
 - **Smoothing Vector Fields**: Approximate trends in noisy vector data
   and compute prediction intervals for uncertainty visualization.  
-- **Gradient and Potential Analysis**: Derive gradient fields to study
-  scalar variations and visualize potential functions to identify
-  conservative fields.  
 - **Dynamic Flow and Stream Plots**: Model particle trajectories and
-  visualize dynamic behavior in time-dependent fields.  
-- **Mathematical Feature Mapping**: Display vector norms, divergence,
-  and curl to highlight flow strength, expansion, and rotational
-  behavior.
+  visualize dynamic behavior in time-dependent fields.
 
-**ggvfields** offers two techniques for smoothing noisey vector field
-data. `geom_stream_smooth` and `geom_vector_smooth`
+**ggvfields** offers two techniques for smoothing noisy vector field
+data `geom_stream_smooth()` and `geom_vector_smooth()`
 
-`geom_stream_smooth` uses a dynamical systems approach and
-`geom_vector_smooth` offers a miltivariate regression approach that
+`geom_stream_smooth()` uses a dynamical systems approach and
+`geom_vector_smooth()` offers a multivariate regression approach that
 accounts for uncertainty.
 
-### `geom_stream_smooth`
+### `geom_stream_smooth()`
 
 ``` r
 ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
-  geom_vector(normalize = FALSE) +
-  geom_stream_smooth(aes(x = lon, y = lat, fx = fx, fy = fy)) +
-  lims(x = c(-3,3), y = c(-1.5,3))
-#> Warning: Removed 3 rows containing missing values or values outside the scale range
-#> (`geom_stream()`).
+  geom_vector() +
+  geom_stream_smooth(aes(x = lon, y = lat, fx = fx, fy = fy)) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-23-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-26-1.png" width="100%" />
 
-### `geom_vector_smooth`
+### `geom_vector_smooth()`
 
 Provides smoothed estimates of vector fields by applying statistical
 techniques to observed vectors.
@@ -412,7 +479,7 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
 #> (`geom_stream()`).
 ```
 
-<img src="man/figures/README-unnamed-chunk-24-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-27-1.png" width="100%" />
 
 - **Using Wedges to Visualize Uncertainty**:
 
@@ -422,7 +489,7 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector_smooth(eval_points = eval_point, pi_type = "wedge") 
 ```
 
-<img src="man/figures/README-unnamed-chunk-25-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-28-1.png" width="100%" />
 
 - **Grid-Based Smoothing**:
 
@@ -432,7 +499,7 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector() 
 ```
 
-<img src="man/figures/README-unnamed-chunk-26-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-29-1.png" width="100%" />
 
 - **Custom Grid Resolution**:
 
@@ -441,7 +508,7 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector_smooth(n = 6, pi_type = "wedge") 
 ```
 
-<img src="man/figures/README-unnamed-chunk-27-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-30-1.png" width="100%" />
 
 - **Altering Confidence Level**
 
@@ -455,107 +522,113 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector_smooth(eval_points = eval_point, pi_type = "wedge", conf_level = .7) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-28-1.png" width="100%" />
-
-### `geom_gradient_field` and `geom_gradient_field2`
-
-The geom_gradient_field function computes and visualizes gradient fields
-derived from scalar functions and displays the gradient vector field of
-a scalar function, $f(x, y)$. The gradient is given by:
-
-$$
-\nabla f(x, y) = \left( \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right)
-$$
-
-This vector field points in the direction of the greatest rate of
-increase of the scalar function. The function numerically evaluates
-these partial derivatives and visualizes the resulting vectors.
-
-- **Gradient Field with Norm to Color**:
-
-``` r
-paraboloid_field <- function(v) {
-  x <- v[1]
-  y <- v[2]
-  x^2 + y^2
-}
-
-ggplot() +
-  geom_gradient_field(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
-```
-
-<img src="man/figures/README-unnamed-chunk-29-1.png" width="100%" />
-
-- **Gradient Field with Norm to Length**:
-
-``` r
-ggplot() +
-  geom_gradient_field2(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
-```
-
-<img src="man/figures/README-unnamed-chunk-30-1.png" width="100%" />
-
-- **Adjusting Grid Density**:
-
-The `n` parameter adjusts the density of the grid used to evaluate the
-gradient field. Decreasing `n` reduces the number of vectors which
-producing a coarser grid while increasing `n` results in a finer grid
-with more vectors.
-
-``` r
-ggplot() +
-  geom_gradient_field(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10), n = 5)
-```
-
 <img src="man/figures/README-unnamed-chunk-31-1.png" width="100%" />
 
-### `geom_potential`
+### `geom_gradient_smooth()`
 
-A potential function represents a scalar field whose gradient produces a
-vector field. It is used to describe conservative vector fields which
-exist when the curl of the vector field is 0.
+`geom_gradient_smooth()` creates a **smoothed gradient field** from raw
+scalar data using a fitted linear model. This function estimates
+gradients when only scalar values (`z`) are observed at spatial
+locations (`x`, `y`). It is designed for cases where you have scalar
+data and wish to estimate the gradient.
 
-The `geom_potential` function computes and visualizes the scalar
-potential function for a given conservative vector field. The input
-function must represent a 2D vector field and the output is the
-corresponding potential function. If the input field is not
-conservative, the function checks this condition numerically based on a
-tolerance parameter. The tolerance determines how strictly the field
-must satisfy the conservation condition.
+The gradients are computed numerically from a fitted scalar field model
+and the resulting gradient vectors are visualized using either
+streamlines or vector arrows.
+
+- `formula`: A formula specifying the linear model used to approximate
+  the scalar field. Defaults to `z ~ x + y + I(x^2) + I(y^2)`.
+- `type`: Type of visualization, either `"vector"` (default, arrows) or
+  `"stream"` (streamlines).
+- `n`: The resolution of the grid to evaluate the gradient field.
+- `center`, `normalize`, and other graphical options for controlling
+  visual appearance similar to the other gradient and vector functions
+  above.
 
 ``` r
-conservative_fun <- function(v) {
- x <- v[1]
- y <- v[2]
- c(sin(x) + y, x - sin(y))
+f1 <- function(u) {
+  x <- u[1]
+  y <- u[2]
+  x^2 - y^2
 }
 
-ggplot() +
-  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi))
+grid_data <- expand.grid(
+  x = seq(-5, 5, length.out = 30),
+  y = seq(-5, 5, length.out = 30)
+)
+
+set.seed(123)
+grid_data$z <- apply(grid_data, 1, f1) + rnorm(nrow(grid_data), mean = 0, sd = 5)
+
+ggplot(grid_data, aes(x = x, y = y, z = z)) +
+  geom_gradient_smooth()
 ```
 
 <img src="man/figures/README-unnamed-chunk-32-1.png" width="100%" />
 
-The tolerance parameter can be adjusted to control the sensitivity of
-the conservativeness check. Decreasing the tolerance makes the check
-stricter, while increasing it allows for more numerical error.
+To illustrate how `geom_gradient_smooth()` can adapt to nonlinear
+surfaces, we can change the formula used to fit the scalar field and
+switch to a streamline visualization using `type = "stream"`. The
+example below uses a smooth but noisy scalar function that generates
+curved gradients and fits a flexible smoothing model to capture these
+variations.
 
 ``` r
-ggplot() +
-  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), tol = 1e-4)
+h1 <- function(u) {
+  x <- u[1]
+  y <- u[2]
+  sin(x / 2) * cos(y / 2)
+}
+
+grid_data$z <- apply(grid_data, 1, h1) + rnorm(nrow(grid_data), mean = 0, sd = 1)
+
+ggplot(grid_data, aes(x = x, y = y, z = z)) +
+  geom_gradient_smooth(formula = z ~ I(x^2) * I(y^2), n = 5, type = "stream") 
 ```
 
 <img src="man/figures/README-unnamed-chunk-33-1.png" width="100%" />
 
-As with other functions, we can increase the granulatity of the
-visualization with the `n` parameter.
+## Other Features
+
+### Automatic Limit Detection
+
+These functions can automatically determine plot limits based on the
+function provided. This happens when data exists in previous layers or
+in the base ggplot object. This allows the limits to be inferred from
+context. Customize limits with the `xlim` and `ylim` parameters if
+needed for more control.
 
 ``` r
-ggplot() +
-  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), n = 50)
+ggplot(data = wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
+  geom_vector() +
+  geom_stream_field(fun = f) # Automatically determines limits based on existing data
 ```
 
 <img src="man/figures/README-unnamed-chunk-34-1.png" width="100%" />
+
+### Custom Grids
+
+The `geom_*_field` functions allow the user to plot with custom
+evaluation locations. The user can specify specific points to be
+evaluated over the field or can also use a “hex” pattern.
+
+``` r
+ggplot() +
+  geom_stream_field(fun = f, grid = "hex")
+```
+
+<img src="man/figures/README-unnamed-chunk-35-1.png" width="100%" />
+
+This shows a custom grid.
+
+``` r
+custom <- data.frame(x = c(1,3,5), y = c(3,4,5))
+
+ggplot() +
+  geom_stream_field(fun = f, grid = custom, normalize = FALSE, center = FALSE, L = 4)
+```
+
+<img src="man/figures/README-unnamed-chunk-36-1.png" width="100%" />
 
 ## License
 
@@ -568,9 +641,11 @@ issue](https://github.com/dusty-turner/ggvfields/issues/new).
 
 ## Related Projects
 
+- [metR](https://github.com/eliocamp/metR/blob/master/R/geom_streamline.R):
+  Meteorological visualizations with tools for vector fields.
+- [ggfields](https://github.com/pepijn-devries/ggfields): Vector field
+  layers similar to `geom_spoke`.
 - [ggquiver](http://pkg.mitchelloharawild.com/ggquiver/): Quiver plots
   for vector fields.
 - [ggarchery](https://github.com/mdhall272/ggarchery): Arrow segment
   visualizations.
-- [ggfields](https://github.com/pepijn-devries/ggfields): Vector field
-  layers similar to `geom_spoke`.
