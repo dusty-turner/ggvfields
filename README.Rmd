@@ -18,7 +18,11 @@ knitr::opts_chunk$set(
 
 # ggvfields  <img src="man/figures/ggvfields_hex.png"  align="right"  width="120" style="padding-left:10px;background-color:white;" />
 
-`r badger::badge_repostatus("Active")`  `r badger::badge_code_size()`  `r badger::badge_codecov()`
+`r badger::badge_repostatus("Active")`  `r badger::badge_code_size()`  `r badger::badge_codecov()`  
+
+<!-- badger::badge_cran_checks(pkg = "ggvfields") -->
+<!-- [![CRAN status](https://www.r-pkg.org/badges/version/ggvfields)](https://CRAN.R-project.org/package=ggvfields) -->
+
 
 <!-- badger::badge_cran_download() -->
 <!-- badger::badge_doi() -->

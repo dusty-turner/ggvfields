@@ -201,9 +201,6 @@
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2),
 #'   grid = grid_hex(c(-2,2), c(-2,2), .35))
 #'
-#'
-#'
-#' # bug here with alpha
 #' ggplot() +
 #'   geom_stream_field(fun = f, aes(alpha = after_stat(t)), xlim = c(-2,2), ylim = c(-2,2)) +
 #'   scale_alpha(range  = c(0,1))

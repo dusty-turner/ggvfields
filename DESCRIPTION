@@ -1,6 +1,6 @@
 Package: ggvfields
 Type: Package
-Title: Vector Field Visualizations with ggplot2
+Title: Vector Field Visualizations with 'ggplot2'
 Version: 1.0.0
 Authors@R: 
     c(person(given = "Dusty",
