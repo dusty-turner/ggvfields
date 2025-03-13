@@ -190,6 +190,14 @@ geom_gradient_field <- function(
     default_mapping <- aes()
   }
 
+  # Merge user mapping with default mapping:
+  if (is.null(mapping)) {
+    mapping <- default_mapping
+  } else {
+    mapping <- modifyList(default_mapping, mapping)
+  }
+
+
   if (missing(fun) || !is.function(fun)) {
     stop("Please provide a valid scalar function `fun` that takes a numeric vector and returns a single numeric value.")
   }
@@ -288,13 +296,19 @@ stat_gradient_field <- function(
     cli::cli_abort("`type` must be either 'stream' or 'vector', not {.val {type}}")
   }
 
-
   user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
 
   if (!user_fixed_color) {
     default_mapping <- aes(color = after_stat(norm))
   } else {
     default_mapping <- aes()
+  }
+
+  # Merge user mapping with default mapping:
+  if (is.null(mapping)) {
+    mapping <- default_mapping
+  } else {
+    mapping <- modifyList(default_mapping, mapping)
   }
 
   if (missing(fun) || !is.function(fun)) {

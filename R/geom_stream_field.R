@@ -251,13 +251,20 @@ geom_stream_field <- function(
     arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
 
-  # Define default mapping for geom_vector_field
-  default_mapping <- aes(color = after_stat(avg_spd))
+  if (type == "vector") {
+    default_mapping <- aes(color = after_stat(norm))
+  } else if (type == "stream") {
+    default_mapping <- aes(color = after_stat(avg_spd))
+  } else {
+    stop("Unknown type specified. Valid values are 'vector' or 'stream'.")
+  }
 
-  # Merge user-provided mapping with default mapping
-  # User mapping takes precedence
+  # Merge user-provided mapping with default mapping.
+  # If the user did not specify a color aesthetic, add the default.
   if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
+    if (!"color" %in% names(mapping)) {
+      mapping <- modifyList(default_mapping, mapping)
+    }
   } else {
     mapping <- default_mapping
   }
@@ -334,11 +341,16 @@ stat_stream_field <- function(
     arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
 
-  # Define default mapping for geom_vector_field
-  default_mapping <- aes(color = after_stat(avg_spd))
+  if (type == "vector") {
+    default_mapping <- aes(color = after_stat(norm))
+  } else if (type == "stream") {
+    default_mapping <- aes(color = after_stat(avg_spd))
+  } else {
+    stop("Unknown type specified. Valid values are 'vector' or 'stream'.")
+  }
 
-  # Merge user-provided mapping with default mapping
-  # User mapping takes precedence
+  # Merge user-provided mapping with default mapping.
+  # If the user did not specify a color aesthetic, add the default.
   if (!is.null(mapping)) {
     if (!"color" %in% names(mapping)) {
       mapping <- modifyList(default_mapping, mapping)
