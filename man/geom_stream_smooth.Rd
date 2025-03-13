@@ -181,7 +181,7 @@ Two types of prediction intervals can be displayed:
 
 \examples{
 
-\dontrun{
+\donttest{
 # Define a true vector field function
 f <- function(u) {
   x <- u[1]; y <- u[2]

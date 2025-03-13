@@ -21,7 +21,7 @@
 #' @param geom The geometric object used to render the streamline (only used in
 #'   `stat_stream()`; defaults to [GeomStream]).
 #' @param stat The statistical transformation to use on the data for this layer;
-#' defaults to [StatStream].
+#'   defaults to [StatStream].
 #' @param position Position adjustment, either as a string or the result of a
 #'   position adjustment function.
 #' @param na.rm Logical. If `FALSE` (the default), missing values are removed
@@ -31,8 +31,8 @@
 #'   rather than combining with them.
 #' @param arrow An optional [grid::arrow()] specification to place arrowheads on
 #'   the streamline.
-#' @param arrow.fill An optional parameter specifying the color of the arrow head.
-#'   Defaults to `NULL` and inherets fill/alpha of `aes()`.
+#' @param arrow.fill An optional parameter specifying the color of the arrow
+#'   head. Defaults to `NULL` and inherets fill/alpha of `aes()`.
 #' @param lineend Line end style (round, butt, square).
 #' @param linejoin Line join style (round, mitre, bevel).
 #' @param linemitre Line mitre limit (number greater than 1).
@@ -557,6 +557,17 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 #'   scalar specifying the upper bound of the output range. Should be between 0
 #'   and 1.
 #' @param ... Other arguments passed to \code{continuous_scale()}.
+#'
+#' @return If \code{max_range} is less than or equal to 0.5 (the default), a
+#'   continuous scale object (typically of class \code{"ScaleContinuous"})
+#'   mapping the \code{length} aesthetic is returned. If \code{max_range} is
+#'   greater than 0.5, a list is returned with two components:
+#'   \itemize{
+#'     \item the continuous scale object, and
+#'     \item a theme modification (a \code{theme} object) that adjusts the legend key width based
+#'           on the value of \code{max_range}.
+#'   }
+#'
 #' @export
 scale_length_continuous <- function(max_range = 0.5, ...) {
 

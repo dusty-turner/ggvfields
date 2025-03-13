@@ -39,7 +39,7 @@
 #' @return A ggplot2 layer that can be added to a ggplot object.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Define several scalar field functions:
 #'
 #' # Example 1: f(x, y) = x^2 - y^2

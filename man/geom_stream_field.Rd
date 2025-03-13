@@ -285,7 +285,7 @@ f <- function(u) c(-u[2], u[1])
 
 # the basic usage involves providing a fun, xlim, and ylim
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-\dontrun{
+\donttest{
 # if unspecified, xlim and ylim default to c(-1,1). we use this in what
 # follows to focus on other parts of the code
 ggplot() + geom_stream_field(fun = f)
@@ -364,9 +364,6 @@ ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2))
 ggplot() + geom_stream_field(fun = f, xlim = c(-2,2), ylim = c(-2,2),
   grid = grid_hex(c(-2,2), c(-2,2), .35))
 
-
-
-# bug here with alpha
 ggplot() +
   geom_stream_field(fun = f, aes(alpha = after_stat(t)), xlim = c(-2,2), ylim = c(-2,2)) +
   scale_alpha(range  = c(0,1))

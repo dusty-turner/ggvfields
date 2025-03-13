@@ -13,6 +13,17 @@ and 1.}
 
 \item{...}{Other arguments passed to \code{continuous_scale()}.}
 }
+\value{
+If \code{max_range} is less than or equal to 0.5 (the default), a
+continuous scale object (typically of class \code{"ScaleContinuous"})
+mapping the \code{length} aesthetic is returned. If \code{max_range} is
+greater than 0.5, a list is returned with two components:
+\itemize{
+\item the continuous scale object, and
+\item a theme modification (a \code{theme} object) that adjusts the legend key width based
+on the value of \code{max_range}.
+}
+}
 \description{
 \code{\link[=scale_length_continuous]{scale_length_continuous()}} provides a continuous scale for controlling the
 length aesthetic in a ggplot. This is particularly useful when working with
