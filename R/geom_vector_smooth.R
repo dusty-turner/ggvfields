@@ -519,7 +519,33 @@ GeomVectorSmooth <- ggproto(
           coord = coord
         )
 
-        grobs <- c(grobs, grid::gList(wedge_grob))
+        raster_data <- data.frame(x = data$x, y = data$y)
+        raster_data$z <- (data$max_angle - data$min_angle) * (180 / pi)
+
+        # browser()
+        n_rows <- length(unique(raster_data$y))
+        n_cols <- length(unique(raster_data$x))
+
+        raster_data <- raster_data[order(raster_data$y, raster_data$x), ]
+
+        z_matrix <- matrix(raster_data$z, nrow = n_rows, ncol = n_cols, byrow = TRUE)
+
+        nColors <- 100
+        colorRamp <- colorRampPalette(c("black", "white"))
+
+        # Normalize z_matrix to indices between 1 and nColors
+        z_norm <- round((z_matrix - min(z_matrix)) / (max(z_matrix) - min(z_matrix)) * (nColors - 1)) + 1
+        color_matrix <- matrix(colorRamp(nColors)[z_norm], nrow = nrow(z_matrix))
+
+        raster_grob <- grid::nullGrob()
+
+        # raster_grob <-  grid::rasterGrob(image = color_matrix,
+        #                           width = unit(1, "npc"),
+        #                           height = unit(1, "npc"),
+        #                           interpolate = TRUE)
+
+
+        grobs <- c(grobs, grid::gList(raster_grob, wedge_grob))
 
       } else if (pi_type == "ellipse") {
         # Draw ellipses
