@@ -3,23 +3,44 @@
 
 # ggvfields <img src="man/figures/ggvfields_hex.png"  align="right"  width="120" style="padding-left:10px;background-color:white;" />
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/ggvfields)](https://CRAN.R-project.org/package=ggvfields)
+[![CRAN
+checks](https://badges.cranchecks.info/summary/ggvfields.svg)](https://cran.r-project.org/web/checks/check_results_ggvfields.html)
 [![Project Status: Active - The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![](https://img.shields.io/github/languages/code-size/dusty-turner/ggvfields.svg)](https://github.com/dusty-turner/ggvfields)
 [![](https://codecov.io/gh/dusty-turner/ggvfields/branch/main/graph/badge.svg)](https://app.codecov.io/gh/dusty-turner/ggvfields)
 
-<!-- badger::badge_cran_download() -->
+[![](http://cranlogs.r-pkg.org/badges/last-month/ggvfields)](https://cran.r-project.org/package=ggvfields)
+[![CRAN RStudio mirror
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/ggvfields?color=blue)](https://r-pkg.org/pkg/ggvfields)
+
+<!-- [![](https://img.shields.io/github/languages/code-size/dusty-turner/ggvfields.svg)](https://github.com/dusty-turner/ggvfields) -->
 <!-- badger::badge_doi() -->
 
-**ggvfields** is a powerful package for visualizing vector fields,
-stream plots, and related visualizations. It provides tools to explore
-directional data, including options for vector smoothing, gradient
-fields, potential visualizations, and dynamic flow representations.
+**ggvfields** extends
+[**ggplot2**](https://github.com/tidyverse/ggplot2) by providing suite
+of tools to visualize vector and stream fields. In addition to standard
+vector and stream plotting, **ggvfields** automatically computes and
+visualizes smoothed vector fields, smooth gradient fields, gradient
+fields derived from scalar functions, and potential fields from
+gradients. This integrated framework simplifies the analysis and
+interpretation of complex vector and scalar field data.
+
+A manuscript describing the theoretical foundations and detailed
+methodologies behind ggvfields is forthcoming.
 
 ## Installation
 
-Install **ggvfields** directly from GitHub:
+**ggvfields** is available on CRAN and can be installed with:
+
+``` r
+install.packages("ggvfields")
+```
+
+Alternatively, you can install the latest development version from
+[GitHub](https://github.com/dusty-turner/ggvfields) with:
 
 ``` r
 remotes::install_github("dusty-turner/ggvfields")
@@ -48,154 +69,101 @@ options(ggplot2.continuous.colour="viridis")
 <!--   - [Automatic Limit Detection](#automatic-limit-detection) -->
 <!--   - [Custom Grids](#custom-grids) -->
 
-Generate sample wind data:
-
-``` r
-set.seed(1234)
-n <- 10
-
-wind_data <- data.frame(
-  lon = rnorm(n), 
-  lat = rnorm(n), 
-  dir = runif(n, -pi/2, pi/2),
-  spd = rchisq(n, df = 2)
-) |> 
-  within({
-    fx    <- spd * cos(dir)          # Compute the x-component of the vector
-    fy    <- spd * sin(dir)          # Compute the y-component of the vector
-    xend  <- lon + fx                # Compute the end x-coordinate
-    yend  <- lat + fy                # Compute the end y-coordinate
-  })
-
-round(wind_data, digits = 2) 
-#>      lon   lat   dir   spd  yend  xend    fy    fx
-#> 1  -1.21 -0.48  0.17  3.55  0.11  2.29  0.59  3.50
-#> 2   0.28 -1.00  0.46  2.19 -0.03  2.24  0.97  1.96
-#> 3   1.08 -0.78 -0.59  2.99 -2.44  3.56 -1.66  2.48
-#> 4  -2.35  0.06  0.38 10.81  4.10  7.68  4.04 10.03
-#> 5   0.43  0.96 -0.53  3.45 -0.80  3.40 -1.76  2.97
-#> 6   0.51 -0.11  0.01  3.91 -0.09  4.41  0.02  3.91
-#> 7  -0.57 -0.51  0.56  0.16 -0.43 -0.44  0.08  0.13
-#> 8  -0.55 -0.91 -0.05  0.42 -0.93 -0.12 -0.02  0.42
-#> 9  -0.56 -0.84 -0.80  0.42 -1.14 -0.28 -0.30  0.29
-#> 10 -0.89  2.42  0.83  4.17  5.51  1.91  3.09  2.80
-```
-
 ------------------------------------------------------------------------
 
 ## Core Features
 
-### `geom_vector()` and `geom_vector2()`
+### `geom_vector_field()` and `geom_vector_field2()`
 
-These functions allow for flexible visualizations of vector data.
-
-- **`geom_vector()`**: By default, this maps the norm (magnitude) of a
-  vector to its color. This helps compare relative magnitudes visually
-  through color gradients. Users do not need to explicitly specify this
-  unless overriding the default behavior.
-
-``` r
-ggplot(wind_data) +
-  geom_vector(aes(x = lon, y = lat, xend = xend, yend = yend)) 
-```
-
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
-
-`geom_vector()` also supports both `xend`/`yend` format as well as
-`fx`/`fy` format.
-
-``` r
-ggplot(wind_data) +
-  geom_vector(aes(x = lon, y = lat, fx = fx, fy = fy)) 
-```
-
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
-
-- **`geom_vector2()`**: Maps the norm of a vector directly to its
-  length. This provides a more intuitive representation of magnitude.
-  This is done by mapping `length = after_stat(norm)` by default.
-
-``` r
-ggplot(wind_data) +
-  geom_vector2(aes(x = lon, y = lat, fx = fx, fy = fy)) 
-```
-
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
-
-#### Why Length Mapping Matters
-
-Mapping vector lengths to their norms allows viewers to immediately
-understand magnitude differences without relying solely on color.
+- **`geom_vector_field()`**: Computes vector fields from a user-defined
+  function over the domain
+  $\{(x,y) \in \mathbb{R}^2 : -1 < x < 1,\ -1 < y < 1\}$ on an
+  $n \times n$ grid (default: $11 \times 11$) and maps the norm to
+  color. Vectors are centered and normalized by default.
 
 The norm $\mathbf{w} = (u, v)$ is calculated
 $$|\mathbf{w}| = \sqrt{u^2 + v^2}$$ .
-
-This feature of `geom_vector2()` enhances interpretability by using
-actual vector lengths to represent magnitude. The legend reflects the
-scaling and ensures consistent interpretation.
-
-#### Polar Coordinates Support
-
-Both `geom_vector()` and `geom_vector2()` also support polar
-coordinates, where vectors are specified using magnitude (`distance`)
-and direction (`angle`). Instead of providing Cartesian components
-(`fx`, `fy` or `xend`, `yend`), users can directly supply polar data.
-This feature simplifies workflows for directional data and works for all
-subsequent relevant functions that handle polar coordinates.
-
-Polar coordinates can be visualized like this:
-
-``` r
-ggplot(wind_data) +
-  geom_vector(aes(x = lon, y = lat, distance = spd, angle = dir)) 
-```
-
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
-
-#### Normalize and Center
-
-Two important options in `geom_vector()` and subsequent functions are
-`normalize` and `center` - both of which default to `TRUE.` These
-options help control the visual representation of vectors:
-
-- `normalize`: When set to `TRUE`, this option scales each vector to
-  have a unit length, which can help avoid overplotting in dense vector
-  fields. This is especially useful when the direction of vectors is
-  more important than their magnitude. However, it’s important to note
-  that normalize is different from mapping the norm of the vector to the
-  length aesthetic. While normalization ensures that all vectors are
-  visually uniform in length, mapping the norm to length preserves the
-  relative differences in magnitude by varying the vector lengths based
-  on their actual norms.
-
-- `center`: By default, `center` is also set to `TRUE`, meaning the
-  midpoint of each vector is placed at the corresponding (`x`, `y`)
-  coordinate, effectively “centering” the vector on the point. When
-  center is `FALSE`, the base of the vector is anchored at the (`x`,
-  `y`) point, and the vector extends outward from there.
-
-The example below turns off this default behavior:
-
-``` r
-ggplot(wind_data) +
-  geom_vector(aes(x = lon, y = lat, fx = fx, fy = fy), center = FALSE, normalize = FALSE) 
-```
-
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
-
-### `geom_stream_field()` and `geom_stream_field2()`
-
-- **`geom_stream_field()`**: Computes stream fields from a user-defined
-  function and maps the average speed to color.
 
 ``` r
 f <- function(v) c(-v[2], v[1]) # Define a function for the field
 
 ggplot() +
+  geom_vector_field(fun = f) 
+```
+
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+
+- **`geom_vector_field2()`**: Similar to `geom_vector_field()`, but maps
+  the norm of vectors to their lengths instead of color.
+
+``` r
+ggplot() +
+  geom_vector_field2(fun = f) 
+```
+
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+
+**Why Length Mapping Matters**
+
+Mapping vector lengths to their norms allows viewers to immediately
+understand magnitude differences without relying solely on color. This
+feature of `geom_vector2()` enhances interpretability by using actual
+vector lengths to represent magnitude. The legend reflects the scaling
+and ensures correct interpretation.
+
+- **`geom_vector_field()` options**
+
+**Length**
+
+We can set the `L` parameter to visualize vectors at a specified length.
+
+``` r
+ggplot() +
+  geom_vector_field(fun = f, n = 4, L = 2) 
+```
+
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+
+**Center**
+
+By default, all vectors are centered on their origin. We can turn off
+centering.
+
+``` r
+ggplot() +
+  geom_vector_field(fun = f, n = 4, center = FALSE) 
+```
+
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
+
+**normalize**
+
+If we turn off normalization and centering, we get a raw look at the
+vector field data.
+
+``` r
+ggplot() +
+  geom_vector_field(fun = f, n = 4, normalize = FALSE, center = FALSE) 
+```
+
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+
+### `geom_stream_field()` and `geom_stream_field2()`
+
+- **`geom_stream_field()`**: Computes stream fields from a user-defined
+  function and maps the average speed to color. Average speed is the
+  overall rate at which a particle traverses the shown stream. If the
+  displacement vector has length $|\mathbf{d}|$ and it takes time $t$,
+  the integration time of streams, to traverse that distance, then the
+  average speed is given by
+  $\text{Average Speed} = \frac{|\mathbf{d}|}{t}$
+
+``` r
+ggplot() +
   geom_stream_field(fun = f) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
 
 - **`geom_stream_field2()`**: Similar to `geom_stream_field()`, but
   removes mapping, arrow heads, and designates stream origins with a
@@ -206,19 +174,12 @@ ggplot() +
   geom_stream_field2(fun = f) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
 
 - **`geom_stream_field()` options**
 
-**Grid Density**: The user can control the density of the grid by using
-the `n` parameter.
-
-``` r
-ggplot() +
-  geom_stream_field(fun = f, n = 4) 
-```
-
-<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
+`geom_stream_field()` maintains similar options to
+`geom_vector_field()`. Some arguments yield slightly different behavior.
 
 **Length**
 
@@ -230,7 +191,7 @@ ggplot() +
   geom_stream_field(fun = f, n = 4, L = .8) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="100%" />
 
 **Normalization**
 
@@ -244,75 +205,35 @@ ggplot() +
   geom_stream_field(fun = f, n = 4, normalize = FALSE) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="100%" />
+
+We can control the length of the longest stream when `normalize = FALSE`
+by altering the `L` argument.
+
+``` r
+ggplot() +
+  geom_stream_field(fun = f, n = 4, normalize = FALSE, L = .8) 
+```
+
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
 
 **Time**
 
-When normalization is turned off, we can grow each stream for the same
-amount of time by using the `T` parameter.
+When `normalize = FALSE`, we can grow each stream for the same amount of
+time by using the `T` parameter.
 
 ``` r
 ggplot() +
   geom_stream_field(fun = f, n = 4, normalize = FALSE, T = .5) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
-
-### `geom_vector_field()` and `geom_vector_field2()`
-
-Vector fields can be seen as special cases of streams.
-
-- **`geom_vector_field()`**: Computes vector fields from a user-defined
-  function and maps the norm to color.
-
-``` r
-ggplot() +
-  geom_vector_field(fun = f) 
-```
-
-<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
-
-- **`geom_vector_field2()`**: Similar to `geom_vector_field()`, but maps
-  the norm of vectors to their lengths instead of color.
-
-``` r
-ggplot() +
-  geom_vector_field2(fun = f) 
-```
-
-<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
-
-- **`geom_vector_field()` options**
-
-**Length**
-
-As with streams, we can set the `L` parameter to grow vectors to a
-specified length.
-
-``` r
-ggplot() +
-  geom_vector_field(fun = f, n = 4, L = 2) 
-```
-
-<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
-
-**Center**
-
-If we turn off normalization and centering, we get a raw look at the
-vector field data.
-
-``` r
-ggplot() +
-  geom_vector_field(fun = f, n = 4, normalize = FALSE, center = FALSE) 
-```
-
-<img src="man/figures/README-unnamed-chunk-19-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-14-1.png" width="100%" />
 
 ### `geom_gradient_field()` and `geom_gradient_field2()`
 
-The geom_gradient_field function computes and visualizes gradient fields
-derived from scalar functions and displays the gradient vector field of
-a scalar function, $f(x, y)$. The gradient is given by:
+The `geom_gradient_field()` function computes and visualizes gradient
+fields derived from scalar functions and displays the gradient vector
+field of a scalar function, $f(x, y)$. The gradient is given by:
 
 $$
 \nabla f(x, y) = \left( \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right)
@@ -322,43 +243,31 @@ This vector field points in the direction of the greatest rate of
 increase of the scalar function. The function numerically evaluates
 these partial derivatives and visualizes the resulting vectors.
 
-- **Gradient Field with Norm to Color**:
+- **Gradient Fields as Vectors** The resulting vector field has all the
+  same defaults and same options as `geom_vector_field()`
 
 ``` r
-paraboloid_field <- function(v) {
+field <- function(v) {
   x <- v[1]
   y <- v[2]
-  x^2 + y^2
+  x^3 + y^3
 }
 
 ggplot() +
-  geom_gradient_field(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
+  geom_gradient_field(fun = field)
 ```
 
-<img src="man/figures/README-unnamed-chunk-20-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="100%" />
 
-- **Gradient Field with Norm to Length**:
+- **Gradient Fields as Streams** The resulting stream field has all the
+  same defaults and same options as `geom_stream_field()`
 
 ``` r
 ggplot() +
-  geom_gradient_field2(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
+  geom_gradient_field(fun = field, type = "stream")
 ```
 
-<img src="man/figures/README-unnamed-chunk-21-1.png" width="100%" />
-
-- **Adjusting Grid Density**:
-
-The `n` parameter adjusts the density of the grid used to evaluate the
-gradient field. Decreasing `n` reduces the number of vectors which
-producing a coarser grid while increasing `n` results in a finer grid
-with more vectors.
-
-``` r
-ggplot() +
-  geom_gradient_field(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10), n = 5)
-```
-
-<img src="man/figures/README-unnamed-chunk-22-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="100%" />
 
 ### `geom_potential()`
 
@@ -385,48 +294,148 @@ ggplot() +
   geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi))
 ```
 
-<img src="man/figures/README-unnamed-chunk-23-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-17-1.png" width="100%" />
 
-The tolerance parameter can be adjusted to control the sensitivity of
-the conservativeness check. Decreasing the tolerance makes the check
-stricter, while increasing it allows for more numerical error.
+The `tol` parameter can be adjusted to control the sensitivity of the
+conservativeness check. Decreasing the tolerance makes the check
+stricter, while increasing it allows for more numerical error. You can
+turn this functionality on with `verify_conservative = TRUE`.
 
 ``` r
+non_conservative_fun <- function(v) {
+ x <- v[1]
+ y <- v[2]
+ c(-y, x)
+}
+
 ggplot() +
-  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), tol = 1e-4)
+  geom_potential(fun = non_conservative_fun, 
+                 xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), 
+                 verify_conservative = TRUE,
+                 tol = 1e-6
+                 )
+#> Warning: ! The provided vector field does not have a potential function everywhere
+#>   within the specified domain.
+#> → Ensure that the vector field satisfies the necessary conditions for a
+#>   potential function.
+```
+
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="100%" />
+
+### `geom_vector()` and `geom_vector2()`
+
+So far, these layers have supported visualizing functions. **ggvfields**
+can also visualize raw data.
+
+Generate sample wind data:
+
+``` r
+set.seed(1234)
+n <- 10
+
+wind_data <- data.frame(
+  lon = rnorm(n), 
+  lat = rnorm(n), 
+  dir = runif(n, -pi/2, pi/2),
+  spd = rchisq(n, df = 2)
+) |> 
+  within({
+    fx    <- spd * cos(dir)          # Compute the x-component of the vector
+    fy    <- spd * sin(dir)          # Compute the y-component of the vector
+    xend  <- lon + fx                # Compute the end x-coordinate
+    yend  <- lat + fy                # Compute the end y-coordinate
+  })
+
+round(wind_data, digits = 2) |> head(6)
+#>     lon   lat   dir   spd  yend xend    fy    fx
+#> 1 -1.21 -0.48  0.17  3.55  0.11 2.29  0.59  3.50
+#> 2  0.28 -1.00  0.46  2.19 -0.03 2.24  0.97  1.96
+#> 3  1.08 -0.78 -0.59  2.99 -2.44 3.56 -1.66  2.48
+#> 4 -2.35  0.06  0.38 10.81  4.10 7.68  4.04 10.03
+#> 5  0.43  0.96 -0.53  3.45 -0.80 3.40 -1.76  2.97
+#> 6  0.51 -0.11  0.01  3.91 -0.09 4.41  0.02  3.91
+```
+
+- **`geom_vector()`**: By default, this maps the norm (magnitude) of a
+  vector to its color.
+
+``` r
+ggplot(wind_data) +
+  geom_vector(aes(x = lon, y = lat, xend = xend, yend = yend)) 
+```
+
+<img src="man/figures/README-unnamed-chunk-20-1.png" width="100%" />
+
+`geom_vector()` also supports both `xend`/`yend` format as well as
+`fx`/`fy` format.
+
+``` r
+ggplot(wind_data) +
+  geom_vector(aes(x = lon, y = lat, fx = fx, fy = fy)) 
+```
+
+<img src="man/figures/README-unnamed-chunk-21-1.png" width="100%" />
+
+- **`geom_vector2()`**: Maps the norm of a vector directly to its
+  length. This provides a more intuitive representation of magnitude.
+  This is done by mapping `length = after_stat(norm)` by default.
+
+``` r
+ggplot(wind_data) +
+  geom_vector2(aes(x = lon, y = lat, fx = fx, fy = fy)) 
+```
+
+<img src="man/figures/README-unnamed-chunk-22-1.png" width="100%" />
+
+**Polar Coordinates Support**
+
+Both `geom_vector()` and `geom_vector2()` also support polar
+coordinates, where vectors are specified using magnitude (`distance`)
+and direction (`angle`). Instead of providing Cartesian components
+(`fx`, `fy` or `xend`, `yend`), users can directly supply polar data.
+This feature simplifies workflows for directional data and works for all
+subsequent relevant functions that handle polar coordinates.
+
+Polar coordinates can be visualized like this:
+
+``` r
+ggplot(wind_data) +
+  geom_vector(aes(x = lon, y = lat, distance = spd, angle = dir)) 
+```
+
+<img src="man/figures/README-unnamed-chunk-23-1.png" width="100%" />
+
+**Normalize and Center**
+
+- `normalize`: When set to `TRUE`, this option scales each vector to
+  have a unit length, which can help avoid overplotting in dense vector
+  fields. This is especially useful when the direction of vectors is
+  more important than their magnitude. However, it’s important to note
+  that normalize is different from mapping the norm of the vector to the
+  length aesthetic. While normalization ensures that all vectors are
+  visually uniform in length, mapping the norm to length preserves the
+  relative differences in magnitude by varying the vector lengths based
+  on their actual norms.
+
+- `center`: By default, `center` is also set to `TRUE`, meaning the
+  midpoint of each vector is placed at the corresponding (`x`, `y`)
+  coordinate, effectively “centering” the vector on the point. When
+  center is `FALSE`, the base of the vector is anchored at the (`x`,
+  `y`) point, and the vector extends outward from there.
+
+The example below turns off this default behavior:
+
+``` r
+ggplot(wind_data) +
+  geom_vector(aes(x = lon, y = lat, fx = fx, fy = fy), center = FALSE, normalize = FALSE) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-24-1.png" width="100%" />
 
-As with other functions, we can increase the granularity of the
-visualization with the `n` parameter.
+## Modeling Features
 
-``` r
-ggplot() +
-  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), n = 50)
-```
-
-<img src="man/figures/README-unnamed-chunk-25-1.png" width="100%" />
-
-------------------------------------------------------------------------
-
-## Advanced Features
-
-This section introduces tools for deeper exploration of vector fields,
-allowing users to analyze properties such as smoothness, uncertainty,
-gradients, and potential functions. These tools provide mathematical
-insights into the structure of vector fields and extend visualization
-capabilities beyond basic representations.
-
-Key capabilities include:
-
-- **Smoothing Vector Fields**: Approximate trends in noisy vector data
-  and compute prediction intervals for uncertainty visualization.  
-- **Dynamic Flow and Stream Plots**: Model particle trajectories and
-  visualize dynamic behavior in time-dependent fields.
-
-**ggvfields** offers two techniques for smoothing noisy vector field
-data `geom_stream_smooth()` and `geom_vector_smooth()`
+**ggvfields** offers techniques for smoothing noisy vector field data
+`geom_stream_smooth()` and `geom_vector_smooth()`
 
 `geom_stream_smooth()` uses a dynamical systems approach and
 `geom_vector_smooth()` offers a multivariate regression approach that
@@ -436,11 +445,11 @@ accounts for uncertainty.
 
 ``` r
 ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
-  geom_vector() +
+  geom_vector(alpha = .5, color = "black") +
   geom_stream_smooth(aes(x = lon, y = lat, fx = fx, fy = fy)) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-26-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-25-1.png" width="100%" />
 
 ### `geom_vector_smooth()`
 
@@ -479,7 +488,7 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
 #> (`geom_stream()`).
 ```
 
-<img src="man/figures/README-unnamed-chunk-27-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-26-1.png" width="100%" />
 
 - **Using Wedges to Visualize Uncertainty**:
 
@@ -489,7 +498,7 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector_smooth(eval_points = eval_point, pi_type = "wedge") 
 ```
 
-<img src="man/figures/README-unnamed-chunk-28-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-27-1.png" width="100%" />
 
 - **Grid-Based Smoothing**:
 
@@ -499,7 +508,7 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector() 
 ```
 
-<img src="man/figures/README-unnamed-chunk-29-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-28-1.png" width="100%" />
 
 - **Custom Grid Resolution**:
 
@@ -508,7 +517,7 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector_smooth(n = 6, pi_type = "wedge") 
 ```
 
-<img src="man/figures/README-unnamed-chunk-30-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-29-1.png" width="100%" />
 
 - **Altering Confidence Level**
 
@@ -522,7 +531,7 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_vector_smooth(eval_points = eval_point, pi_type = "wedge", conf_level = .7) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-31-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-30-1.png" width="100%" />
 
 ### `geom_gradient_smooth()`
 
@@ -535,15 +544,6 @@ data and wish to estimate the gradient.
 The gradients are computed numerically from a fitted scalar field model
 and the resulting gradient vectors are visualized using either
 streamlines or vector arrows.
-
-- `formula`: A formula specifying the linear model used to approximate
-  the scalar field. Defaults to `z ~ x + y + I(x^2) + I(y^2)`.
-- `type`: Type of visualization, either `"vector"` (default, arrows) or
-  `"stream"` (streamlines).
-- `n`: The resolution of the grid to evaluate the gradient field.
-- `center`, `normalize`, and other graphical options for controlling
-  visual appearance similar to the other gradient and vector functions
-  above.
 
 ``` r
 f1 <- function(u) {
@@ -564,7 +564,7 @@ ggplot(grid_data, aes(x = x, y = y, z = z)) +
   geom_gradient_smooth()
 ```
 
-<img src="man/figures/README-unnamed-chunk-32-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-31-1.png" width="100%" />
 
 To illustrate how `geom_gradient_smooth()` can adapt to nonlinear
 surfaces, we can change the formula used to fit the scalar field and
@@ -586,7 +586,7 @@ ggplot(grid_data, aes(x = x, y = y, z = z)) +
   geom_gradient_smooth(formula = z ~ I(x^2) * I(y^2), n = 5, type = "stream") 
 ```
 
-<img src="man/figures/README-unnamed-chunk-33-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-32-1.png" width="100%" />
 
 ## Other Features
 
@@ -604,7 +604,7 @@ ggplot(data = wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
   geom_stream_field(fun = f) # Automatically determines limits based on existing data
 ```
 
-<img src="man/figures/README-unnamed-chunk-34-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-33-1.png" width="100%" />
 
 ### Custom Grids
 
@@ -617,7 +617,7 @@ ggplot() +
   geom_stream_field(fun = f, grid = "hex")
 ```
 
-<img src="man/figures/README-unnamed-chunk-35-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-34-1.png" width="100%" />
 
 This shows a custom grid.
 
@@ -628,7 +628,7 @@ ggplot() +
   geom_stream_field(fun = f, grid = custom, normalize = FALSE, center = FALSE, L = 4)
 ```
 
-<img src="man/figures/README-unnamed-chunk-36-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-35-1.png" width="100%" />
 
 ## License
 

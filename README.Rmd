@@ -12,27 +12,35 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%",
   dev = "png", dpi = 300,
-  fig.height = 3.5
+  fig.height = 3.5,
+  cache = TRUE
 )
 ```
 
 # ggvfields  <img src="man/figures/ggvfields_hex.png"  align="right"  width="120" style="padding-left:10px;background-color:white;" />
 
-`r badger::badge_repostatus("Active")`  `r badger::badge_code_size()`  `r badger::badge_codecov()`  
+[![CRAN status](https://www.r-pkg.org/badges/version/ggvfields)](https://CRAN.R-project.org/package=ggvfields) `r badger::badge_cran_checks(pkg = "ggvfields")` `r badger::badge_repostatus("Active")` `r badger::badge_codecov()` 
 
-<!-- badger::badge_cran_checks(pkg = "ggvfields") -->
-<!-- [![CRAN status](https://www.r-pkg.org/badges/version/ggvfields)](https://CRAN.R-project.org/package=ggvfields) -->
+`r badger::badge_cran_download()` `r cranlogs::cranlogs_badge(package_name = "ggvfields", "grand-total")`
 
+<!-- `r badger::badge_code_size()` -->
 
-<!-- badger::badge_cran_download() -->
 <!-- badger::badge_doi() -->
 
-**ggvfields** is a powerful package for visualizing vector fields, stream plots, and related visualizations. It provides tools to explore directional data, including options for vector smoothing, gradient fields, potential visualizations, and dynamic flow representations.
+**ggvfields** extends [**ggplot2**](https://github.com/tidyverse/ggplot2) by providing suite of tools to visualize vector and stream fields. In addition to standard vector and stream plotting, **ggvfields** automatically computes and visualizes smoothed vector fields, smooth gradient fields, gradient fields derived from scalar functions, and potential fields from gradients. This integrated framework simplifies the analysis and interpretation of complex vector and scalar field data.
+
+A manuscript describing the theoretical foundations and detailed methodologies behind ggvfields is forthcoming.
 
 ## Installation
 
-Install **ggvfields** directly from GitHub:
-  
+**ggvfields** is available on CRAN and can be installed with:
+
+``` r 
+install.packages("ggvfields")
+```
+
+Alternatively, you can install the latest development version from [GitHub](https://github.com/dusty-turner/ggvfields) with:
+
 ```{r eval = FALSE}
 remotes::install_github("dusty-turner/ggvfields")
 ```
@@ -43,7 +51,6 @@ Load the package in R:
 library("ggvfields")
 options(ggplot2.continuous.colour="viridis")
 ```
-
 
 <!-- - [Installation](#installation) -->
 <!-- - [Core Features](#core-features) -->
@@ -59,6 +66,187 @@ options(ggplot2.continuous.colour="viridis")
 <!-- - [Other Features](#other-features) -->
 <!--   - [Automatic Limit Detection](#automatic-limit-detection) -->
 <!--   - [Custom Grids](#custom-grids) -->
+
+---
+  
+## Core Features
+
+### `geom_vector_field()` and `geom_vector_field2()`
+
+- **`geom_vector_field()`**: Computes vector fields from a user-defined function over the domain $\{(x,y) \in \mathbb{R}^2 : -1 < x < 1,\ -1 < y < 1\}$ on an $n \times n$ grid (default: $11 \times 11$) and maps the norm to color. Vectors are centered and normalized by default.
+
+The norm $\mathbf{w} = (u, v)$ is calculated $$|\mathbf{w}| = \sqrt{u^2 + v^2}$$ .
+
+```{r}
+f <- function(v) c(-v[2], v[1]) # Define a function for the field
+
+ggplot() +
+  geom_vector_field(fun = f) 
+```
+
+- **`geom_vector_field2()`**: Similar to `geom_vector_field()`, but maps the norm of vectors to their lengths instead of color.
+
+```{r}
+ggplot() +
+  geom_vector_field2(fun = f) 
+```
+
+**Why Length Mapping Matters**
+
+Mapping vector lengths to their norms allows viewers to immediately understand magnitude differences without relying solely on color.  This feature of `geom_vector2()` enhances interpretability by using actual vector lengths to represent magnitude. The legend reflects the scaling and ensures correct interpretation.
+
+- **`geom_vector_field()` options**
+
+**Length**
+
+We can set the `L` parameter to visualize vectors at a specified length. 
+
+```{r}
+ggplot() +
+  geom_vector_field(fun = f, n = 4, L = 2) 
+```
+
+**Center**
+
+By default, all vectors are centered on their origin.  We can turn off centering.
+
+```{r}
+ggplot() +
+  geom_vector_field(fun = f, n = 4, center = FALSE) 
+```
+
+**normalize**
+
+If we turn off normalization and centering, we get a raw look at the vector field data.
+
+```{r}
+ggplot() +
+  geom_vector_field(fun = f, n = 4, normalize = FALSE, center = FALSE) 
+```
+
+### `geom_stream_field()` and `geom_stream_field2()`
+
+- **`geom_stream_field()`**: Computes stream fields from a user-defined function and maps the average speed to color.
+Average speed is the overall rate at which a particle traverses the shown stream. If the displacement vector has length $|\mathbf{d}|$ and it takes time $t$, the integration time of streams, to traverse that distance, then the average speed is given by $\text{Average Speed} = \frac{|\mathbf{d}|}{t}$
+
+```{r}
+ggplot() +
+  geom_stream_field(fun = f) 
+```
+
+- **`geom_stream_field2()`**: Similar to `geom_stream_field()`, but removes mapping, arrow heads, and designates stream origins with a dot.
+
+```{r}
+ggplot() +
+  geom_stream_field2(fun = f) 
+```
+
+- **`geom_stream_field()` options**
+
+`geom_stream_field()` maintains similar options to `geom_vector_field()`.  Some arguments yield slightly different behavior.
+
+**Length**
+
+By adjusting the `L` parameter, we can control the length of each stream.
+
+```{r}
+ggplot() +
+  geom_stream_field(fun = f, n = 4, L = .8) 
+```
+
+**Normalization**
+
+By default, the lengths of each stream is normalized to be the same length.  By turning normalization off, each stream becomes time normalized.  In other words, each stream grows for the same amount of time. 
+
+```{r}
+ggplot() +
+  geom_stream_field(fun = f, n = 4, normalize = FALSE) 
+```
+
+We can control the length of the longest stream when `normalize = FALSE` by altering the `L` argument. 
+
+```{r}
+ggplot() +
+  geom_stream_field(fun = f, n = 4, normalize = FALSE, L = .8) 
+```
+
+**Time**
+
+When `normalize = FALSE`, we can grow each stream for the same amount of time by using the `T` parameter. 
+
+```{r}
+ggplot() +
+  geom_stream_field(fun = f, n = 4, normalize = FALSE, T = .5) 
+```
+
+
+### `geom_gradient_field()` and `geom_gradient_field2()`
+  
+The `geom_gradient_field()` function computes and visualizes gradient fields derived from scalar functions and displays the gradient vector field of a scalar function, $f(x, y)$. The gradient is given by:
+
+$$
+\nabla f(x, y) = \left( \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right)
+$$
+
+This vector field points in the direction of the greatest rate of increase of the scalar function. The function numerically evaluates these partial derivatives and visualizes the resulting vectors.
+
+- **Gradient Fields as Vectors** The resulting vector field has all the same defaults and same options as `geom_vector_field()`
+  
+```{r}
+field <- function(v) {
+  x <- v[1]
+  y <- v[2]
+  x^3 + y^3
+}
+
+ggplot() +
+  geom_gradient_field(fun = field)
+```
+
+- **Gradient Fields as Streams** The resulting stream field has all the same defaults and same options as `geom_stream_field()`
+
+```{r}
+ggplot() +
+  geom_gradient_field(fun = field, type = "stream")
+```
+
+### `geom_potential()`
+  
+A potential function represents a scalar field whose gradient produces a vector field. It is used to describe conservative vector fields which exist when the curl of the vector field is 0.  
+
+The `geom_potential()` function computes and visualizes the scalar potential function for a given conservative vector field. The input function must represent a 2D vector field and the output is the corresponding potential function. If the input field is not conservative, the function checks this condition numerically based on a tolerance parameter. The tolerance determines how strictly the field must satisfy the conservation condition.
+
+```{r}
+conservative_fun <- function(v) {
+ x <- v[1]
+ y <- v[2]
+ c(sin(x) + y, x - sin(y))
+}
+
+ggplot() +
+  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi))
+```
+
+The `tol` parameter can be adjusted to control the sensitivity of the conservativeness check. Decreasing the tolerance makes the check stricter, while increasing it allows for more numerical error.  You can turn this functionality on with `verify_conservative = TRUE`.
+
+```{r}
+non_conservative_fun <- function(v) {
+ x <- v[1]
+ y <- v[2]
+ c(-y, x)
+}
+
+ggplot() +
+  geom_potential(fun = non_conservative_fun, 
+                 xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), 
+                 verify_conservative = TRUE,
+                 tol = 1e-6
+                 )
+```
+
+### `geom_vector()` and `geom_vector2()`
+
+So far, these layers have supported visualizing functions.  **ggvfields** can also visualize raw data.
 
 Generate sample wind data:
   
@@ -79,18 +267,11 @@ wind_data <- data.frame(
     yend  <- lat + fy                # Compute the end y-coordinate
   })
 
-round(wind_data, digits = 2) 
+round(wind_data, digits = 2) |> head(6)
 ```
 
----
-  
-## Core Features
 
-### `geom_vector()` and `geom_vector2()`
-
-These functions allow for flexible visualizations of vector data.
-
-- **`geom_vector()`**: By default, this maps the norm (magnitude) of a vector to its color.  This helps compare relative magnitudes visually through color gradients. Users do not need to explicitly specify this unless overriding the default behavior.
+- **`geom_vector()`**: By default, this maps the norm (magnitude) of a vector to its color.  
 
 ```{r}
 ggplot(wind_data) +
@@ -111,16 +292,7 @@ ggplot(wind_data) +
   geom_vector2(aes(x = lon, y = lat, fx = fx, fy = fy)) 
 ```
 
-#### Why Length Mapping Matters
-
-Mapping vector lengths to their norms allows viewers to immediately understand magnitude differences without relying solely on color.
-
-The norm $\mathbf{w} = (u, v)$ is calculated $$|\mathbf{w}| = \sqrt{u^2 + v^2}$$ .
-
-This feature of `geom_vector2()` enhances interpretability by using actual vector lengths to represent magnitude. The legend reflects the scaling and ensures consistent interpretation.
-
-
-#### Polar Coordinates Support
+**Polar Coordinates Support**
 
 Both `geom_vector()` and `geom_vector2()` also support polar coordinates, where vectors are specified using magnitude (`distance`) and direction (`angle`). Instead of providing Cartesian components (`fx`, `fy` or `xend`, `yend`), users can directly supply polar data. This feature simplifies workflows for directional data and works  for all subsequent relevant functions that handle polar coordinates.
 
@@ -131,9 +303,7 @@ ggplot(wind_data) +
   geom_vector(aes(x = lon, y = lat, distance = spd, angle = dir)) 
 ```
 
-#### Normalize and Center
-
-Two important options in `geom_vector()` and subsequent functions are `normalize` and `center` - both of which default to `TRUE.` These options help control the visual representation of vectors:
+**Normalize and Center**
 
 - `normalize`: When set to `TRUE`, this option scales each vector to have a unit length, which can help avoid overplotting in dense vector fields. This is especially useful when the direction of vectors is more important than their magnitude. However, it’s important to note that normalize is different from mapping the norm of the vector to the length aesthetic. While normalization ensures that all vectors are visually uniform in length, mapping the norm to length preserves the relative differences in magnitude by varying the vector lengths based on their actual norms.
 
@@ -146,181 +316,9 @@ ggplot(wind_data) +
   geom_vector(aes(x = lon, y = lat, fx = fx, fy = fy), center = FALSE, normalize = FALSE) 
 ```
 
+## Modeling Features
 
-### `geom_stream_field()` and `geom_stream_field2()`
-
-- **`geom_stream_field()`**: Computes stream fields from a user-defined function and maps the average speed to color.
-
-```{r}
-f <- function(v) c(-v[2], v[1]) # Define a function for the field
-
-ggplot() +
-  geom_stream_field(fun = f) 
-```
-
-- **`geom_stream_field2()`**: Similar to `geom_stream_field()`, but removes mapping, arrow heads, and designates stream origins with a dot.
-
-```{r}
-ggplot() +
-  geom_stream_field2(fun = f) 
-```
-
-- **`geom_stream_field()` options**
-
-**Grid Density**: The user can control the density of the grid by using the `n` parameter.
-
-```{r}
-ggplot() +
-  geom_stream_field(fun = f, n = 4) 
-```
-
-**Length**
-
-By adjusting the `L` parameter, we can control the length of each stream.
-
-```{r}
-ggplot() +
-  geom_stream_field(fun = f, n = 4, L = .8) 
-```
-
-**Normalization**
-
-By default, the lengths of each stream is normalized to be the same length.  By turning normalization off, each stream becomes time normalized.  In other words, each stream grows for the same amount of time. 
-
-```{r}
-ggplot() +
-  geom_stream_field(fun = f, n = 4, normalize = FALSE) 
-```
-
-**Time**
-
-When normalization is turned off, we can grow each stream for the same amount of time by using the `T` parameter. 
-
-```{r}
-ggplot() +
-  geom_stream_field(fun = f, n = 4, normalize = FALSE, T = .5) 
-```
-
-### `geom_vector_field()` and `geom_vector_field2()`
-
-Vector fields can be seen as special cases of streams.
-
-- **`geom_vector_field()`**: Computes vector fields from a user-defined function and maps the norm to color.
-
-```{r}
-ggplot() +
-  geom_vector_field(fun = f) 
-```
-
-- **`geom_vector_field2()`**: Similar to `geom_vector_field()`, but maps the norm of vectors to their lengths instead of color.
-
-```{r}
-ggplot() +
-  geom_vector_field2(fun = f) 
-```
-
-- **`geom_vector_field()` options**
-
-**Length**
-
-As with streams, we can set the `L` parameter to grow vectors to a specified length. 
-
-```{r}
-ggplot() +
-  geom_vector_field(fun = f, n = 4, L = 2) 
-```
-
-**Center**
-
-If we turn off normalization and centering, we get a raw look at the vector field data.
-
-```{r}
-ggplot() +
-  geom_vector_field(fun = f, n = 4, normalize = FALSE, center = FALSE) 
-```
-
-### `geom_gradient_field()` and `geom_gradient_field2()`
-  
-The geom_gradient_field function computes and visualizes gradient fields derived from scalar functions and displays the gradient vector field of a scalar function, $f(x, y)$. The gradient is given by:
-
-$$
-\nabla f(x, y) = \left( \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right)
-$$
-
-This vector field points in the direction of the greatest rate of increase of the scalar function. The function numerically evaluates these partial derivatives and visualizes the resulting vectors.
-
-- **Gradient Field with Norm to Color**:
-  
-```{r}
-paraboloid_field <- function(v) {
-  x <- v[1]
-  y <- v[2]
-  x^2 + y^2
-}
-
-ggplot() +
-  geom_gradient_field(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
-```
-
-- **Gradient Field with Norm to Length**:
-  
-```{r}
-ggplot() +
-  geom_gradient_field2(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10))
-```
-
-- **Adjusting Grid Density**:
-
-The `n` parameter adjusts the density of the grid used to evaluate the gradient field. Decreasing `n` reduces the number of vectors which producing a coarser grid while increasing `n` results in a finer grid with more vectors. 
-
-```{r}
-ggplot() +
-  geom_gradient_field(fun = paraboloid_field, xlim = c(-10, 10), ylim = c(-10, 10), n = 5)
-```
-
-### `geom_potential()`
-  
-A potential function represents a scalar field whose gradient produces a vector field. It is used to describe conservative vector fields which exist when the curl of the vector field is 0.  
-
-The `geom_potential()` function computes and visualizes the scalar potential function for a given conservative vector field. The input function must represent a 2D vector field and the output is the corresponding potential function. If the input field is not conservative, the function checks this condition numerically based on a tolerance parameter. The tolerance determines how strictly the field must satisfy the conservation condition.
-
-```{r}
-conservative_fun <- function(v) {
- x <- v[1]
- y <- v[2]
- c(sin(x) + y, x - sin(y))
-}
-
-ggplot() +
-  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi))
-```
-
-The tolerance parameter can be adjusted to control the sensitivity of the conservativeness check. Decreasing the tolerance makes the check stricter, while increasing it allows for more numerical error.
-
-```{r}
-ggplot() +
-  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), tol = 1e-4)
-```
-
-As with other functions, we can increase the granularity of the visualization with the `n` parameter.
-
-```{r}
-ggplot() +
-  geom_potential(fun = conservative_fun, xlim = c(-2*pi, 2*pi), ylim = c(-2*pi, 2*pi), n = 50)
-```
-
----
-  
-## Advanced Features
-
-This section introduces tools for deeper exploration of vector fields, allowing users to analyze properties such as smoothness, uncertainty, gradients, and potential functions. These tools provide mathematical insights into the structure of vector fields and extend visualization capabilities beyond basic representations.
-
-Key capabilities include:
-
-- **Smoothing Vector Fields**: Approximate trends in noisy vector data and compute prediction intervals for uncertainty visualization.  
-- **Dynamic Flow and Stream Plots**: Model particle trajectories and visualize dynamic behavior in time-dependent fields.  
-
-**ggvfields** offers two techniques for smoothing noisy vector field data `geom_stream_smooth()` and `geom_vector_smooth()`
+**ggvfields** offers techniques for smoothing noisy vector field data `geom_stream_smooth()` and `geom_vector_smooth()`
 
 `geom_stream_smooth()` uses a dynamical systems approach and `geom_vector_smooth()` offers a multivariate regression approach that accounts for uncertainty. 
 
@@ -328,7 +326,7 @@ Key capabilities include:
 
 ```{r}
 ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
-  geom_vector() +
+  geom_vector(alpha = .5, color = "black") +
   geom_stream_smooth(aes(x = lon, y = lat, fx = fx, fy = fy)) 
 ```
 
@@ -400,12 +398,6 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
 
 The gradients are computed numerically from a fitted scalar field model and the resulting gradient vectors are visualized using either streamlines or vector arrows.
 
-
-- `formula`: A formula specifying the linear model used to approximate the scalar field. Defaults to `z ~ x + y + I(x^2) + I(y^2)`.
-- `type`: Type of visualization, either `"vector"` (default, arrows) or `"stream"` (streamlines).
-- `n`: The resolution of the grid to evaluate the gradient field.
-- `center`, `normalize`, and other graphical options for controlling visual appearance similar to the other gradient and vector functions above. 
-
 ```{r}
 f1 <- function(u) {
   x <- u[1]
@@ -472,8 +464,6 @@ custom <- data.frame(x = c(1,3,5), y = c(3,4,5))
 ggplot() +
   geom_stream_field(fun = f, grid = custom, normalize = FALSE, center = FALSE, L = 4)
 ```
-
-
 
 ## License
 
