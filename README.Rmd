@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 
 [![CRAN status](https://www.r-pkg.org/badges/version/ggvfields)](https://CRAN.R-project.org/package=ggvfields) `r badger::badge_cran_checks(pkg = "ggvfields")` `r badger::badge_repostatus("Active")` `r badger::badge_codecov()` 
 
-`r badger::badge_cran_download()` `r cranlogs::cranlogs_badge(package_name = "ggvfields", "grand-total")`
+<!-- `r badger::badge_cran_download()` `r cranlogs::cranlogs_badge(package_name = "ggvfields", "grand-total")` -->
 
 <!-- `r badger::badge_code_size()` -->
 

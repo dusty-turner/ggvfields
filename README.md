@@ -12,10 +12,7 @@ state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![](https://codecov.io/gh/dusty-turner/ggvfields/branch/main/graph/badge.svg)](https://app.codecov.io/gh/dusty-turner/ggvfields)
 
-[![](http://cranlogs.r-pkg.org/badges/last-month/ggvfields)](https://cran.r-project.org/package=ggvfields)
-[![CRAN RStudio mirror
-downloads](https://cranlogs.r-pkg.org/badges/grand-total/ggvfields?color=blue)](https://r-pkg.org/pkg/ggvfields)
-
+<!-- [![](http://cranlogs.r-pkg.org/badges/last-month/ggvfields)](https://cran.r-project.org/package=ggvfields) [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/grand-total/ggvfields?color=blue)](https://r-pkg.org/pkg/ggvfields) -->
 <!-- [![](https://img.shields.io/github/languages/code-size/dusty-turner/ggvfields.svg)](https://github.com/dusty-turner/ggvfields) -->
 <!-- badger::badge_doi() -->
 
