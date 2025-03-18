@@ -25,7 +25,7 @@ geom_vector_smooth(
   n = c(11, 11),
   method = "lm",
   se = TRUE,
-  se.circle = TRUE,
+  se.circle = FALSE,
   pi_type = "ellipse",
   conf_level = c(0.95, NA),
   formula = cbind(fx, fy) ~ x * y,
