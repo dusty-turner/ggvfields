@@ -8,6 +8,8 @@
 #'
 #' @importFrom stats qt
 #' @importFrom stats integrate
+#' @importFrom sp coordinates coordinates<-
+#' @importFrom gstat gstat variogram fit.lmc vgm
 #'
 #' @param mapping A set of aesthetic mappings created by \code{ggplot2::aes()}.
 #'   **Required:** Must include **`x`** and **`y`**; vector displacements are defined by
@@ -244,7 +246,6 @@ StatVectorSmooth <- ggproto(
 
   compute_group = function(data, scales, n, method, se = TRUE, conf_level,
                            pi_type, eval_points = NULL, formula, ...) {
-
     # ----------------------------
     # 1. Initial Data Checks and Manipulation
     # ----------------------------
@@ -307,7 +308,7 @@ StatVectorSmooth <- ggproto(
     # ----------------------------
     # 2. Model Fitting and Prediction
     # ----------------------------
-
+    if(method == "lm"){
     # Fit the multivariate linear model
     model_mv <- lm(formula, data = data)
 
@@ -370,9 +371,59 @@ StatVectorSmooth <- ggproto(
     # Assemble the covariance matrix for (fx, fy) predictions
     cov_pred <- data.frame(var_fx, var_fy, cov_fx_fy)
 
+    }
+
+    if(method == "kriging"){
+
+      # Convert data (a tibble) to a regular data frame and then to a SpatialPointsDataFrame
+      df <- as.data.frame(data)
+      sp::coordinates(df) <- ~ x + y
+
+      # Build the cokriging model for fx and fy
+      g <- gstat(id = "fx", formula = fx ~ 1, data = df)
+      g <- gstat(g, id = "fy", formula = fy ~ 1, data = df)
+
+      # Compute the experimental variograms (adjust cutoff as needed)
+      # v <- variogram(g, cutoff = 5)
+      v <- variogram(g)
+
+      # Fit a linear model of coregionalization (LMC) using a spherical model example
+      model <- vgm(psill = 1, model = "Sph", range = 3, nugget = 0.1)
+      lmc <- fit.lmc(v, g, model = model)
+
+      # Define prediction points: if eval_points is NULL, use grid; otherwise, use eval_points
+      new_point <- if (is.null(eval_points)) grid else eval_points
+
+      # Convert the new_point data frame to a SpatialPointsDataFrame
+      coordinates(new_point) <- ~ x + y
+
+      # Perform prediction using the fitted LMC model
+      pred <- predict(lmc, newdata = new_point)
+
+      # Extract prediction results into a simple data frame (optional)
+      grid <- data.frame(x = new_point$x, y = new_point$y,
+                         fx = pred$fx.pred, fy = pred$fy.pred)
+      cov_pred <- data.frame(var_fx = pred$fx.var,
+                             var_fy = pred$fy.var,
+                             cov_fx_fy = pred$cov.fx.fy)
+
+      # Compute overall (lag-0) covariance matrix from the LMC model
+      sill_fx    <- sum(lmc$model$fx$psill)
+      sill_fy    <- sum(lmc$model$fy$psill)
+      sill_fx_fy <- sum(lmc$model$`fx.fy`$psill)
+
+      Sigma <- matrix(c(sill_fx, sill_fx_fy,
+                        sill_fx_fy, sill_fy), nrow = 2)
+
+      # Calculate the overall correlation (rho) from the covariance matrix
+      rho <- sill_fx_fy / sqrt(sill_fx * sill_fy)
+
+    }
+
     # ----------------------------
     # 4. Compute Prediction Intervals
     # ----------------------------
+
 
     if (pi_type == "ellipse" || pi_type == "wedge") {
       # Compute prediction intervals based on pi_type
@@ -522,7 +573,6 @@ GeomVectorSmooth <- ggproto(
         raster_data <- data.frame(x = data$x, y = data$y)
         raster_data$z <- (data$max_angle - data$min_angle) * (180 / pi)
 
-        # browser()
         n_rows <- length(unique(raster_data$y))
         n_cols <- length(unique(raster_data$x))
 
