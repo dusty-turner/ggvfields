@@ -1,4 +1,4 @@
-#' @importFrom stats lm median predict quantile
+#' @importFrom stats lm median predict quantile qnorm
 # List of non-expored and non-documented functions
 
 ensure_nonempty_data <- function(data) {
@@ -232,6 +232,7 @@ create_ellipse_data <- function(x_center, y_center, width, height, angle, n_poin
 }
 
 predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL, conf_level) {
+
   # Validate inputs
   if (!is.numeric(x) || length(x) != 1) {
     stop("Input 'x' must be a single numeric value.")
@@ -252,110 +253,144 @@ predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL, conf_level
     stop("Input 'conf_level' must be a numeric value between 0 and 1.")
   }
 
-  # If rho is not provided, calculate it from Sigma
+  # If rho is not provided, calculate it (not used by delta method but for compatibility)
   if (is.null(rho)) {
     sigma_x <- sqrt(Sigma[1, 1])
     sigma_y <- sqrt(Sigma[2, 2])
     rho <- Sigma[1, 2] / (sigma_x * sigma_y)
   }
 
-  # Define the bivariate normal PDF in polar coordinates
-  bivariate_normal <- function(r, theta, mux, muy, Sigma) {
-    x_val <- r * cos(theta)
-    y_val <- r * sin(theta)
+  # Compute the predicted vector's angle (theta_pred) in [0, 2*pi)
+  theta_pred <- atan2(muy, mux)
+  if (theta_pred < 0) theta_pred <- theta_pred + 2*pi
 
-    z1 <- x_val - mux
-    z2 <- y_val - muy
+  # Delta method: compute the variance of theta = arctan2(muy, mux)
+  denom <- mux^2 + muy^2
+  if (denom == 0) {
+    return(data.frame(min_angle = NA, max_angle = NA))
+  }
+  grad <- c(-muy/denom, mux/denom)
+  var_theta <- as.numeric(t(grad) %*% Sigma %*% grad)
+  se_theta <- sqrt(var_theta)
 
-    inv_Sigma <- solve(Sigma)
-    det_Sigma <- det(Sigma)
+  # Get the z-value for the desired confidence level (e.g., ~1.96 for 95%)
+  z_val <- qnorm(1 - (1 - conf_level) / 2)
 
-    # Compute the exponent term using matrix notation
-    exponent <- -0.5 * (inv_Sigma[1, 1] * z1^2 +
-                          2 * inv_Sigma[1, 2] * z1 * z2 +
-                          inv_Sigma[2, 2] * z2^2)
+  # Compute the raw (unwrapped) confidence interval for theta
+  raw_lower <- theta_pred - z_val * se_theta
+  raw_upper <- theta_pred + z_val * se_theta
 
-    exp_term <- exp(exponent)
-
-    # Return the PDF value
-    return((r / (2 * pi * sqrt(det_Sigma))) * exp_term)
+  # If the raw interval width is >= 2*pi, cap the interval at the full circle.
+  if ((raw_upper - raw_lower) >= 2*pi) {
+    # cat("Delta method interval exceeds full circle; capping at [0, 2*pi].\n")
+    return(data.frame(min_angle = .001, max_angle = 2*pi))
   }
 
-  # Define the marginal_theta function by integrating out r
-  marginal_theta <- function(theta) {
-    integrate(
-      f = function(r) {
-        bivariate_normal(r, theta, mux, muy, Sigma)
-      },
-      lower = 0, upper = Inf,
-      rel.tol = 1e-8 # Increase precision if needed
-    )$value
-  }
-
-  # Helper function to compute interval
-  compute_interval <- function(theta_vals, conf_level) {
-    # Compute the marginal PDF for each theta
-    pdf_vals <- sapply(theta_vals, marginal_theta)
-
-    # Normalize the PDF to ensure it integrates to 1
-    delta_theta <- diff(theta_vals)[1]
-    pdf_vals <- pdf_vals / sum(pdf_vals * delta_theta)
-
-    # Compute the cumulative distribution function (CDF)
-    cdf_vals <- cumsum(pdf_vals * delta_theta)
-
-    # Calculate lower and upper percentiles based on conf_level
-    alpha <- 1 - conf_level
-    lower_bound <- alpha / 2
-    upper_bound <- 1 - lower_bound
-
-    # Determine the 2.5th and 97.5th percentiles for the 95% prediction interval
-    lower_index <- which(cdf_vals >= lower_bound)[1]
-    upper_index <- which(cdf_vals >= upper_bound)[1]
-
-    theta_lower <- theta_vals[lower_index]
-    theta_upper <- theta_vals[upper_index]
-
-    return(list(theta_lower = theta_lower, theta_upper = theta_upper, cdf_vals = cdf_vals))
-  }
-
-  # First attempt: integrate from -pi to pi
-  theta_vals_initial <- seq(-pi, pi, length.out = 200)
-  interval_initial <- compute_interval(theta_vals_initial, conf_level = conf_level)
-  theta_lower_initial <- interval_initial$theta_lower
-  theta_upper_initial <- interval_initial$theta_upper
-
-  # Check if theta_lower is approximately equal to -theta_upper
-  # Define a small threshold for numerical precision
-  epsilon <- 1e-6
-  is_invalid <- abs(theta_lower_initial + theta_upper_initial) < epsilon
-
-  if (!is_invalid) {
-    # Valid interval found with -pi to pi integration
-    result_df <- data.frame(
-      min_angle = theta_lower_initial,
-      max_angle = theta_upper_initial
-    )
-    # print(result_df)
-    return(result_df)
+  # Unwrap the interval so it is continuous:
+  if (raw_lower < 0) {
+    lower_unwrapped <- raw_lower + 2*pi
+    upper_unwrapped <- raw_upper + 2*pi
+  } else if (raw_upper >= 2*pi) {
+    lower_unwrapped <- raw_lower - 2*pi
+    upper_unwrapped <- raw_upper - 2*pi
   } else {
-    # Invalid interval detected, redo integration from 0 to 2pi
-    theta_vals_new <- seq(0, 2 * pi, length.out = 200)
-    interval_new <- compute_interval(theta_vals_new, conf_level = conf_level)
-    theta_lower_new <- interval_new$theta_lower
-    theta_upper_new <- interval_new$theta_upper
-
-    # print("c(x,y)")
-    # print(c(x,y))
-    # Create the output dataframe
-    result_df <- data.frame(
-      min_angle = theta_lower_new,
-      max_angle = theta_upper_new
-    )
-
-    return(result_df)
+    lower_unwrapped <- raw_lower
+    upper_unwrapped <- raw_upper
   }
+
+  data.frame(min_angle = lower_unwrapped, max_angle = upper_unwrapped)
 }
+
+
+
+
+
+
+# predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL, conf_level) {
+#   # Validate inputs
+#   if (!is.numeric(x) || length(x) != 1) {
+#     stop("Input 'x' must be a single numeric value.")
+#   }
+#   if (!is.numeric(y) || length(y) != 1) {
+#     stop("Input 'y' must be a single numeric value.")
+#   }
+#   if (!is.numeric(mux) || length(mux) != 1) {
+#     stop("Input 'mux' must be a single numeric value.")
+#   }
+#   if (!is.numeric(muy) || length(muy) != 1) {
+#     stop("Input 'muy' must be a single numeric value.")
+#   }
+#   if (!is.matrix(Sigma) || any(dim(Sigma) != c(2, 2))) {
+#     stop("Input 'Sigma' must be a 2x2 covariance matrix.")
+#   }
+#   if (!is.numeric(conf_level) || conf_level <= 0 || conf_level >= 1) {
+#     stop("Input 'conf_level' must be a numeric value between 0 and 1.")
+#   }
+#
+#   # If rho is not provided, calculate it from Sigma
+#   if (is.null(rho)) {
+#     sigma_x <- sqrt(Sigma[1, 1])
+#     sigma_y <- sqrt(Sigma[2, 2])
+#     rho <- Sigma[1, 2] / (sigma_x * sigma_y)
+#   }
+#
+#   # Compute the predicted vector's angle (in radians)
+#   theta_pred <- atan2(muy, mux)
+#
+#   # Define the bivariate normal PDF in polar coordinates for the error distribution.
+#   # Here the error distribution is assumed to be centered at (0,0)
+#   bivariate_normal <- function(r, theta, Sigma) {
+#     x_val <- r * cos(theta)
+#     y_val <- r * sin(theta)
+#     inv_Sigma <- solve(Sigma)
+#     det_Sigma <- det(Sigma)
+#     exponent <- -0.5 * (inv_Sigma[1, 1] * x_val^2 +
+#                           2 * inv_Sigma[1, 2] * x_val * y_val +
+#                           inv_Sigma[2, 2] * y_val^2)
+#     return((r / (2 * pi * sqrt(det_Sigma))) * exp(exponent))
+#   }
+#
+#   # Define the marginal density for theta by integrating out r
+#   marginal_theta <- function(theta) {
+#     integrate(
+#       f = function(r) { bivariate_normal(r, theta, Sigma) },
+#       lower = 0, upper = Inf,
+#       rel.tol = 1e-8
+#     )$value
+#   }
+#
+#   # Compute the angular interval over a theta grid
+#   compute_interval <- function(theta_vals, conf_level) {
+#     pdf_vals <- sapply(theta_vals, marginal_theta)
+#     delta_theta <- diff(theta_vals)[1]
+#     pdf_vals <- pdf_vals / sum(pdf_vals * delta_theta)  # Normalize PDF
+#     cdf_vals <- cumsum(pdf_vals * delta_theta)
+#
+#     alpha <- 1 - conf_level
+#     lower_bound <- alpha / 2
+#     upper_bound <- 1 - lower_bound
+#
+#     lower_index <- which(cdf_vals >= lower_bound)[1]
+#     upper_index <- which(cdf_vals >= upper_bound)[1]
+#
+#     theta_lower <- theta_vals[lower_index]
+#     theta_upper <- theta_vals[upper_index]
+#
+#     list(theta_lower = theta_lower, theta_upper = theta_upper, cdf_vals = cdf_vals)
+#   }
+#
+#   # Use integration over -pi to pi
+#   theta_vals <- seq(-pi, pi, length.out = 200)
+#   interval <- compute_interval(theta_vals, conf_level)
+#   theta_lower <- interval$theta_lower
+#   theta_upper <- interval$theta_upper
+#
+#   # Shift the computed wedge by the predicted angle and wrap into [0, 2*pi)
+#   min_angle <- (theta_lower + theta_pred) %% (2 * pi)
+#   max_angle <- (theta_upper + theta_pred) %% (2 * pi)
+#
+#   data.frame(min_angle = min_angle, max_angle = max_angle)
+# }
 
 
 # geom_stream_field

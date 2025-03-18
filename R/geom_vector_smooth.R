@@ -382,7 +382,6 @@ StatVectorSmooth <- ggproto(
     # ----------------------------
     # 2. Model Fitting and Prediction
     # ----------------------------
-
     if(method == "lm"){
 
       # Fit the multivariate linear model
@@ -460,7 +459,11 @@ StatVectorSmooth <- ggproto(
       v <- variogram(g)
 
       # Fit a linear model of coregionalization (LMC) using a spherical model example
-      model <- vgm(psill = 1, model = "Sph", range = 3, nugget = 0.1)
+      model <- vgm(psill = 1, model = "Gau", range = 3, nugget = 0.1)
+      # model <- vgm(psill = 1, model = "Sph", range = 3, nugget = 0.1)
+      # model <- vgm(psill = 1, model = "Exp", range = 3, nugget = 0.1)
+      # model <- vgm(psill = 1, model = "Mat", range = 3, nugget = 0.1)
+
       lmc <- fit.lmc(v, g, model = model)
 
       # Define prediction points: if eval_points is NULL, use grid; otherwise, use eval_points
@@ -521,9 +524,11 @@ StatVectorSmooth <- ggproto(
 
     }
 
+
     # ----------------------------
     # 3. Compute Prediction Intervals
     # ----------------------------
+
 
     if (pi_type == "ellipse" || pi_type == "wedge") {
       # Compute prediction intervals based on pi_type
@@ -543,15 +548,25 @@ StatVectorSmooth <- ggproto(
       }
 
       if (pi_type == "wedge") {
+
         wedge_angles <- do.call(rbind, mapply(
-          predict_theta_interval,
+          function(x, y, mux, muy, var_fx, var_fy, cov_fx_fy, rho, conf_level) {
+
+            Sigma_local <- matrix(c(var_fx, cov_fx_fy, cov_fx_fy, var_fy), nrow = 2)
+            predict_theta_interval(x = x, y = y, mux = mux, muy = muy,
+                                   Sigma = Sigma_local, rho = rho, conf_level = conf_level)
+          },
           x = grid$x,
           y = grid$y,
           mux = grid$fx,
           muy = grid$fy,
-          MoreArgs = list(Sigma = Sigma, rho = rho, conf_level = conf_level[1]),
+          var_fx = cov_pred$var_fx,
+          var_fy = cov_pred$var_fy,
+          cov_fx_fy = cov_pred$cov_fx_fy,
+          MoreArgs = list(rho = rho, conf_level = conf_level[1]),
           SIMPLIFY = FALSE
         ))
+
         grid <- cbind(grid, wedge_angles)
         grid$r_upper <- sqrt(grid$fx^2 + grid$fy^2)
         grid$r_lower <- 0

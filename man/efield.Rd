@@ -5,13 +5,14 @@
 \alias{efield_maker}
 \title{Electric field}
 \usage{
-efield(u, charge_positions, charges, k = 1, q_test = +1)
+efield(u, charge_positions, charges, k = 1, q_test = +1, log = FALSE)
 
 efield_maker(
   charge_positions = rbind(c(-1, -1), c(1, 1)),
   charges = c(-1, +1),
   k = 1,
-  q_test = +1
+  q_test = +1,
+  log = FALSE
 )
 }
 \arguments{
@@ -27,6 +28,9 @@ charge_positions. Defaulted in \code{\link[=efield_maker]{efield_maker()}}.}
 more rigorous use of physical constants.}
 
 \item{q_test}{The test charge, defaulted to +1.}
+
+\item{log}{Executes the transformation of the double log of the norm of the
+vectors.}
 }
 \value{
 A vector containing the force felt by the test charge on account of
@@ -38,7 +42,7 @@ dictated by Coulomb's law. This function is mainly used to provide examples
 for visualizing vector fields with ggvfields.
 }
 \examples{
-\donttest{
+\dontrun{
 # set a - charge at (-1,-1) and a + charge at (1,1)
 charge_positions <- rbind(c(-1,-1), c(1,1))
 charges <- c(-1, +1)

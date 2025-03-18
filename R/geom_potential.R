@@ -67,7 +67,7 @@
 #'
 #' @examples
 #'
-#' \donttest{
+#' \dontrun{
 #' scalar_field <- function(u){
 #'   x <- u[1]; y <- u[2]
 #'   (x + y)^2 + 4*(x - y)^2 - 8*(.5)^2
