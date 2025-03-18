@@ -77,6 +77,66 @@
 #'   field visualization.
 #'
 #' @examples
+#'
+#' # define vector field of single vector argument
+#' f <- function(u) {
+#'   x <- u[1]; y <- u[2]
+#'   c(-y, x)
+#' }
+#'
+#' # make data frame grid with space for (fx(x,y), fy(x,y))
+#' N <- 11
+#' df <- expand.grid( "x" = seq(-1, 1, len = N), "y" = seq(-1, 1, len = N) )
+#' df$fy <- df$fx <- NA # make placeholders for fx(x,y) and fy(x,y) values
+#'
+#' # evaluate f(u) at each point and look at result
+#' for (i in 1:nrow(df)) df[i,3:4] <- f( as.numeric(df[i,1:2]) ) + rnorm(2, sd = .1)
+#'
+#' # ggplot() +
+#' #   geom_vector(aes(x, y, fx = fx, fy = fy), data = df)
+#' #
+#' # ggplot() +
+#' #   geom_vector(aes(x, y, fx = fx, fy = fy), data = df) +
+#' #   geom_vector_smooth(aes(x, y, fx = fx, fy = fy), data = df)
+#'
+#' # co-krige
+#' library(sp)
+#' library(gstat)
+#'
+#' # convert df into a SpatialPointsDataFrame
+#' coordinates(df) <- ~ x + y
+#'
+#' # define a gstat object for both fx and fy
+#' g <- gstat(id = "fx", formula = fx ~ 1, data = df)
+#' g <- gstat(g, id = "fy", formula = fy ~ 1, data = df)
+#'
+#' # compute direct- and cross-variograms
+#' v <- variogram(g)
+#'
+#' # fit basic linear model of coregionalization
+#' # Here we assume a simple Exponential model for demonstration:
+#' mod <- fit.lmc(v, g, model = vgm(psill = 1, model = "Exp", range = 1, nugget = 1))
+#'
+#' # create prediction function for u
+#' fhat <- function(u) {
+#'
+#'   # wrap u in a SpatialPointsDataFrame for gstat
+#'   newpt <- data.frame(x = u[1], y = u[2])
+#'   coordinates(newpt) <- ~x + y
+#'
+#'   # predict
+#'   pred <- predict(mod, newpt)
+#'
+#'   # extract predictions and return
+#'   with( pred, c(fx.pred, fy.pred) )
+#'
+#' }
+#' fhat(c(0.1, -0.2))
+#'
+#'
+#'
+#'
+#'
 #' # Function to generate vectors
 #' generate_vectors <- function(v) {
 #'   x <- v[1]
@@ -231,6 +291,72 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
 StatVectorSmooth <- ggproto(
   "StatVectorSmooth",
   Stat,
+
+  setup_params = function(data, params) {
+    params$flipped_aes <- has_flipped_aes(data, params, ambiguous = TRUE)
+    msg <- character()
+    method <- params$method
+    if (is.null(method) || identical(method, "auto")) {
+      # Use loess for small datasets, gam with a cubic regression basis for
+      # larger. Based on size of the _largest_ group to avoid bad memory
+      # behaviour of loess
+      max_group <- max(table(interaction(data$group, data$PANEL, drop = TRUE)))
+
+      if (max_group < 1000) {
+        method <- "loess"
+      } else {
+        method <- "gam"
+      }
+      msg <- c(msg, paste0("method = '", method, "'"))
+    }
+
+    if (identical(method, "gam") &&
+        !prompt_install("mgcv", "for using {.code method = \"gam\"}")) {
+      cli::cli_inform(c(
+        "The {.arg method} was set to {.val gam}, but {.pkg mgcv} is not installed.",
+        "!" = "Falling back to {.code method = \"lm\"}.",
+        i = "Install {.pkg mgcv} or change the {.arg method} argument to \\
+        resolve this issue."
+      ))
+      method <- "lm"
+    }
+
+    if (is.null(params$formula)) {
+      if (identical(method, "gam")) {
+        params$formula <- y ~ s(x, bs = "cs")
+      } else {
+        params$formula <- y ~ x
+      }
+      msg <- c(msg, paste0("formula = '", deparse(params$formula), "'"))
+    }
+
+    # Special case span because it's the most commonly used model argument
+    if (identical(method, "loess")) {
+      params$method.args$span <- params$span %||% 0.75
+    }
+
+    if (is.character(method)) {
+      if (identical(method, "gam")) {
+        # method <- gam_method()
+        method <- mgcv::gam
+      } else {
+        method <- match.fun(method)
+      }
+    }
+    # If gam and gam's method is not specified by the user then use REML
+    if (identical(method, gam_method())) {
+      params$method.args$method <- params$method.args$method %||% "REML"
+    }
+
+    if (length(msg) > 0) {
+      cli::cli_inform("{.fn geom_smooth} using {msg}")
+    }
+
+    params$method <- method
+    params
+  },
+
+
   required_aes = c("x", "y"),
   dropped_aes = c("distance", "angle"),
   # default_aes = aes(
