@@ -23,9 +23,9 @@ geom_vector_smooth(
   show.legend = NA,
   inherit.aes = TRUE,
   n = c(11, 11),
-  method = "lm",
+  method = "gam",
   se = TRUE,
-  se.circle = TRUE,
+  se.circle = FALSE,
   pi_type = "ellipse",
   conf_level = c(0.95, NA),
   formula = cbind(fx, fy) ~ x * y,
@@ -133,6 +133,80 @@ level is set via \code{conf_level}.
 }
 
 \examples{
+
+library("patchwork")
+
+# define vector field of single vector argument
+f <- function(u) {
+  x <- u[1]; y <- u[2]
+  c(-y, x)
+}
+
+# simulate data at random places across spatial extent
+df <- data.frame("x" = runif(N^2, -1, 1), "y" = runif(N^2, -1, 1))
+df$fy <- df$fx <- NA # make placeholders for fx(x,y) and fy(x,y) values
+
+# evaluate f(u) at each point and look at result
+for (i in 1:nrow(df)) df[i,3:4] <- f( as.numeric(df[i,1:2]) ) + rnorm(2, sd = .1)
+
+ggplot() +
+  geom_vector(aes(x, y, fx = fx, fy = fy), data = df)
+
+ggplot() +
+  geom_vector(aes(x, y, fx = fx, fy = fy), data = df) +
+  geom_vector_smooth(aes(x, y, fx = fx, fy = fy), data = df, se = FALSE)
+
+p1 <- ggplot() +
+  geom_vector(aes(x, y, fx = fx, fy = fy), data = df)  +
+  scale_color_viridis_c(guide = "none")
+
+p2 <- ggplot() +
+  geom_vector_smooth(aes(x, y, fx = fx, fy = fy), data = df, se = FALSE)
+
+p1 + p2 & theme(axis.title = element_blank())
+
+
+
+
+
+
+# define vector field of single vector argument
+f <- efield_maker(log = TRUE)
+
+# simulate data at random places across spatial extent
+xlim <- c(-2,2); ylim = c(-2,2)
+df <- data.frame(
+  "x" = runif(N^2, xlim[1], xlim[2]),
+  "y" = runif(N^2, ylim[1], ylim[2])
+)
+df$fy <- df$fx <- NA # make placeholders for fx(x,y) and fy(x,y) values
+
+# evaluate f(u) at each point and look at result
+for (i in 1:nrow(df)) df[i,3:4] <- f( as.numeric(df[i,1:2]) ) + rnorm(2, sd = .1)
+
+ggplot() +
+  geom_vector(aes(x, y, fx = fx, fy = fy), data = df)
+
+ggplot() +
+  geom_vector(aes(x, y, fx = fx, fy = fy), data = df) +
+  geom_vector_smooth(aes(x, y, fx = fx, fy = fy), data = df, se = FALSE)
+
+p1 <- ggplot() +
+  geom_vector(aes(x, y, fx = fx, fy = fy), data = df)  +
+  scale_color_viridis_c(guide = "none")
+
+p2 <- ggplot() +
+  geom_vector_smooth(aes(x, y, fx = fx, fy = fy), data = df, se = FALSE)
+
+p1 + p2 & theme(axis.title = element_blank())
+
+
+
+
+
+
+
+
 # Function to generate vectors
 generate_vectors <- function(v) {
   x <- v[1]

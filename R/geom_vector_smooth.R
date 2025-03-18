@@ -8,6 +8,8 @@
 #'
 #' @importFrom stats qt
 #' @importFrom stats integrate
+#' @importFrom sp coordinates coordinates<-
+#' @importFrom gstat gstat variogram fit.lmc vgm
 #'
 #' @param mapping A set of aesthetic mappings created by \code{ggplot2::aes()}.
 #'   **Required:** Must include **`x`** and **`y`**; vector displacements are defined by
@@ -78,60 +80,74 @@
 #'
 #' @examples
 #'
+#' library("patchwork")
+#'
 #' # define vector field of single vector argument
 #' f <- function(u) {
 #'   x <- u[1]; y <- u[2]
 #'   c(-y, x)
 #' }
 #'
-#' # make data frame grid with space for (fx(x,y), fy(x,y))
-#' N <- 11
-#' df <- expand.grid( "x" = seq(-1, 1, len = N), "y" = seq(-1, 1, len = N) )
+#' # simulate data at random places across spatial extent
+#' df <- data.frame("x" = runif(N^2, -1, 1), "y" = runif(N^2, -1, 1))
 #' df$fy <- df$fx <- NA # make placeholders for fx(x,y) and fy(x,y) values
 #'
 #' # evaluate f(u) at each point and look at result
 #' for (i in 1:nrow(df)) df[i,3:4] <- f( as.numeric(df[i,1:2]) ) + rnorm(2, sd = .1)
 #'
-#' # ggplot() +
-#' #   geom_vector(aes(x, y, fx = fx, fy = fy), data = df)
-#' #
-#' # ggplot() +
-#' #   geom_vector(aes(x, y, fx = fx, fy = fy), data = df) +
-#' #   geom_vector_smooth(aes(x, y, fx = fx, fy = fy), data = df)
+#' ggplot() +
+#'   geom_vector(aes(x, y, fx = fx, fy = fy), data = df)
 #'
-#' # co-krige
-#' library(sp)
-#' library(gstat)
+#' ggplot() +
+#'   geom_vector(aes(x, y, fx = fx, fy = fy), data = df) +
+#'   geom_vector_smooth(aes(x, y, fx = fx, fy = fy), data = df, se = FALSE)
 #'
-#' # convert df into a SpatialPointsDataFrame
-#' coordinates(df) <- ~ x + y
+#' p1 <- ggplot() +
+#'   geom_vector(aes(x, y, fx = fx, fy = fy), data = df)  +
+#'   scale_color_viridis_c(guide = "none")
 #'
-#' # define a gstat object for both fx and fy
-#' g <- gstat(id = "fx", formula = fx ~ 1, data = df)
-#' g <- gstat(g, id = "fy", formula = fy ~ 1, data = df)
+#' p2 <- ggplot() +
+#'   geom_vector_smooth(aes(x, y, fx = fx, fy = fy), data = df, se = FALSE)
 #'
-#' # compute direct- and cross-variograms
-#' v <- variogram(g)
+#' p1 + p2 & theme(axis.title = element_blank())
 #'
-#' # fit basic linear model of coregionalization
-#' # Here we assume a simple Exponential model for demonstration:
-#' mod <- fit.lmc(v, g, model = vgm(psill = 1, model = "Exp", range = 1, nugget = 1))
 #'
-#' # create prediction function for u
-#' fhat <- function(u) {
 #'
-#'   # wrap u in a SpatialPointsDataFrame for gstat
-#'   newpt <- data.frame(x = u[1], y = u[2])
-#'   coordinates(newpt) <- ~x + y
 #'
-#'   # predict
-#'   pred <- predict(mod, newpt)
 #'
-#'   # extract predictions and return
-#'   with( pred, c(fx.pred, fy.pred) )
 #'
-#' }
-#' fhat(c(0.1, -0.2))
+#' # define vector field of single vector argument
+#' f <- efield_maker(log = TRUE)
+#'
+#' # simulate data at random places across spatial extent
+#' xlim <- c(-2,2); ylim = c(-2,2)
+#' df <- data.frame(
+#'   "x" = runif(N^2, xlim[1], xlim[2]),
+#'   "y" = runif(N^2, ylim[1], ylim[2])
+#' )
+#' df$fy <- df$fx <- NA # make placeholders for fx(x,y) and fy(x,y) values
+#'
+#' # evaluate f(u) at each point and look at result
+#' for (i in 1:nrow(df)) df[i,3:4] <- f( as.numeric(df[i,1:2]) ) + rnorm(2, sd = .1)
+#'
+#' ggplot() +
+#'   geom_vector(aes(x, y, fx = fx, fy = fy), data = df)
+#'
+#' ggplot() +
+#'   geom_vector(aes(x, y, fx = fx, fy = fy), data = df) +
+#'   geom_vector_smooth(aes(x, y, fx = fx, fy = fy), data = df, se = FALSE)
+#'
+#' p1 <- ggplot() +
+#'   geom_vector(aes(x, y, fx = fx, fy = fy), data = df)  +
+#'   scale_color_viridis_c(guide = "none")
+#'
+#' p2 <- ggplot() +
+#'   geom_vector_smooth(aes(x, y, fx = fx, fy = fy), data = df, se = FALSE)
+#'
+#' p1 + p2 & theme(axis.title = element_blank())
+#'
+#'
+#'
 #'
 #'
 #'
@@ -197,22 +213,22 @@ NULL
 #' @rdname geom_vector_smooth
 #' @export
 geom_vector_smooth <- function(mapping = NULL, data = NULL,
-   stat = "vector_smooth",
-   position = "identity",
-   ...,
-   na.rm = FALSE,
-   show.legend = NA,
-   inherit.aes = TRUE,
-   n = c(11, 11),
-   method = "lm",
-   se = TRUE,
-   se.circle = TRUE,
-   pi_type = "ellipse",
-   conf_level = c(.95, NA),
-   formula = cbind(fx, fy) ~ x * y,
-   eval_points = NULL,
-   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
-   ) {
+                               stat = "vector_smooth",
+                               position = "identity",
+                               ...,
+                               na.rm = FALSE,
+                               show.legend = NA,
+                               inherit.aes = TRUE,
+                               n = c(11, 11),
+                               method = "gam",
+                               se = TRUE,
+                               se.circle = FALSE,
+                               pi_type = "ellipse",
+                               conf_level = c(.95, NA),
+                               formula = cbind(fx, fy) ~ x * y,
+                               eval_points = NULL,
+                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
+) {
 
   layer(
     stat = StatVectorSmooth,
@@ -243,22 +259,22 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
 #' @usage NULL
 #' @keywords internal
 stat_vector_smooth <- function(mapping = NULL, data = NULL,
-   geom = "vector_smooth",
-   position = "identity",
-   ...,
-   na.rm = FALSE,
-   show.legend = NA,
-   inherit.aes = TRUE,
-   n = c(11, 11),
-   method = "lm",
-   se = TRUE,
-   se.circle = TRUE,
-   conf_level = c(.95, NA),
-   pi_type = "ellipse",
-   formula = cbind(fx, fy) ~ x * y,
-   eval_points = NULL,
-   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
-   ) {
+                               geom = "vector_smooth",
+                               position = "identity",
+                               ...,
+                               na.rm = FALSE,
+                               show.legend = NA,
+                               inherit.aes = TRUE,
+                               n = c(11, 11),
+                               method = "gam",
+                               se = TRUE,
+                               se.circle = TRUE,
+                               conf_level = c(.95, NA),
+                               pi_type = "ellipse",
+                               formula = cbind(fx, fy) ~ x * y,
+                               eval_points = NULL,
+                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
+) {
 
   layer(
     stat = StatVectorSmooth,
@@ -291,72 +307,6 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
 StatVectorSmooth <- ggproto(
   "StatVectorSmooth",
   Stat,
-
-  setup_params = function(data, params) {
-    params$flipped_aes <- has_flipped_aes(data, params, ambiguous = TRUE)
-    msg <- character()
-    method <- params$method
-    if (is.null(method) || identical(method, "auto")) {
-      # Use loess for small datasets, gam with a cubic regression basis for
-      # larger. Based on size of the _largest_ group to avoid bad memory
-      # behaviour of loess
-      max_group <- max(table(interaction(data$group, data$PANEL, drop = TRUE)))
-
-      if (max_group < 1000) {
-        method <- "loess"
-      } else {
-        method <- "gam"
-      }
-      msg <- c(msg, paste0("method = '", method, "'"))
-    }
-
-    if (identical(method, "gam") &&
-        !prompt_install("mgcv", "for using {.code method = \"gam\"}")) {
-      cli::cli_inform(c(
-        "The {.arg method} was set to {.val gam}, but {.pkg mgcv} is not installed.",
-        "!" = "Falling back to {.code method = \"lm\"}.",
-        i = "Install {.pkg mgcv} or change the {.arg method} argument to \\
-        resolve this issue."
-      ))
-      method <- "lm"
-    }
-
-    if (is.null(params$formula)) {
-      if (identical(method, "gam")) {
-        params$formula <- y ~ s(x, bs = "cs")
-      } else {
-        params$formula <- y ~ x
-      }
-      msg <- c(msg, paste0("formula = '", deparse(params$formula), "'"))
-    }
-
-    # Special case span because it's the most commonly used model argument
-    if (identical(method, "loess")) {
-      params$method.args$span <- params$span %||% 0.75
-    }
-
-    if (is.character(method)) {
-      if (identical(method, "gam")) {
-        # method <- gam_method()
-        method <- mgcv::gam
-      } else {
-        method <- match.fun(method)
-      }
-    }
-    # If gam and gam's method is not specified by the user then use REML
-    if (identical(method, gam_method())) {
-      params$method.args$method <- params$method.args$method %||% "REML"
-    }
-
-    if (length(msg) > 0) {
-      cli::cli_inform("{.fn geom_smooth} using {msg}")
-    }
-
-    params$method <- method
-    params
-  },
-
-
   required_aes = c("x", "y"),
   dropped_aes = c("distance", "angle"),
   # default_aes = aes(
@@ -370,7 +320,6 @@ StatVectorSmooth <- ggproto(
 
   compute_group = function(data, scales, n, method, se = TRUE, conf_level,
                            pi_type, eval_points = NULL, formula, ...) {
-
     # ----------------------------
     # 1. Initial Data Checks and Manipulation
     # ----------------------------
@@ -434,70 +383,146 @@ StatVectorSmooth <- ggproto(
     # 2. Model Fitting and Prediction
     # ----------------------------
 
-    # Fit the multivariate linear model
-    model_mv <- lm(formula, data = data)
+    if(method == "lm"){
 
-    # Predict fx and fy for the grid
-    predictions_mv <- predict(model_mv, newdata = grid)
+      # Fit the multivariate linear model
+      model_mv <- lm(formula, data = data)
 
-    # Extract predicted means (ensure correct column names)
-    grid$fx <- predictions_mv[, "fx"]  # Predicted fx
-    grid$fy <- predictions_mv[, "fy"]  # Predicted fy
+      # Predict fx and fy for the grid
+      predictions_mv <- predict(model_mv, newdata = grid)
 
-    # ----------------------------
-    # 3. Covariance Matrix Computation
-    # ----------------------------
+      # Extract predicted means (ensure correct column names)
+      grid$fx <- predictions_mv[, "fx"]  # Predicted fx
+      grid$fy <- predictions_mv[, "fy"]  # Predicted fy
 
-    # Extract the covariance matrix of the model coefficients
-    cov_coef <- vcov(model_mv)
-    # Create the design matrix for the grid
-    design_matrix <- model.matrix(formula, data = grid)
+      # Extract the covariance matrix of the model coefficients
+      cov_coef <- vcov(model_mv)
+      # Create the design matrix for the grid
+      design_matrix <- model.matrix(formula, data = grid)
 
-    # Number of response variables (fx and fy)
-    n_resp <- length(all.vars(formula[[2]]))
+      # Number of response variables (fx and fy)
+      n_resp <- length(all.vars(formula[[2]]))
 
-    # Number of coefficients per response
-    coeffs_per_response <- length(coef(model_mv)[,1])
+      # Number of coefficients per response
+      coeffs_per_response <- length(coef(model_mv)[,1])
 
-    # Check the number of coefficients
-    total_coeffs <- ncol(cov_coef)
+      # Check the number of coefficients
+      total_coeffs <- ncol(cov_coef)
 
-    # Extract residuals from the model
-    residuals_mv <- resid(model_mv)
+      # Extract residuals from the model
+      residuals_mv <- resid(model_mv)
 
-    # Compute covariance matrix of residuals
-    Sigma <- cov(residuals_mv)
+      # Compute covariance matrix of residuals
+      Sigma <- cov(residuals_mv)
 
-    # Extract correlation coefficient
-    sigma_x <- sqrt(Sigma["fx", "fx"])
-    sigma_y <- sqrt(Sigma["fy", "fy"])
-    rho <- Sigma["fx", "fy"] / (sigma_x * sigma_y)
+      # Extract correlation coefficient
+      sigma_x <- sqrt(Sigma["fx", "fx"])
+      sigma_y <- sqrt(Sigma["fy", "fy"])
+      rho <- Sigma["fx", "fy"] / (sigma_x * sigma_y)
 
-    expected_coeffs <- coeffs_per_response * n_resp
-    if (total_coeffs != expected_coeffs) {
-      stop("Unexpected number of coefficients in the model. Please verify the formula and data.")
+      expected_coeffs <- coeffs_per_response * n_resp
+      if (total_coeffs != expected_coeffs) {
+        stop("Unexpected number of coefficients in the model. Please verify the formula and data.")
+      }
+
+      # Extract covariance matrices
+      cov_beta_fx <- cov_coef[1:coeffs_per_response, 1:coeffs_per_response]     # Covariance for fx coefficients
+      cov_beta_fy <- cov_coef[(coeffs_per_response+1):(expected_coeffs), (coeffs_per_response+1):(expected_coeffs)]     # Covariance for fy coefficients
+      cov_beta_fx_fy <- cov_coef[1:coeffs_per_response, (coeffs_per_response+1):(expected_coeffs)]  # Covariance between fx and fy coefficients
+
+      # Compute variance for fx and fy predictions
+      var_fx <- rowSums(design_matrix * (design_matrix %*% cov_beta_fx))
+      var_fy <- rowSums(design_matrix * (design_matrix %*% cov_beta_fy))
+      cov_fx_fy <- rowSums(design_matrix * (design_matrix %*% cov_beta_fx_fy))
+
+      # Add residual variances and covariance
+      var_fx <- var_fx + Sigma["fx", "fx"]
+      var_fy <- var_fy + Sigma["fy", "fy"]
+      cov_fx_fy <- cov_fx_fy + Sigma["fx", "fy"]
+
+      # Assemble the covariance matrix for (fx, fy) predictions
+      cov_pred <- data.frame(var_fx, var_fy, cov_fx_fy)
+
     }
 
-    # Extract covariance matrices
-    cov_beta_fx <- cov_coef[1:coeffs_per_response, 1:coeffs_per_response]     # Covariance for fx coefficients
-    cov_beta_fy <- cov_coef[(coeffs_per_response+1):(expected_coeffs), (coeffs_per_response+1):(expected_coeffs)]     # Covariance for fy coefficients
-    cov_beta_fx_fy <- cov_coef[1:coeffs_per_response, (coeffs_per_response+1):(expected_coeffs)]  # Covariance between fx and fy coefficients
+    if(method == "kriging"){
 
-    # Compute variance for fx and fy predictions
-    var_fx <- rowSums(design_matrix * (design_matrix %*% cov_beta_fx))
-    var_fy <- rowSums(design_matrix * (design_matrix %*% cov_beta_fy))
-    cov_fx_fy <- rowSums(design_matrix * (design_matrix %*% cov_beta_fx_fy))
+      # Convert data (a tibble) to a regular data frame and then to a SpatialPointsDataFrame
+      df <- as.data.frame(data)
+      sp::coordinates(df) <- ~ x + y
 
-    # Add residual variances and covariance
-    var_fx <- var_fx + Sigma["fx", "fx"]
-    var_fy <- var_fy + Sigma["fy", "fy"]
-    cov_fx_fy <- cov_fx_fy + Sigma["fx", "fy"]
+      # Build the cokriging model for fx and fy
+      g <- gstat(id = "fx", formula = fx ~ 1, data = df)
+      g <- gstat(g, id = "fy", formula = fy ~ 1, data = df)
 
-    # Assemble the covariance matrix for (fx, fy) predictions
-    cov_pred <- data.frame(var_fx, var_fy, cov_fx_fy)
+      # Compute the experimental variograms (adjust cutoff as needed)
+      # v <- variogram(g, cutoff = 5)
+      v <- variogram(g)
+
+      # Fit a linear model of coregionalization (LMC) using a spherical model example
+      model <- vgm(psill = 1, model = "Sph", range = 3, nugget = 0.1)
+      lmc <- fit.lmc(v, g, model = model)
+
+      # Define prediction points: if eval_points is NULL, use grid; otherwise, use eval_points
+      new_point <- if (is.null(eval_points)) grid else eval_points
+
+      # Convert the new_point data frame to a SpatialPointsDataFrame
+      coordinates(new_point) <- ~ x + y
+
+      # Perform prediction using the fitted LMC model
+      pred <- predict(lmc, newdata = new_point)
+
+      # Extract prediction results into a simple data frame (optional)
+      grid <- data.frame(x = new_point$x, y = new_point$y,
+                         fx = pred$fx.pred, fy = pred$fy.pred)
+      cov_pred <- data.frame(var_fx = pred$fx.var,
+                             var_fy = pred$fy.var,
+                             cov_fx_fy = pred$cov.fx.fy)
+
+      # Compute overall (lag-0) covariance matrix from the LMC model
+      sill_fx    <- sum(lmc$model$fx$psill)
+      sill_fy    <- sum(lmc$model$fy$psill)
+      sill_fx_fy <- sum(lmc$model$`fx.fy`$psill)
+
+      Sigma <- matrix(c(sill_fx, sill_fx_fy,
+                        sill_fx_fy, sill_fy), nrow = 2)
+
+      # Calculate the overall correlation (rho) from the covariance matrix
+      rho <- sill_fx_fy / sqrt(sill_fx * sill_fy)
+
+    }
+
+    if(method == "gam"){
+
+      gam <- mgcv::gam
+      s <- mgcv::s
+
+      # fit gam
+      fx_mod <- gam(fx ~ s(x, y, bs = "tp"), data = data)
+      fy_mod <- gam(fy ~ s(x, y, bs = "tp"), data = data)
+
+      # Define prediction points: if eval_points is NULL, use grid; otherwise, use eval_points
+      new_point <- if (is.null(eval_points)) grid else eval_points
+
+      # predict with gam
+      pred_fx <- predict(fx_mod, newdata = new_point[,c("x","y")])
+      pred_fy <- predict(fy_mod, newdata = new_point[,c("x","y")])
+
+      # format into a new data frame
+      grid <- data.frame(
+        x = new_point$x,
+        y = new_point$y,
+        fx = unname( pred_fx ),
+        fy = unname( pred_fy )
+      )
+
+      # add rho so it works
+      rho <- 1
+
+    }
 
     # ----------------------------
-    # 4. Compute Prediction Intervals
+    # 3. Compute Prediction Intervals
     # ----------------------------
 
     if (pi_type == "ellipse" || pi_type == "wedge") {
@@ -648,7 +673,6 @@ GeomVectorSmooth <- ggproto(
         raster_data <- data.frame(x = data$x, y = data$y)
         raster_data$z <- (data$max_angle - data$min_angle) * (180 / pi)
 
-        # browser()
         n_rows <- length(unique(raster_data$y))
         n_cols <- length(unique(raster_data$x))
 
