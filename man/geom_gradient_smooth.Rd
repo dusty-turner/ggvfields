@@ -164,7 +164,7 @@ used internally, it is dropped from the final visual output.
 }
 
 \examples{
-\donttest{
+\dontrun{
 # Define several scalar field functions:
 
 # Example 1: f(x, y) = x^2 - y^2

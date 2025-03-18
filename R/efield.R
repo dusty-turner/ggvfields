@@ -21,7 +21,7 @@
 #' @name efield
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # set a - charge at (-1,-1) and a + charge at (1,1)
 #' charge_positions <- rbind(c(-1,-1), c(1,1))
 #' charges <- c(-1, +1)
