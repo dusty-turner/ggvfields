@@ -383,7 +383,6 @@ StatVectorSmooth <- ggproto(
       g <- gstat(g, id = "fy", formula = fy ~ 1, data = df)
 
       # Compute the experimental variograms (adjust cutoff as needed)
-      # v <- variogram(g, cutoff = 5)
       v <- variogram(g)
 
       # Fit a linear model of coregionalization (LMC) using a spherical model example
@@ -421,6 +420,34 @@ StatVectorSmooth <- ggproto(
       rho <- sill_fx_fy / sqrt(sill_fx * sill_fy)
     }
 
+    if(method == "gam"){
+browser()
+      gam <- mgcv::gam
+      s <- mgcv::s
+
+      # fit gam
+      fx_mod <- gam(fx ~ s(x, y, bs = "tp"), data = data)
+      fy_mod <- gam(fy ~ s(x, y, bs = "tp"), data = data)
+
+      # Define prediction points: if eval_points is NULL, use grid; otherwise, use eval_points
+      new_point <- if (is.null(eval_points)) grid else eval_points
+
+      # predict with gam
+      pred_fx <- predict(fx_mod, newdata = new_point[,c("x","y")])
+      pred_fy <- predict(fy_mod, newdata = new_point[,c("x","y")])
+
+      # format into a new data frame
+      grid <- data.frame(
+        x = new_point$x,
+        y = new_point$y,
+        fx = unname( pred_fx ),
+        fy = unname( pred_fy )
+      )
+
+      # add rho so it works
+      rho <- 1
+
+    }
 
     # ----------------------------
     # 4. Compute Prediction Intervals
