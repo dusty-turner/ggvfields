@@ -21,13 +21,17 @@
 #'   position adjustment function.
 #' @param n An integer vector specifying the number of grid points along each
 #'   axis for smoothing.
-#' @param method Character. Specifies the smoothing method. Currently, the only
-#'   supported method is `"lm"`, which fits a multivariate linear model to
-#'   predict the vector displacements (`fx`, `fy`) from `x` and `y`.
+#' @param method Character. Specifies the smoothing method. Supported options
+#'   include `"lm"`, `"kriging"`, and `"gam"`. The `"lm"` method fits a
+#'   multivariate linear model, `"kriging"` uses a cokriging approach via the
+#'   `gstat` package, and `"gam"` fits separate generalized additive models for
+#'   `fx` and `fy` (with predictions assumed independent, i.e., zero
+#'   covariance).
 #' @param se Logical. If `TRUE`, prediction (confidence) intervals are computed
 #'   and plotted.
-#' @param se.circle Logical. If `TRUE`, circles are drawn around the origin of
-#'   each vector to represent the radius of the prediction interval.
+#' @param se.circle Logical. Defaults to `FALSE`. If `TRUE`, circles are drawn
+#'   around the origin of each vector. By default, the circle’s radius is
+#'   computed as the magnitude of the predicted vector.
 #' @param conf_level Numeric. Specifies the confidence level for the prediction
 #'   intervals. Default is `0.95`.
 #' @param eval_points A data frame of evaluation points. If provided, these
@@ -39,12 +43,12 @@
 #'   - `"ellipse"`: Ellipses are used to represent the covariance of the predictions.
 #'   If `pi_type` is set to `"ellipse"` and `eval_points` is `NULL`, it will
 #'   revert to `"wedge"`.
-#' @param arrow A \code{grid::arrow()} specification for arrowheads on the smoothed
-#'   vectors.
+#' @param arrow A \code{grid::arrow()} specification for arrowheads on the
+#'   smoothed vectors.
 #' @param formula A formula specifying the multivariate linear model used for
 #'   smoothing. The default is `cbind(fx, fy) ~ x * y`.
-#' @param ... Other arguments passed to \code{ggplot2::layer()} and the underlying
-#'   geometry/stat.
+#' @param ... Other arguments passed to \code{ggplot2::layer()} and the
+#'   underlying geometry/stat.
 #'
 #'
 #' @section Aesthetics: `geom_vector_smooth()` supports the following aesthetics
@@ -62,21 +66,24 @@
 #'
 #' @section Details:
 #' **Multivariate Linear Model:**
-#' The `"lm"` method fits a multivariate linear model to predict vector
-#' displacements (`fx` and `fy`) based on the coordinates `x` and `y`, including
-#' interaction terms (`x * y`). This model smooths the raw vector data to
-#' provide an estimate of the underlying vector field.
+#'   The `"lm"` method fits a multivariate linear model to predict vector
+#'   displacements (`fx` and `fy`) based on the coordinates `x` and `y`,
+#'   including interaction terms (`x * y`). This model smooths the raw vector
+#'   data to provide an estimate of the underlying vector field.
 #'
 #' **Prediction Intervals:**
-#' When `se = TRUE`, prediction intervals are computed for the smoothed vectors.
-#' Two types of intervals are supported:
+#'   When `se = TRUE`, prediction intervals are computed for the smoothed
+#'   vectors. Two types of intervals are supported:
 #'   - **Ellipse:** Ellipses represent the joint uncertainty (covariance) in the predicted `fx` and `fy`.
 #'   - **Wedge:** Wedges (angular sectors) indicate the range of possible vector directions and magnitudes.
-#' The type of interval displayed is controlled by `pi_type`, and the confidence
-#' level is set via `conf_level`.
+#'   The type of interval displayed is controlled by `pi_type`, and the
+#'   confidence level is set via `conf_level`.
 #'
 #' @return A ggplot2 layer that can be added to a plot to create a smooth vector
 #'   field visualization.
+#'
+#' @description
+#' `r lifecycle::badge("experimental")`
 #'
 #' @examples
 #' # Function to generate vectors
@@ -131,7 +138,8 @@
 #'   geom_vector_smooth(aes(fx = fx, fy = fy), eval_points = eval_points, pi_type = "ellipse") +
 #'   ggtitle("Smoothed Vector Field with Wedge Intervals")
 #'
-#' @aliases geom_vector_smooth stat_vector_smooth geom_vector_smooth2 stat_vector_smooth2 StatVectorSmooth
+#' @aliases geom_vector_smooth stat_vector_smooth geom_vector_smooth2
+#'   stat_vector_smooth2 StatVectorSmooth
 #' @name geom_vector_smooth
 #' @export
 NULL
@@ -146,7 +154,7 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
    show.legend = NA,
    inherit.aes = TRUE,
    n = c(11, 11),
-   method = "lm",
+   method = "gam",
    se = TRUE,
    se.circle = FALSE,
    pi_type = "ellipse",
@@ -192,7 +200,7 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
    show.legend = NA,
    inherit.aes = TRUE,
    n = c(11, 11),
-   method = "lm",
+   method = "gam",
    se = TRUE,
    se.circle = FALSE,
    conf_level = c(.95, NA),
@@ -421,7 +429,6 @@ StatVectorSmooth <- ggproto(
     }
 
     if(method == "gam"){
-browser()
       gam <- mgcv::gam
       s <- mgcv::s
 
@@ -433,19 +440,27 @@ browser()
       new_point <- if (is.null(eval_points)) grid else eval_points
 
       # predict with gam
-      pred_fx <- predict(fx_mod, newdata = new_point[,c("x","y")])
-      pred_fy <- predict(fy_mod, newdata = new_point[,c("x","y")])
+      pred_fx <- predict(fx_mod, newdata = new_point[, c("x", "y")], se.fit = TRUE)
+      pred_fy <- predict(fy_mod, newdata = new_point[, c("x", "y")], se.fit = TRUE)
 
       # format into a new data frame
       grid <- data.frame(
-        x = new_point$x,
-        y = new_point$y,
-        fx = unname( pred_fx ),
-        fy = unname( pred_fy )
+        x  = new_point$x,
+        y  = new_point$y,
+        fx = pred_fx$fit,
+        fy = pred_fy$fit
       )
 
+      var_fx <- pred_fx$se.fit^2
+      var_fy <- pred_fy$se.fit^2
+
+      # Since the models are fitted separately, we assume independence:
+      cov_fx_fy <- rep(0, length(var_fx))
+
+      # Assemble the covariance data frame similar to LM and kriging
+      cov_pred <- data.frame(var_fx = var_fx, var_fy = var_fy, cov_fx_fy = cov_fx_fy)
       # add rho so it works
-      rho <- 1
+      rho <- 0
 
     }
 
