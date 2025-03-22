@@ -89,6 +89,7 @@
 #' }
 #'
 #' # simulate data at random places across spatial extent
+#' N <- 11
 #' df <- data.frame("x" = runif(N^2, -1, 1), "y" = runif(N^2, -1, 1))
 #' df$fy <- df$fx <- NA # make placeholders for fx(x,y) and fy(x,y) values
 #'
