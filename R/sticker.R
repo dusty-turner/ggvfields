@@ -182,10 +182,10 @@ df_letters <- tibble::tribble(
   "L", 2, 12, 0, 13, 0,         # Bottom horizontal
 
   # D (offset = 14)
-  "D", 1, 14,   1,   14,   0,
-  "D", 2, 14,   1,   15,   1,
-  "D", 3, 15,   1,   15,   0,
-  "D", 4, 14,   0,   15,   0,
+  "D", 1, 14,   1,   15,   .80,
+  "D", 2, 15,   .80,   15,   .20,
+  "D", 3, 15,   .20,   14,   0,
+  "D", 4, 14,   0,   14,   1,
 
   # S (offset = 16) – re‑designed as a block S
   "S", 1, 16, 1, 17, 1,         # Top horizontal
