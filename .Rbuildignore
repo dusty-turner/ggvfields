@@ -11,3 +11,4 @@ dusty_files*
 ^LICENSE\.md$
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
+sticker.R
