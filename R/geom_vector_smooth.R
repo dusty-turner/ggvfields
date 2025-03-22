@@ -21,13 +21,17 @@
 #'   position adjustment function.
 #' @param n An integer vector specifying the number of grid points along each
 #'   axis for smoothing.
-#' @param method Character. Specifies the smoothing method. Currently, the only
-#'   supported method is `"lm"`, which fits a multivariate linear model to
-#'   predict the vector displacements (`fx`, `fy`) from `x` and `y`.
+#' @param method Character. Specifies the smoothing method. Supported options
+#'   include `"lm"`, `"kriging"`, and `"gam"`. The `"lm"` method fits a
+#'   multivariate linear model, `"kriging"` uses a cokriging approach via the
+#'   `gstat` package, and `"gam"` fits separate generalized additive models for
+#'   `fx` and `fy` (with predictions assumed independent, i.e., zero
+#'   covariance).
 #' @param se Logical. If `TRUE`, prediction (confidence) intervals are computed
 #'   and plotted.
-#' @param se.circle Logical. If `TRUE`, circles are drawn around the origin of
-#'   each vector to represent the radius of the prediction interval.
+#' @param se.circle Logical. Defaults to `FALSE`. If `TRUE`, circles are drawn
+#'   around the origin of each vector. By default, the circle’s radius is
+#'   computed as the magnitude of the predicted vector.
 #' @param conf_level Numeric. Specifies the confidence level for the prediction
 #'   intervals. Default is `0.95`.
 #' @param eval_points A data frame of evaluation points. If provided, these
@@ -39,12 +43,12 @@
 #'   - `"ellipse"`: Ellipses are used to represent the covariance of the predictions.
 #'   If `pi_type` is set to `"ellipse"` and `eval_points` is `NULL`, it will
 #'   revert to `"wedge"`.
-#' @param arrow A \code{grid::arrow()} specification for arrowheads on the smoothed
-#'   vectors.
+#' @param arrow A \code{grid::arrow()} specification for arrowheads on the
+#'   smoothed vectors.
 #' @param formula A formula specifying the multivariate linear model used for
 #'   smoothing. The default is `cbind(fx, fy) ~ x * y`.
-#' @param ... Other arguments passed to \code{ggplot2::layer()} and the underlying
-#'   geometry/stat.
+#' @param ... Other arguments passed to \code{ggplot2::layer()} and the
+#'   underlying geometry/stat.
 #'
 #'
 #' @section Aesthetics: `geom_vector_smooth()` supports the following aesthetics
@@ -62,21 +66,24 @@
 #'
 #' @section Details:
 #' **Multivariate Linear Model:**
-#' The `"lm"` method fits a multivariate linear model to predict vector
-#' displacements (`fx` and `fy`) based on the coordinates `x` and `y`, including
-#' interaction terms (`x * y`). This model smooths the raw vector data to
-#' provide an estimate of the underlying vector field.
+#'   The `"lm"` method fits a multivariate linear model to predict vector
+#'   displacements (`fx` and `fy`) based on the coordinates `x` and `y`,
+#'   including interaction terms (`x * y`). This model smooths the raw vector
+#'   data to provide an estimate of the underlying vector field.
 #'
 #' **Prediction Intervals:**
-#' When `se = TRUE`, prediction intervals are computed for the smoothed vectors.
-#' Two types of intervals are supported:
+#'   When `se = TRUE`, prediction intervals are computed for the smoothed
+#'   vectors. Two types of intervals are supported:
 #'   - **Ellipse:** Ellipses represent the joint uncertainty (covariance) in the predicted `fx` and `fy`.
 #'   - **Wedge:** Wedges (angular sectors) indicate the range of possible vector directions and magnitudes.
-#' The type of interval displayed is controlled by `pi_type`, and the confidence
-#' level is set via `conf_level`.
+#'   The type of interval displayed is controlled by `pi_type`, and the
+#'   confidence level is set via `conf_level`.
 #'
 #' @return A ggplot2 layer that can be added to a plot to create a smooth vector
 #'   field visualization.
+#'
+#' @description
+#' `r lifecycle::badge("experimental")`
 #'
 #' @examples
 #'
@@ -206,7 +213,8 @@
 #'   geom_vector_smooth(aes(fx = fx, fy = fy), eval_points = eval_points, pi_type = "ellipse") +
 #'   ggtitle("Smoothed Vector Field with Wedge Intervals")
 #'
-#' @aliases geom_vector_smooth stat_vector_smooth geom_vector_smooth2 stat_vector_smooth2 StatVectorSmooth
+#' @aliases geom_vector_smooth stat_vector_smooth geom_vector_smooth2
+#'   stat_vector_smooth2 StatVectorSmooth
 #' @name geom_vector_smooth
 #' @export
 NULL
@@ -214,22 +222,22 @@ NULL
 #' @rdname geom_vector_smooth
 #' @export
 geom_vector_smooth <- function(mapping = NULL, data = NULL,
-                               stat = "vector_smooth",
-                               position = "identity",
-                               ...,
-                               na.rm = FALSE,
-                               show.legend = NA,
-                               inherit.aes = TRUE,
-                               n = c(11, 11),
-                               method = "gam",
-                               se = TRUE,
-                               se.circle = FALSE,
-                               pi_type = "ellipse",
-                               conf_level = c(.95, NA),
-                               formula = cbind(fx, fy) ~ x * y,
-                               eval_points = NULL,
-                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
-) {
+   stat = "vector_smooth",
+   position = "identity",
+   ...,
+   na.rm = FALSE,
+   show.legend = NA,
+   inherit.aes = TRUE,
+   n = c(11, 11),
+   method = "gam",
+   se = TRUE,
+   se.circle = FALSE,
+   pi_type = "ellipse",
+   conf_level = c(.95, NA),
+   formula = cbind(fx, fy) ~ x * y,
+   eval_points = NULL,
+   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
+   ) {
 
   layer(
     stat = StatVectorSmooth,
@@ -260,22 +268,22 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
 #' @usage NULL
 #' @keywords internal
 stat_vector_smooth <- function(mapping = NULL, data = NULL,
-                               geom = "vector_smooth",
-                               position = "identity",
-                               ...,
-                               na.rm = FALSE,
-                               show.legend = NA,
-                               inherit.aes = TRUE,
-                               n = c(11, 11),
-                               method = "gam",
-                               se = TRUE,
-                               se.circle = TRUE,
-                               conf_level = c(.95, NA),
-                               pi_type = "ellipse",
-                               formula = cbind(fx, fy) ~ x * y,
-                               eval_points = NULL,
-                               arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
-) {
+   geom = "vector_smooth",
+   position = "identity",
+   ...,
+   na.rm = FALSE,
+   show.legend = NA,
+   inherit.aes = TRUE,
+   n = c(11, 11),
+   method = "gam",
+   se = TRUE,
+   se.circle = FALSE,
+   conf_level = c(.95, NA),
+   pi_type = "ellipse",
+   formula = cbind(fx, fy) ~ x * y,
+   eval_points = NULL,
+   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
+   ) {
 
   layer(
     stat = StatVectorSmooth,
@@ -456,7 +464,6 @@ StatVectorSmooth <- ggproto(
       g <- gstat(g, id = "fy", formula = fy ~ 1, data = df)
 
       # Compute the experimental variograms (adjust cutoff as needed)
-      # v <- variogram(g, cutoff = 5)
       v <- variogram(g)
 
       # Fit a linear model of coregionalization (LMC) using a spherical model example
@@ -525,6 +532,41 @@ StatVectorSmooth <- ggproto(
 
     }
 
+    if(method == "gam"){
+      gam <- mgcv::gam
+      s <- mgcv::s
+
+      # fit gam
+      fx_mod <- gam(fx ~ s(x, y, bs = "tp"), data = data)
+      fy_mod <- gam(fy ~ s(x, y, bs = "tp"), data = data)
+
+      # Define prediction points: if eval_points is NULL, use grid; otherwise, use eval_points
+      new_point <- if (is.null(eval_points)) grid else eval_points
+
+      # predict with gam
+      pred_fx <- predict(fx_mod, newdata = new_point[, c("x", "y")], se.fit = TRUE)
+      pred_fy <- predict(fy_mod, newdata = new_point[, c("x", "y")], se.fit = TRUE)
+
+      # format into a new data frame
+      grid <- data.frame(
+        x  = new_point$x,
+        y  = new_point$y,
+        fx = pred_fx$fit,
+        fy = pred_fy$fit
+      )
+
+      var_fx <- pred_fx$se.fit^2
+      var_fy <- pred_fy$se.fit^2
+
+      # Since the models are fitted separately, we assume independence:
+      cov_fx_fy <- rep(0, length(var_fx))
+
+      # Assemble the covariance data frame similar to LM and kriging
+      cov_pred <- data.frame(var_fx = var_fx, var_fy = var_fy, cov_fx_fy = cov_fx_fy)
+      # add rho so it works
+      rho <- 0
+
+    }
 
     # ----------------------------
     # 3. Compute Prediction Intervals
@@ -624,7 +666,8 @@ GeomVectorSmooth <- ggproto(
   #   fill = NULL, color = "#3366FF"
   # ),
   default_aes = aes(
-    linewidth = 0.5, linetype = 1, alpha = 1,
+    linewidth = 0.5,
+    linetype = 1, alpha = 1,
     fill = NULL
   ),
 
@@ -633,20 +676,20 @@ GeomVectorSmooth <- ggproto(
     return(data)
   },
 
-  draw_panel = function(
-    data, panel_params, coord,
-    arrow = NULL, se = TRUE, se.circle = FALSE,
-    eval_points, pi_type
-  ) {
+  draw_panel = function(data, panel_params, coord, arrow = NULL, se = TRUE,
+                        se.circle = FALSE, eval_points, pi_type) {
 
     if (is.null(data$colour)) {
       data$colour <- "#3366FF"
     }
 
+    if (nrow(data) == 1) {
+      data$linewidth <- 1.5
+    }
+
     grobs <- list()
 
     if (pi_type == "ellipse" && is.null(eval_points)) {
-      # message("eval_points is NULL; changing pi_type from 'ellipse' to 'wedge'.")
       pi_type <- "wedge"
     }
 
@@ -676,7 +719,7 @@ GeomVectorSmooth <- ggproto(
         # Assign aesthetics for the wedge
         wedge_data$linewidth <- 0.5
         wedge_data$alpha <- .4
-        wedge_data$fill <- "grey60"
+        wedge_data$fill <- "grey40"
         wedge_data$colour <- NA
 
         # Draw the wedges using GeomPolygon
@@ -785,7 +828,7 @@ GeomVectorSmooth <- ggproto(
     segments_grob <- GeomSegment$draw_panel(
       data, panel_params, coord, arrow = arrow
     )
-    grobs <- c(grobs, grid::gList(segments_grob))
+    grobs <- c(grid::gList(segments_grob), grobs)
 
     # Combine all grobs into a single grobTree
     combined_grob <- grid::grobTree(children = do.call(grid::gList, grobs))
@@ -795,3 +838,276 @@ GeomVectorSmooth <- ggproto(
 
   draw_key = draw_key_smooth
 )
+
+#' @keywords internal
+validate_aesthetics <- function(data) {
+  # Helper function to check if all specified columns exist and are non-NA
+  columns_valid <- function(df, cols) {
+    all(cols %in% names(df)) && all(!is.na(df[[cols[1]]])) && all(!is.na(df[[cols[2]]]))
+  }
+
+  # Check if both 'angle' and 'distance' are provided and fully populated
+  has_angle_distance <- columns_valid(data, c("angle", "distance"))
+
+  # Check if both 'dx' and 'dy' are provided and fully populated
+  has_fx_fy <- columns_valid(data, c("fx", "fy"))
+
+  # If neither pair is fully provided, throw an error
+  if (!(has_angle_distance || has_fx_fy)) {
+    stop("You must provide either both 'fx' and 'fy' or both 'angle' and 'distance' aesthetics.")
+  }
+
+  # Return a list indicating which pair is present
+  return(list(
+    has_angle_distance = has_angle_distance,
+    has_fx_fy = has_fx_fy
+  ))
+}
+
+#' @keywords internal
+# Compute ellipse parameters based on covariance - geom_vector_smooth
+compute_ellipse_params <- function(var_fx, var_fy, cov_fx_fy, conf_level = 0.95) {
+  # Construct the covariance matrix
+  cov_matrix <- matrix(c(var_fx, cov_fx_fy, cov_fx_fy, var_fy), nrow = 2)
+
+  # Eigen decomposition
+  eig <- eigen(cov_matrix)
+
+  # Eigenvalues and eigenvectors
+  eigenvalues <- eig$values
+  eigenvectors <- eig$vectors
+
+  # Compute the angle of rotation in degrees
+  angle <- atan2(eigenvectors[2,1], eigenvectors[1,1]) * (180 / pi)
+
+  # Compute the scaling factor based on the desired confidence level
+  # For a 95% confidence ellipse in 2D, the scaling factor is sqrt(5.991)
+  # This comes from the chi-square distribution with 2 degrees of freedom
+  chi_sq_val <- stats::qchisq(conf_level, df = 2)
+  scale_factor <- sqrt(chi_sq_val)
+
+  # Width and height of the ellipse (2 * axis lengths)
+  width <- 2 * scale_factor * sqrt(eigenvalues[1])
+  height <- 2 * scale_factor * sqrt(eigenvalues[2])
+
+  return(list(width = width, height = height, angle = angle))
+}
+
+#' @keywords internal
+# Define a helper function to compute wedge endpoints (unchanged) - geom_vector_smooth
+compute_prediction_endpoints <- function(x, y, fx, fy, angle_lower, angle_upper) {
+  # Validate inputs
+  if (!is.numeric(x) || length(x) != 1) {
+    stop("Input 'x' must be a single numeric value.")
+  }
+  if (!is.numeric(y) || length(y) != 1) {
+    stop("Input 'y' must be a single numeric value.")
+  }
+  if (!is.numeric(fx) || length(fx) != 1) {
+    stop("Input 'fx' must be a single numeric value.")
+  }
+  if (!is.numeric(fy) || length(fy) != 1) {
+    stop("Input 'fy' must be a single numeric value.")
+  }
+  if (!is.numeric(angle_lower) || length(angle_lower) != 1) {
+    stop("Input 'angle_lower' must be a single numeric value in radians.")
+  }
+  if (!is.numeric(angle_upper) || length(angle_upper) != 1) {
+    stop("Input 'angle_upper' must be a single numeric value in radians.")
+  }
+
+  # Calculate the magnitude of the predicted vector
+  magnitude <- sqrt(fx^2 + fy^2)
+
+  # Compute the endpoints based on absolute angles
+  xend_lower <- x + magnitude * cos(angle_lower)
+  yend_lower <- y + magnitude * sin(angle_lower)
+
+  xend_upper <- x + magnitude * cos(angle_upper)
+  yend_upper <- y + magnitude * sin(angle_upper)
+
+  # Create and return the output dataframe
+  result_df <- data.frame(
+    xend_lower = xend_lower,
+    yend_lower = yend_lower,
+    xend_upper = xend_upper,
+    yend_upper = yend_upper
+  )
+
+  return(result_df)
+}
+
+#' @keywords internal
+# create circles in geom_vector_smooth
+create_circle_data <- function(x, y, radius, n = 100, group) {
+  angle <- seq(0, 2 * pi, length.out = n)
+  data.frame(
+    x = x + radius * cos(angle),
+    y = y + radius * sin(angle),
+    group = group
+  )
+}
+
+#' @keywords internal
+# create circles in geom_vector_smooth
+create_wedge_data <- function(
+    x, y, xend_upper, yend_upper, xend_lower, yend_lower,
+    xend, yend, id, n_points = 100,
+    outer_radius = NULL,
+    inner_radius = 0
+) {
+  # Calculate angles using atan2 for upper, lower, and midpoint
+  angle_upper <- atan2(yend_upper - y, xend_upper - x) + 2*pi#%% (2 * pi)
+  angle_lower <- atan2(yend_lower - y, xend_lower - x) + 2*pi#%% (2 * pi)
+  midpoint_angle <- atan2(yend - y, xend - x) + 2*pi#%% (2 * pi)
+
+  if(angle_upper < angle_lower){
+    angle_upper <- angle_upper + 2*pi
+  }
+
+  # Calculate the shift to bring the midpoint to 0 radians
+  shift <- -midpoint_angle
+
+  # Shift all angles by the same amount
+  shifted_upper <- (angle_upper + shift) #%% (2 * pi)
+  shifted_lower <- (angle_lower + shift) #%% (2 * pi)
+
+  # Generate arc points from upper (positive) to lower (negative)
+  arc_angles <- seq(shifted_upper, shifted_lower, length.out = n_points)
+
+  # Create outer arc
+  arc_x_outer <- outer_radius * cos(arc_angles)
+  arc_y_outer <- outer_radius * sin(arc_angles)
+
+  # Rotate the arc points back to the original coordinate system
+  final_x_outer <- x + arc_x_outer * cos(-shift) - arc_y_outer * sin(-shift)
+  final_y_outer <- y + arc_x_outer * sin(-shift) + arc_y_outer * cos(-shift)
+
+  if (inner_radius > 0) {
+    # if (inner_radius > 0 && !is.null(inner_radius)) {
+    # Create inner arc
+    arc_x_inner <- inner_radius * cos(arc_angles)
+    arc_y_inner <- inner_radius * sin(arc_angles)
+
+    # Rotate the inner arc points back to the original coordinate system
+    final_x_inner <- x + arc_x_inner * cos(-shift) - arc_y_inner * sin(-shift)
+    final_y_inner <- y + arc_x_inner * sin(-shift) + arc_y_inner * cos(-shift)
+
+    # Combine outer and inner arcs to form an annular wedge
+    wedge_data <- data.frame(
+      x = c(final_x_outer, rev(final_x_inner)),
+      y = c(final_y_outer, rev(final_y_inner)),
+      group = rep(id, each = length(final_x_outer) + length(final_x_inner)),
+      id = rep(id, each = length(final_x_outer) + length(final_x_inner))
+    )
+
+  } else {
+    # Create regular wedge by connecting outer arc to center
+    wedge_data <- data.frame(
+      x = c(x, final_x_outer, x),
+      y = c(y, final_y_outer, y),
+      group = rep(id, length.out = n_points + 2),
+      id = rep(id, length.out = n_points + 2)
+    )
+  }
+
+  return(wedge_data)
+}
+
+#' @keywords internal
+# Helper function to create ellipse polygon data
+create_ellipse_data <- function(x_center, y_center, width, height, angle, n_points = 50) {
+  theta <- seq(0, 2 * pi, length.out = n_points)
+  ellipse <- data.frame(
+    theta = theta,
+    x = width / 2 * cos(theta),
+    y = height / 2 * sin(theta)
+  )
+
+  # Rotation matrix
+  rotation_matrix <- matrix(c(cos(angle * pi / 180), -sin(angle * pi / 180),
+                              sin(angle * pi / 180),  cos(angle * pi / 180)),
+                            nrow = 2)
+
+  rotated <- as.matrix(ellipse[, c("x", "y")]) %*% rotation_matrix
+  ellipse$x <- rotated[,1] + x_center
+  ellipse$y <- rotated[,2] + y_center
+
+  return(ellipse)
+}
+
+#' @keywords internal
+predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL, conf_level) {
+
+  # Validate inputs
+  if (!is.numeric(x) || length(x) != 1) {
+    stop("Input 'x' must be a single numeric value.")
+  }
+  if (!is.numeric(y) || length(y) != 1) {
+    stop("Input 'y' must be a single numeric value.")
+  }
+  if (!is.numeric(mux) || length(mux) != 1) {
+    stop("Input 'mux' must be a single numeric value.")
+  }
+  if (!is.numeric(muy) || length(muy) != 1) {
+    stop("Input 'muy' must be a single numeric value.")
+  }
+  if (!is.matrix(Sigma) || any(dim(Sigma) != c(2, 2))) {
+    stop("Input 'Sigma' must be a 2x2 covariance matrix.")
+  }
+  if (!is.numeric(conf_level) || conf_level <= 0 || conf_level >= 1) {
+    stop("Input 'conf_level' must be a numeric value between 0 and 1.")
+  }
+
+  # If rho is not provided, calculate it (not used by delta method but for compatibility)
+  if (is.null(rho)) {
+    sigma_x <- sqrt(Sigma[1, 1])
+    sigma_y <- sqrt(Sigma[2, 2])
+    rho <- Sigma[1, 2] / (sigma_x * sigma_y)
+  }
+
+  # Compute the predicted vector's angle (theta_pred) in [0, 2*pi)
+  theta_pred <- atan2(muy, mux)
+  if (theta_pred < 0) theta_pred <- theta_pred + 2*pi
+
+  # Delta method: compute the variance of theta = arctan2(muy, mux)
+  denom <- mux^2 + muy^2
+  if (denom == 0) {
+    return(data.frame(min_angle = NA, max_angle = NA))
+  }
+
+
+  grad <- c(-muy/denom, mux/denom)
+  var_theta <- as.numeric(t(grad) %*% Sigma %*% grad)
+
+  se_theta <- ifelse(var_theta < 1e-6, 0, sqrt(var_theta))
+
+  # Get the z-value for the desired confidence level (e.g., ~1.96 for 95%)
+  z_val <- qnorm(1 - (1 - conf_level) / 2)
+
+  # Compute the raw (unwrapped) confidence interval for theta
+  raw_lower <- theta_pred - z_val * se_theta
+  raw_upper <- theta_pred + z_val * se_theta
+
+  # If the raw interval width is >= 2*pi, cap the interval at the full circle.
+  if ((raw_upper - raw_lower) >= 2*pi) {
+    # cat("Delta method interval exceeds full circle; capping at [0, 2*pi].\n")
+    return(data.frame(min_angle = .001, max_angle = 2*pi))
+  }
+
+  # Unwrap the interval so it is continuous:
+  if (raw_lower < 0) {
+    lower_unwrapped <- raw_lower + 2*pi
+    upper_unwrapped <- raw_upper + 2*pi
+  } else if (raw_upper >= 2*pi) {
+    lower_unwrapped <- raw_lower - 2*pi
+    upper_unwrapped <- raw_upper - 2*pi
+  } else {
+    lower_unwrapped <- raw_lower
+    upper_unwrapped <- raw_upper
+  }
+
+  data.frame(min_angle = lower_unwrapped, max_angle = upper_unwrapped)
+}
+
+

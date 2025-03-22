@@ -1125,6 +1125,26 @@ stream_center <- function(data) {
   data <- crop_stream_length(data, L/2)
   data[nrow(data),]
 }
+
+#' @keywords internal
+matrix_to_df_with_names <- function(mat, col_names = NULL) {
+  # Check if the input is a matrix
+  if (!is.matrix(mat)) stop("Input must be a matrix.")
+
+  # Convert to a data frame
+  df <- as.data.frame(mat)
+
+  # Set column names if provided
+  if (!is.null(col_names)) {
+    if (length(col_names) != ncol(df)) {
+      stop("`col_names` must have the same length as the number of columns in the matrix.")
+    }
+    names(df) <- col_names
+  }
+
+  return(df)
+}
+
 # df |> stream_length()
 # df |> stream_center()
 # df |>

@@ -48,21 +48,25 @@ GeomVectorSmooth
 \item{position}{Position adjustment, either as a string or the result of a
 position adjustment function.}
 
-\item{...}{Other arguments passed to \code{ggplot2::layer()} and the underlying
-geometry/stat.}
+\item{...}{Other arguments passed to \code{ggplot2::layer()} and the
+underlying geometry/stat.}
 
 \item{n}{An integer vector specifying the number of grid points along each
 axis for smoothing.}
 
-\item{method}{Character. Specifies the smoothing method. Currently, the only
-supported method is \code{"lm"}, which fits a multivariate linear model to
-predict the vector displacements (\code{fx}, \code{fy}) from \code{x} and \code{y}.}
+\item{method}{Character. Specifies the smoothing method. Supported options
+include \code{"lm"}, \code{"kriging"}, and \code{"gam"}. The \code{"lm"} method fits a
+multivariate linear model, \code{"kriging"} uses a cokriging approach via the
+\code{gstat} package, and \code{"gam"} fits separate generalized additive models for
+\code{fx} and \code{fy} (with predictions assumed independent, i.e., zero
+covariance).}
 
 \item{se}{Logical. If \code{TRUE}, prediction (confidence) intervals are computed
 and plotted.}
 
-\item{se.circle}{Logical. If \code{TRUE}, circles are drawn around the origin of
-each vector to represent the radius of the prediction interval.}
+\item{se.circle}{Logical. Defaults to \code{FALSE}. If \code{TRUE}, circles are drawn
+around the origin of each vector. By default, the circle’s radius is
+computed as the magnitude of the predicted vector.}
 
 \item{pi_type}{Character. Determines the display style for prediction
 intervals:
@@ -83,14 +87,17 @@ smoothing. The default is \code{cbind(fx, fy) ~ x * y}.}
 specify the grid where the smoothing model is evaluated. If \code{NULL}, a grid
 is generated based on \code{n}.}
 
-\item{arrow}{A \code{grid::arrow()} specification for arrowheads on the smoothed
-vectors.}
+\item{arrow}{A \code{grid::arrow()} specification for arrowheads on the
+smoothed vectors.}
 }
 \value{
 A ggplot2 layer that can be added to a plot to create a smooth vector
 field visualization.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+}
+\details{
 \code{geom_vector_smooth()} creates a ggplot2 layer that visualizes a smooth
 vector field. It takes raw vector data and applies smoothing (via a
 multivariate linear model) to estimate the underlying vector field. This
@@ -117,18 +124,18 @@ vector data rather than scalar responses.
 
 \strong{Multivariate Linear Model:}
 The \code{"lm"} method fits a multivariate linear model to predict vector
-displacements (\code{fx} and \code{fy}) based on the coordinates \code{x} and \code{y}, including
-interaction terms (\code{x * y}). This model smooths the raw vector data to
-provide an estimate of the underlying vector field.
+displacements (\code{fx} and \code{fy}) based on the coordinates \code{x} and \code{y},
+including interaction terms (\code{x * y}). This model smooths the raw vector
+data to provide an estimate of the underlying vector field.
 
 \strong{Prediction Intervals:}
-When \code{se = TRUE}, prediction intervals are computed for the smoothed vectors.
-Two types of intervals are supported:
+When \code{se = TRUE}, prediction intervals are computed for the smoothed
+vectors. Two types of intervals are supported:
 \itemize{
 \item \strong{Ellipse:} Ellipses represent the joint uncertainty (covariance) in the predicted \code{fx} and \code{fy}.
 \item \strong{Wedge:} Wedges (angular sectors) indicate the range of possible vector directions and magnitudes.
-The type of interval displayed is controlled by \code{pi_type}, and the confidence
-level is set via \code{conf_level}.
+The type of interval displayed is controlled by \code{pi_type}, and the
+confidence level is set via \code{conf_level}.
 }
 }
 

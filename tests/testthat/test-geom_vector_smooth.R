@@ -28,7 +28,7 @@ test_that("geom_vector_smooth issues warning and switches pi_type when eval_poin
     geom_vector_smooth(aes(fx = fx, fy = fy),
                        n = c(5, 5),
                        pi_type = "ellipse",
-                       conf_level = 0.95,
+                       conf_level = 0.95, method = "lm",
                        formula = cbind(fx, fy) ~ x * y)
 
   # The warning is issued during the computation (ggplot_build),
@@ -58,7 +58,7 @@ test_that("geom_vector_smooth computes ellipse parameters when eval_points provi
                        n = c(5, 5),
                        pi_type = "ellipse",
                        conf_level = 0.95,
-                       eval_points = eval_pts,
+                       eval_points = eval_pts, method = "lm",
                        formula = cbind(fx, fy) ~ x * y)
 
   d <- get_smooth_data(p)
@@ -89,7 +89,7 @@ test_that("GeomVectorSmooth draw_panel produces a grob", {
                        pi_type = "wedge",
                        conf_level = 0.95,
                        eval_points = NULL,  # forces wedge (via warning)
-                       formula = cbind(fx, fy) ~ x * y,
+                       formula = cbind(fx, fy) ~ x * y, method = "lm",
                        arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed"),
                        se = TRUE, se.circle = TRUE)
 
@@ -110,7 +110,7 @@ test_that("StatVectorSmooth computes prediction intervals and endpoints", {
     geom_vector_smooth(aes(fx = fx, fy = fy),
                        n = c(5, 5),
                        pi_type = "wedge",
-                       conf_level = 0.95,
+                       conf_level = 0.95, method = "lm",
                        eval_points = expand.grid(
                          x = seq(min(df$x), max(df$x), length.out = 4),
                          y = seq(min(df$y), max(df$y), length.out = 4)
@@ -134,7 +134,7 @@ test_that("geom_vector_smooth issues warning and switches pi_type when eval_poin
     stat_vector_smooth(aes(fx = fx, fy = fy),
                        n = c(5, 5),
                        pi_type = "ellipse",
-                       conf_level = 0.95,
+                       conf_level = 0.95, method = "lm",
                        formula = cbind(fx, fy) ~ x * y)
 
   # The warning is issued during the computation (ggplot_build),
@@ -150,3 +150,4 @@ test_that("geom_vector_smooth issues warning and switches pi_type when eval_poin
   # Check that required columns exist and that endpoints are computed.
   expect_true(all(c("x", "y", "xend", "yend", "id") %in% names(d)))
 })
+

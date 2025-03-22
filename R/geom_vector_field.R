@@ -287,14 +287,11 @@ geom_vector_field2 <- function(
   # Define default mapping for stat_stream_field2
   default_mapping <- ggplot2::aes(length = after_stat(norm))
 
-  # Merge user-provided mapping with default mapping
-  # User mapping takes precedence
-  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
-
-  if (!user_fixed_color) {
-    default_mapping <- aes(color = after_stat(norm))
+  # Merge default mapping with the user mapping, where user mapping takes precedence.
+  if (is.null(mapping)) {
+    mapping <- default_mapping
   } else {
-    default_mapping <- aes()
+    mapping <- modifyList(default_mapping, mapping)
   }
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
@@ -360,14 +357,11 @@ stat_vector_field2 <- function(
   # Define default mapping for stat_stream_field2
   default_mapping <- ggplot2::aes(length = after_stat(norm))
 
-  # Merge user-provided mapping with default mapping
-  # User mapping takes precedence
-  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
-
-  if (!user_fixed_color) {
-    default_mapping <- aes(color = after_stat(norm))
+  # Merge default mapping with the user mapping, where user mapping takes precedence.
+  if (is.null(mapping)) {
+    mapping <- default_mapping
   } else {
-    default_mapping <- aes()
+    mapping <- modifyList(default_mapping, mapping)
   }
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
