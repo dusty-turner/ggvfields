@@ -1,3 +1,5 @@
+if (interactive()) {
+
 library("hexSticker")
 
 library("tidyverse")
@@ -260,3 +262,5 @@ sticker(
 )
 
 system(glue::glue("open {outfile}"))
+
+}
