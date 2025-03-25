@@ -1,147 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>/reference/efield.html</loc>
-  </url>
-  <url>
-    <loc>/reference/efield_maker.html</loc>
-  </url>
-  <url>
-    <loc>/reference/GeomPotential.html</loc>
-  </url>
-  <url>
-    <loc>/reference/GeomStream.html</loc>
-  </url>
-  <url>
-    <loc>/reference/GeomVectorSmooth.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_gradient_field.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_gradient_field2.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_gradient_smooth.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_potential.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_stream.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_stream_field.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_stream_field2.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_stream_smooth.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_vector.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_vector2.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_vector_field.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_vector_field2.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_vector_smooth.html</loc>
-  </url>
-  <url>
-    <loc>/reference/geom_vector_smooth2.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ggvfields-package.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ggvfields.html</loc>
-  </url>
-  <url>
-    <loc>/reference/grid_hex.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/scale_length_continuous.html</loc>
-  </url>
-  <url>
-    <loc>/reference/StatPotential.html</loc>
-  </url>
-  <url>
-    <loc>/reference/StatStream.html</loc>
-  </url>
-  <url>
-    <loc>/reference/StatStreamField.html</loc>
-  </url>
-  <url>
-    <loc>/reference/StatVector.html</loc>
-  </url>
-  <url>
-    <loc>/reference/StatVectorSmooth.html</loc>
-  </url>
-  <url>
-    <loc>/reference/stat_gradient_field.html</loc>
-  </url>
-  <url>
-    <loc>/reference/stat_gradient_field2.html</loc>
-  </url>
-  <url>
-    <loc>/reference/stat_gradient_smooth.html</loc>
-  </url>
-  <url>
-    <loc>/reference/stat_potential.html</loc>
-  </url>
-  <url>
-    <loc>/reference/stat_stream.html</loc>
-  </url>
-  <url>
-    <loc>/reference/stat_stream_field.html</loc>
-  </url>
-  <url>
-    <loc>/reference/stat_stream_field2.html</loc>
-  </url>
-  <url>
-    <loc>/reference/stat_stream_smooth.html</loc>
-  </url>
-  <url>
-    <loc>/reference/stat_vector.html</loc>
-  </url>
-  <url>
-    <loc>/reference/stat_vector2.html</loc>
-  </url>
-  <url>
-    <loc>/reference/stat_vector_field.html</loc>
-  </url>
-  <url>
-    <loc>/reference/stat_vector_field2.html</loc>
-  </url>
-  <url>
-    <loc>/reference/stat_vector_smooth.html</loc>
-  </url>
-  <url>
-    <loc>/reference/stat_vector_smooth2.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/LICENSE.html</loc></url>
+<url><loc>/news/index.html</loc></url>
+<url><loc>/reference/efield.html</loc></url>
+<url><loc>/reference/geom_gradient_field.html</loc></url>
+<url><loc>/reference/geom_gradient_smooth.html</loc></url>
+<url><loc>/reference/geom_potential.html</loc></url>
+<url><loc>/reference/geom_stream.html</loc></url>
+<url><loc>/reference/geom_stream_field.html</loc></url>
+<url><loc>/reference/geom_stream_smooth.html</loc></url>
+<url><loc>/reference/geom_vector.html</loc></url>
+<url><loc>/reference/geom_vector_field.html</loc></url>
+<url><loc>/reference/geom_vector_smooth.html</loc></url>
+<url><loc>/reference/ggvfields.html</loc></url>
+<url><loc>/reference/grid_hex.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/scale_length_continuous.html</loc></url>
 </urlset>
+
