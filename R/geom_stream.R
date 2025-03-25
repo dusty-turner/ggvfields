@@ -44,17 +44,18 @@
 #'
 #'   - **`x`**: Horizontal position.
 #'   - **`y`**: Vertical position.
-#'   - **`t`**: Temporal or ordered variable used to sequence data points.
+#'   - `t`: Temporal or ordered variable used to sequence data points.
+#'        If not provided, a default sequence ranging from 0 to 1 is automatically generated for each group (or for all data if no grouping is provided).
 #'   - `group`: Grouping variable for multiple streams (automatically mapped from `id` if absent).
-#'   - `color`: Color of the stream.
+#'   - `color`/`colour`: Color of the stream. If not provided, it is automatically mapped to the computed `t` value.
 #'   - `linetype`: Type of line used to draw the stream.
 #'   - `linewidth`: Thickness of the stream line.
 #'   - `alpha`: Transparency of the stream.
 #'
 #' @section Details:
-#' - **Data Ordering**: If `t` is not provided, an error is thrown. When present,
-#'   points within each group are sorted by `t` prior to drawing the stream.
-#' - **Arrows**: The `arrow` parameter can be used to indicate direction along each stream.
+#' - **Data Ordering**: If `t` is not provided, a default sequence (from 0 to 1) is generated per group (or for the entire dataset if no grouping is specified).
+#'   Points within each group are then sorted by `t` prior to drawing the
+#'   stream.
 #'
 #' @return A ggplot2 layer that can be added to a plot to produce a streamline
 #'   visualization.
@@ -145,7 +146,28 @@ geom_stream <- function(mapping = NULL, data = NULL,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 ) {
 
-  # If 'id' is provided in mapping, map it to 'group'
+  dots <- list(...)
+
+  default_mapping <- ggplot2::aes(t = after_stat(t), color = after_stat(t))
+
+  # If mapping is provided, check if color/colour is in mapping OR fixed color in dots.
+  if (!is.null(mapping)) {
+    if (!( "color" %in% names(mapping) ||
+           "colour" %in% names(mapping) ||
+           "color" %in% names(dots) ||
+           "colour" %in% names(dots) )) {
+      mapping <- modifyList(default_mapping, mapping)
+    }
+  } else {
+    # No mapping provided: if a fixed color was supplied, omit the default color mapping.
+    if ("color" %in% names(dots) || "colour" %in% names(dots)) {
+      mapping <- ggplot2::aes(t = after_stat(t))
+    } else {
+      mapping <- default_mapping
+    }
+  }
+
+  # Map 'id' to 'group' if provided.
   if (!is.null(mapping) && "id" %in% names(mapping)) {
     mapping$group <- mapping$group %||% mapping$id
   }
@@ -187,7 +209,28 @@ stat_stream <- function(mapping = NULL, data = NULL,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 ) {
 
-  # If 'id' is provided in mapping, map it to 'group'
+  dots <- list(...)
+
+  default_mapping <- ggplot2::aes(t = after_stat(t), color = after_stat(t))
+
+  # If mapping is provided, check if color/colour is in mapping OR fixed color in dots.
+  if (!is.null(mapping)) {
+    if (!( "color" %in% names(mapping) ||
+           "colour" %in% names(mapping) ||
+           "color" %in% names(dots) ||
+           "colour" %in% names(dots) )) {
+      mapping <- modifyList(default_mapping, mapping)
+    }
+  } else {
+    # No mapping provided: if a fixed color was supplied, omit the default color mapping.
+    if ("color" %in% names(dots) || "colour" %in% names(dots)) {
+      mapping <- ggplot2::aes(t = after_stat(t))
+    } else {
+      mapping <- default_mapping
+    }
+  }
+
+  # Map 'id' to 'group' if provided.
   if (!is.null(mapping) && "id" %in% names(mapping)) {
     mapping$group <- mapping$group %||% mapping$id
   }
@@ -218,25 +261,29 @@ stat_stream <- function(mapping = NULL, data = NULL,
 #' @usage NULL
 #' @export
 StatStream <- ggproto("StatStream", Stat,
-  required_aes = c("x", "y", "t"),
+  required_aes = c("x", "y"),
 
-  optional_aes = c("id"),
+  optional_aes = c("id", "t"),
 
   default_aes = aes(x = NA, y = NA, length = 1,
                     color = "black", fill = "black",
                     linewidth = 1, linetype = 1, alpha = 1),
 
   compute_group = function(data, scales, ...) {
-    # Ensure the data is ordered by the temporal variable 't'
+
     if (!"t" %in% names(data)) {
-      stop("StatStream requires a 't' (time) aesthetic for ordering.")
+      data$t <- if(nrow(data) == 1) 0 else seq(0, 1, length.out = nrow(data))
     }
 
+    # Order the data by t to ensure the points are connected in the intended sequence
+    data <- data[order(data$t), , drop = FALSE]
+
+    # Compute the normalization factor using the ranges of x and y
     data$norm <- sqrt((diff(range(data$x)))^2 + (diff(range(data$y)))^2)
 
     data
-
   }
+
 )
 
 #' @keywords internal

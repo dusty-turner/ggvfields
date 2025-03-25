@@ -106,9 +106,10 @@ following aesthetics (required aesthetics are in \strong{bold}):
 \itemize{
 \item \strong{\code{x}}: Horizontal position.
 \item \strong{\code{y}}: Vertical position.
-\item \strong{\code{t}}: Temporal or ordered variable used to sequence data points.
+\item \code{t}: Temporal or ordered variable used to sequence data points.
+If not provided, a default sequence ranging from 0 to 1 is automatically generated for each group (or for all data if no grouping is provided).
 \item \code{group}: Grouping variable for multiple streams (automatically mapped from \code{id} if absent).
-\item \code{color}: Color of the stream.
+\item \code{color}/\code{colour}: Color of the stream. If not provided, it is automatically mapped to the computed \code{t} value.
 \item \code{linetype}: Type of line used to draw the stream.
 \item \code{linewidth}: Thickness of the stream line.
 \item \code{alpha}: Transparency of the stream.
@@ -118,9 +119,9 @@ following aesthetics (required aesthetics are in \strong{bold}):
 \section{Details}{
 
 \itemize{
-\item \strong{Data Ordering}: If \code{t} is not provided, an error is thrown. When present,
-points within each group are sorted by \code{t} prior to drawing the stream.
-\item \strong{Arrows}: The \code{arrow} parameter can be used to indicate direction along each stream.
+\item \strong{Data Ordering}: If \code{t} is not provided, a default sequence (from 0 to 1) is generated per group (or for the entire dataset if no grouping is specified).
+Points within each group are then sorted by \code{t} prior to drawing the
+stream.
 }
 }
 

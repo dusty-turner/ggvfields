@@ -39,4 +39,4 @@ norm <- function(u) sqrt(sum(u^2))
 normalize <- function(u) u / norm(u)
 
 
-utils::globalVariables(c("potential", "fun", "f", "l", "max_t", "avg_spd", "x", "y", "fx", "fy", "normalize", "z"))
+utils::globalVariables(c("potential", "fun", "f", "l", "max_t", "avg_spd", "x", "y", "fx", "fy", "normalize", "z", "capture.output"))
