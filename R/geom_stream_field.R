@@ -862,13 +862,18 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
   df <- data.frame()
 
   # solve up to length L; soln is not actually used after since evals are captured
-  soln <- deSolve::ode(
-    func = fun_wrapper,
-    y = c(u0, "l" = 0), # 0 = initial arc length
-    parms = list("L" = L),
-    times = c(0, T),
-    rootfun = rootfun,
-    maxsteps = max_it
+  # the invisible part is used to suppress warnings
+  invisible(
+    capture.output(
+      soln <- deSolve::ode(
+        func = fun_wrapper,
+        y = c(u0, "l" = 0), # 0 = initial arc length
+        parms = list("L" = L),
+        times = c(0, T),
+        rootfun = rootfun,
+        maxsteps = max_it
+      )
+    )
   )
 
   # the evals have lots of near-duplicated rows. let's remove those
