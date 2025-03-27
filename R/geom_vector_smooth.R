@@ -581,7 +581,7 @@ GeomVectorSmooth <- ggproto(
     }
 
     if (nrow(data) == 1) {
-      data$linewidth <- 1.5
+      data$linewidth <- .5
     }
 
     grobs <- list()
