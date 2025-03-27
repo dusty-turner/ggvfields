@@ -394,6 +394,7 @@ StatVectorSmooth <- ggproto(
       v <- variogram(g)
 
       # Fit a linear model of coregionalization (LMC) using a spherical model example
+      # model <- vgm(psill = 1, model = "Gau", range = 3, nugget = 0.1)
       model <- vgm(psill = 1, model = "Gau", range = 3, nugget = 0.1)
       # model <- vgm(psill = 1, model = "Sph", range = 3, nugget = 0.1)
       # model <- vgm(psill = 1, model = "Exp", range = 3, nugget = 0.1)
@@ -407,7 +408,7 @@ StatVectorSmooth <- ggproto(
       coordinates(new_point) <- ~ x + y
 
       # Perform prediction using the fitted LMC model
-      pred <- predict(lmc, newdata = new_point)
+       invisible(capture.output(pred <- predict(lmc, newdata = new_point)))
 
       # Extract prediction results into a simple data frame (optional)
       grid <- data.frame(x = new_point$x, y = new_point$y,
@@ -650,7 +651,7 @@ GeomVectorSmooth <- ggproto(
         #                           interpolate = TRUE)
 
 
-        grobs <- c(grobs, grid::gList(raster_grob, wedge_grob))
+        grobs <- c(grid::gList(wedge_grob, raster_grob), grobs)
 
       } else if (pi_type == "ellipse") {
         # Draw ellipses
@@ -683,7 +684,7 @@ GeomVectorSmooth <- ggproto(
           coord = coord
         )
 
-        grobs <- c(grobs, grid::gList(ellipse_grob))
+        grobs <- c(grid::gList(ellipse_grob), grobs)
       } else {
         stop("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
       }
@@ -724,7 +725,7 @@ GeomVectorSmooth <- ggproto(
     segments_grob <- GeomSegment$draw_panel(
       data, panel_params, coord, arrow = arrow
     )
-    grobs <- c(grid::gList(segments_grob), grobs)
+    grobs <- c(grobs, grid::gList(segments_grob))
 
     # Combine all grobs into a single grobTree
     combined_grob <- grid::grobTree(children = do.call(grid::gList, grobs))
