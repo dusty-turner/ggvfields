@@ -38,7 +38,8 @@ Imports:
     scales,
     sp,
     gstat,
-    cli
+    cli,
+    mgcv
 URL: https://github.com/dusty-turner/ggvfields
 BugReports: https://github.com/dusty-turner/ggvfields/issues
 Suggests: 

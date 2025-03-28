@@ -27,6 +27,7 @@
 #' @param lineend Line end style (round, butt, square).
 #' @param linejoin Line join style (round, mitre, bevel).
 #' @param linemitre Line mitre limit (number greater than 1).
+#' @param method either "gam" (default) or "lm".
 #' @param ... Additional arguments passed to the layer. If a fixed parameter
 #'   `color` is not provided, then `color = "blue"` is used.
 #'
@@ -168,6 +169,7 @@ geom_stream_smooth <- function(mapping = NULL,
    center = FALSE,
    type = "vector",
    formula = cbind(fx, fy) ~ x * y,
+   method = "gam",
    eval_points = NULL,
    lineend = "butt",
    linejoin = "round",
@@ -196,17 +198,44 @@ geom_stream_smooth <- function(mapping = NULL,
 
   # Define the vector field function. It retrieves the prepared data from the
   # parent environment (which comes from the stat after setup_data()).
+
+  if(method == "gam") {
+
   vec_field <- function(u) {
 
     group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
-
+    s <- mgcv::s
+    gam <- mgcv::gam
     # if (inherits(group_data, "try-error") || is.null(group_data)) {
     #   stop("Could not retrieve group data for vector field calculation.")
     # }
     # Fit the regression using the (possibly modified) formula.
-    model <- lm(formula, data = group_data)
-    newdata <- data.frame(x = u[1], y = u[2])
-    as.numeric(predict(model, newdata = newdata))
+      fx_mod <- gam(fx ~ s(x, y, bs = "tp"), data = group_data)
+      fy_mod <- gam(fy ~ s(x, y, bs = "tp"), data = group_data)
+
+      new_point <- data.frame(x = u[1], y = u[2])
+
+      pred_fx <- predict(fx_mod, newdata = new_point[, c("x", "y")])
+      pred_fy <- predict(fy_mod, newdata = new_point[, c("x", "y")])
+
+      c(pred_fx, pred_fy)
+    }
+  }
+
+  if(method == "lm"){
+
+     vec_field <- function(u) {
+
+       group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
+
+       # if (inherits(group_data, "try-error") || is.null(group_data)) {
+       #   stop("Could not retrieve group data for vector field calculation.")
+       # }
+       # Fit the regression using the (possibly modified) formula.
+       model <- lm(formula, data = group_data)
+       newdata <- data.frame(x = u[1], y = u[2])
+       as.numeric(predict(model, newdata = newdata))
+     }
   }
 
   layer(
@@ -256,6 +285,7 @@ stat_stream_smooth <- function(mapping = NULL,
    normalize = TRUE,
    center = FALSE,
    type = "vector",
+   method = "gam",
    formula = cbind(fx, fy) ~ x * y,
    eval_points = NULL,
    lineend = "butt",
@@ -285,17 +315,44 @@ stat_stream_smooth <- function(mapping = NULL,
 
   # Define the vector field function. It retrieves the prepared data from the
   # parent environment (which comes from the stat after setup_data()).
-  vec_field <- function(u) {
 
-    group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
+  if(method == "gam") {
 
-    # if (inherits(group_data, "try-error") || is.null(group_data)) {
-    #   stop("Could not retrieve group data for vector field calculation.")
-    # }
-    # Fit the regression using the (possibly modified) formula.
-    model <- lm(formula, data = group_data)
-    newdata <- data.frame(x = u[1], y = u[2])
-    as.numeric(predict(model, newdata = newdata))
+    vec_field <- function(u) {
+
+      group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
+      s <- mgcv::s
+      gam <- mgcv::gam
+      # if (inherits(group_data, "try-error") || is.null(group_data)) {
+      #   stop("Could not retrieve group data for vector field calculation.")
+      # }
+      # Fit the regression using the (possibly modified) formula.
+      fx_mod <- gam(fx ~ s(x, y, bs = "tp"), data = group_data)
+      fy_mod <- gam(fy ~ s(x, y, bs = "tp"), data = group_data)
+
+      new_point <- data.frame(x = u[1], y = u[2])
+
+      pred_fx <- predict(fx_mod, newdata = new_point[, c("x", "y")])
+      pred_fy <- predict(fy_mod, newdata = new_point[, c("x", "y")])
+
+      c(pred_fx, pred_fy)
+    }
+  }
+
+  if(method == "lm"){
+
+    vec_field <- function(u) {
+
+      group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
+
+      # if (inherits(group_data, "try-error") || is.null(group_data)) {
+      #   stop("Could not retrieve group data for vector field calculation.")
+      # }
+      # Fit the regression using the (possibly modified) formula.
+      model <- lm(formula, data = group_data)
+      newdata <- data.frame(x = u[1], y = u[2])
+      as.numeric(predict(model, newdata = newdata))
+    }
   }
 
   layer(

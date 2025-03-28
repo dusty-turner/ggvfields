@@ -6,10 +6,10 @@ test_that("geom_stream_smooth layer produces computed data with expected aesthet
   # Create a sample dataset.
   set.seed(123)
   df <- data.frame(
-    x = runif(10, -2, 2),
-    y = runif(10, -2, 2),
-    fx = rnorm(10),
-    fy = rnorm(10)
+    x = runif(100, -2, 2),
+    y = runif(100, -2, 2),
+    fx = rnorm(100),
+    fy = rnorm(100)
   )
 
   # Build a plot with a raw vector layer (for context) and a smoothed layer.
@@ -17,7 +17,7 @@ test_that("geom_stream_smooth layer produces computed data with expected aesthet
     geom_vector(aes(fx = fx, fy = fy), color = "black", normalize = FALSE) +
     geom_stream_smooth(
       data = df,
-      formula = cbind(fx, fy) ~ x * y,
+      # formula = cbind(fx, fy) ~ x * y,
       n = 5,
       normalize = TRUE,
       center = FALSE
@@ -37,10 +37,10 @@ test_that("geom_stream_smooth uses evaluation points when provided", {
   # Create a sample dataset.
   set.seed(456)
   df <- data.frame(
-    x = runif(15, -2, 2),
-    y = runif(15, -2, 2),
-    fx = rnorm(15),
-    fy = rnorm(15)
+    x = runif(150, -2, 2),
+    y = runif(150, -2, 2),
+    fx = rnorm(150),
+    fy = rnorm(150)
   )
 
   # Create a grid of evaluation points.
@@ -75,10 +75,10 @@ test_that("stat_stream_smooth layer produces computed data with expected aesthet
   # Create a sample dataset.
   set.seed(123)
   df <- data.frame(
-    x = runif(10, -2, 2),
-    y = runif(10, -2, 2),
-    fx = rnorm(10),
-    fy = rnorm(10)
+    x = runif(100, -2, 2),
+    y = runif(100, -2, 2),
+    fx = rnorm(100),
+    fy = rnorm(100)
   )
 
   # Build a plot with a raw vector layer (for context) and a smoothed layer.
@@ -106,10 +106,10 @@ test_that("stat_stream_smooth uses evaluation points when provided", {
   # Create a sample dataset.
   set.seed(456)
   df <- data.frame(
-    x = runif(15, -2, 2),
-    y = runif(15, -2, 2),
-    fx = rnorm(15),
-    fy = rnorm(15)
+    x = runif(150, -2, 2),
+    y = runif(150, -2, 2),
+    fx = rnorm(150),
+    fy = rnorm(150)
   )
 
   # Create a grid of evaluation points.

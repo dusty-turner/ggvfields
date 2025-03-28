@@ -21,6 +21,7 @@ geom_stream_smooth(
   center = FALSE,
   type = "vector",
   formula = cbind(fx, fy) ~ x * y,
+  method = "gam",
   eval_points = NULL,
   lineend = "butt",
   linejoin = "round",
@@ -43,6 +44,7 @@ stat_stream_smooth(
   normalize = TRUE,
   center = FALSE,
   type = "vector",
+  method = "gam",
   formula = cbind(fx, fy) ~ x * y,
   eval_points = NULL,
   lineend = "butt",
@@ -95,6 +97,8 @@ computes a full streamline by integrating in both directions (if \code{center = 
 
 \item{formula}{A formula specifying the multivariate linear model used for
 smoothing. Defaults to \code{cbind(fx, fy) ~ x * y}.}
+
+\item{method}{either "gam" (default) or "lm".}
 
 \item{eval_points}{A data frame of evaluation points, or \code{NULL}. When
 provided, it specifies the grid where the smoothing model is evaluated; if

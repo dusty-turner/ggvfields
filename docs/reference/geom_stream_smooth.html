@@ -70,6 +70,7 @@ vector displacements.</p>
 <span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"vector"</span>,</span>
 <span>  formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"gam"</span>,</span>
 <span>  eval_points <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lineend <span class="op">=</span> <span class="st">"butt"</span>,</span>
 <span>  linejoin <span class="op">=</span> <span class="st">"round"</span>,</span>
@@ -92,6 +93,7 @@ vector displacements.</p>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"vector"</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"gam"</span>,</span>
 <span>  formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>,</span>
 <span>  eval_points <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lineend <span class="op">=</span> <span class="st">"butt"</span>,</span>
@@ -177,6 +179,10 @@ computes a full streamline by integrating in both directions (if <code>center = 
 <dt id="arg-formula">formula<a class="anchor" aria-label="anchor" href="#arg-formula"></a></dt>
 <dd><p>A formula specifying the multivariate linear model used for
 smoothing. Defaults to <code>cbind(fx, fy) ~ x * y</code>.</p></dd>
+
+
+<dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
+<dd><p>either "gam" (default) or "lm".</p></dd>
 
 
 <dt id="arg-eval-points">eval_points<a class="anchor" aria-label="anchor" href="#arg-eval-points"></a></dt>

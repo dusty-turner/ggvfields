@@ -10,6 +10,7 @@
 #' @importFrom stats integrate
 #' @importFrom sp coordinates coordinates<-
 #' @importFrom gstat gstat variogram fit.lmc vgm
+#' @importFrom mgcv gam s
 #'
 #' @param mapping A set of aesthetic mappings created by \code{ggplot2::aes()}.
 #'   **Required:** Must include **`x`** and **`y`**; vector displacements are defined by
