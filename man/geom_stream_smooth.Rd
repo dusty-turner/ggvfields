@@ -119,6 +119,9 @@ the vectors (default: \code{grid::arrow(angle = 25, length = unit(0.025, "npc"),
 \value{
 A ggplot2 layer that can be added to a ggplot object to display a
 smoothed vector field.
+}
+\description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 
 \describe{
 \item{norm}{Computed as the Euclidean norm of the displacement,
@@ -134,7 +137,7 @@ the smoothed field (when applicable).}
 as the cumulative sum of \code{d}.}
 }
 }
-\description{
+\details{
 \code{geom_stream_smooth()} creates a ggplot2 layer that visualizes a smooth
 vector field based on raw vector data. The function fits a multivariate
 linear model (by default, using the formula \code{cbind(fx, fy) ~ x * y}) to

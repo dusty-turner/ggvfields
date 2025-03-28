@@ -68,6 +68,9 @@
 #' @return A ggplot2 layer that can be added to a ggplot object to display a
 #'   smoothed vector field.
 #'
+#' @description
+#' `r lifecycle::badge("experimental")`
+#'
 #' \describe{
 #'  \item{norm}{Computed as the Euclidean norm of the displacement,
 #'     \eqn{\sqrt{fx^2 + fy^2}}, this variable is used to normalize and scale the

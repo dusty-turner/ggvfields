@@ -192,7 +192,6 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
 #' @rdname geom_vector_smooth
 #' @format NULL
 #' @usage NULL
-#' @keywords internal
 stat_vector_smooth <- function(mapping = NULL, data = NULL,
    geom = "vector_smooth",
    position = "identity",
@@ -551,10 +550,10 @@ StatVectorSmooth <- ggproto(
 )
 
 
-
-
 #' @rdname geom_vector_smooth
-#' @export
+#' @format NULL
+#' @usage NULL
+#' @keywords internal
 GeomVectorSmooth <- ggproto(
   "GeomVectorSmooth",
   GeomSegment,

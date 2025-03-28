@@ -2,7 +2,6 @@
 
 export(GeomPotential)
 export(GeomStream)
-export(GeomVectorSmooth)
 export(StatPotential)
 export(StatStream)
 export(StatStreamField)
