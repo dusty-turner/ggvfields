@@ -33,7 +33,7 @@ jobs:
           git clone https://$PAT@github.com/dusty-turner/blog-reboot.git
 
           # Synchronize the files to the target repository, replacing existing contents
-          rsync -av --delete docs/ blog-reboot/public/ggvfields/
+          rsync -av --delete docs/ blog-reboot/static/ggvfields/
 
           # Commit and push the changes
           cd blog-reboot
