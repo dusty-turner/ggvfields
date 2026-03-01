@@ -42,3 +42,8 @@ reference:
       - ggvfields
       - efield
       - grid_hex
+
+articles:
+  - title: "Gallery"
+    contents:
+      - gallery

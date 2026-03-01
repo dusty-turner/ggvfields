@@ -682,6 +682,6 @@ issue](https://github.com/dusty-turner/ggvfields/issues/new).
 
 # Articles
 
-### All vignettes
+### Gallery
 
 - [The Art of Flow: A Visual Gallery](/articles/gallery.md):
