@@ -43,6 +43,14 @@ reference:
       - efield
       - grid_hex
 
+navbar:
+  components:
+    articles:
+      text: Articles
+      menu:
+        - text: "The Art of Flow: A Visual Gallery"
+          href: articles/gallery.html
+
 articles:
   - title: "Gallery"
     contents:
