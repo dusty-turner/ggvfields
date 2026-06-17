@@ -95,7 +95,7 @@ automatically ordered by \code{t} to form a continuous path.
 There are two variants:
 \itemize{
 \item \code{geom_stream()}: A convenient wrapper that sets \code{stat = StatStream} and uses
-\link[ggplot2:ggplot2-ggproto]{ggplot2::GeomPath} by default.
+\link[ggplot2:Geom]{ggplot2::GeomPath} by default.
 \item \code{stat_stream()}: Provides direct access to the reordering stat (i.e. \code{StatStream})
 for advanced customization, using \link{GeomStream} for drawing.
 }

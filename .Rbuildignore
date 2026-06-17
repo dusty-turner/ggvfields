@@ -13,3 +13,4 @@ dusty_files*
 ^CRAN-SUBMISSION$
 ^R/sticker\.R$
 
+^vignettes$
