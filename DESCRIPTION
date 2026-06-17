@@ -1,7 +1,7 @@
 Package: ggvfields
 Type: Package
 Title: Vector Field Visualizations with 'ggplot2'
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: 
     c(person(given = "Dusty",
            family = "Turner",
@@ -47,6 +47,6 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
-Date: 2025-03-08
+Date: 2026-06-17
 Config/testthat/edition: 3
 BuildVignettes: true
