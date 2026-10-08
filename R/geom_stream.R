@@ -355,18 +355,9 @@ GeomStream <- ggproto("GeomStream", GeomPath,
     ## do all work for stream grob seperate from vector grob.  have to munch here
     if(type == "stream"){
 
-      fix_linewidth <- function(data, name) {
-        if (is.null(data$linewidth) && !is.null(data$size)) {
-          deprecate_soft0("3.4.0", I(paste0("Using the `size` aesthetic with ", name)), I("the `linewidth` aesthetic"))
-          data$linewidth <- data$size
-        }
-        data
-      }
-
-      data <- fix_linewidth(data, snake_class(self))
       if (!anyDuplicated(data$group)) {
         cli::cli_inform(c(
-          "{.fn {snake_class(self)}}: Each group consists of only one observation.",
+          "{.fn geom_stream}: Each group consists of only one observation.",
           i = "Do you need to adjust the {.field group} aesthetic?"
         ))
       }
@@ -392,7 +383,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
       solid_lines <- all(attr$solid)
       constant <- all(attr$constant)
       if (!solid_lines && !constant) {
-        cli::cli_abort("{.fn {snake_class(self)}} can't have varying {.field colour}, {.field linewidth}, and/or {.field alpha} along the line when {.field linetype} isn't solid.")
+        cli::cli_abort("{.fn geom_stream} can't have varying {.field colour}, {.field linewidth}, and/or {.field alpha} along the line when {.field linetype} isn't solid.")
       }
 
       # Work out grouping variables for grobs
