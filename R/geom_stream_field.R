@@ -707,6 +707,10 @@ StatStreamField <- ggproto(
 
       }
       if (type == "stream") {
+
+        # the field is undefined at this seed point, so there is no stream
+        if (!all(is.finite(fun(grid[i, ])))) next
+
         # stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
         if ( !normalize && !is.null(T) ) {
           stream <- ode_stepper(grid[i, ], fun, T = T, L = 1e6, max_it, tol, method, center)
@@ -735,7 +739,8 @@ StatStreamField <- ggproto(
       # compute how long it takes for each stream to get to L
       times_to_L_by_stream <- vapply(
         list_of_streams,
-        function(df) df$t[nrow(df)] - df$t[1], # if center = FALSE, will have negative times
+        # if center = FALSE, will have negative times; skipped streams are NULL
+        function(df) if (is.null(df)) NA_real_ else df$t[nrow(df)] - df$t[1],
         numeric(1)
       )
       times_to_L_by_stream <- unname(times_to_L_by_stream)
@@ -746,6 +751,7 @@ StatStreamField <- ggproto(
 
       # go back through grid cropping time to T = fastest_t
       for (i in 1:nrow(grid)) {
+        if (is.null(list_of_streams[[i]])) next
         list_of_streams[[i]] <- crop_stream_time(
           list_of_streams[[i]],
           T = smallest_t,
