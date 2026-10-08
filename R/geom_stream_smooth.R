@@ -195,7 +195,7 @@ geom_stream_smooth <- function(mapping = NULL,
 
   n <- ensure_length_two(n)
   dots <- list(...)
-  if (!("color" %in% names(dots))) {
+  if (!any(c("color", "colour") %in% names(dots))) {
     dots$color <- "blue"
   }
 
@@ -263,8 +263,7 @@ geom_stream_smooth <- function(mapping = NULL,
         lineend = lineend,
         linejoin = linejoin,
         linemitre = linemitre,
-        arrow = arrow,
-        ...
+        arrow = arrow
       ),
       dots
     )
@@ -312,7 +311,7 @@ stat_stream_smooth <- function(mapping = NULL,
 
   n <- ensure_length_two(n)
   dots <- list(...)
-  if (!("color" %in% names(dots))) {
+  if (!any(c("color", "colour") %in% names(dots))) {
     dots$color <- "blue"
   }
 
@@ -380,8 +379,7 @@ stat_stream_smooth <- function(mapping = NULL,
         lineend = lineend,
         linejoin = linejoin,
         linemitre = linemitre,
-        arrow = arrow,
-        ...
+        arrow = arrow
       ),
       dots
     )
