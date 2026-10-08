@@ -928,10 +928,9 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
   fun_wrapper <- function(t, u, parms) {
 
     fu <- fun(u[1:2])
-    df <<- rbind(
-      df,
-      matrix_to_df_with_names(t( c(t, u[1:2]) ), c("t","x","y"))
-    )
+    n_evals <<- n_evals + 1L
+    if (n_evals > length(evals)) length(evals) <<- 2L * length(evals)
+    evals[[n_evals]] <<- c(t, u[1:2])
     list( c( fu, "l" = norm(fu) ) )
   }
 
@@ -940,8 +939,9 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
     u[3] - parms$L
   }
 
-  # initialize the data frame tracking evals of fun
-  df <- data.frame()
+  # initialize the list tracking evals of fun; it is doubled when it fills up
+  evals <- vector("list", 64L)
+  n_evals <- 0L
 
   # solve up to length L; soln is not actually used after since evals are captured
   # the invisible part is used to suppress warnings
@@ -960,14 +960,14 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
   )
 
   # the evals have lots of near-duplicated rows. let's remove those
-  row_is_duplicate <- logical( nrow(df) )
-  for (i in 2:nrow(df)) {
-    u <- as.numeric( df[i-1,] )
-    v <- as.numeric( df[i  ,] )
-    row_is_duplicate[i] <- norm(u-v) <= tol
-  }
-  df <- df[!row_is_duplicate,]
-  row.names(df) <- 1:nrow(df)
+  # (a row is dropped when it is within tol of the eval just before it)
+  evals <- unname( do.call(rbind, evals[seq_len(n_evals)]) )
+  n <- nrow(evals)
+  steps <- sqrt(rowSums( (evals[-1,,drop = FALSE] - evals[-n,,drop = FALSE])^2 ))
+  df <- matrix_to_df_with_names(
+    evals[c(TRUE, !(steps <= tol)),,drop = FALSE],
+    c("t","x","y")
+  )
 
   # time order streams. they are almost always in order, but not quite always.
   df <- df[order(df$t),]
