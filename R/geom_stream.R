@@ -86,11 +86,11 @@
 #'   coord_equal()
 #'
 #' ggplot(df) +
-#'   geom_stream(aes(x, y, t = t, alpha = t), size = 5) +
+#'   geom_stream(aes(x, y, t = t, alpha = t), linewidth = 5) +
 #'   coord_equal()
 #'
 #' ggplot(df) +
-#'   geom_path(aes(x, y, alpha = t), size = 5) +
+#'   geom_path(aes(x, y, alpha = t), linewidth = 5) +
 #'   coord_equal()
 #'
 #'

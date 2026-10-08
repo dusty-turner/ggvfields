@@ -11,6 +11,7 @@
 #'
 #' @import ggplot2
 #' @importFrom utils modifyList capture.output
+#' @importFrom rlang inject check_installed
 #' @name ggvfields
 #' @aliases ggvfields ggvfields-package
 NULL
