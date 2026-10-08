@@ -542,7 +542,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
           col =  coords[!duplicated(coords$group), "colour"],
           fill = coords[!duplicated(coords$group), "colour"],
           lwd = coords[!duplicated(coords$group), "linewidth"],
-          linetype = coords[!duplicated(coords$group), "linetype"],
+          lty = coords[!duplicated(coords$group), "linetype"],
           alpha = coords[!duplicated(coords$group), "alpha"]
         ), arrow = arrow
       )
