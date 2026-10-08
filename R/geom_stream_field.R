@@ -1092,7 +1092,7 @@ crop_stream_time <- function(data, T, centered = FALSE) {
 
   # now to update t, d, and l
   data[i,"d"] <- proportion_needed * norm(v)
-  data[i,"l"] <- data[i-1,"l"] + data[i-1,"d"]
+  data[i,"l"] <- data[i-1,"l"] + data[i,"d"]
   data[i,"t"] <- T
 
   # return data
