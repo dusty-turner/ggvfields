@@ -11,8 +11,7 @@
 #' * \url{https://github.com/dusty-turner/ggvfields/}
 #'
 #' @import ggplot2
-#' @importFrom farver encode_colour
-#' @importFrom utils modifyList
+#' @importFrom utils modifyList capture.output
 #' @name ggvfields
 #' @aliases ggvfields ggvfields-package
 NULL

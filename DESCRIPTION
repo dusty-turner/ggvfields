@@ -28,23 +28,25 @@ Depends:
     R (>= 4.1.0),
     ggplot2 (>= 3.3.0)
 Imports:
-    farver,
-    tibble,
-    numDeriv,
-    deSolve,
-    grid,
-    utils,
-    scales,
-    sp,
-    gstat,
     cli,
-    mgcv
+    deSolve,
+    grDevices,
+    grid,
+    mgcv,
+    numDeriv,
+    rlang,
+    scales,
+    stats,
+    tibble,
+    utils
 URL: https://github.com/dusty-turner/ggvfields
 BugReports: https://github.com/dusty-turner/ggvfields/issues
 Suggests: 
     ggdensity,
+    gstat,
     knitr,
     rmarkdown,
+    sp,
     testthat (>= 3.0.0)
 Date: 2026-06-17
 Config/testthat/edition: 3

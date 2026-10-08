@@ -7,10 +7,8 @@
 #' functionality is analogous to `geom_smooth()` in ggplot2 but is tailored for
 #' vector data rather than scalar responses.
 #'
-#' @importFrom stats qt
-#' @importFrom stats integrate
-#' @importFrom sp coordinates coordinates<-
-#' @importFrom gstat gstat variogram fit.lmc vgm
+#' @importFrom stats qt integrate vcov model.matrix coef resid cov
+#' @importFrom grDevices colorRampPalette
 #' @importFrom mgcv gam s
 #'
 #' @param mapping A set of aesthetic mappings created by \code{ggplot2::aes()}.
@@ -389,30 +387,28 @@ StatVectorSmooth <- ggproto(
 
     if(method == "kriging"){
 
+      rlang::check_installed(c("sp", "gstat"), reason = "to use `method = \"kriging\"`.")
+
       # Convert data (a tibble) to a regular data frame and then to a SpatialPointsDataFrame
       df <- as.data.frame(data)
       sp::coordinates(df) <- ~ x + y
 
       # Build the cokriging model for fx and fy
-      g <- gstat(id = "fx", formula = fx ~ 1, data = df)
-      g <- gstat(g, id = "fy", formula = fy ~ 1, data = df)
+      g <- gstat::gstat(id = "fx", formula = fx ~ 1, data = df)
+      g <- gstat::gstat(g, id = "fy", formula = fy ~ 1, data = df)
 
       # Compute the experimental variograms (adjust cutoff as needed)
-      v <- variogram(g)
+      v <- gstat::variogram(g)
 
-      # Fit a linear model of coregionalization (LMC) using a spherical model example
-      # model <- vgm(psill = 1, model = "Gau", range = 3, nugget = 0.1)
-      model <- vgm(psill = 1, model = "Gau", range = 3, nugget = 0.1)
-      # model <- vgm(psill = 1, model = "Sph", range = 3, nugget = 0.1)
-      # model <- vgm(psill = 1, model = "Exp", range = 3, nugget = 0.1)
-      # model <- vgm(psill = 1, model = "Mat", range = 3, nugget = 0.1)
-      lmc <- fit.lmc(v, g, model = model)
+      # Fit a linear model of coregionalization (LMC) using a Gaussian model
+      model <- gstat::vgm(psill = 1, model = "Gau", range = 3, nugget = 0.1)
+      lmc <- gstat::fit.lmc(v, g, model = model)
 
       # Define prediction points: if eval_points is NULL, use grid; otherwise, use eval_points
       new_point <- if (is.null(eval_points)) grid else eval_points
 
       # Convert the new_point data frame to a SpatialPointsDataFrame
-      coordinates(new_point) <- ~ x + y
+      sp::coordinates(new_point) <- ~ x + y
 
       # Perform prediction using the fitted LMC model
        invisible(capture.output(pred <- predict(lmc, newdata = new_point)))
