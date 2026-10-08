@@ -60,8 +60,11 @@
 #'   all streamlines are cropped to the duration it takes for the fastest one to reach
 #'   the length `L`, allowing for variations in arc lengths that reflect differences in
 #'   flow speeds.
-#' @param method Character. Integration method (e.g. `"rk4"` for Runge-Kutta 4,
-#'   `"euler"` for Euler's method). Defaults to `"rk4"`.
+#' @param method Character. Integration method. `"rk4"` (Runge-Kutta 4, the
+#'   default) and `"euler"` (Euler's method) are fixed-step integrators: each
+#'   step covers an equal share of the arc length `L` or, when streams are run
+#'   to a time `T`, an equal share of that time. `"lsoda"` uses the adaptive
+#'   solver from \code{deSolve::ode()}.
 #' @param grid A data frame containing precomputed grid points for seed
 #'   placement. If `NULL` (default), a regular Cartesian grid is generated based
 #'   on `xlim`, `ylim`, and `n`.
@@ -271,6 +274,7 @@ geom_stream_field <- function(
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
+  method <- match.arg(method, c("rk4", "euler", "lsoda"))
 
   layer(
     stat = stat,
@@ -361,6 +365,7 @@ stat_stream_field <- function(
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
+  method <- match.arg(method, c("rk4", "euler", "lsoda"))
 
   layer(
     stat = StatStreamField,
@@ -441,6 +446,7 @@ geom_stream_field2 <- function(
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
+  method <- match.arg(method, c("rk4", "euler", "lsoda"))
 
   layer(
     stat = stat,
@@ -520,6 +526,7 @@ stat_stream_field2 <- function(
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
+  method <- match.arg(method, c("rk4", "euler", "lsoda"))
 
   layer(
     stat = StatStreamField,
@@ -588,7 +595,7 @@ StatStreamField <- ggproto(
   },
 
   compute_group = function(data, scales, fun, xlim, ylim, n,
-                           method, max_it = 1000, tol = sqrt(.Machine$double.eps),
+                           method = "lsoda", max_it = 1000, tol = sqrt(.Machine$double.eps),
                            T = NULL, L = NULL,
                            center, type, normalize, args = NULL, grid, ...) {
 
@@ -782,6 +789,68 @@ StatStreamField <- ggproto(
 )
 
 #' @keywords internal
+fixed_step_path <- function(u0, fun, T = NULL, L = NULL, max_it = 1000,
+                            tol = sqrt(.Machine$double.eps), method = "rk4",
+                            n_steps = 25) {
+
+  T <- T %||% Inf
+  L <- L %||% Inf
+
+  step <- switch(method,
+    "euler" = function(u, fu, h) u + h * fu,
+    "rk4" = function(u, fu, h) {
+      k2 <- fun(u + h/2 * fu)
+      k3 <- fun(u + h/2 * k2)
+      k4 <- fun(u + h * k3)
+      u + h/6 * (fu + 2*k2 + 2*k3 + k4)
+    }
+  )
+
+  path <- matrix(NA_real_, nrow = max_it + 1, ncol = 3)
+  u <- as.numeric(u0); t <- 0; l <- 0; k <- 1
+  path[1,] <- c(t, u)
+
+  # each step covers arc length L/n_steps or time T/n_steps, whichever is
+  # shorter, so streams run to L take equal length steps and streams run to T
+  # take equal time steps
+  while (l < L && t < T && k <= max_it) {
+
+    fu <- fun(u)
+    nfu <- norm(fu)
+
+    # the field is undefined here; nothing to draw if this is the seed point
+    if (!is.finite(nfu)) break
+
+    # the stream is in a sink or source
+    if (nfu < tol) {
+      if (k == 1) { k <- 2; path[2,] <- c(T, u) }
+      break
+    }
+
+    h <- min(L / n_steps / nfu, T / n_steps)
+    u_new <- step(u, fu, h)
+    if (!all(is.finite(u_new))) break
+
+    l <- l + norm(u_new - u)
+    t <- t + h
+    u <- u_new
+    k <- k + 1
+    path[k,] <- c(t, u)
+
+  }
+
+  if (k == 1) {
+    return(data.frame(
+      t = numeric(0), x = numeric(0), y = numeric(0), d = numeric(0),
+      l = numeric(0), avg_spd = numeric(0), norm = numeric(0)
+    ))
+  }
+
+  matrix_to_df_with_names(path[seq_len(k), , drop = FALSE], c("t","x","y"))
+
+}
+
+#' @keywords internal
 ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.Machine$double.eps),
                         method = "lsoda", center = FALSE) {
   if ( center ) {
@@ -839,6 +908,13 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
     return(df)
 
   }
+  if (method %in% c("rk4", "euler")) {
+
+    df <- fixed_step_path(u0, fun, T, L, max_it, tol, method)
+    if (nrow(df) == 0) return(df)
+
+  } else {
+
   # deSolve::ode() is a little particular in terms of what it assumes about the
   # function. first, it assumes that the function returns a list with a vector
   # in it, e.g. list(1:2). second, it only solves up until at the points c(0,T)
@@ -877,7 +953,8 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
         parms = list("L" = L),
         times = c(0, T),
         rootfun = rootfun,
-        maxsteps = max_it
+        maxsteps = max_it,
+        method = method
       )
     )
   )
@@ -894,6 +971,8 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
 
   # time order streams. they are almost always in order, but not quite always.
   df <- df[order(df$t),]
+
+  }
 
   # compute d and l stats
   n <- nrow(df)
