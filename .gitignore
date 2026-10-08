@@ -50,3 +50,6 @@ po/*~
 rsconnect/
 
 ggvfields.Rproj
+
+# Default graphics device output
+Rplots.pdf

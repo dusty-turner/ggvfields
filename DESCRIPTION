@@ -1,7 +1,7 @@
 Package: ggvfields
 Type: Package
 Title: Vector Field Visualizations with 'ggplot2'
-Version: 1.0.1
+Version: 1.0.1.9000
 Authors@R: 
     c(person(given = "Dusty",
            family = "Turner",
@@ -22,7 +22,6 @@ Description: A 'ggplot2' extension for visualizing vector fields in two-dimensio
            scalar data to estimate underlying patterns. 
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Roxygen: list(markdown = TRUE)
 Depends: 
     R (>= 4.1.0),
@@ -49,5 +48,4 @@ Suggests:
     testthat (>= 3.0.0)
 Date: 2026-06-17
 Config/testthat/edition: 3
-BuildVignettes: true
 Config/roxygen2/version: 8.0.0
