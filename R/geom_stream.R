@@ -286,6 +286,42 @@ StatStream <- ggproto("StatStream", Stat,
 
 )
 
+# A stream is drawn as one segment per pair of consecutive points, so an arrow
+# specification has to be spread over the segments: only the first and/or last
+# segment of each group keeps its arrowhead. `group` must be sorted. This
+# follows the helper of the same name inside ggplot2, which is not exported.
+#' @keywords internal
+repair_segment_arrow <- function(arrow, group) {
+
+  if (is.null(arrow)) return(arrow)
+
+  # segments have one member less than lines
+  rle_len   <- rle(as.vector(group))$lengths - 1
+  n_groups  <- length(rle_len)
+  rle_end   <- cumsum(rle_len)
+  rle_start <- rle_end - rle_len + 1
+
+  # recycle ends and lengths
+  ends <- rep(rep(arrow$ends,   length.out = n_groups), rle_len)
+  len  <- rep(rep(arrow$length, length.out = n_groups), rle_len)
+
+  # convert 'both' ends to first/last in multi-member groups
+  is_both <- which(ends == 3)
+  ends[setdiff(intersect(rle_start, is_both), rle_end)] <- 1L
+  ends[setdiff(intersect(rle_end, is_both), rle_start)] <- 2L
+  arrow$ends <- ends
+
+  # set the arrow length to zero on every segment that should not show one
+  zero <- unit(0, "mm")
+  len[intersect(setdiff(rle_start, rle_end), which(ends == 2))] <- zero
+  len[intersect(setdiff(rle_end, rle_start), which(ends == 1))] <- zero
+  len[setdiff(seq_along(len), c(rle_start, rle_end))] <- zero
+  arrow$length <- len
+
+  arrow
+
+}
+
 #' @keywords internal
 draw_key_length <- function(data, params, size) {
 
@@ -372,16 +408,15 @@ GeomStream <- ggproto("GeomStream", GeomPath,
       if (nrow(munched) < 2) return(zeroGrob())
 
       # Work out whether we should use lines or segments
-      attr <- ggplot2:::dapply(munched, "group", function(df) {
-        linetype <- ggplot2:::unique0(df$linetype)
-        ggplot2:::data_frame0(
+      attr <- lapply(split(munched, munched$group), function(df) {
+        linetype <- unique(df$linetype)
+        list(
           solid = length(linetype) == 1 && (identical(linetype, "solid") || linetype == 1),
-          constant = nrow(ggplot2:::unique0(df[, names(df) %in% c("alpha", "colour", "linewidth", "linetype")])) == 1,
-          .size = 1
+          constant = nrow(unique(df[, names(df) %in% c("alpha", "colour", "linewidth", "linetype"), drop = FALSE])) == 1
         )
       })
-      solid_lines <- all(attr$solid)
-      constant <- all(attr$constant)
+      solid_lines <- all(vapply(attr, `[[`, logical(1), "solid"))
+      constant <- all(vapply(attr, `[[`, logical(1), "constant"))
       if (!solid_lines && !constant) {
         cli::cli_abort("{.fn geom_stream} can't have varying {.field colour}, {.field linewidth}, and/or {.field alpha} along the line when {.field linetype} isn't solid.")
       }
@@ -402,7 +437,7 @@ GeomStream <- ggproto("GeomStream", GeomPath,
       end <-   c(group_diff, TRUE)
 
 
-      arrow <- ggplot2:::repair_segment_arrow(arrow, munched$group)
+      arrow <- repair_segment_arrow(arrow, munched$group)
 
       stream_grob <- grid::segmentsGrob(
         munched$x[!end], munched$y[!end], munched$x[!start], munched$y[!start],
