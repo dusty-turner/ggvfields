@@ -33,8 +33,9 @@ test_that("geom_gradient_smooth layer creates a proper LayerInstance", {
   layer_obj <- geom_gradient_smooth(mapping = aes(x = x, y = y, z = z))
   expect_s3_class(layer_obj, "LayerInstance")
 
-  # Check that the layer uses the default StatStreamField (or modified one if applicable)
-  expect_equal(layer_obj$stat, StatStreamField)
+  # Check that the layer uses StatGradientSmooth, which extends StatStreamField
+  expect_equal(layer_obj$stat, StatGradientSmooth)
+  expect_s3_class(layer_obj$stat, "StatStreamField")
 
   # And that the layer uses GeomStream as its geom.
   expect_equal(layer_obj$geom, GeomStream)
@@ -63,8 +64,9 @@ test_that("stat_gradient_smooth layer creates a proper LayerInstance", {
   layer_obj <- stat_gradient_smooth(mapping = aes(x = x, y = y, z = z))
   expect_s3_class(layer_obj, "LayerInstance")
 
-  # Check that the layer uses the default StatStreamField (or modified one if applicable)
-  expect_equal(layer_obj$stat, StatStreamField)
+  # Check that the layer uses StatGradientSmooth, which extends StatStreamField
+  expect_equal(layer_obj$stat, StatGradientSmooth)
+  expect_s3_class(layer_obj$stat, "StatStreamField")
 
   # And that the layer uses GeomStream as its geom.
   expect_equal(layer_obj$geom, GeomStream)
