@@ -95,7 +95,7 @@ NULL
 geom_gradient_smooth <- function(
     mapping = NULL,
     data = NULL,
-    stat = StatStreamField,
+    stat = StatGradientSmooth,
     position = "identity",
     ...,
     na.rm = FALSE,
@@ -143,18 +143,6 @@ geom_gradient_smooth <- function(
     mapping <- modifyList(mapping, default_color_aes)
   }
 
-  gradient_field <- function(u) {
-    group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
-    local_scalar_field <- function(u) {
-      model <- lm(formula, data = group_data)
-      newdata <- data.frame(x = u[1], y = u[2])
-      as.numeric(predict(model, newdata = newdata))
-    }
-
-    # Compute the numerical gradient.
-    numDeriv::grad(func = local_scalar_field, x = u)
-  }
-
   layer(
     stat = stat,
     geom = GeomStream,
@@ -164,7 +152,7 @@ geom_gradient_smooth <- function(
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
-      fun = gradient_field,
+      formula = formula,
       xlim = xlim,
       ylim = ylim,
       n = n,
@@ -240,21 +228,8 @@ stat_gradient_smooth <- function(
     mapping <- modifyList(mapping, default_color_aes)
   }
 
-  gradient_field <- function(u) {
-    group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
-
-    local_scalar_field <- function(u) {
-      model <- lm(formula, data = group_data)
-      newdata <- data.frame(x = u[1], y = u[2])
-      as.numeric(predict(model, newdata = newdata))
-    }
-
-    # Compute the numerical gradient.
-    numDeriv::grad(func = local_scalar_field, x = u)
-  }
-
   layer(
-    stat = StatStreamField,
+    stat = StatGradientSmooth,
     geom = geom,
     data = data,
     mapping = mapping,
@@ -262,7 +237,7 @@ stat_gradient_smooth <- function(
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
-      fun = gradient_field,
+      formula = formula,
       xlim = xlim,
       ylim = ylim,
       n = n,

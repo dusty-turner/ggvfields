@@ -159,7 +159,7 @@ NULL
 #' @export
 geom_stream_smooth <- function(mapping = NULL,
   data = NULL,
-   stat = StatStreamField,
+   stat = StatStreamSmooth,
    position = "identity",
    ...,
    na.rm = FALSE,
@@ -199,48 +199,6 @@ geom_stream_smooth <- function(mapping = NULL,
     dots$color <- "blue"
   }
 
-  # Define the vector field function. It retrieves the prepared data from the
-  # parent environment (which comes from the stat after setup_data()).
-
-  if(method == "gam") {
-
-  vec_field <- function(u) {
-
-    group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
-    s <- mgcv::s
-    gam <- mgcv::gam
-    # if (inherits(group_data, "try-error") || is.null(group_data)) {
-    #   stop("Could not retrieve group data for vector field calculation.")
-    # }
-    # Fit the regression using the (possibly modified) formula.
-      fx_mod <- gam(fx ~ s(x, y, bs = "tp"), data = group_data)
-      fy_mod <- gam(fy ~ s(x, y, bs = "tp"), data = group_data)
-
-      new_point <- data.frame(x = u[1], y = u[2])
-
-      pred_fx <- predict(fx_mod, newdata = new_point[, c("x", "y")])
-      pred_fy <- predict(fy_mod, newdata = new_point[, c("x", "y")])
-
-      c(pred_fx, pred_fy)
-    }
-  }
-
-  if(method == "lm"){
-
-     vec_field <- function(u) {
-
-       group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
-
-       # if (inherits(group_data, "try-error") || is.null(group_data)) {
-       #   stop("Could not retrieve group data for vector field calculation.")
-       # }
-       # Fit the regression using the (possibly modified) formula.
-       model <- lm(formula, data = group_data)
-       newdata <- data.frame(x = u[1], y = u[2])
-       as.numeric(predict(model, newdata = newdata))
-     }
-  }
-
   layer(
     stat = stat,
     data = data,
@@ -255,7 +213,8 @@ geom_stream_smooth <- function(mapping = NULL,
         n = n,
         normalize = normalize,
         center = center,
-        fun = vec_field,
+        formula = formula,
+        method = method,
         xlim = xlim,
         ylim = ylim,
         grid = eval_points,
@@ -315,50 +274,8 @@ stat_stream_smooth <- function(mapping = NULL,
     dots$color <- "blue"
   }
 
-  # Define the vector field function. It retrieves the prepared data from the
-  # parent environment (which comes from the stat after setup_data()).
-
-  if(method == "gam") {
-
-    vec_field <- function(u) {
-
-      group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
-      s <- mgcv::s
-      gam <- mgcv::gam
-      # if (inherits(group_data, "try-error") || is.null(group_data)) {
-      #   stop("Could not retrieve group data for vector field calculation.")
-      # }
-      # Fit the regression using the (possibly modified) formula.
-      fx_mod <- gam(fx ~ s(x, y, bs = "tp"), data = group_data)
-      fy_mod <- gam(fy ~ s(x, y, bs = "tp"), data = group_data)
-
-      new_point <- data.frame(x = u[1], y = u[2])
-
-      pred_fx <- predict(fx_mod, newdata = new_point[, c("x", "y")])
-      pred_fy <- predict(fy_mod, newdata = new_point[, c("x", "y")])
-
-      c(pred_fx, pred_fy)
-    }
-  }
-
-  if(method == "lm"){
-
-    vec_field <- function(u) {
-
-      group_data <- try(get("data", envir = parent.frame()), silent = TRUE)
-
-      # if (inherits(group_data, "try-error") || is.null(group_data)) {
-      #   stop("Could not retrieve group data for vector field calculation.")
-      # }
-      # Fit the regression using the (possibly modified) formula.
-      model <- lm(formula, data = group_data)
-      newdata <- data.frame(x = u[1], y = u[2])
-      as.numeric(predict(model, newdata = newdata))
-    }
-  }
-
   layer(
-    stat = StatStreamField,
+    stat = StatStreamSmooth,
     data = data,
     mapping = mapping,
     geom = geom,
@@ -371,7 +288,8 @@ stat_stream_smooth <- function(mapping = NULL,
         n = n,
         normalize = normalize,
         center = center,
-        fun = vec_field,
+        formula = formula,
+        method = method,
         xlim = xlim,
         ylim = ylim,
         grid = eval_points,

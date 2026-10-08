@@ -2,9 +2,11 @@
 
 export(GeomPotential)
 export(GeomStream)
+export(StatGradientSmooth)
 export(StatPotential)
 export(StatStream)
 export(StatStreamField)
+export(StatStreamSmooth)
 export(StatVector)
 export(efield)
 export(efield_maker)
