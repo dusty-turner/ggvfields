@@ -49,11 +49,11 @@ underlying geometry/stat.}
 axis for smoothing.}
 
 \item{method}{Character. Specifies the smoothing method. Supported options
-include \code{"lm"}, \code{"kriging"}, and \code{"gam"}. The \code{"lm"} method fits a
-multivariate linear model, \code{"kriging"} uses a cokriging approach via the
-\code{gstat} package, and \code{"gam"} fits separate generalized additive models for
-\code{fx} and \code{fy} (with predictions assumed independent, i.e., zero
-covariance).}
+are \code{"gam"} (default), \code{"lm"}, and \code{"kriging"}. The \code{"gam"} method fits
+separate generalized additive models for \code{fx} and \code{fy} with the smooth
+\code{s(x, y)} (with predictions assumed independent, i.e., zero covariance),
+the \code{"lm"} method fits the multivariate linear model given by \code{formula},
+and \code{"kriging"} uses a cokriging approach via the \code{gstat} package.}
 
 \item{se}{Logical. If \code{TRUE}, prediction (confidence) intervals are computed
 and plotted.}
@@ -75,7 +75,9 @@ revert to \code{"wedge"}.
 intervals. Default is \code{0.95}.}
 
 \item{formula}{A formula specifying the multivariate linear model used for
-smoothing. The default is \code{cbind(fx, fy) ~ x * y}.}
+smoothing when \code{method = "lm"}. The default is \code{cbind(fx, fy) ~ x * y}. It
+is ignored by the other methods, with a warning if it is supplied when
+\code{method = "gam"}.}
 
 \item{eval_points}{A data frame of evaluation points. If provided, these
 specify the grid where the smoothing model is evaluated. If \code{NULL}, a grid
@@ -93,8 +95,9 @@ field visualization.
 }
 \details{
 \code{geom_vector_smooth()} creates a ggplot2 layer that visualizes a smooth
-vector field. It takes raw vector data and applies smoothing (via a
-multivariate linear model) to estimate the underlying vector field. This
+vector field. It takes raw vector data and applies smoothing (by default a
+generalized additive model; a multivariate linear model or cokriging are
+also available via \code{method}) to estimate the underlying vector field. This
 functionality is analogous to \code{geom_smooth()} in ggplot2 but is tailored for
 vector data rather than scalar responses.
 }

@@ -53,6 +53,7 @@ test_that("geom_stream_smooth uses evaluation points when provided", {
   p <- ggplot(df, aes(x = x, y = y)) +
     geom_stream_smooth(
       data = df,
+      method = "lm",
       formula = cbind(fx, fy) ~ x * y,
       eval_points = eval_pts,
       n = 5,
@@ -86,6 +87,7 @@ test_that("stat_stream_smooth layer produces computed data with expected aesthet
     stat_vector(aes(fx = fx, fy = fy), color = "black", normalize = FALSE) +
     stat_stream_smooth(
       data = df,
+      method = "lm",
       formula = cbind(fx, fy) ~ x * y,
       n = 5,
       normalize = TRUE,
@@ -122,6 +124,7 @@ test_that("stat_stream_smooth uses evaluation points when provided", {
   p <- ggplot(df, aes(x = x, y = y)) +
     stat_stream_smooth(
       data = df,
+      method = "lm",
       formula = cbind(fx, fy) ~ x * y,
       eval_points = eval_pts,
       n = 5,

@@ -97,9 +97,11 @@ original \verb{(x, y)} becomes the midpoint (default is \code{TRUE} for
 computes a full streamline by integrating in both directions (if \code{center = TRUE}), while \code{"vector"} computes a single vector.}
 
 \item{formula}{A formula specifying the multivariate linear model used for
-smoothing. Defaults to \code{cbind(fx, fy) ~ x * y}.}
+smoothing when \code{method = "lm"}. Defaults to \code{cbind(fx, fy) ~ x * y}. It is
+ignored, with a warning if supplied, when \code{method = "gam"}.}
 
-\item{method}{either "gam" (default) or "lm".}
+\item{method}{Either \code{"gam"} (default), which fits \code{fx} and \code{fy} separately
+with the smooth \code{s(x, y)}, or \code{"lm"}, which fits \code{formula}.}
 
 \item{eval_points}{A data frame of evaluation points, or \code{NULL}. When
 provided, it specifies the grid where the smoothing model is evaluated; if
@@ -140,8 +142,10 @@ as the cumulative sum of \code{d}.}
 }
 \details{
 \code{geom_stream_smooth()} creates a ggplot2 layer that visualizes a smooth
-vector field based on raw vector data. The function fits a multivariate
-linear model (by default, using the formula \code{cbind(fx, fy) ~ x * y}) to
+vector field based on raw vector data. By default (\code{method = "gam"}) the
+function fits a thin plate spline smoother to each of \code{fx} and \code{fy}; with
+\code{method = "lm"} it fits a multivariate linear model (by default, using the
+formula \code{cbind(fx, fy) ~ x * y}). The fitted model is used to
 predict the vector displacements at any given location. It also handles
 different input formats by converting polar coordinates or endpoint data to
 vector displacements.
@@ -174,8 +178,9 @@ polar coordinates (\code{angle} and \code{distance}) and computes \eqn{xend = x 
 available.
 
 \strong{Smoothing:}
-The multivariate linear model is fitted using the provided \code{formula} and
-\code{data}. This model is then used to predict vector displacements at any
+The model is fitted once per group: a thin plate spline smoother for each
+component when \code{method = "gam"}, or the multivariate linear model given by
+\code{formula} when \code{method = "lm"}. It is then used to predict vector displacements at any
 specified grid point, generating a smooth approximation of the vector
 field.
 
@@ -214,15 +219,24 @@ df <- cbind(df, fdf)
 # Visualize raw vector field data
 ggplot(df) + geom_vector(aes(x, y, fx = fx, fy = fy))
 
-# Add smoothed layer using default model
+# Add smoothed layer using the default smoother
 ggplot(df) +
   geom_vector(aes(x, y, fx = fx, fy = fy)) +
-  geom_stream_smooth(formula = cbind(fx, fy) ~ x * y)
+  geom_stream_smooth()
+
+# Use a linear model
+ggplot(df) +
+  geom_vector(aes(x, y, fx = fx, fy = fy)) +
+  geom_stream_smooth(method = "lm", formula = cbind(fx, fy) ~ x * y)
 
 # Use a more complex polynomial model
 ggplot(df) +
   geom_vector(aes(x, y, fx = fx, fy = fy)) +
-  geom_stream_smooth(formula = cbind(fx, fy) ~ poly(x, 2) * poly(y, 2), data = df)
+  geom_stream_smooth(
+    method = "lm",
+    formula = cbind(fx, fy) ~ poly(x, 2) * poly(y, 2),
+    data = df
+  )
 
 # Fit a linear model and use it for prediction
 fhat <- function(u) {

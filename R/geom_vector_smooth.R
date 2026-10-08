@@ -1,8 +1,9 @@
 #' Create a Smooth Vector Plot Layer
 #'
 #' `geom_vector_smooth()` creates a ggplot2 layer that visualizes a smooth
-#' vector field. It takes raw vector data and applies smoothing (via a
-#' multivariate linear model) to estimate the underlying vector field. This
+#' vector field. It takes raw vector data and applies smoothing (by default a
+#' generalized additive model; a multivariate linear model or cokriging are
+#' also available via `method`) to estimate the underlying vector field. This
 #' functionality is analogous to `geom_smooth()` in ggplot2 but is tailored for
 #' vector data rather than scalar responses.
 #'
@@ -23,11 +24,11 @@
 #' @param n An integer vector specifying the number of grid points along each
 #'   axis for smoothing.
 #' @param method Character. Specifies the smoothing method. Supported options
-#'   include `"lm"`, `"kriging"`, and `"gam"`. The `"lm"` method fits a
-#'   multivariate linear model, `"kriging"` uses a cokriging approach via the
-#'   `gstat` package, and `"gam"` fits separate generalized additive models for
-#'   `fx` and `fy` (with predictions assumed independent, i.e., zero
-#'   covariance).
+#'   are `"gam"` (default), `"lm"`, and `"kriging"`. The `"gam"` method fits
+#'   separate generalized additive models for `fx` and `fy` with the smooth
+#'   `s(x, y)` (with predictions assumed independent, i.e., zero covariance),
+#'   the `"lm"` method fits the multivariate linear model given by `formula`,
+#'   and `"kriging"` uses a cokriging approach via the `gstat` package.
 #' @param se Logical. If `TRUE`, prediction (confidence) intervals are computed
 #'   and plotted.
 #' @param se.circle Logical. Defaults to `FALSE`. If `TRUE`, circles are drawn
@@ -47,7 +48,9 @@
 #' @param arrow A \code{grid::arrow()} specification for arrowheads on the
 #'   smoothed vectors.
 #' @param formula A formula specifying the multivariate linear model used for
-#'   smoothing. The default is `cbind(fx, fy) ~ x * y`.
+#'   smoothing when `method = "lm"`. The default is `cbind(fx, fy) ~ x * y`. It
+#'   is ignored by the other methods, with a warning if it is supplied when
+#'   `method = "gam"`.
 #' @param ... Other arguments passed to \code{ggplot2::layer()} and the
 #'   underlying geometry/stat.
 #'
@@ -165,6 +168,8 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
    ) {
 
+  warn_if_formula_ignored(method, !missing(formula))
+
   layer(
     stat = StatVectorSmooth,
     data = data,
@@ -209,6 +214,8 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
    eval_points = NULL,
    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
    ) {
+
+  warn_if_formula_ignored(method, !missing(formula))
 
   layer(
     stat = StatVectorSmooth,

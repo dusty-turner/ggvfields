@@ -16,6 +16,17 @@ ensure_length_two <- function(n) {
   return(n)
 }
 
+# the gam smoothers always fit fx and fy with s(x, y), so a formula has no effect
+warn_if_formula_ignored <- function(method, formula_supplied) {
+  if (identical(method, "gam") && formula_supplied) {
+    cli::cli_warn(c(
+      "{.arg formula} is ignored when {.code method = \"gam\"}.",
+      "i" = "Use {.code method = \"lm\"} to fit {.arg formula}."
+    ))
+  }
+  invisible()
+}
+
 times <- `*`
 
 rad2deg <- function(rad, rotate = 0) {

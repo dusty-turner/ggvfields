@@ -1,8 +1,10 @@
 #' Create a Smoothed Vector Field Layer
 #'
 #' `geom_stream_smooth()` creates a ggplot2 layer that visualizes a smooth
-#' vector field based on raw vector data. The function fits a multivariate
-#' linear model (by default, using the formula `cbind(fx, fy) ~ x * y`) to
+#' vector field based on raw vector data. By default (`method = "gam"`) the
+#' function fits a thin plate spline smoother to each of `fx` and `fy`; with
+#' `method = "lm"` it fits a multivariate linear model (by default, using the
+#' formula `cbind(fx, fy) ~ x * y`). The fitted model is used to
 #' predict the vector displacements at any given location. It also handles
 #' different input formats by converting polar coordinates or endpoint data to
 #' vector displacements.
@@ -19,7 +21,8 @@
 #' @param position Position adjustment, either as a string or the result of a
 #'   position adjustment function.
 #' @param formula A formula specifying the multivariate linear model used for
-#'   smoothing. Defaults to `cbind(fx, fy) ~ x * y`.
+#'   smoothing when `method = "lm"`. Defaults to `cbind(fx, fy) ~ x * y`. It is
+#'   ignored, with a warning if supplied, when `method = "gam"`.
 #' @param eval_points A data frame of evaluation points, or `NULL`. When
 #'   provided, it specifies the grid where the smoothing model is evaluated; if
 #'   `NULL`, a grid is generated based on `n`.
@@ -27,7 +30,8 @@
 #' @param lineend Line end style (round, butt, square).
 #' @param linejoin Line join style (round, mitre, bevel).
 #' @param linemitre Line mitre limit (number greater than 1).
-#' @param method either "gam" (default) or "lm".
+#' @param method Either `"gam"` (default), which fits `fx` and `fy` separately
+#'   with the smooth `s(x, y)`, or `"lm"`, which fits `formula`.
 #' @param ... Additional arguments passed to the layer. If a fixed parameter
 #'   `color` is not provided, then `color = "blue"` is used.
 #'
@@ -55,8 +59,9 @@
 #'   available.
 #'
 #' **Smoothing:**
-#'   The multivariate linear model is fitted using the provided `formula` and
-#'   `data`. This model is then used to predict vector displacements at any
+#'   The model is fitted once per group: a thin plate spline smoother for each
+#'   component when `method = "gam"`, or the multivariate linear model given by
+#'   `formula` when `method = "lm"`. It is then used to predict vector displacements at any
 #'   specified grid point, generating a smooth approximation of the vector
 #'   field.
 #'
@@ -112,15 +117,24 @@
 #' # Visualize raw vector field data
 #' ggplot(df) + geom_vector(aes(x, y, fx = fx, fy = fy))
 #'
-#' # Add smoothed layer using default model
+#' # Add smoothed layer using the default smoother
 #' ggplot(df) +
 #'   geom_vector(aes(x, y, fx = fx, fy = fy)) +
-#'   geom_stream_smooth(formula = cbind(fx, fy) ~ x * y)
+#'   geom_stream_smooth()
+#'
+#' # Use a linear model
+#' ggplot(df) +
+#'   geom_vector(aes(x, y, fx = fx, fy = fy)) +
+#'   geom_stream_smooth(method = "lm", formula = cbind(fx, fy) ~ x * y)
 #'
 #' # Use a more complex polynomial model
 #' ggplot(df) +
 #'   geom_vector(aes(x, y, fx = fx, fy = fy)) +
-#'   geom_stream_smooth(formula = cbind(fx, fy) ~ poly(x, 2) * poly(y, 2), data = df)
+#'   geom_stream_smooth(
+#'     method = "lm",
+#'     formula = cbind(fx, fy) ~ poly(x, 2) * poly(y, 2),
+#'     data = df
+#'   )
 #'
 #' # Fit a linear model and use it for prediction
 #' fhat <- function(u) {
@@ -179,6 +193,8 @@ geom_stream_smooth <- function(mapping = NULL,
    linemitre = 10,
    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
 ) {
+
+  warn_if_formula_ignored(method, !missing(formula))
 
   # Inspect the LHS of the formula. If it is cbind(xend, yend), then change it
   lhs <- formula[[2]]
@@ -254,6 +270,8 @@ stat_stream_smooth <- function(mapping = NULL,
    linemitre = 10,
    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
 ) {
+
+  warn_if_formula_ignored(method, !missing(formula))
 
   # Inspect the LHS of the formula. If it is cbind(xend, yend), then change it
   lhs <- formula[[2]]
