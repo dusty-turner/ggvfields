@@ -79,5 +79,5 @@ efield_maker <- function(
   q_test = +1,
   log = FALSE
 ) {
-  function(u) efield(u, charge_positions, charges, k = 1, q_test = +1, log = log)
+  function(u) efield(u, charge_positions, charges, k = k, q_test = q_test, log = log)
 }
