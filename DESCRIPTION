@@ -30,7 +30,6 @@ Depends:
 Imports:
     cli,
     deSolve,
-    grDevices,
     grid,
     mgcv,
     numDeriv,

@@ -62,7 +62,6 @@ efield <- function(u, charge_positions, charges, k = 1, q_test = +1, log = FALSE
     r <- norm(F)
     theta <- atan2(F[2],F[1])
     R <- log(r + 1)
-    # R <- log(log(log(r + 1) + 1))
     F <- c(R * cos(theta), R * sin(theta))
   }
   F

@@ -27,12 +27,6 @@ warn_if_formula_ignored <- function(method, formula_supplied) {
   invisible()
 }
 
-times <- `*`
-
-rad2deg <- function(rad, rotate = 0) {
-  ((rad + rotate) * 360/(2*pi)) %% 360
-}
-
 
 tibble0 <- function(...) {
   tibble::tibble(..., .name_repair = "minimal")

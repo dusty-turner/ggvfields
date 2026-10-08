@@ -231,7 +231,6 @@ geom_stream_field <- function(
     na.rm = FALSE,
     show.legend = NA,
     inherit.aes = FALSE,
-    # inherit.aes = TRUE,
     fun,
     xlim = NULL,
     ylim = NULL,
@@ -413,7 +412,6 @@ geom_stream_field2 <- function(
     na.rm = FALSE,
     show.legend = NA,
     inherit.aes = FALSE,
-    # inherit.aes = TRUE,
     fun,
     xlim = NULL,
     ylim = NULL,
@@ -493,7 +491,6 @@ stat_stream_field2 <- function(
     na.rm = FALSE,
     show.legend = NA,
     inherit.aes = FALSE,
-    # inherit.aes = TRUE,
     fun,
     xlim = NULL,
     ylim = NULL,
@@ -718,10 +715,8 @@ StatStreamField <- ggproto(
         # the field is undefined at this seed point, so there is no stream
         if (!all(is.finite(fun(grid[i, ])))) next
 
-        # stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
         if ( !normalize && !is.null(T) ) {
           stream <- ode_stepper(grid[i, ], fun, T = T, L = 1e6, max_it, tol, method, center)
-          # stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
         } else {
           stream <- ode_stepper(grid[i, ], fun, T = 1e6, L = L, max_it, tol, method, center)
         }
@@ -778,12 +773,10 @@ StatStreamField <- ggproto(
     list_of_streams$distance <- NA_real_
     list_of_streams$angle <- NA_real_
 
-    # list_of_streams$norm <- list_of_streams$l
 
     list_of_streams
 
   }
-
 
 
 )
@@ -999,30 +992,6 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
   df
 
 }
-# f <- function(u) c(-u[2], u[1])
-# ode_stepper( c(1,0), f, L = pi) |> str()
-# ode_stepper( c(1,0), f, L = pi) |> tail() # look at last l
-# ode_stepper( c(1,0), f, L = pi) |>
-#   ggplot(aes(x, y)) +
-#     geom_path(aes(color = t))
-#
-# ode_stepper(  c(-1,1), efield_maker(), L = 2 ) |> stream_length()
-# ode_stepper( c(-.2,1), efield_maker(), L = 2 ) |> stream_length()
-# ode_stepper( c(-.3,1), efield_maker(), L = 2 ) |> stream_length()
-#
-# ode_stepper( c(-1,1), efield_maker() ) |>
-#   ggplot(aes(x, y)) +
-#     geom_path(aes(color = t))
-#
-# ode_stepper( c(-1,1), efield_maker() ) |>
-#   ggplot(aes(x, y)) +
-#   geom_path(aes(color = l))
-#
-# ode_stepper( c(-1,1), efield_maker(), L = 3 ) |>
-#   ggplot(aes(x, y)) +
-#   geom_path(aes(color = l))
-
-
 
 
 #' @keywords internal
@@ -1067,29 +1036,6 @@ crop_stream_length <- function(data, L) {
   data
 
 }
-# N <- 20 # set this to 2 to a single vector
-# s <- seq(0, 1, length.out = N+1)[-(N+1)]
-# df <- data.frame(
-#   "t" = s,
-#   "x" = cos(2*pi*s),
-#   "y" = sin(2*pi*s)
-# )
-# seg_lengths <- apply(df[2:N,c("x","y")] - df[1:(N-1),c("x","y")], 1, norm)
-# df$d <- c(0, seg_lengths)
-# df$l <- cumsum(df$d) # note that last is ~ 2*pi, which is good
-#
-# df |>
-#   ggplot(aes(x,y)) +
-#     geom_path(aes(color = l)) +
-#     coord_equal(xlim = c(-1,1), ylim = c(-1,1))
-#
-# df |>
-#   crop_stream_length(pi) |>
-#   ggplot(aes(x,y)) +
-#     geom_path(aes(color = l)) +
-#     coord_equal(xlim = c(-1,1), ylim = c(-1,1))
-
-
 
 
 # this function behaves just like crop_stream_length(), see main comments there
@@ -1156,7 +1102,6 @@ crop_stream_time <- function(data, T, centered = FALSE) {
 
   ## happens when in a sync or source
   if (is.na(data$t[n])) return(data[0, , drop = FALSE])
-  # if (is.na(data$t[n])) return( data[0, ] )
   # return data if doesn't get to time T, return data
   # NOTE: this may need to change in the future
   if (T >= data$t[n]) return( data )
@@ -1186,36 +1131,6 @@ crop_stream_time <- function(data, T, centered = FALSE) {
 }
 
 
-
-
-
-#' @keywords internal
-stream_length <- function(data) {
-
-  # data is assumed to have columns t, x, y
-  # t is assumed in order
-  # data <- data[order(data$t),]
-
-  # discard any columns other than x and y
-  data <- data[,c("x","y")]
-
-  # find length of path
-  n <- nrow(data)
-  apply(data[2:n,] - data[1:(n-1),], 1, norm) |> sum()
-
-}
-# df |> stream_length() # should match last l; does
-# df |> crop_stream_length(pi) |> stream_length() # should match pi and new last l; does
-
-
-
-#' @keywords internal
-stream_center <- function(data) {
-  L <- stream_length(data)
-  data <- crop_stream_length(data, L/2)
-  data[nrow(data),]
-}
-
 #' @keywords internal
 matrix_to_df_with_names <- function(mat, col_names = NULL) {
   # Check if the input is a matrix
@@ -1234,71 +1149,3 @@ matrix_to_df_with_names <- function(mat, col_names = NULL) {
 
   return(df)
 }
-
-# df |> stream_length()
-# df |> stream_center()
-# df |>
-#   ggplot(aes(x, y)) +
-#     geom_path() +
-#     geom_point(data = stream_center(df), color = "firebrick")
-
-
-
-
-# parameterization <- function(data) {
-#   fx <- with(data, approxfun(t,x))
-#   fy <- with(data, approxfun(t,y))
-#   function(t) {
-#     n <- length(t)
-#     df <- cbind("x" = fx(t), "y" = fy(t)) |> matrix_to_df_with_names()
-#     df$d <- c(0, apply(df[2:n,] - df[1:(n-1),], 1, norm))
-#     df$l <- cumsum(df$d)
-#     df$t <- t
-#     df[,c("t","x","y","d","l")]
-#   }
-# }
-
-# random_ts <- runif(50, min = min(df$t), max = max(df$t))
-# parameterization(df)( random_ts )
-
-
-
-
-# sample_stream <- function(n, data) {
-#   random_ts <- runif(n, min = min(data$t), max = max(data$t))
-#   parameterization(df)( random_ts )
-# }
-# df |>
-#   ggplot(aes(x, y)) +
-#     geom_path() +
-#     geom_point(data = stream_center(df), color = "firebrick") +
-#     geom_point(data = sample_stream(20, df), color = "steelblue") +
-#     coord_equal()
-
-
-
-
-# center_on_point <- function(data, point = c(0,0)) {
-#
-#   # compute center
-#   center <- as.numeric( stream_center(data)[,c("x","y")] )
-#
-#   # translate each point in path by center
-#   # for (i in 1:nrow(data)) data[i,c("x","y")] <- data[i,c("x","y")] - center + point
-#   mat <- as.matrix( data[,c("x","y")] )
-#   data[,c("x","y")] <- t( t(mat) - center + point )
-#
-#   # return
-#   data
-#
-# }
-# df
-# df |> center_on_point()
-# df |>
-#   ggplot(aes(x, y)) +
-#     geom_path() +
-#     geom_point(data = stream_center(df), color = "firebrick") +
-#     geom_path(data = center_on_point(df), color = "steelblue") +
-#     coord_equal()
-
-

@@ -195,18 +195,6 @@ geom_gradient_field <- function(
     stop("Please provide a valid scalar function `fun` that takes a numeric vector and returns a single numeric value.")
   }
 
-  # if (is.null(xlim) && !is.null(data) && "x" %in% names(data)) {
-  #   xlim <- range(data$x, na.rm = TRUE)
-  # } else if (is.null(xlim)) {
-  #   xlim <- c(-10, 10)  # Fallback default range
-  # }
-  #
-  # if (is.null(ylim) && !is.null(data) && "y" %in% names(data)) {
-  #   ylim <- range(data$y, na.rm = TRUE)
-  # } else if (is.null(ylim)) {
-  #   ylim <- c(-10, 10)  # Fallback default range
-  # }
-
   gradient_fun <- function(u) {
 
     if (!is.numeric(u) || length(u) != 2) {
