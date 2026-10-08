@@ -7,7 +7,6 @@
 #' @seealso
 #'
 #' Useful links:
-#' * \url{https://jamesotto852.github.io/ggdensity/}
 #' * \url{https://github.com/dusty-turner/ggvfields/}
 #'
 #' @import ggplot2

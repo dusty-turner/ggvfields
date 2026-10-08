@@ -125,7 +125,7 @@
 #'
 #' # the basic usage involves providing a fun, xlim, and ylim
 #' ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-#' \dontrun{
+#' \donttest{
 #' # if unspecified, xlim and ylim default to c(-1,1). we use this in what
 #' # follows to focus on other parts of the code
 #' ggplot() + geom_stream_field(fun = f)
@@ -477,7 +477,7 @@ StatStreamField <- ggproto(
     ## stream and normalize
     if ( type == "stream" && normalize ) {
         if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
-        if( !is.null(T) ) cli::cli_alert("Specifying T for normalized sterams is not compatible. Ignoreing T")
+        if( !is.null(T) ) cli::cli_alert("Specifying T for normalized streams is not compatible. Ignoring T.")
     }
 
     ## stream and not normalize
@@ -958,7 +958,7 @@ crop_stream_time <- function(data, T, centered = FALSE) {
 #' @keywords internal
 matrix_to_df_with_names <- function(mat, col_names = NULL) {
   # Check if the input is a matrix
-  if (!is.matrix(mat)) stop("Input must be a matrix.")
+  if (!is.matrix(mat)) cli::cli_abort("Input must be a matrix.")
 
   # Convert to a data frame
   df <- as.data.frame(mat)
@@ -966,7 +966,7 @@ matrix_to_df_with_names <- function(mat, col_names = NULL) {
   # Set column names if provided
   if (!is.null(col_names)) {
     if (length(col_names) != ncol(df)) {
-      stop("`col_names` must have the same length as the number of columns in the matrix.")
+      cli::cli_abort("`col_names` must have the same length as the number of columns in the matrix.")
     }
     names(df) <- col_names
   }

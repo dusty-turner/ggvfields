@@ -32,16 +32,16 @@
 #'   around the origin of each vector. By default, the circle’s radius is
 #'   computed as the magnitude of the predicted vector.
 #' @param conf_level Numeric. Specifies the confidence level for the prediction
-#'   intervals. Default is `0.95`.
+#'   intervals. Default is `0.95`. If a vector is given, its first element is used.
 #' @param eval_points A data frame of evaluation points. If provided, these
 #'   specify the grid where the smoothing model is evaluated. If `NULL`, a grid
 #'   is generated based on `n`.
 #' @param pi_type Character. Determines the display style for prediction
 #'   intervals:
-#'   - `"wedge"` (default): Angular wedges are drawn.
-#'   - `"ellipse"`: Ellipses are used to represent the covariance of the predictions.
-#'   If `pi_type` is set to `"ellipse"` and `eval_points` is `NULL`, it will
-#'   revert to `"wedge"`.
+#'   - `"ellipse"` (default): Ellipses are used to represent the covariance of the predictions.
+#'   - `"wedge"`: Angular wedges are drawn.
+#'   Ellipses need `eval_points`: if `pi_type` is `"ellipse"` and `eval_points`
+#'   is `NULL`, wedges are drawn instead, with a warning.
 #' @param arrow A \code{grid::arrow()} specification for arrowheads on the
 #'   smoothed vectors.
 #' @param formula A formula specifying the multivariate linear model used for
@@ -130,17 +130,16 @@
 #' # Example 2: Ellipse with eval_points
 #' ggplot(sample_points, aes(x = x, y = y)) +
 #'   geom_vector(aes(fx = fx, fy = fy, color = NULL), center = FALSE, alpha = 0.2) +
-#'   geom_vector_smooth(aes(fx = fx, fy = fy), eval_points = eval_points, conf_level = c(0.9)) +
+#'   geom_vector_smooth(aes(fx = fx, fy = fy), eval_points = eval_points, conf_level = 0.9) +
 #'   ggtitle("Smoothed Vector Field with Ellipse Intervals")
 #'
 #' # Example 3: Wedge with eval_points
 #' ggplot(sample_points, aes(x = x, y = y)) +
 #'   geom_vector(aes(fx = fx, fy = fy, color = NULL), center = FALSE, alpha = 0.2) +
-#'   geom_vector_smooth(aes(fx = fx, fy = fy), eval_points = eval_points, pi_type = "ellipse") +
+#'   geom_vector_smooth(aes(fx = fx, fy = fy), eval_points = eval_points, pi_type = "wedge") +
 #'   ggtitle("Smoothed Vector Field with Wedge Intervals")
 #'
-#' @aliases geom_vector_smooth stat_vector_smooth geom_vector_smooth2
-#'   stat_vector_smooth2 StatVectorSmooth
+#' @aliases geom_vector_smooth stat_vector_smooth StatVectorSmooth
 #' @name geom_vector_smooth
 #' @export
 NULL
@@ -159,7 +158,7 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
    se = TRUE,
    se.circle = FALSE,
    pi_type = "ellipse",
-   conf_level = c(.95, NA),
+   conf_level = .95,
    formula = cbind(fx, fy) ~ x * y,
    eval_points = NULL,
    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
@@ -177,8 +176,7 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
 }
 
 #' @rdname geom_vector_smooth
-#' @format NULL
-#' @usage NULL
+#' @export
 stat_vector_smooth <- function(mapping = NULL, data = NULL,
    geom = "vector_smooth",
    position = "identity",
@@ -190,7 +188,7 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
    method = "gam",
    se = TRUE,
    se.circle = FALSE,
-   conf_level = c(.95, NA),
+   conf_level = .95,
    pi_type = "ellipse",
    formula = cbind(fx, fy) ~ x * y,
    eval_points = NULL,
@@ -252,7 +250,7 @@ StatVectorSmooth <- ggproto(
     if (!is.null(eval_points)) {
       # Validate eval_points contains necessary columns
       if (!all(c("x", "y") %in% names(eval_points))) {
-        stop("The 'eval_points' argument must contain 'x' and 'y' columns.")
+        cli::cli_abort("The 'eval_points' argument must contain 'x' and 'y' columns.")
       }
 
       grid <- eval_points
@@ -326,7 +324,7 @@ StatVectorSmooth <- ggproto(
 
     expected_coeffs <- coeffs_per_response * n_resp
     if (total_coeffs != expected_coeffs) {
-      stop("Unexpected number of coefficients in the model. Please verify the formula and data.")
+      cli::cli_abort("Unexpected number of coefficients in the model. Please verify the formula and data.")
     }
 
     # Extract covariance matrices
@@ -509,7 +507,7 @@ StatVectorSmooth <- ggproto(
       result$xend <- result$x + result$fx
       result$yend <- result$y + result$fy
     } else {
-      stop("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
+      cli::cli_abort("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
     }
     return(result)
   }
@@ -625,7 +623,7 @@ GeomVectorSmooth <- ggproto(
 
         grobs <- c(grid::gList(ellipse_grob), grobs)
       } else {
-        stop("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
+        cli::cli_abort("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
       }
     }
     if (se.circle) {
@@ -690,7 +688,7 @@ validate_aesthetics <- function(data) {
 
   # If neither pair is fully provided, throw an error
   if (!(has_angle_distance || has_fx_fy)) {
-    stop("You must provide either both 'fx' and 'fy' or both 'angle' and 'distance' aesthetics.")
+    cli::cli_abort("You must provide either both 'fx' and 'fy' or both 'angle' and 'distance' aesthetics.")
   }
 
   # Return a list indicating which pair is present
@@ -734,22 +732,22 @@ compute_ellipse_params <- function(var_fx, var_fy, cov_fx_fy, conf_level = 0.95)
 compute_prediction_endpoints <- function(x, y, fx, fy, angle_lower, angle_upper) {
   # Validate inputs
   if (!is.numeric(x) || length(x) != 1) {
-    stop("Input 'x' must be a single numeric value.")
+    cli::cli_abort("Input 'x' must be a single numeric value.")
   }
   if (!is.numeric(y) || length(y) != 1) {
-    stop("Input 'y' must be a single numeric value.")
+    cli::cli_abort("Input 'y' must be a single numeric value.")
   }
   if (!is.numeric(fx) || length(fx) != 1) {
-    stop("Input 'fx' must be a single numeric value.")
+    cli::cli_abort("Input 'fx' must be a single numeric value.")
   }
   if (!is.numeric(fy) || length(fy) != 1) {
-    stop("Input 'fy' must be a single numeric value.")
+    cli::cli_abort("Input 'fy' must be a single numeric value.")
   }
   if (!is.numeric(angle_lower) || length(angle_lower) != 1) {
-    stop("Input 'angle_lower' must be a single numeric value in radians.")
+    cli::cli_abort("Input 'angle_lower' must be a single numeric value in radians.")
   }
   if (!is.numeric(angle_upper) || length(angle_upper) != 1) {
-    stop("Input 'angle_upper' must be a single numeric value in radians.")
+    cli::cli_abort("Input 'angle_upper' must be a single numeric value in radians.")
   }
 
   # Calculate the magnitude of the predicted vector
@@ -877,22 +875,22 @@ predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL, conf_level
 
   # Validate inputs
   if (!is.numeric(x) || length(x) != 1) {
-    stop("Input 'x' must be a single numeric value.")
+    cli::cli_abort("Input 'x' must be a single numeric value.")
   }
   if (!is.numeric(y) || length(y) != 1) {
-    stop("Input 'y' must be a single numeric value.")
+    cli::cli_abort("Input 'y' must be a single numeric value.")
   }
   if (!is.numeric(mux) || length(mux) != 1) {
-    stop("Input 'mux' must be a single numeric value.")
+    cli::cli_abort("Input 'mux' must be a single numeric value.")
   }
   if (!is.numeric(muy) || length(muy) != 1) {
-    stop("Input 'muy' must be a single numeric value.")
+    cli::cli_abort("Input 'muy' must be a single numeric value.")
   }
   if (!is.matrix(Sigma) || any(dim(Sigma) != c(2, 2))) {
-    stop("Input 'Sigma' must be a 2x2 covariance matrix.")
+    cli::cli_abort("Input 'Sigma' must be a 2x2 covariance matrix.")
   }
   if (!is.numeric(conf_level) || conf_level <= 0 || conf_level >= 1) {
-    stop("Input 'conf_level' must be a numeric value between 0 and 1.")
+    cli::cli_abort("Input 'conf_level' must be a numeric value between 0 and 1.")
   }
 
   # If rho is not provided, calculate it (not used by delta method but for compatibility)

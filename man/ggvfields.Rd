@@ -12,7 +12,6 @@ field functions.
 \seealso{
 Useful links:
 \itemize{
-\item \url{https://jamesotto852.github.io/ggdensity/}
 \item \url{https://github.com/dusty-turner/ggvfields/}
 }
 }

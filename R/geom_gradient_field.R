@@ -108,7 +108,7 @@
 #' ggplot() +
 #'   geom_gradient_field(fun = f, xlim = c(-3, 3), ylim = c(-3, 3))
 #'
-#' \dontrun{
+#' \donttest{
 #' df <- expand.grid(x = seq(-3, 3, 0.1), y = seq(-3, 3, 0.1)) |>
 #'   transform(fxy = apply(cbind(x, y), 1, f))
 #'
@@ -117,22 +117,15 @@
 #'   geom_gradient_field(fun = f, xlim = c(-3, 3), ylim = c(-3, 3)) +
 #'   coord_equal()
 #'
-#' fxy <- function(x, y) apply(cbind(x,y), 1, f)
-#'
-#' ggplot() +
-#'   ggdensity::geom_hdr_fun(fun = fxy, xlim = c(-3,3), ylim = c(-3,3)) +
-#'   geom_gradient_field(fun = f, xlim = c(-3,3), ylim = c(-3,3)) +
-#'   coord_equal()
-#'
-#'   library("ggdensity")
+#' # over highest density regions, if ggdensity is installed
+#' if (requireNamespace("ggdensity", quietly = TRUE)) {
 #'   fxy <- function(x, y) apply(cbind(x, y), 1, f)
-#'   fxy(1, 2)
-#'   f(1:2)
 #'
 #'   ggplot() +
-#'     geom_hdr_fun(fun = fxy, xlim = c(-3, 3), ylim = c(-3, 3)) +
+#'     ggdensity::geom_hdr_fun(fun = fxy, xlim = c(-3, 3), ylim = c(-3, 3)) +
 #'     geom_gradient_field(fun = f, xlim = c(-3, 3), ylim = c(-3, 3)) +
 #'     coord_equal()
+#' }
 #' }
 #' @aliases geom_gradient_field stat_gradient_field geom_gradient_field2
 #'   stat_gradient_field2

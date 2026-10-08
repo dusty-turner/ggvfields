@@ -453,7 +453,7 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
 Provides smoothed estimates of vector fields by applying statistical
 techniques to observed vectors.
 
-Smoothing is performed using a multivariate linear model defined by:
+By default (`method = "gam"`), each component of the vector field is smoothed with a generalized additive model using a thin plate spline in `x` and `y`. With `method = "lm"`, smoothing is performed using a multivariate linear model, by default:
 
 $$
 \begin{pmatrix}
@@ -463,7 +463,8 @@ $$
 $$
 
 where $\beta$ are coefficients estimated by ordinary least squares
-(OLS). This approach captures linear and interaction effects to
+(OLS), and the model can be changed with the `formula` argument. This
+approach captures linear and interaction effects to
 approximate the underlying vector field. This function also creates a
 prediction interval around the vector specified by the `conf_level`
 argument and defaults to `.95`.

@@ -172,10 +172,9 @@ vector displacements.
 If \code{xend}/\code{yend} are missing or all \code{NA}, the function computes them. It
 first checks for vector displacements (\code{fx} and \code{fy}); if present, it
 computes \eqn{xend = x + fx,\quad yend = y + fy.} Otherwise, it checks for
-polar coordinates (\code{angle} and \code{distance}) and computes \eqn{xend = x +
-  distance \times \cos(angle \times 180/\pi),\quad yend = y + distance \times
-  \sin(angle \times 180/\pi).} An error is thrown if neither set is
-available.
+polar coordinates (\code{angle}, in radians, and \code{distance}) and computes
+\eqn{xend = x + distance \times \cos(angle),\quad yend = y + distance \times
+  \sin(angle).} An error is thrown if neither set is available.
 
 \strong{Smoothing:}
 The model is fitted once per group: a thin plate spline smoother for each
@@ -194,7 +193,7 @@ Two types of prediction intervals can be displayed:
 
 \examples{
 
-\dontrun{
+\donttest{
 # Define a true vector field function
 f <- function(u) {
   x <- u[1]; y <- u[2]
@@ -207,8 +206,9 @@ f <- function(u) c(-u[2], u[1])
 # Visualize the vector field
 ggplot() + geom_stream_field(fun = f, xlim = c(-2, 2), ylim = c(-2, 2))
 
-# Generate design points
-n <- 20
+# Generate design points (the default gam smoother needs at least 30)
+set.seed(1)
+n <- 50
 df <- data.frame(x = runif(n, -2, 2), y = runif(n, -2, 2))
 
 # Sample function values at design points

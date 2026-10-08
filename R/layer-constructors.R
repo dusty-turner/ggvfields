@@ -177,7 +177,7 @@ stream_field_layer <- function(
   } else if (type == "stream") {
     default_mapping <- aes(color = after_stat(avg_spd))
   } else {
-    stop("Unknown type specified. Valid values are 'vector' or 'stream'.")
+    cli::cli_abort("Unknown type specified. Valid values are 'vector' or 'stream'.")
   }
 
   mapping <- merge_default_mapping(default_mapping, mapping)
@@ -299,12 +299,12 @@ gradient_field_layer <- function(
   }
 
   if (missing(fun) || !is.function(fun)) {
-    stop("Please provide a valid scalar function `fun` that takes a numeric vector and returns a single numeric value.")
+    cli::cli_abort("Please provide a valid scalar function `fun` that takes a numeric vector and returns a single numeric value.")
   }
 
   gradient_fun <- function(u) {
     if (!is.numeric(u) || length(u) != 2) {
-      stop("Input to the gradient function must be a numeric vector of length 2.")
+      cli::cli_abort("Input to the gradient function must be a numeric vector of length 2.")
     }
     numDeriv::grad(func = fun, x = u)
   }
@@ -509,7 +509,7 @@ potential_layer <- function(
 
   # Ensure the potential function is provided
   if (missing(fun)) {
-    stop("Parameter `fun` must be provided to compute the potential function.")
+    cli::cli_abort("Parameter `fun` must be provided to compute the potential function.")
   }
 
   mapping <- merge_default_mapping(aes(fill = after_stat(potential)), mapping)

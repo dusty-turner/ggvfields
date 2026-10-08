@@ -3,8 +3,6 @@
 \name{geom_vector_smooth}
 \alias{geom_vector_smooth}
 \alias{stat_vector_smooth}
-\alias{geom_vector_smooth2}
-\alias{stat_vector_smooth2}
 \alias{StatVectorSmooth}
 \alias{GeomVectorSmooth}
 \title{Create a Smooth Vector Plot Layer}
@@ -23,7 +21,27 @@ geom_vector_smooth(
   se = TRUE,
   se.circle = FALSE,
   pi_type = "ellipse",
-  conf_level = c(0.95, NA),
+  conf_level = 0.95,
+  formula = cbind(fx, fy) ~ x * y,
+  eval_points = NULL,
+  arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
+)
+
+stat_vector_smooth(
+  mapping = NULL,
+  data = NULL,
+  geom = "vector_smooth",
+  position = "identity",
+  ...,
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE,
+  n = c(11, 11),
+  method = "gam",
+  se = TRUE,
+  se.circle = FALSE,
+  conf_level = 0.95,
+  pi_type = "ellipse",
   formula = cbind(fx, fy) ~ x * y,
   eval_points = NULL,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
@@ -65,14 +83,14 @@ computed as the magnitude of the predicted vector.}
 \item{pi_type}{Character. Determines the display style for prediction
 intervals:
 \itemize{
-\item \code{"wedge"} (default): Angular wedges are drawn.
-\item \code{"ellipse"}: Ellipses are used to represent the covariance of the predictions.
-If \code{pi_type} is set to \code{"ellipse"} and \code{eval_points} is \code{NULL}, it will
-revert to \code{"wedge"}.
+\item \code{"ellipse"} (default): Ellipses are used to represent the covariance of the predictions.
+\item \code{"wedge"}: Angular wedges are drawn.
+Ellipses need \code{eval_points}: if \code{pi_type} is \code{"ellipse"} and \code{eval_points}
+is \code{NULL}, wedges are drawn instead, with a warning.
 }}
 
 \item{conf_level}{Numeric. Specifies the confidence level for the prediction
-intervals. Default is \code{0.95}.}
+intervals. Default is \code{0.95}. If a vector is given, its first element is used.}
 
 \item{formula}{A formula specifying the multivariate linear model used for
 smoothing when \code{method = "lm"}. The default is \code{cbind(fx, fy) ~ x * y}. It
@@ -180,13 +198,13 @@ ggplot(sample_points, aes(x = x, y = y)) +
 # Example 2: Ellipse with eval_points
 ggplot(sample_points, aes(x = x, y = y)) +
   geom_vector(aes(fx = fx, fy = fy, color = NULL), center = FALSE, alpha = 0.2) +
-  geom_vector_smooth(aes(fx = fx, fy = fy), eval_points = eval_points, conf_level = c(0.9)) +
+  geom_vector_smooth(aes(fx = fx, fy = fy), eval_points = eval_points, conf_level = 0.9) +
   ggtitle("Smoothed Vector Field with Ellipse Intervals")
 
 # Example 3: Wedge with eval_points
 ggplot(sample_points, aes(x = x, y = y)) +
   geom_vector(aes(fx = fx, fy = fy, color = NULL), center = FALSE, alpha = 0.2) +
-  geom_vector_smooth(aes(fx = fx, fy = fy), eval_points = eval_points, pi_type = "ellipse") +
+  geom_vector_smooth(aes(fx = fx, fy = fy), eval_points = eval_points, pi_type = "wedge") +
   ggtitle("Smoothed Vector Field with Wedge Intervals")
 
 }

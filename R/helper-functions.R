@@ -12,7 +12,7 @@ ensure_nonempty_data <- function(data) {
 
 ensure_length_two <- function(n) {
   if (length(n) == 1) n <- rep(n, 2)
-  if (length(n) != 2) stop("Length of 'n' must be 2")
+  if (length(n) != 2) cli::cli_abort("Length of 'n' must be 2")
   return(n)
 }
 

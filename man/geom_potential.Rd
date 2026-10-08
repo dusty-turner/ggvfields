@@ -66,8 +66,8 @@ rather than combining with them.}
 \item{show.legend}{Logical. Should this layer be included in the legends?}
 
 \item{fun}{A function that takes a numeric vector of length 2 (\code{c(x, y)}) and
-returns a numeric value, defining the conservative vector field.
-\strong{(Required)}}
+returns a numeric vector of length 2, the value of the conservative vector
+field at that point. \strong{(Required)}}
 
 \item{xlim}{Numeric vector of length 2 defining the domain limits on the
 x-axis. Defaults to \code{c(-1, 1)}.}
@@ -76,7 +76,7 @@ x-axis. Defaults to \code{c(-1, 1)}.}
 y-axis. Defaults to \code{c(-1, 1)}.}
 
 \item{n}{Integer. Number of grid points along each axis for computing the
-potential. Defaults to \code{21}.}
+potential. Defaults to \code{51}.}
 
 \item{tol}{Numeric. Tolerance for verifying if the vector field is
 conservative. Defaults to \code{1e-6}.}
@@ -131,7 +131,7 @@ the \code{fill} aesthetic in the raster layer.}
 
 \examples{
 
-\dontrun{
+\donttest{
 scalar_field <- function(u){
   x <- u[1]; y <- u[2]
   (x + y)^2 + 4*(x - y)^2 - 8*(.5)^2

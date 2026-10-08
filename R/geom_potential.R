@@ -24,14 +24,14 @@
 #' @param inherit.aes Logical. If `FALSE`, overrides the default aesthetics
 #'   rather than combining with them.
 #' @param fun A function that takes a numeric vector of length 2 (`c(x, y)`) and
-#'   returns a numeric value, defining the conservative vector field.
-#'   **(Required)**
+#'   returns a numeric vector of length 2, the value of the conservative vector
+#'   field at that point. **(Required)**
 #' @param xlim Numeric vector of length 2 defining the domain limits on the
 #'   x-axis. Defaults to `c(-1, 1)`.
 #' @param ylim Numeric vector of length 2 defining the domain limits on the
 #'   y-axis. Defaults to `c(-1, 1)`.
 #' @param n Integer. Number of grid points along each axis for computing the
-#'   potential. Defaults to `21`.
+#'   potential. Defaults to `51`.
 #' @param tol Numeric. Tolerance for verifying if the vector field is
 #'   conservative. Defaults to `1e-6`.
 #' @param verify_conservative Logical. If `TRUE`, the function verifies that the
@@ -67,7 +67,7 @@
 #'
 #' @examples
 #'
-#' \dontrun{
+#' \donttest{
 #' scalar_field <- function(u){
 #'   x <- u[1]; y <- u[2]
 #'   (x + y)^2 + 4*(x - y)^2 - 8*(.5)^2
@@ -169,7 +169,7 @@ StatPotential <- ggproto(
 
     # Ensure the vector field function is provided
     if (is.null(fun)) {
-      stop("Parameter `fun` must be provided to compute the potential function.")
+      cli::cli_abort("Parameter `fun` must be provided to compute the potential function.")
     }
 
     # Generate grid

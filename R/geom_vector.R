@@ -246,7 +246,7 @@ StatVector <- ggproto("StatVector", Stat,
         data$xend <- data$x + data$distance * cos(data$angle)
         data$yend <- data$y + data$distance * sin(data$angle)
       } else {
-        stop("Either xend/yend or fx/fy or angle/distance must be provided.")
+        cli::cli_abort("Either xend/yend or fx/fy or angle/distance must be provided.")
       }
     }
 

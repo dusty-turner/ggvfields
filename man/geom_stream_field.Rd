@@ -287,7 +287,7 @@ f <- function(u) c(-u[2], u[1])
 
 # the basic usage involves providing a fun, xlim, and ylim
 ggplot() + geom_stream_field(fun = f, xlim = c(-1,1), ylim = c(-1,1))
-\dontrun{
+\donttest{
 # if unspecified, xlim and ylim default to c(-1,1). we use this in what
 # follows to focus on other parts of the code
 ggplot() + geom_stream_field(fun = f)
