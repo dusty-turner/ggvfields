@@ -13,30 +13,26 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v4
 
-      - name: Set up Git
-        run: |
-          git config --global user.email "dusty.s.turner@gmail.com"
-          git config --global user.name "dusty-turner"
+      # The token is handed to the checkout action rather than written into a
+      # clone URL, so it cannot end up in the logs.
+      - name: Checkout the target repository
+        uses: actions/checkout@v4
+        with:
+          repository: dusty-turner/blog-reboot
+          token: ${{ secrets.PAT }}
+          path: blog-reboot
 
       - name: Move file to another repository
-        env:
-          PAT: ${{ secrets.PAT }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y rsync
-
-          # Clone the target repository
-          git clone https://$PAT@github.com/dusty-turner/blog-reboot.git
-
           # Synchronize the files to the target repository, replacing existing contents
           rsync -av --delete docs/ blog-reboot/public/ggvfields/
 
           # Commit and push the changes
           cd blog-reboot
+          git config user.email "dusty.s.turner@gmail.com"
+          git config user.name "dusty-turner"
           git add .
-          git commit -m "Move docs from ggvfields"
-          git push https://$PAT@github.com/dusty-turner/blog-reboot.git
+          git diff --cached --quiet || git commit -m "Move docs from ggvfields"
+          git push
