@@ -146,50 +146,11 @@ geom_stream <- function(mapping = NULL, data = NULL,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 ) {
 
-  dots <- list(...)
+  call_args <- as.list(environment())
 
-  default_mapping <- ggplot2::aes(t = after_stat(t), color = after_stat(t))
-
-  # If mapping is provided, check if color/colour is in mapping OR fixed color in dots.
-  if (!is.null(mapping)) {
-    if (!( "color" %in% names(mapping) ||
-           "colour" %in% names(mapping) ||
-           "color" %in% names(dots) ||
-           "colour" %in% names(dots) )) {
-      mapping <- modifyList(default_mapping, mapping)
-    }
-  } else {
-    # No mapping provided: if a fixed color was supplied, omit the default color mapping.
-    if ("color" %in% names(dots) || "colour" %in% names(dots)) {
-      mapping <- ggplot2::aes(t = after_stat(t))
-    } else {
-      mapping <- default_mapping
-    }
-  }
-
-  # Map 'id' to 'group' if provided.
-  if (!is.null(mapping) && "id" %in% names(mapping)) {
-    mapping$group <- mapping$group %||% mapping$id
-  }
-
-  layer(
-    stat = stat,
-    geom = GeomStream,
-    mapping = mapping,
-    data = data,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      arrow = arrow,
-      arrow.fill = arrow.fill,
-      type = "stream",
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      ...
-    )
+  construct_layer(
+    stream_layer, call_args, list(...),
+    geom = GeomStream
   )
 }
 
@@ -209,50 +170,11 @@ stat_stream <- function(mapping = NULL, data = NULL,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
 ) {
 
-  dots <- list(...)
+  call_args <- as.list(environment())
 
-  default_mapping <- ggplot2::aes(t = after_stat(t), color = after_stat(t))
-
-  # If mapping is provided, check if color/colour is in mapping OR fixed color in dots.
-  if (!is.null(mapping)) {
-    if (!( "color" %in% names(mapping) ||
-           "colour" %in% names(mapping) ||
-           "color" %in% names(dots) ||
-           "colour" %in% names(dots) )) {
-      mapping <- modifyList(default_mapping, mapping)
-    }
-  } else {
-    # No mapping provided: if a fixed color was supplied, omit the default color mapping.
-    if ("color" %in% names(dots) || "colour" %in% names(dots)) {
-      mapping <- ggplot2::aes(t = after_stat(t))
-    } else {
-      mapping <- default_mapping
-    }
-  }
-
-  # Map 'id' to 'group' if provided.
-  if (!is.null(mapping) && "id" %in% names(mapping)) {
-    mapping$group <- mapping$group %||% mapping$id
-  }
-
-  layer(
-    stat = StatStream,
-    geom = geom,
-    mapping = mapping,
-    data = data,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      arrow = arrow,
-      type = "stream",
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      arrow.fill = arrow.fill,
-      ...
-    )
+  construct_layer(
+    stream_layer, call_args, list(...),
+    stat = StatStream
   )
 }
 

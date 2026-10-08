@@ -165,29 +165,14 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
    ) {
 
-  warn_if_formula_ignored(method, !missing(formula))
+  call_args <- as.list(environment())
 
-  layer(
+  # the layer always uses StatVectorSmooth; `stat` is not used
+  construct_layer(
+    vector_smooth_layer, call_args, list(...),
     stat = StatVectorSmooth,
-    data = data,
-    mapping = mapping,
     geom = GeomVectorSmooth,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      n = n,
-      method = method,
-      se = se,
-      se.circle = se.circle,
-      pi_type = pi_type,
-      conf_level = conf_level,
-      arrow = arrow,
-      eval_points = eval_points,
-      formula = formula,
-      na.rm = na.rm,
-      ...
-    )
+    formula_supplied = !missing(formula)
   )
 }
 
@@ -212,29 +197,12 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
    ) {
 
-  warn_if_formula_ignored(method, !missing(formula))
+  call_args <- as.list(environment())
 
-  layer(
+  construct_layer(
+    vector_smooth_layer, call_args, list(...),
     stat = StatVectorSmooth,
-    data = data,
-    mapping = mapping,
-    geom = geom,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      n = n,
-      method = method,
-      se = se,
-      se.circle = se.circle,
-      pi_type = pi_type,
-      conf_level = conf_level,
-      arrow = arrow,
-      eval_points = eval_points,
-      formula = formula,
-      na.rm = na.rm,
-      ...
-    )
+    formula_supplied = !missing(formula)
   )
 }
 

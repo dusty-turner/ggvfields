@@ -170,68 +170,12 @@ geom_gradient_field <- function(
   arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"), type = "closed")
 ) {
 
-  if (is.null(data)) data <- ensure_nonempty_data(data)
+  call_args <- as.list(environment())
 
-  n <- ensure_length_two(n)
-
-  if (type == "stream") {
-    default_mapping <- aes(color = after_stat(avg_spd))
-  } else if (type == "vector") {
-    default_mapping <- aes(color = after_stat(norm))
-  } else {
-    cli::cli_abort("`type` must be either 'stream' or 'vector', not {.val {type}}")
-  }
-
-  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
-
-  # Only merge user mapping with default if no color is fixed by the user:
-  if (is.null(mapping)) {
-    mapping <- default_mapping
-  } else {
-    mapping <- modifyList(default_mapping, mapping)
-  }
-
-  if (missing(fun) || !is.function(fun)) {
-    stop("Please provide a valid scalar function `fun` that takes a numeric vector and returns a single numeric value.")
-  }
-
-  gradient_fun <- function(u) {
-
-    if (!is.numeric(u) || length(u) != 2) {
-      stop("Input to the gradient function must be a numeric vector of length 2.")
-    }
-    numDeriv::grad(func = fun, x = u)
-  }
-
-  layer(
-    stat = stat,
+  construct_layer(
+    gradient_field_layer, call_args, list(...),
     geom = GeomStream,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      fun = gradient_fun,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      na.rm = na.rm,
-      max_it = max_it,
-      T = T,
-      L = L,
-      center = center,
-      type = type,
-      normalize = normalize,
-      tail_point = tail_point,
-      eval_point = eval_point,
-      grid = grid,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      arrow = arrow,
-      ...
-    )
+    map_colour = TRUE
   )
 }
 
@@ -265,67 +209,12 @@ stat_gradient_field <- function(
   arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"), type = "closed")
 ) {
 
-  if (is.null(data)) data <- ensure_nonempty_data(data)
+  call_args <- as.list(environment())
 
-  n <- ensure_length_two(n)
-
-  if (type == "stream") {
-    default_mapping <- aes(color = after_stat(avg_spd))
-  } else if (type == "vector") {
-    default_mapping <- aes(color = after_stat(norm))
-  } else {
-    cli::cli_abort("`type` must be either 'stream' or 'vector', not {.val {type}}")
-  }
-
-  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
-
-  # Only merge user mapping with default if no color is fixed by the user:
-  if (is.null(mapping)) {
-    mapping <- default_mapping
-  } else {
-    mapping <- modifyList(default_mapping, mapping)
-  }
-
-  if (missing(fun) || !is.function(fun)) {
-    stop("Please provide a valid scalar function `fun` that takes a numeric vector and returns a single numeric value.")
-  }
-
-  gradient_fun <- function(u) {
-    if (!is.numeric(u) || length(u) != 2) {
-      stop("Input to the gradient function must be a numeric vector of length 2.")
-    }
-    numDeriv::grad(func = fun, x = u)
-  }
-
-  layer(
+  construct_layer(
+    gradient_field_layer, call_args, list(...),
     stat = StatStreamField,
-    geom = geom,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      fun = gradient_fun,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      na.rm = na.rm,
-      max_it = max_it,
-      T = T,
-      L = L,
-      center = center,
-      type = type,
-      normalize = normalize,
-      tail_point = tail_point,
-      eval_point = eval_point,
-      grid = grid,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      arrow = arrow,
-      ...
-    )
+    map_colour = TRUE
   )
 }
 
@@ -359,59 +248,13 @@ geom_gradient_field2 <- function(
   linemitre = 10,
   arrow = NULL
 ) {
-  if (is.null(data)) data <- ensure_nonempty_data(data)
-  n <- ensure_length_two(n)
 
-  default_mapping <- aes(length = after_stat(norm))
+  call_args <- as.list(environment())
 
-  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
-
-  if (!user_fixed_color) {
-    default_mapping <- aes(color = after_stat(norm))
-  } else {
-    default_mapping <- aes()
-  }
-
-  if (missing(fun) || !is.function(fun)) {
-    stop("Please provide a valid scalar function `fun` that takes a numeric vector and returns a single numeric value.")
-  }
-
-  gradient_fun <- function(v) {
-    if (!is.numeric(v) || length(v) != 2) {
-      stop("Input to the gradient function must be a numeric vector of length 2.")
-    }
-    numDeriv::grad(func = fun, x = v)
-  }
-
-  layer(
-    stat = stat,
+  construct_layer(
+    gradient_field_layer, call_args, list(...),
     geom = GeomStream,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      fun = gradient_fun,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      na.rm = na.rm,
-      max_it = max_it,
-      T = T,
-      L = L,
-      center = center,
-      type = type,
-      normalize = normalize,
-      tail_point = tail_point,
-      eval_point = eval_point,
-      grid = grid,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      arrow = arrow,
-      ...
-    )
+    map_colour = FALSE
   )
 }
 
@@ -445,58 +288,12 @@ stat_gradient_field2 <- function(
   linemitre = 10,
   arrow = NULL
 ) {
-  if (is.null(data)) data <- ensure_nonempty_data(data)
-  n <- ensure_length_two(n)
 
-  default_mapping <- aes(length = after_stat(norm))
+  call_args <- as.list(environment())
 
-  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
-
-  if (!user_fixed_color) {
-    default_mapping <- aes(color = after_stat(norm))
-  } else {
-    default_mapping <- aes()
-  }
-
-  if (missing(fun) || !is.function(fun)) {
-    stop("Please provide a valid scalar function `fun` that takes a numeric vector and returns a single numeric value.")
-  }
-
-  gradient_fun <- function(v) {
-    if (!is.numeric(v) || length(v) != 2) {
-      stop("Input to the gradient function must be a numeric vector of length 2.")
-    }
-    numDeriv::grad(func = fun, x = v)
-  }
-
-  layer(
+  construct_layer(
+    gradient_field_layer, call_args, list(...),
     stat = StatStreamField,
-    geom = geom,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      fun = gradient_fun,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      na.rm = na.rm,
-      max_it = max_it,
-      T = T,
-      L = L,
-      center = center,
-      type = type,
-      normalize = normalize,
-      tail_point = tail_point,
-      eval_point = eval_point,
-      grid = grid,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      arrow = arrow,
-      ...
-    )
+    map_colour = FALSE
   )
 }

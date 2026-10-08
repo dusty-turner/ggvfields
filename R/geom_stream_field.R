@@ -253,60 +253,11 @@ geom_stream_field <- function(
     arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
 
-  if (type == "vector") {
-    default_mapping <- aes(color = after_stat(norm))
-  } else if (type == "stream") {
-    default_mapping <- aes(color = after_stat(avg_spd))
-  } else {
-    stop("Unknown type specified. Valid values are 'vector' or 'stream'.")
-  }
+  call_args <- as.list(environment())
 
-  # Merge user-provided mapping with default mapping.
-  # If the user did not specify a color aesthetic, add the default.
-  if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) {
-      mapping <- modifyList(default_mapping, mapping)
-    }
-  } else {
-    mapping <- default_mapping
-  }
-
-  if (is.null(data)) data <- ensure_nonempty_data(data)
-  n <- ensure_length_two(n)
-  method <- match.arg(method, c("rk4", "euler", "lsoda"))
-
-  layer(
-    stat = stat,
-    geom = GeomStream,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      fun = fun,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      args = args,
-      method = method,
-      na.rm = na.rm,
-      max_it = max_it,
-      tol = tol,
-      T = T,
-      L = L,
-      center = center,
-      type = type,
-      normalize = normalize,
-      tail_point = tail_point,
-      eval_point = eval_point,
-      grid = grid,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      arrow = arrow,
-      ...
-    )
+  construct_layer(
+    stream_field_layer, call_args, list(...),
+    geom = GeomStream
   )
 }
 
@@ -344,60 +295,13 @@ stat_stream_field <- function(
     arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
 ) {
 
-  if (type == "vector") {
-    default_mapping <- aes(color = after_stat(norm))
-  } else if (type == "stream") {
-    default_mapping <- aes(color = after_stat(avg_spd))
-  } else {
-    stop("Unknown type specified. Valid values are 'vector' or 'stream'.")
-  }
+  call_args <- as.list(environment())
 
-  # Merge user-provided mapping with default mapping.
-  # If the user did not specify a color aesthetic, add the default.
-  if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) {
-      mapping <- modifyList(default_mapping, mapping)
-    }
-  } else {
-    mapping <- default_mapping
-  }
-
-  if (is.null(data)) data <- ensure_nonempty_data(data)
-  n <- ensure_length_two(n)
-  method <- match.arg(method, c("rk4", "euler", "lsoda"))
-
-  layer(
+  # normalize is fixed here, as it has been since 1.0.0 (audit item 3, undecided)
+  construct_layer(
+    stream_field_layer, call_args, list(...),
     stat = StatStreamField,
-    geom = geom,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      fun = fun,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      args = args,
-      method = method,
-      na.rm = na.rm,
-      max_it = max_it,
-      tol = tol,
-      T = T,
-      L = L,
-      center = center,
-      type = type,
-      normalize = TRUE,
-      tail_point = tail_point,
-      eval_point = eval_point,
-      grid = grid,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      arrow = arrow,
-      ...
-    )
+    normalize = TRUE
   )
 }
 
@@ -431,52 +335,11 @@ geom_stream_field2 <- function(
     method = "rk4"
     ) {
 
-  # Define default mapping for geom_vector_field
-  default_mapping <- aes(color = after_stat(NULL))
+  call_args <- as.list(environment())
 
-  # Merge user-provided mapping with default mapping
-  # User mapping takes precedence
-  if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
-  } else {
-    mapping <- default_mapping
-  }
-
-  if (is.null(data)) data <- ensure_nonempty_data(data)
-  n <- ensure_length_two(n)
-  method <- match.arg(method, c("rk4", "euler", "lsoda"))
-
-  layer(
-    stat = stat,
-    geom = GeomStream,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      fun = fun,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      args = args,
-      method = method,
-      na.rm = na.rm,
-      max_it = max_it,
-      tol = tol,
-      L = L,
-      center = center,
-      type = type,
-      normalize = TRUE,
-      tail_point = tail_point,
-      eval_point = eval_point,
-      grid = grid,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      arrow = NULL,
-      ...
-    )
+  construct_layer(
+    stream_field2_layer, call_args, list(...),
+    geom = GeomStream
   )
 }
 
@@ -510,52 +373,13 @@ stat_stream_field2 <- function(
     method = "rk4"
     ) {
 
-  # Define default mapping for geom_vector_field
-  default_mapping <- aes(color = after_stat(NULL))
+  call_args <- as.list(environment())
 
-  # Merge user-provided mapping with default mapping
-  # User mapping takes precedence
-  if (!is.null(mapping)) {
-    if (!"color" %in% names(mapping)) mapping <- modifyList(default_mapping, mapping)
-  } else {
-    mapping <- default_mapping
-  }
-
-  if (is.null(data)) data <- ensure_nonempty_data(data)
-  n <- ensure_length_two(n)
-  method <- match.arg(method, c("rk4", "euler", "lsoda"))
-
-  layer(
+  # tol is fixed here, as it has been since 1.0.0 (audit item 3, undecided)
+  construct_layer(
+    stream_field2_layer, call_args, list(...),
     stat = StatStreamField,
-    geom = geom,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      fun = fun,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      args = args,
-      method = method,
-      na.rm = na.rm,
-      max_it = max_it,
-      tol = sqrt(.Machine$double.eps),
-      L = L,
-      center = center,
-      type = type,
-      normalize = TRUE,
-      tail_point = tail_point,
-      eval_point = eval_point,
-      grid = grid,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      arrow = NULL,
-      ...
-    )
+    tol = sqrt(.Machine$double.eps)
   )
 }
 

@@ -142,48 +142,12 @@ geom_vector_field <- function(
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
   ) {
 
-  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
+  call_args <- as.list(environment())
 
-  if (!user_fixed_color) {
-    default_mapping <- aes(color = after_stat(norm))
-  } else {
-    default_mapping <- aes()
-  }
-
-  mapping <- modifyList(default_mapping, mapping %||% aes())
-
-  if (is.null(data)) data <- ensure_nonempty_data(data)
-  n <- ensure_length_two(n)
-
-  layer(
-    stat = stat,
+  construct_layer(
+    vector_field_layer, call_args, list(...),
     geom = GeomStream,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      fun = fun,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      args = args,
-      method = "euler",
-      na.rm = na.rm,
-      max_it = 2,
-      center = center,
-      normalize = normalize,
-      type = "vector",
-      tail_point = tail_point,
-      eval_point = eval_point,
-      grid = grid,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      arrow = arrow,
-      ...
-    )
+    extra_params = list(max_it = 2)
   )
 }
 
@@ -215,48 +179,9 @@ stat_vector_field <- function(
   arrow = grid::arrow(angle = 30, length = unit(0.02, "npc"), type = "closed")
   ) {
 
-  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
+  call_args <- as.list(environment())
 
-  if (!user_fixed_color) {
-    default_mapping <- aes(color = after_stat(norm))
-  } else {
-    default_mapping <- aes()
-  }
-
-  mapping <- modifyList(default_mapping, mapping %||% aes())
-
-  if (is.null(data)) data <- ensure_nonempty_data(data)
-  n <- ensure_length_two(n)
-
-  layer(
-    stat = stat,
-    geom = geom,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      fun = fun,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      args = args,
-      method = "euler",
-      na.rm = na.rm,
-      center = center,
-      normalize = normalize,
-      type = "vector",
-      tail_point = tail_point,
-      eval_point = eval_point,
-      grid = grid,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      arrow = arrow,
-      ...
-    )
-  )
+  construct_layer(vector_field_layer, call_args, list(...))
 }
 
 #' @rdname geom_vector_field
@@ -284,48 +209,11 @@ geom_vector_field2 <- function(
    linemitre = 10,
    arrow = NULL) {
 
-  # Define default mapping for stat_stream_field2
-  default_mapping <- ggplot2::aes(length = after_stat(norm))
+  call_args <- as.list(environment())
 
-  # Merge default mapping with the user mapping, where user mapping takes precedence.
-  if (is.null(mapping)) {
-    mapping <- default_mapping
-  } else {
-    mapping <- modifyList(default_mapping, mapping)
-  }
-
-  if (is.null(data)) data <- ensure_nonempty_data(data)
-  n <- ensure_length_two(n)
-
-  ggplot2::layer(
-    stat = stat,
-    geom = GeomStream,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      fun = fun,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      args = args,
-      method = "euler",
-      na.rm = na.rm,
-      center = center,
-      normalize = TRUE,
-      type = "vector",
-      tail_point = tail_point,
-      eval_point = eval_point,
-      T = 1,
-      grid = grid,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      arrow = arrow,
-      ...
-    )
+  construct_layer(
+    vector_field2_layer, call_args, list(...),
+    geom = GeomStream
   )
 }
 
@@ -354,48 +242,11 @@ stat_vector_field2 <- function(
     linemitre = 10,
     arrow = NULL) {
 
-  # Define default mapping for stat_stream_field2
-  default_mapping <- ggplot2::aes(length = after_stat(norm))
+  call_args <- as.list(environment())
 
-  # Merge default mapping with the user mapping, where user mapping takes precedence.
-  if (is.null(mapping)) {
-    mapping <- default_mapping
-  } else {
-    mapping <- modifyList(default_mapping, mapping)
-  }
-
-  if (is.null(data)) data <- ensure_nonempty_data(data)
-  n <- ensure_length_two(n)
-
-  ggplot2::layer(
-    geom = geom,
-    stat = StatStreamField,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      fun = fun,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      args = args,
-      method = "euler",
-      na.rm = na.rm,
-      center = center,
-      normalize = TRUE,
-      type = "vector",
-      tail_point = tail_point,
-      eval_point = eval_point,
-      T = 1,
-      grid = grid,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      arrow = arrow,
-      ...
-    )
+  construct_layer(
+    vector_field2_layer, call_args, list(...),
+    stat = StatStreamField
   )
 }
 

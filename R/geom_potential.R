@@ -103,43 +103,11 @@ geom_potential <- function(
   tol = 1e-6,
   verify_conservative = FALSE) {
 
-  if (is.null(data)) {
-    data <- data.frame(x = NA_real_, y = NA_real_)
-  }
+  call_args <- as.list(environment())
 
-  # Ensure the potential function is provided
-  if (missing(fun)) {
-    stop("Parameter `fun` must be provided to compute the potential function.")
-  }
-
-  # Default aesthetic mapping for fill
-  default_mapping <- aes(fill = after_stat(potential))
-
-  # Merge user-provided mappings with defaults
-  if (is.null(mapping)) {
-    mapping <- default_mapping
-  } else {
-    mapping <- modifyList(default_mapping, mapping)
-  }
-
-  layer(
-    stat = stat,
-    geom = GeomPotential,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      fun = fun,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      tol = tol,
-      verify_conservative = verify_conservative,
-      ...
-    )
+  construct_layer(
+    potential_layer, call_args, list(...),
+    geom = GeomPotential
   )
 }
 
@@ -162,43 +130,11 @@ stat_potential <- function(
   verify_conservative = FALSE
   ) {
 
-  if (is.null(data)) {
-    data <- data.frame(x = NA_real_, y = NA_real_)
-  }
+  call_args <- as.list(environment())
 
-  # Ensure the potential function is provided
-  if (missing(fun)) {
-    stop("Parameter `fun` must be provided to compute the potential function.")
-  }
-
-  # Default aesthetic mapping for fill
-  default_mapping <- aes(fill = after_stat(potential))
-
-  # Merge user-provided mappings with defaults
-  if (is.null(mapping)) {
-    mapping <- default_mapping
-  } else {
-    mapping <- modifyList(default_mapping, mapping)
-  }
-
-  layer(
-    stat = StatPotential,
-    geom = geom,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      fun = fun,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      tol = tol,
-      verify_conservative = verify_conservative,
-      ...
-    )
+  construct_layer(
+    potential_layer, call_args, list(...),
+    stat = StatPotential
   )
 }
 

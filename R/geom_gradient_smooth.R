@@ -120,58 +120,11 @@ geom_gradient_smooth <- function(
     arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"), type = "closed")
 ) {
 
-  n <- ensure_length_two(n)
+  call_args <- as.list(environment())
 
-  default_aes <- aes(x = x, y = y, z = z)
-
-  if (is.null(mapping)) {
-    mapping <- default_aes
-  } else {
-    mapping <- modifyList(default_aes, mapping)
-  }
-
-  default_color_aes <- if (type == "stream") {
-    aes(color = after_stat(avg_spd))
-  } else if (type == "vector") {
-    aes(color = after_stat(norm))
-  } else {
-    cli::cli_abort("`type` must be either 'stream' or 'vector', not {.val {type}}")
-  }
-
-  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
-  if (!user_fixed_color) {
-    mapping <- modifyList(mapping, default_color_aes)
-  }
-
-  layer(
-    stat = stat,
-    geom = GeomStream,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      formula = formula,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      na.rm = na.rm,
-      max_it = max_it,
-      T = T,
-      L = L,
-      center = center,
-      type = type,
-      normalize = normalize,
-      tail_point = tail_point,
-      eval_point = eval_point,
-      grid = grid,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      arrow = arrow,
-      ...
-    )
+  construct_layer(
+    gradient_smooth_layer, call_args, list(...),
+    geom = GeomStream
   )
 }
 
@@ -205,57 +158,10 @@ stat_gradient_smooth <- function(
     arrow = grid::arrow(angle = 30, length = grid::unit(0.02, "npc"), type = "closed")
 ) {
 
-  n <- ensure_length_two(n)
+  call_args <- as.list(environment())
 
-  default_aes <- aes(x = x, y = y, z = z)
-
-  if (is.null(mapping)) {
-    mapping <- default_aes
-  } else {
-    mapping <- modifyList(default_aes, mapping)
-  }
-
-  default_color_aes <- if (type == "stream") {
-    aes(color = after_stat(avg_spd))
-  } else if (type == "vector") {
-    aes(color = after_stat(norm))
-  } else {
-    cli::cli_abort("`type` must be either 'stream' or 'vector', not {.val {type}}")
-  }
-
-  user_fixed_color <- any(c("color", "colour") %in% names(list(...)))
-  if (!user_fixed_color) {
-    mapping <- modifyList(mapping, default_color_aes)
-  }
-
-  layer(
-    stat = StatGradientSmooth,
-    geom = geom,
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      formula = formula,
-      xlim = xlim,
-      ylim = ylim,
-      n = n,
-      na.rm = na.rm,
-      max_it = max_it,
-      T = T,
-      L = L,
-      center = center,
-      type = type,
-      normalize = normalize,
-      tail_point = tail_point,
-      eval_point = eval_point,
-      grid = grid,
-      lineend = lineend,
-      linejoin = linejoin,
-      linemitre = linemitre,
-      arrow = arrow,
-      ...
-    )
+  construct_layer(
+    gradient_smooth_layer, call_args, list(...),
+    stat = StatGradientSmooth
   )
 }

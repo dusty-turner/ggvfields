@@ -175,33 +175,12 @@ geom_vector <- function(
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
   ) {
 
-  default_mapping <- ggplot2::aes(color = after_stat(norm))
+  call_args <- as.list(environment())
 
-  if (is.null(mapping)) {
-    mapping <- default_mapping
-  } else {
-    mapping <- modifyList(default_mapping, mapping)
-  }
-
-  layer(
-    stat = stat,
+  construct_layer(
+    vector_layer, call_args, list(...),
     geom = GeomStream,
-    mapping = mapping,
-    data = data,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      arrow = arrow,
-      center = center,
-      normalize = normalize,
-      tail_point = tail_point,
-      eval_point = eval_point,
-      L = L,
-      type = "vector",
-      ...
-    )
+    default_mapping = aes(color = after_stat(norm))
   )
 }
 
@@ -222,25 +201,11 @@ stat_vector <- function(mapping = NULL, data = NULL,
   arrow = grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")
   ) {
 
-  layer(
-    stat = StatVector,
-    geom = geom,
-    mapping = mapping,
-    data = data,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      arrow = arrow,
-      center = center,
-      normalize = normalize,
-      tail_point = tail_point,
-      eval_point = eval_point,
-      L = L,
-      type = "vector",
-      ...
-    )
+  call_args <- as.list(environment())
+
+  construct_layer(
+    vector_layer, call_args, list(...),
+    stat = StatVector
   )
 }
 
@@ -365,33 +330,12 @@ geom_vector2 <- function(
    L = NULL,
    arrow = NULL) {
 
-  default_mapping <- ggplot2::aes(length = after_stat(norm))
+  call_args <- as.list(environment())
 
-  if (is.null(mapping)) {
-    mapping <- default_mapping
-  } else {
-    mapping <- modifyList(default_mapping, mapping)
-  }
-
-  layer(
-    stat = stat,
+  construct_layer(
+    vector_layer, call_args, list(...),
     geom = GeomStream,
-    mapping = mapping,
-    data = data,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      arrow = arrow,
-      center = center,
-      normalize = TRUE,
-      tail_point = tail_point,
-      eval_point = eval_point,
-      L = L,
-      type = "vector",
-      ...
-    )
+    default_mapping = aes(length = after_stat(norm))
   )
 }
 
@@ -412,33 +356,12 @@ stat_vector2 <- function(
    L = NULL,
    arrow = NULL) {
 
-  default_mapping <- ggplot2::aes(length = after_stat(norm))
+  call_args <- as.list(environment())
 
-  if (is.null(mapping)) {
-    mapping <- default_mapping
-  } else {
-    mapping <- modifyList(default_mapping, mapping)
-  }
-
-  layer(
+  construct_layer(
+    vector_layer, call_args, list(...),
     stat = StatVector,
-    geom = geom,
-    mapping = mapping,
-    data = data,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(
-      na.rm = na.rm,
-      arrow = arrow,
-      center = center,
-      normalize = TRUE,
-      tail_point = tail_point,
-      eval_point = eval_point,
-      L = L,
-      type = "vector",
-      ...
-    )
+    default_mapping = aes(length = after_stat(norm))
   )
 }
 

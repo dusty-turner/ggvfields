@@ -194,54 +194,12 @@ geom_stream_smooth <- function(mapping = NULL,
    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
 ) {
 
-  warn_if_formula_ignored(method, !missing(formula))
+  call_args <- as.list(environment())
 
-  # Inspect the LHS of the formula. If it is cbind(xend, yend), then change it
-  lhs <- formula[[2]]
-  if (is.call(lhs) && identical(lhs[[1]], as.name("cbind"))) {
-    lhs_vars <- sapply(as.list(lhs[-1]), as.character)
-    if (all(lhs_vars %in% c("xend", "yend")) ||
-        all(lhs_vars %in% c("distance", "angle"))) {
-      # Change to use fx and fy instead
-      formula[[2]] <- substitute(cbind(fx, fy))
-    }
-  }
-
-  if (is.null(mapping)) mapping <- aes(x = x, y = y, fx = fx, fy = fy)
-
-  n <- ensure_length_two(n)
-  dots <- list(...)
-  if (!any(c("color", "colour") %in% names(dots))) {
-    dots$color <- "blue"
-  }
-
-  layer(
-    stat = stat,
-    data = data,
-    mapping = mapping,
+  construct_layer(
+    stream_smooth_layer, call_args, list(...),
     geom = GeomStream,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = c(
-      list(
-        na.rm = na.rm,
-        n = n,
-        normalize = normalize,
-        center = center,
-        formula = formula,
-        method = method,
-        xlim = xlim,
-        ylim = ylim,
-        grid = eval_points,
-        type = type,
-        lineend = lineend,
-        linejoin = linejoin,
-        linemitre = linemitre,
-        arrow = arrow
-      ),
-      dots
-    )
+    formula_supplied = !missing(formula)
   )
 }
 
@@ -271,53 +229,11 @@ stat_stream_smooth <- function(mapping = NULL,
    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
 ) {
 
-  warn_if_formula_ignored(method, !missing(formula))
+  call_args <- as.list(environment())
 
-  # Inspect the LHS of the formula. If it is cbind(xend, yend), then change it
-  lhs <- formula[[2]]
-  if (is.call(lhs) && identical(lhs[[1]], as.name("cbind"))) {
-    lhs_vars <- sapply(as.list(lhs[-1]), as.character)
-    if (all(lhs_vars %in% c("xend", "yend")) ||
-        all(lhs_vars %in% c("distance", "angle"))) {
-      # Change to use fx and fy instead
-      formula[[2]] <- substitute(cbind(fx, fy))
-    }
-  }
-
-  if (is.null(mapping)) mapping <- aes(x = x, y = y, fx = fx, fy = fy)
-
-  n <- ensure_length_two(n)
-  dots <- list(...)
-  if (!any(c("color", "colour") %in% names(dots))) {
-    dots$color <- "blue"
-  }
-
-  layer(
+  construct_layer(
+    stream_smooth_layer, call_args, list(...),
     stat = StatStreamSmooth,
-    data = data,
-    mapping = mapping,
-    geom = geom,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = c(
-      list(
-        na.rm = na.rm,
-        n = n,
-        normalize = normalize,
-        center = center,
-        formula = formula,
-        method = method,
-        xlim = xlim,
-        ylim = ylim,
-        grid = eval_points,
-        type = type,
-        lineend = lineend,
-        linejoin = linejoin,
-        linemitre = linemitre,
-        arrow = arrow
-      ),
-      dots
-    )
+    formula_supplied = !missing(formula)
   )
 }
