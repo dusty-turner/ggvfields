@@ -34,6 +34,10 @@
 * `avg_spd`, the default color of streams, is now right for streams drawn with
   `normalize = FALSE`, `center = FALSE` and a time `T`. The arc length of the
   last point was miscalculated, which made `avg_spd` too low.
+* Streams that run into a sink anywhere other than the origin now get the
+  right `avg_spd`. The solver only recognized a sink at the origin; elsewhere
+  it kept the clock running long after the stream had stopped moving, so
+  `avg_spd` came out near zero. The drawn streams are unchanged.
 * `geom_stream_smooth()` and `stat_stream_smooth()` no longer warn about
   duplicated aesthetics when given a fixed aesthetic such as `color = "red"`
   or `linewidth = 2`, and `colour = "red"` is no longer overridden by the blue

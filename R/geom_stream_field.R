@@ -805,9 +805,11 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
     list( c( fu, "l" = norm(fu) ) )
   }
 
+  # two roots stop the solver: the arc length reaching L, and the speed of the
+  # field falling to tol, which happens when the stream runs into a sink.
+  # (fun is called directly so these evaluations are not tracked as the path)
   rootfun <- function(t, u, parms) {
-    if (t > 0 && abs(u[1]) < tol && abs(u[2]) < tol) return(0)
-    u[3] - parms$L
+    c(u[3] - parms$L, norm(fun(u[1:2])) - tol)
   }
 
   # initialize the list tracking evals of fun; it is doubled when it fills up

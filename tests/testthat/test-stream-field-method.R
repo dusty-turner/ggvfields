@@ -72,6 +72,20 @@ test_that("streams stop at a sink instead of running past it", {
   }
 })
 
+test_that("lsoda stops at a sink wherever it is", {
+  # the same sink at the origin and moved to (1, 1) must give the same stream;
+  # lsoda used to stop only at sinks at the origin and otherwise ran the clock
+  # to T = 1e6, which made avg_spd nearly 0
+  at_origin <- ode_stepper(c(0.1, 0.05), function(u) -u,
+                           T = 1e6, L = 1, method = "lsoda", center = FALSE)
+  offset <- ode_stepper(c(1.1, 1.05), function(u) c(1, 1) - u,
+                        T = 1e6, L = 1, method = "lsoda", center = FALSE)
+
+  expect_lt(max(offset$t), 100)
+  expect_equal(offset$avg_spd[1], at_origin$avg_spd[1], tolerance = 1e-6)
+  expect_equal(max(offset$l), max(at_origin$l), tolerance = 1e-6)
+})
+
 test_that("rk4 follows a spiral into its sink", {
   f_spiral <- function(u) c(-u[1] - 3 * u[2], 3 * u[1] - u[2])
   rk4 <- ode_stepper(c(0.15, 0), f_spiral, T = 1e6, L = 1, method = "rk4", center = FALSE)
