@@ -63,9 +63,10 @@
 #' @param method Character. Integration method. `"lsoda"` (the default) uses
 #'   the adaptive solver from \code{deSolve::ode()}, stopping each stream when
 #'   its arc length reaches `L`. `"rk4"` (Runge-Kutta 4) and `"euler"` (Euler's
-#'   method) are fixed-step integrators: each step covers an equal share of the
-#'   arc length `L` or, when streams are run to a time `T`, an equal share of
-#'   that time.
+#'   method) step through the field in equal shares of the arc length `L` or,
+#'   when streams are run to a time `T`, of that time. A step is shortened
+#'   where the field turns sharply, so a stream that runs into a sink stops
+#'   there, short of `L`.
 #' @param grid A data frame containing precomputed grid points for seed
 #'   placement. If `NULL` (default), a regular Cartesian grid is generated based
 #'   on `xlim`, `ylim`, and `n`.
@@ -609,60 +610,112 @@ StatStreamField <- ggproto(
 #' @keywords internal
 fixed_step_path <- function(u0, fun, T = NULL, L = NULL, max_it = 1000,
                             tol = sqrt(.Machine$double.eps), method = "rk4",
-                            n_steps = 25) {
+                            n_steps = 25, max_turn = pi / 12, max_halvings = 30) {
 
   T <- T %||% Inf
   L <- L %||% Inf
 
+  empty <- data.frame(
+    t = numeric(0), x = numeric(0), y = numeric(0), d = numeric(0),
+    l = numeric(0), avg_spd = numeric(0), norm = numeric(0)
+  )
+
+  u <- as.numeric(u0)
+  nfu <- norm(fun(u))
+
+  # the field is undefined at the seed; nothing to draw
+  if (!is.finite(nfu)) return(empty)
+
+  # the seed is a sink or source; the stream does not move
+  if (nfu < tol) {
+    return(matrix_to_df_with_names(rbind(c(0, u), c(T, u)), c("t","x","y")))
+  }
+
+  # streams are integrated in whichever variable bounds them first at the
+  # starting speed. a stream run to length L is integrated in arc length s,
+  # du/ds = f(u)/|f(u)| and dt/ds = 1/|f(u)|, so each step moves the same
+  # distance and the time it takes is tracked for avg_spd. a stream run to
+  # time T is integrated in time, du/dt = f(u). the state is v = (x, y, t).
+  by_length <- L / nfu <= T
+  deriv <- if (by_length) {
+    function(v) { fv <- fun(v[1:2]); nfv <- norm(fv); c(fv / nfv, 1 / nfv) }
+  } else {
+    function(v) c(fun(v[1:2]), 1)
+  }
+
+  # each step returns the new state and the derivatives at its stages
   step <- switch(method,
-    "euler" = function(u, fu, h) u + h * fu,
-    "rk4" = function(u, fu, h) {
-      k2 <- fun(u + h/2 * fu)
-      k3 <- fun(u + h/2 * k2)
-      k4 <- fun(u + h * k3)
-      u + h/6 * (fu + 2*k2 + 2*k3 + k4)
+    "euler" = function(v, dv, h) list(v = v + h * dv, stages = list()),
+    "rk4" = function(v, dv, h) {
+      k2 <- deriv(v + h/2 * dv)
+      k3 <- deriv(v + h/2 * k2)
+      k4 <- deriv(v + h * k3)
+      list(v = v + h/6 * (dv + 2*k2 + 2*k3 + k4), stages = list(k2, k3, k4))
     }
   )
 
+  # the direction of the field may turn at most max_turn over one step, at the
+  # end of the step and at every stage. a step that crosses a sink turns the
+  # direction around, so it is retried with half the step size; the stream
+  # closes in on the sink and stops there, short of L
+  turn_ok <- function(dv, dv_new) {
+    a <- dv[1:2]; b <- dv_new[1:2]
+    na <- norm(a); nb <- norm(b)
+    if (!is.finite(nb)) return(FALSE)
+    if (na < tol || nb < tol) return(TRUE)
+    sum(a * b) / (na * nb) >= cos(max_turn)
+  }
+
+  # the field has stopped moving: a sink in time, or 1/|f| blowing up in length
+  stalled <- function(dv) {
+    if (by_length) dv[3] > 1 / tol else norm(dv[1:2]) < tol
+  }
+
+  h0 <- if (by_length) L / n_steps else T / n_steps
+  h <- h0
+  v <- c(u, 0)
+  dv <- deriv(v)
+  l <- 0; k <- 1
+
   path <- matrix(NA_real_, nrow = max_it + 1, ncol = 3)
-  u <- as.numeric(u0); t <- 0; l <- 0; k <- 1
-  path[1,] <- c(t, u)
+  path[1,] <- c(0, u)
 
-  # each step covers arc length L/n_steps or time T/n_steps, whichever is
-  # shorter, so streams run to L take equal length steps and streams run to T
-  # take equal time steps
-  while (l < L && t < T && k <= max_it) {
+  while (l < L && v[3] < T && k <= max_it) {
 
-    fu <- fun(u)
-    nfu <- norm(fu)
+    # land the last step of a time-bounded stream exactly on T
+    if (!by_length) h <- min(h, T - v[3])
 
-    # the field is undefined here; nothing to draw if this is the seed point
-    if (!is.finite(nfu)) break
-
-    # the stream is in a sink or source
-    if (nfu < tol) {
-      if (k == 1) { k <- 2; path[2,] <- c(T, u) }
-      break
+    accepted <- FALSE
+    for (i in 0:max_halvings) {
+      stepped <- step(v, dv, h)
+      v_new <- stepped$v
+      if (all(is.finite(v_new))) {
+        dv_new <- deriv(v_new)
+        checks <- c(stepped$stages, list(dv_new))
+        if (all(is.finite(dv_new)) && all(vapply(checks, turn_ok, logical(1), dv = dv))) {
+          accepted <- TRUE
+          break
+        }
+      }
+      h <- h / 2
     }
 
-    h <- min(L / n_steps / nfu, T / n_steps)
-    u_new <- step(u, fu, h)
-    if (!all(is.finite(u_new))) break
+    # no step size works: the stream has reached a sink or an undefined point
+    if (!accepted) break
 
-    l <- l + norm(u_new - u)
-    t <- t + h
-    u <- u_new
+    l <- l + norm(v_new[1:2] - v[1:2])
+    v <- v_new
+    dv <- dv_new
     k <- k + 1
-    path[k,] <- c(t, u)
+    path[k,] <- c(v[3], v[1:2])
+
+    if (stalled(dv)) break
+
+    h <- min(2 * h, h0)
 
   }
 
-  if (k == 1) {
-    return(data.frame(
-      t = numeric(0), x = numeric(0), y = numeric(0), d = numeric(0),
-      l = numeric(0), avg_spd = numeric(0), norm = numeric(0)
-    ))
-  }
+  if (k == 1) return(empty)
 
   matrix_to_df_with_names(path[seq_len(k), , drop = FALSE], c("t","x","y"))
 

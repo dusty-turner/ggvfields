@@ -211,9 +211,10 @@ on \code{xlim}, \code{ylim}, and \code{n}.}
 \item{method}{Character. Integration method. \code{"lsoda"} (the default) uses
 the adaptive solver from \code{deSolve::ode()}, stopping each stream when
 its arc length reaches \code{L}. \code{"rk4"} (Runge-Kutta 4) and \code{"euler"} (Euler's
-method) are fixed-step integrators: each step covers an equal share of the
-arc length \code{L} or, when streams are run to a time \code{T}, an equal share of
-that time.}
+method) step through the field in equal shares of the arc length \code{L} or,
+when streams are run to a time \code{T}, of that time. A step is shortened
+where the field turns sharply, so a stream that runs into a sink stops
+there, short of \code{L}.}
 
 \item{lineend}{Line end style (round, butt, square).}
 
