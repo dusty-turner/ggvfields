@@ -32,7 +32,7 @@ geom_stream_field(
   tail_point = FALSE,
   eval_point = FALSE,
   grid = NULL,
-  method = "rk4",
+  method = "lsoda",
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
@@ -63,7 +63,7 @@ stat_stream_field(
   tail_point = FALSE,
   eval_point = FALSE,
   grid = NULL,
-  method = "rk4",
+  method = "lsoda",
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
@@ -95,7 +95,7 @@ geom_stream_field2(
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
-  method = "rk4"
+  method = "lsoda"
 )
 
 stat_stream_field2(
@@ -123,7 +123,7 @@ stat_stream_field2(
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
-  method = "rk4"
+  method = "lsoda"
 )
 }
 \arguments{
@@ -208,11 +208,12 @@ where the field was computed. Defaults to \code{FALSE}.}
 placement. If \code{NULL} (default), a regular Cartesian grid is generated based
 on \code{xlim}, \code{ylim}, and \code{n}.}
 
-\item{method}{Character. Integration method. \code{"rk4"} (Runge-Kutta 4, the
-default) and \code{"euler"} (Euler's method) are fixed-step integrators: each
-step covers an equal share of the arc length \code{L} or, when streams are run
-to a time \code{T}, an equal share of that time. \code{"lsoda"} uses the adaptive
-solver from \code{deSolve::ode()}.}
+\item{method}{Character. Integration method. \code{"lsoda"} (the default) uses
+the adaptive solver from \code{deSolve::ode()}, stopping each stream when
+its arc length reaches \code{L}. \code{"rk4"} (Runge-Kutta 4) and \code{"euler"} (Euler's
+method) are fixed-step integrators: each step covers an equal share of the
+arc length \code{L} or, when streams are run to a time \code{T}, an equal share of
+that time.}
 
 \item{lineend}{Line end style (round, butt, square).}
 

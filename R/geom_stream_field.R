@@ -60,11 +60,12 @@
 #'   all streamlines are cropped to the duration it takes for the fastest one to reach
 #'   the length `L`, allowing for variations in arc lengths that reflect differences in
 #'   flow speeds.
-#' @param method Character. Integration method. `"rk4"` (Runge-Kutta 4, the
-#'   default) and `"euler"` (Euler's method) are fixed-step integrators: each
-#'   step covers an equal share of the arc length `L` or, when streams are run
-#'   to a time `T`, an equal share of that time. `"lsoda"` uses the adaptive
-#'   solver from \code{deSolve::ode()}.
+#' @param method Character. Integration method. `"lsoda"` (the default) uses
+#'   the adaptive solver from \code{deSolve::ode()}, stopping each stream when
+#'   its arc length reaches `L`. `"rk4"` (Runge-Kutta 4) and `"euler"` (Euler's
+#'   method) are fixed-step integrators: each step covers an equal share of the
+#'   arc length `L` or, when streams are run to a time `T`, an equal share of
+#'   that time.
 #' @param grid A data frame containing precomputed grid points for seed
 #'   placement. If `NULL` (default), a regular Cartesian grid is generated based
 #'   on `xlim`, `ylim`, and `n`.
@@ -246,7 +247,7 @@ geom_stream_field <- function(
     tail_point = FALSE,
     eval_point = FALSE,
     grid = NULL,
-    method = "rk4",
+    method = "lsoda",
     lineend = "butt",
     linejoin = "round",
     linemitre = 10,
@@ -288,7 +289,7 @@ stat_stream_field <- function(
     tail_point = FALSE,
     eval_point = FALSE,
     grid = NULL,
-    method = "rk4",
+    method = "lsoda",
     lineend = "butt",
     linejoin = "round",
     linemitre = 10,
@@ -332,7 +333,7 @@ geom_stream_field2 <- function(
     lineend = "butt",
     linejoin = "round",
     linemitre = 10,
-    method = "rk4"
+    method = "lsoda"
     ) {
 
   call_args <- as.list(environment())
@@ -370,7 +371,7 @@ stat_stream_field2 <- function(
     lineend = "butt",
     linejoin = "round",
     linemitre = 10,
-    method = "rk4"
+    method = "lsoda"
     ) {
 
   call_args <- as.list(environment())

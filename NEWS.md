@@ -6,12 +6,11 @@
   `geom_stream_field2()` and `stat_stream_field2()` now selects the integrator.
   It was documented (`"rk4"` by default, `"euler"` available) but ignored, and
   streams were always computed with the adaptive `lsoda` solver from deSolve.
-  `"rk4"` and `"euler"` are now real fixed-step integrators: each step covers
-  an equal share of the arc length `L`, or of the time `T` when streams are
-  run to a time. The previous behavior is available as `method = "lsoda"`.
-  Because `"rk4"` is the default, default stream plots are computed
-  differently from 1.0.1; they look the same, are slightly more accurate, and
-  each stream is made of more points. An unknown `method` is now an error.
+  The default is now documented as `"lsoda"`, so default stream plots are
+  unchanged from 1.0.1. `"rk4"` and `"euler"` are now real fixed-step
+  integrators: each step covers an equal share of the arc length `L`, or of
+  the time `T` when streams are run to a time. An unknown `method` is now an
+  error.
 * Supplying `formula` to `geom_stream_smooth()`, `stat_stream_smooth()`,
   `geom_vector_smooth()` or `stat_vector_smooth()` with the default
   `method = "gam"` now warns. The gam smoothers always fit `fx` and `fy` with

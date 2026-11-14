@@ -11,8 +11,8 @@ test_that("method selects the integrator", {
   expect_false(identical(stream_data(method = "rk4"), stream_data(method = "euler")))
   expect_false(identical(stream_data(method = "rk4"), stream_data(method = "lsoda")))
 
-  # rk4 is the default
-  expect_identical(stream_data(), stream_data(method = "rk4"))
+  # lsoda is the default
+  expect_identical(stream_data(), stream_data(method = "lsoda"))
 })
 
 test_that("an unknown method is an error", {
