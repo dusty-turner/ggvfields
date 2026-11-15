@@ -127,31 +127,19 @@ ggplot() +
 ## IV. The Dipole
 
 The classic electromagnetic dipole: a positive charge and a negative charge.
-Field lines arc gracefully from source to sink. The field is written out by
-hand, softened near each charge and log-scaled like `efield_maker(log =
-TRUE)`, so the streams stay smooth.
+`efield_maker()` builds the field from Coulomb's law, and `log = TRUE` tames
+its strength near the charges. Field lines arc from the source and end where
+they reach the sink.
 
 ```{r dipole, fig.height = 7}
-dipole <- function(v) {
-  pos <- rbind(c(-1, -1), c(1, 1))
-  q <- c(-1, 1)
-  Fx <- 0; Fy <- 0
-  for (i in 1:2) {
-    dx <- v[1] - pos[i, 1]; dy <- v[2] - pos[i, 2]
-    r <- max(sqrt(dx^2 + dy^2), 0.4)
-    Fx <- Fx + q[i] * dx / r^3
-    Fy <- Fy + q[i] * dy / r^3
-  }
-  mag <- sqrt(Fx^2 + Fy^2)
-  log(mag + 1) / (mag + 1e-8) * c(Fx, Fy)
-}
+dipole <- efield_maker(log = TRUE)
 
 ggplot() +
   geom_stream_field(fun = dipole,
                     xlim = c(-3, 3), ylim = c(-3, 3),
                     n = 12, L = 2, center = TRUE) +
   scale_color_gradientn(
-    colors = c("#f7fcf5", "#c7e9c0", "#74c476", "#238b45", "#00441b"),
+    colors = c("#c7e9c0", "#74c476", "#238b45", "#00441b"),
     guide = "none"
   ) +
   annotate("point", x = c(-1, 1), y = c(-1, 1), size = 5,
@@ -372,7 +360,7 @@ stretching <- function(v) {
 ggplot() +
   geom_vector_field2(fun = stretching,
                      xlim = c(-pi, pi), ylim = c(-pi, pi),
-                     n = 16, normalize = FALSE) +
+                     n = 16) +
   coord_equal() +
   theme_void() +
   theme(plot.background = element_rect(fill = "#faf9f6", color = NA))
@@ -383,7 +371,10 @@ ggplot() +
 ## XII. Smoothing the Storm
 
 Real-world data is noisy. `geom_vector_smooth()` fits a model -- here a GAM --
-to recover the underlying flow from scattered, imperfect measurements.
+to recover the underlying flow from scattered, imperfect measurements. Each
+wedge is a 90% prediction interval for the direction of the flow: narrow where
+the current is strong, and opening wide in the calm eye of the storm, where
+the noise can turn a measurement any way.
 
 ```{r smoothing, fig.height = 7}
 # Generate noisy observations from a known field
@@ -394,20 +385,17 @@ pts <- data.frame(
   y = rnorm(n_obs, 0, 1.2)
 )
 true_field <- function(v) c(-v[2], v[1])  # pure rotation
-pts$fx <- sapply(1:n_obs, \(i) true_field(c(pts$x[i], pts$y[i]))[1]) + rnorm(n_obs, 0, 1.5)
-pts$fy <- sapply(1:n_obs, \(i) true_field(c(pts$x[i], pts$y[i]))[2]) + rnorm(n_obs, 0, 1.5)
+pts$fx <- sapply(1:n_obs, \(i) true_field(c(pts$x[i], pts$y[i]))[1]) + rnorm(n_obs, 0, 0.5)
+pts$fy <- sapply(1:n_obs, \(i) true_field(c(pts$x[i], pts$y[i]))[2]) + rnorm(n_obs, 0, 0.5)
 
 ggplot(pts, aes(x = x, y = y, fx = fx, fy = fy)) +
   geom_vector_smooth(method = "gam", se = TRUE, pi_type = "wedge",
                      conf_level = 0.90, n = 10) +
   geom_vector2(color = "grey50", alpha = 0.4) +
-  scale_color_gradientn(
-    colors = c("#48cae4", "#0077b6", "#023e8a"),
-    guide = "none"
-  ) +
+  scale_length_continuous(guide = "none") +
   coord_equal() +
   labs(title = "GAM-Smoothed Flow from Noisy Observations",
-       subtitle = "Raw observations shown in grey") +
+       subtitle = "Raw observations in grey; wedges show 90% prediction intervals") +
   theme_minimal(base_size = 13) +
   theme(
     plot.background = element_rect(fill = "#caf0f8", color = NA),
@@ -810,7 +798,7 @@ source_sink <- function(v) {
 ggplot() +
   geom_vector_field2(fun = source_sink,
                      xlim = c(-4, 4), ylim = c(-4, 4),
-                     n = 16, normalize = FALSE) +
+                     n = 16) +
   scale_length_continuous(max_range = 0.4) +
   annotate("point", x = c(-1.5, 1.5), y = c(0, 0),
            color = c("#9b2226", "#005f73"), size = 5) +
@@ -891,6 +879,59 @@ ggplot() +
   coord_equal() +
   theme_void() +
   theme(plot.background = element_rect(fill = "#001427", color = NA))
+```
+
+---
+
+## XXVI. Speed as Length
+
+`geom_stream_field2()` grows every stream until the fastest one reaches the
+grid spacing, then stops them all at that same moment. Each stream's length
+is the distance its seed travels in that time, so this vortex shows its fast
+ring as long arcs and its still center and edges as dots.
+
+```{r speed-as-length, fig.height = 7}
+vortex <- function(v) {
+  c(-v[2], v[1]) * exp(-sum(v^2) / 2)
+}
+
+ggplot() +
+  geom_stream_field2(fun = vortex,
+                     xlim = c(-3, 3), ylim = c(-3, 3), n = 18,
+                     color = "#ffd166", linewidth = 0.6) +
+  coord_equal() +
+  theme_void() +
+  theme(plot.background = element_rect(fill = "#073b4c", color = NA))
+```
+
+---
+
+## XXVII. Kriging the Wind
+
+Weather stations report wind as a heading and a speed. Mapped to `angle` and
+`norm`, they draw as vectors directly. `method = "kriging"` interpolates the
+wind at new locations, and each ellipse is the 95% prediction region for the
+tip of the interpolated arrow.
+
+```{r kriging-wind, fig.height = 5}
+set.seed(7)
+n_st <- 90
+stations <- data.frame(x = runif(n_st, 0, 10), y = runif(n_st, 0, 6))
+u <- 1 + 0.6 * sin(stations$y)
+v <- 0.8 * cos(stations$x / 2)
+stations$heading <- atan2(v, u) + rnorm(n_st, 0, 0.15)   # radians
+stations$speed <- sqrt(u^2 + v^2) * exp(rnorm(n_st, 0, 0.1))
+
+targets <- expand.grid(x = c(1.5, 5, 8.5), y = c(1, 3, 5))
+
+ggplot(stations, aes(x, y, angle = heading, norm = speed)) +
+  geom_vector(color = "#adb5bd", center = FALSE, normalize = FALSE,
+              linewidth = 0.4) +
+  geom_vector_smooth(method = "kriging", eval_points = targets,
+                     color = "#d00000", linewidth = 1) +
+  coord_equal() +
+  theme_void() +
+  theme(plot.background = element_rect(fill = "#fff8f0", color = NA))
 ```
 
 ---
