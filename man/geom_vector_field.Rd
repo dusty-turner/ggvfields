@@ -26,6 +26,7 @@ geom_vector_field(
   tail_point = FALSE,
   eval_point = FALSE,
   grid = NULL,
+  domain = NULL,
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
@@ -52,6 +53,7 @@ stat_vector_field(
   tail_point = FALSE,
   eval_point = FALSE,
   grid = NULL,
+  domain = NULL,
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
@@ -76,6 +78,7 @@ geom_vector_field2(
   tail_point = TRUE,
   eval_point = FALSE,
   grid = NULL,
+  domain = NULL,
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
@@ -100,6 +103,7 @@ stat_vector_field2(
   tail_point = TRUE,
   eval_point = FALSE,
   grid = NULL,
+  domain = NULL,
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
@@ -166,6 +170,13 @@ centering or normalization is applied.}
 \item{grid}{A data frame containing precomputed grid points for seed
 placement. If \code{NULL} (default), a regular Cartesian grid is generated based
 on \code{xlim}, \code{ylim}, and \code{n}.}
+
+\item{domain}{A function that restricts the field to a region, or \code{NULL}
+(the default) for the whole rectangle \code{xlim} by \code{ylim}. It is called like
+\code{fun}, with a point \code{c(x, y)}, and returns \code{TRUE} for points in the
+region. Seeds outside the region are dropped, and the field is taken to
+be undefined outside it, so streams stop at its boundary. Use it, for
+example, when \code{fun} is only defined on part of the plot.}
 
 \item{lineend}{Line end style (round, butt, square).}
 

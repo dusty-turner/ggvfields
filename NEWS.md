@@ -10,6 +10,13 @@
   smooth uses at most half as many basis functions as there are locations.
   With fewer than 10 locations, or data without noise, `fx` and `fy` are fitted
   separately as before.
+## New features
+
+* The stream, vector and gradient field layers take a `domain` function that
+  restricts the field to a region: seeds outside it are dropped and streams
+  stop at its boundary, so a field only defined on part of the plot can be
+  drawn there (#37).
+
 ## Bug fixes
 
 * `scale_length_continuous()` with a transformation that makes some values

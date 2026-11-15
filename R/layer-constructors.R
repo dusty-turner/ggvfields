@@ -7,6 +7,9 @@
 # wrapper's `as.list(environment())` and `dots` its `list(...)`. Values given in
 # `...` here are added to, or take the place of, the wrapper's arguments.
 construct_layer <- function(constructor, args, dots, ...) {
+  if (!is.null(args$domain) && !is.function(args$domain)) {
+    cli::cli_abort("{.arg domain} must be a function or {.code NULL}.")
+  }
   args <- c(args, dots)
   fixed <- list(...)
   args[names(fixed)] <- fixed

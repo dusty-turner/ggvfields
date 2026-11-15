@@ -86,6 +86,12 @@
 #' @param grid A data frame containing precomputed grid points for seed
 #'   placement. If `NULL` (default), a regular Cartesian grid is generated based
 #'   on `xlim`, `ylim`, and `n`.
+#' @param domain A function that restricts the field to a region, or `NULL`
+#'   (the default) for the whole rectangle `xlim` by `ylim`. It is called like
+#'   `fun`, with a point `c(x, y)`, and returns `TRUE` for points in the
+#'   region. Seeds outside the region are dropped, and the field is taken to
+#'   be undefined outside it, so streams stop at its boundary. Use it, for
+#'   example, when `fun` is only defined on part of the plot.
 #' @param arrow A \code{grid::arrow()} specification for adding arrowheads to the
 #'   streamlines. Defaults to a closed arrow with a 30° angle and length `0.02`
 #'   npc.
@@ -269,6 +275,7 @@ geom_stream_field <- function(
     tail_point = FALSE,
     eval_point = FALSE,
     grid = NULL,
+    domain = NULL,
     method = "rk4",
     lineend = "butt",
     linejoin = "round",
@@ -311,6 +318,7 @@ stat_stream_field <- function(
     tail_point = FALSE,
     eval_point = FALSE,
     grid = NULL,
+    domain = NULL,
     method = "rk4",
     lineend = "butt",
     linejoin = "round",
@@ -350,6 +358,7 @@ geom_stream_field2 <- function(
     tail_point = TRUE,
     eval_point = FALSE,
     grid = NULL,
+    domain = NULL,
     lineend = "butt",
     linejoin = "round",
     linemitre = 10,
@@ -388,6 +397,7 @@ stat_stream_field2 <- function(
     tail_point = TRUE,
     eval_point = FALSE,
     grid = NULL,
+    domain = NULL,
     lineend = "butt",
     linejoin = "round",
     linemitre = 10,
@@ -441,7 +451,8 @@ StatStreamField <- ggproto(
   compute_group = function(data, scales, fun, xlim, ylim, n,
                            method = "rk4", max_it = 1000, tol = sqrt(.Machine$double.eps),
                            T = NULL, L = NULL,
-                           center, type, normalize, args = NULL, grid, ...) {
+                           center, type, normalize, args = NULL, grid,
+                           domain = NULL, ...) {
 
     ## pick the right limits.  may need updating but currently prioritizing
     # limit specified by user
@@ -520,11 +531,21 @@ StatStreamField <- ggproto(
       }
     }
 
+    # restrict the field to its domain: seeds outside it are dropped, and the
+    # field is undefined outside it, so streams stop at its boundary
+    if (!is.null(domain)) {
+      in_domain <- function(u) isTRUE(as.logical(domain(u))[1])
+      grid <- grid[vapply(seq_len(nrow(grid)), function(i) in_domain(grid[i, ]), logical(1)), , drop = FALSE]
+      unrestricted <- fun
+      fun <- function(v) if (in_domain(v)) unrestricted(v) else c(NaN, NaN)
+      if (nrow(grid) == 0) return(data.frame(x = numeric(0), y = numeric(0)))
+    }
+
     # initialize the data frame
     list_of_streams <- vector(mode = "list", length = nrow(grid))
     # iterate computing streams/vectors
 
-    for (i in 1:nrow(grid)) {
+    for (i in seq_len(nrow(grid))) {
 
       # compute the stream for the current grid point using ode_stepper()
       if (type == "vector") {
@@ -603,7 +624,7 @@ StatStreamField <- ggproto(
       smallest_t <- times_to_L_by_stream[fastest_stream_id]
 
       # go back through grid cropping time to T = fastest_t
-      for (i in 1:nrow(grid)) {
+      for (i in seq_len(nrow(grid))) {
         if (is.null(list_of_streams[[i]])) next
         stream <- crop_stream_time(
           list_of_streams[[i]],

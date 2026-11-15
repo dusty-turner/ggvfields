@@ -37,7 +37,7 @@ pairs <- list(
       list(fun = f_vec, xlim = c(0, 1), ylim = c(0, 2), n = c(3, 4), args = list(a = 1),
            max_it = 50, tol = 1e-3, T = 2, L = 3, center = FALSE, type = "vector",
            normalize = FALSE, tail_point = TRUE, eval_point = TRUE, grid = pts,
-           method = "euler", arrow = ar),
+           domain = function(u) TRUE, method = "euler", arrow = ar),
       line_args
     )
   ),

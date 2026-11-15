@@ -32,6 +32,7 @@ geom_stream_field(
   tail_point = FALSE,
   eval_point = FALSE,
   grid = NULL,
+  domain = NULL,
   method = "rk4",
   lineend = "butt",
   linejoin = "round",
@@ -63,6 +64,7 @@ stat_stream_field(
   tail_point = FALSE,
   eval_point = FALSE,
   grid = NULL,
+  domain = NULL,
   method = "rk4",
   lineend = "butt",
   linejoin = "round",
@@ -92,6 +94,7 @@ geom_stream_field2(
   tail_point = TRUE,
   eval_point = FALSE,
   grid = NULL,
+  domain = NULL,
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
@@ -120,6 +123,7 @@ stat_stream_field2(
   tail_point = TRUE,
   eval_point = FALSE,
   grid = NULL,
+  domain = NULL,
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
@@ -205,6 +209,13 @@ where the field was computed. Defaults to \code{FALSE}.}
 \item{grid}{A data frame containing precomputed grid points for seed
 placement. If \code{NULL} (default), a regular Cartesian grid is generated based
 on \code{xlim}, \code{ylim}, and \code{n}.}
+
+\item{domain}{A function that restricts the field to a region, or \code{NULL}
+(the default) for the whole rectangle \code{xlim} by \code{ylim}. It is called like
+\code{fun}, with a point \code{c(x, y)}, and returns \code{TRUE} for points in the
+region. Seeds outside the region are dropped, and the field is taken to
+be undefined outside it, so streams stop at its boundary. Use it, for
+example, when \code{fun} is only defined on part of the plot.}
 
 \item{method}{Character. Integration method. \code{"rk4"} (Runge-Kutta 4, the
 default) and \code{"euler"} (Euler's method) step through the field in equal
