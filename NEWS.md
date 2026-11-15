@@ -97,6 +97,9 @@
 
 ## Bug fixes
 
+* `geom_vector_smooth()` takes a fixed or mapped `colour` for its vectors
+  (blue by default), and keeps a fixed `linewidth` when there is a single
+  evaluation point.
 * `geom_gradient_smooth()` keeps a color mapping supplied in `mapping`, and
   every field layer, including `geom_gradient_field2()`, gives the same error
   for an unknown `type`.

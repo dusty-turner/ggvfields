@@ -573,6 +573,7 @@ GeomVectorSmooth <- ggproto(
   GeomSegment,
   required_aes = c("x", "y", "xend", "yend"),
   default_aes = aes(
+    colour = "#3366FF",
     linewidth = 0.5,
     linetype = 1, alpha = 1,
     fill = NULL
@@ -586,13 +587,6 @@ GeomVectorSmooth <- ggproto(
   draw_panel = function(data, panel_params, coord, arrow = NULL, se = TRUE,
                         se.circle = FALSE, eval_points, pi_type) {
 
-    if (is.null(data$colour)) {
-      data$colour <- "#3366FF"
-    }
-
-    if (nrow(data) == 1) {
-      data$linewidth <- .5
-    }
 
     grobs <- list()
 

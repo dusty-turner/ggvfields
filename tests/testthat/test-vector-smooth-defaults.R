@@ -29,3 +29,28 @@ test_that("xlim and ylim set the range of the grid", {
   d <- smooth_layer(n = 5)
   expect_equal(range(d$x), range(smooth_data$x))
 })
+
+test_that("geom_vector_smooth() takes a fixed or mapped colour and a fixed linewidth", {
+  set.seed(3)
+  d <- data.frame(x = runif(40), y = runif(40))
+  d$fx <- 1 + rnorm(40, 0, .1)
+  d$fy <- rnorm(40, 0, .1)
+  d$g <- rep(c("a", "b"), 20)
+
+  blue <- layer_data(ggplot(d, aes(x, y, fx = fx, fy = fy)) + geom_vector_smooth(n = 3))
+  expect_true(all(blue$colour == "#3366FF"))
+
+  red <- expect_no_warning(layer_data(
+    ggplot(d, aes(x, y, fx = fx, fy = fy)) +
+      geom_vector_smooth(n = 3, colour = "red", linewidth = 2)
+  ))
+  expect_true(all(red$colour == "red"))
+
+  one <- layer_data(ggplot(d, aes(x, y, fx = fx, fy = fy)) +
+    geom_vector_smooth(eval_points = data.frame(x = .5, y = .5), linewidth = 2))
+  expect_equal(one$linewidth, 2)
+
+  mapped <- layer_data(ggplot(d, aes(x, y, fx = fx, fy = fy)) +
+    geom_vector_smooth(aes(colour = g), method = "lm", n = 3))
+  expect_length(unique(mapped$colour), 2)
+})
