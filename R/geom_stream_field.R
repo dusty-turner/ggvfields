@@ -704,7 +704,14 @@ fixed_step_path <- function(u0, fun, T = NULL, L = NULL, max_it = 1000,
   path <- matrix(NA_real_, nrow = max_it + 1, ncol = 3)
   path[1,] <- c(0, u)
 
-  while (l < L && v[3] < T && k <= max_it) {
+  # a stream within a relative 1e-9 of L or T has arrived: the sum of the step
+  # lengths (or times) can fall a rounding error short, and another full step
+  # would be cropped back to a segment of length ~1e-16, along which the
+  # arrowhead would then point in an arbitrary direction
+  L_end <- L * (1 - 1e-9)
+  T_end <- T * (1 - 1e-9)
+
+  while (l < L_end && v[3] < T_end && k <= max_it) {
 
     # land the last step of a time-bounded stream exactly on T
     if (!by_length) h <- min(h, T - v[3])

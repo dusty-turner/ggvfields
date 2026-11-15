@@ -171,3 +171,22 @@ test_that("avg_spd of a stream run to a time T is its length over T", {
     expect_equal(s$avg_spd[1], max(s$l) / 50, info = m)
   }
 })
+
+test_that("streams of a constant field match its vectors (no sliver end segments)", {
+  # the paper's Fig. 2.15: for a constant field, streams and vectors are the
+  # same picture. rounding could leave a ~1e-16 final segment that turned the
+  # arrowhead in an arbitrary direction
+  for (f in list(c(3, 4), c(2, 1))) {
+    for (center in c(TRUE, FALSE)) {
+      d <- layer_data(ggplot() + geom_stream_field(fun = function(u) f, center = center))
+      for (s in split(d, d$group)) {
+        s <- s[order(s$t), ]
+        seg <- sqrt(diff(s$x)^2 + diff(s$y)^2)
+        expect_gt(min(seg), 1e-6)
+        # every segment points along the field
+        dir <- cbind(diff(s$x), diff(s$y)) / seg
+        expect_equal(unname(dir[nrow(dir), ]), f / sqrt(sum(f^2)), tolerance = 1e-8)
+      }
+    }
+  }
+})
