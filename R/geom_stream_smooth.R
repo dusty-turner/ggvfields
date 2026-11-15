@@ -16,8 +16,9 @@
 #'   **Required:** Must include **`x`** and **`y`**; vector displacements are defined
 #'   by **`fx`** and **`fy`**.
 #' @param data A data frame containing the raw vector data.
-#' @param stat The statistical transformation to use on the data. Defaults to
-#'   `"vector_smooth"`.
+#' @param stat The statistical transformation. `geom_stream_smooth()` always
+#'   uses [StatStreamSmooth] and `geom_gradient_smooth()` [StatGradientSmooth],
+#'   which fit the model; another value is ignored with a warning.
 #' @param position Position adjustment, either as a string or the result of a
 #'   position adjustment function.
 #' @param formula A formula specifying the multivariate linear model used for
@@ -199,8 +200,11 @@ geom_stream_smooth <- function(mapping = NULL,
 
   call_args <- as.list(environment())
 
+  warn_if_stat_ignored(stat, StatStreamSmooth, "stream_smooth", "geom_stream_smooth")
+
   construct_layer(
     stream_smooth_layer, call_args, list(...),
+    stat = StatStreamSmooth,
     geom = GeomStream,
     formula_supplied = !missing(formula)
   )

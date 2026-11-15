@@ -61,8 +61,9 @@ by \strong{\code{fx}} and \strong{\code{fy}}.}
 
 \item{data}{A data frame containing the raw vector data.}
 
-\item{stat}{The statistical transformation to use on the data. Defaults to
-\code{"vector_smooth"}.}
+\item{stat}{The statistical transformation. \code{geom_stream_smooth()} always
+uses \link{StatStreamSmooth} and \code{geom_gradient_smooth()} \link{StatGradientSmooth},
+which fit the model; another value is ignored with a warning.}
 
 \item{position}{Position adjustment, either as a string or the result of a
 position adjustment function.}

@@ -77,3 +77,14 @@ grid_spacing <- function(grid) {
   s <- stats::median(nn)
   if (is.finite(s) && s > 0) s else NULL
 }
+
+# the smoothing layers always use their own stat, which fits the model; warn
+# when a different stat is supplied, since it is not used
+warn_if_stat_ignored <- function(stat, own, own_name, fn) {
+  if (is.null(stat) || identical(stat, own) || identical(stat, own_name)) return(invisible())
+  cli::cli_warn(c(
+    "{.fn {fn}} always uses {.cls {class(own)[1]}}, which fits the model.",
+    "i" = "The supplied {.arg stat} is ignored."
+  ))
+  invisible()
+}

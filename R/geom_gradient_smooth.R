@@ -122,8 +122,11 @@ geom_gradient_smooth <- function(
 
   call_args <- as.list(environment())
 
+  warn_if_stat_ignored(stat, StatGradientSmooth, "gradient_smooth", "geom_gradient_smooth")
+
   construct_layer(
     gradient_smooth_layer, call_args, list(...),
+    stat = StatGradientSmooth,
     geom = GeomStream
   )
 }

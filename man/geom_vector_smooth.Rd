@@ -58,8 +58,9 @@ stat_vector_smooth(
 
 \item{data}{A data frame containing the raw vector data.}
 
-\item{stat}{The statistical transformation to use on the data (default:
-\code{"vector_smooth"}).}
+\item{stat}{The statistical transformation. \code{geom_vector_smooth()} always
+uses \code{StatVectorSmooth}, which fits the model; another value is ignored
+with a warning.}
 
 \item{position}{Position adjustment, either as a string or the result of a
 position adjustment function.}

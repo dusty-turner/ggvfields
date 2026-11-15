@@ -14,8 +14,9 @@
 #'   **Required:** Must include **`x`** and **`y`**; vector displacements are defined by
 #'   **`fx`** and **`fy`**.
 #' @param data A data frame containing the raw vector data.
-#' @param stat The statistical transformation to use on the data (default:
-#'   `"vector_smooth"`).
+#' @param stat The statistical transformation. `geom_vector_smooth()` always
+#'   uses `StatVectorSmooth`, which fits the model; another value is ignored
+#'   with a warning.
 #' @param position Position adjustment, either as a string or the result of a
 #'   position adjustment function.
 #' @param n An integer vector specifying the number of grid points along each
@@ -182,7 +183,9 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
 
   call_args <- as.list(environment())
 
-  # the layer always uses StatVectorSmooth; `stat` is not used
+  # the layer always uses StatVectorSmooth, which fits the model
+  warn_if_stat_ignored(stat, StatVectorSmooth, "vector_smooth", "geom_vector_smooth")
+
   construct_layer(
     vector_smooth_layer, call_args, list(...),
     stat = StatVectorSmooth,

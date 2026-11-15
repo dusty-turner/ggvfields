@@ -89,6 +89,10 @@
 
 ## Bug fixes
 
+* `geom_stream_smooth()`, `geom_gradient_smooth()` and `geom_vector_smooth()`
+  always use the stat that fits their model; a different `stat` is ignored
+  with a warning.
+
 * Centered streams (`center = TRUE`, the default) are drawn when a stream can
   move only one way from its seed, for example on the edge of the domain
   where the field is defined.
