@@ -9,6 +9,7 @@ several functions gain arguments; see NEWS.md for the full list.
 * local: Windows 11, R 4.5.2
 * GitHub Actions: macOS (R release), Windows (R release), Ubuntu (R devel,
   release and oldrel-1)
+* win-builder: Windows, R devel
 
 ## R CMD check results
 
