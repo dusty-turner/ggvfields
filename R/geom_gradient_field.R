@@ -10,7 +10,9 @@
 #'
 #' Two variants are provided:
 #'
-#' - **geom_gradient_field()** uses a default mapping that sets `color = after_stat(norm)`.
+#' - **geom_gradient_field()** maps color to the size of the gradient:
+#' `color = after_stat(norm)` for vectors (the default) and `color =
+#' after_stat(avg_spd)` for streams.
 #' - **geom_gradient_field2()** leaves `color` unmapped and marks each seed
 #' point with a dot. With `type = "vector"` it sets `length = after_stat(norm)`,
 #' so vectors are scaled by the size of the gradient, like
@@ -23,8 +25,8 @@
 #' @param mapping A set of aesthetic mappings created by \code{ggplot2::aes()}.
 #'   Additional aesthetics such as `color`, `size`, `linetype`, and `alpha` can
 #'   be defined. In
-#'   **geom_gradient_field** the default mapping includes `color = after_stat(norm)`,
-#'   whereas in **geom_gradient_field2** with `type = "vector"` it includes
+#'   **geom_gradient_field** the default mapping is `color = after_stat(norm)`
+#'   for vectors and `color = after_stat(avg_spd)` for streams, whereas in **geom_gradient_field2** with `type = "vector"` it includes
 #'   `length = after_stat(norm)`.
 #' @param data A data frame containing the input data.
 #' @param stat The statistical transformation to use on the data for this layer.
@@ -47,8 +49,9 @@
 #'   each axis. Higher values produce a denser gradient field. Defaults to `11`.
 #' @param center Logical. If `TRUE`, centers the seed points so that the
 #'   original (x, y) becomes the midpoint.
-#' @param normalize Logical. If `TRUE`, gradient vectors are normalized based on
-#'   grid spacing. Defaults to `TRUE`.
+#' @param normalize Logical. If `TRUE` (the default), every vector or stream
+#'   has the same length `L`. If `FALSE`, lengths show the size of the
+#'   gradient; see [geom_stream_field()] for how streams are then run.
 #' @param tail_point Logical. If `TRUE`, a point is drawn at the tail of each
 #'   gradient vector.
 #' @param eval_point Logical. If `TRUE`, a point is drawn at the evaluation
@@ -62,15 +65,15 @@
 #'   default is `NULL`.
 #' @param max_it Integer. Maximum number of integration steps allowed when
 #'   computing the gradient stream. Defaults to `1000`.
-#' @param T Numeric. Time increment used for numerical integration when
-#'   `normalize` is FALSE. If not provided, it is computed automatically based
-#'   on grid spacing and the vector field’s magnitude.
-#' @param L Numeric. Target length for the gradient vectors or streamlines. When
-#'   `normalize` is TRUE, computed vectors are scaled to have length L. If not
-#'   provided, L is computed automatically from the grid spacing.
+#' @param L Numeric. The length of each vector or stream; with `normalize =
+#'   FALSE` and no `T`, streams are grown to `L` and cut back to the time of
+#'   the fastest one (see [geom_stream_field()]). Defaults to `NULL`, which uses 85% of the
+#'   spacing of the grid.
 #' @param type Character. Specifies the type of field to compute: use `"stream"`
 #'   to generate integrated streamlines or `"vector"` for individual vector
-#'   segments. Defaults to `"stream"`.
+#'   segments. Defaults to `"vector"` in `geom_gradient_field()` and
+#'   `stat_gradient_field()`, and to `"stream"` in `geom_gradient_field2()` and
+#'   `stat_gradient_field2()`.
 #' @param lineend Line end style (round, butt, square).
 #' @param linejoin Line join style (round, mitre, bevel).
 #' @param linemitre Line mitre limit (number greater than 1).
@@ -81,9 +84,10 @@
 #'
 #'   - **`x`**: The x-coordinate of the seed point.
 #'   - **`y`**: The y-coordinate of the seed point.
-#'   - **`color`**: In **geom_gradient_field**, the color of the gradient vector.
-#'   In **geom_gradient_field2**, color is not mapped by default.
-#'   - **`length`**: In **geom_gradient_field2** with `type = "vector"`, the
+#'   - `color`: In **geom_gradient_field**, mapped to `norm` (vectors) or
+#'   `avg_spd` (streams) by default. In **geom_gradient_field2**, color is not
+#'   mapped by default.
+#'   - `length`: In **geom_gradient_field2** with `type = "vector"`, the
 #'   computed vector norm.
 #'   - `size`, `linetype`, `alpha`: Additional aesthetics to control appearance.
 #'
@@ -96,13 +100,13 @@
 #' generating the gradient field from a scalar function:
 #'
 #' \describe{
-#'   \item{norm}{The Euclidean norm of the gradient vector, calculated as
-#'     \eqn{\sqrt{fx^2 + fy^2}}. This value is used, by default, for mapping color or scaling
-#'     arrow lengths in the visualization.}
+#'   \item{norm}{The Euclidean norm of the gradient at the evaluation point,
+#'     \eqn{\sqrt{f_x^2 + f_y^2}}. By default it is the color of vectors in
+#'     **geom_gradient_field** and their length in **geom_gradient_field2**.}
 #'
-#'   \item{avg_spd}{This variable may represent an average speed computed
-#'     from the gradient magnitude. In the default mapping for **geom_gradient_field**, the
-#'     color aesthetic is mapped to \code{after_stat(avg_spd)}.}
+#'   \item{avg_spd}{For streams, the average speed along the stream, as in
+#'     [geom_stream_field()]. By default it is the color of streams in
+#'     **geom_gradient_field**.}
 #' }
 #'
 #' @examples
@@ -131,8 +135,7 @@
 #'     coord_equal()
 #' }
 #' }
-#' @aliases geom_gradient_field stat_gradient_field geom_gradient_field2
-#'   stat_gradient_field2
+#' @aliases geom_gradient_field stat_gradient_field geom_gradient_field2 stat_gradient_field2
 #' @name geom_gradient_field
 #' @export
 NULL
@@ -153,10 +156,10 @@ geom_gradient_field <- function(
   ylim = NULL,
   n = 11,
   max_it = 1000,
+  method = "rk4",
   T = NULL,
   L = NULL,
   center = TRUE,
-  method = "rk4",
   type = "vector",
   normalize = TRUE,
   tail_point = FALSE,
@@ -193,10 +196,10 @@ stat_gradient_field <- function(
   ylim = NULL,
   n = 11,
   max_it = 1000,
+  method = "rk4",
   T = NULL,
   L = NULL,
   center = TRUE,
-  method = "rk4",
   type = "vector",
   normalize = TRUE,
   tail_point = FALSE,
@@ -234,10 +237,10 @@ geom_gradient_field2 <- function(
   ylim = NULL,
   n = 11,
   max_it = 1000,
+  method = "rk4",
   T = NULL,
   L = NULL,
   center = FALSE,
-  method = "rk4",
   type = "stream",
   normalize = TRUE,
   tail_point = TRUE,
@@ -275,10 +278,10 @@ stat_gradient_field2 <- function(
   ylim = NULL,
   n = 11,
   max_it = 1000,
+  method = "rk4",
   T = NULL,
   L = NULL,
   center = FALSE,
-  method = "rk4",
   type = "stream",
   normalize = TRUE,
   tail_point = TRUE,

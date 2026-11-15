@@ -128,6 +128,15 @@
   applying to `method = "lm"`.
 * Angles in `geom_stream_smooth()` are documented as radians, and the
   `geom_vector_smooth()` examples are clarified.
+* The help for `geom_stream_field()`, `geom_vector_field()` and
+  `geom_gradient_field()` describes how `L`, `T` and `normalize` set the
+  length of streams and vectors, including that a centered stream run to a
+  time `T` runs for `T` in each direction.
+* `geom_gradient_field()` documents its default `type` (`"vector"`) and its
+  default colors (`norm` for vectors, `avg_spd` for streams).
+* The `norm` computed variable, `L` in `geom_vector2()`, `log` in `efield()`
+  and the computed variables of `geom_potential()` are described more
+  precisely.
 * Examples are run when the package is checked.
 * The pkgdown site is at <https://dustysturner.com/ggvfields/>.
 

@@ -53,14 +53,18 @@
 #'
 #' @section Computed Variables:
 #'
-#'   The following variable is computed internally by [StatPotential] during the
+#'   The following variables are computed internally by [StatPotential] during the
 #'   potential function calculation:
 #'
 #' \describe{
-#'   \item{Potential}{The scalar potential value computed numerically at each grid point.
+#'   \item{potential}{The scalar potential value computed numerically at each grid point.
 #'     It represents the accumulated potential from a reference point (typically the lower
 #'     bounds of \code{xlim} and \code{ylim}) to the given point. This value is mapped to
 #'     the \code{fill} aesthetic in the raster layer.}
+#'   \item{fx, fy}{The components of the vector field at each grid point.}
+#'   \item{curl}{Only with \code{verify_conservative = TRUE}: \code{TRUE} where
+#'     the field passes the check that it is conservative (its curl is within
+#'     \code{tol} of zero).}
 #' }
 #'
 #' @return A ggplot2 layer that produces a potential function heatmap.

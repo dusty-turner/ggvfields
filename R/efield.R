@@ -12,8 +12,8 @@
 #' @param k The constant of proportionality, defaulted to 1. See examples for a
 #'   more rigorous use of physical constants.
 #' @param q_test The test charge, defaulted to +1.
-#' @param log Executes the transformation of the double log of the norm of the
-#'   vectors.
+#' @param log Logical. If `TRUE`, each vector keeps its direction and its norm
+#'   \eqn{\|F\|} is replaced by \eqn{\log(1 + \|F\|)}.
 #'
 #' @return A vector containing the force felt by the test charge on account of
 #'   the electric field.

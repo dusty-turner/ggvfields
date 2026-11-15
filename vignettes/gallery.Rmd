@@ -127,8 +127,9 @@ ggplot() +
 ## IV. The Dipole
 
 The classic electromagnetic dipole: a positive charge and a negative charge.
-Field lines arc gracefully from source to sink. This uses the built-in
-`efield_maker()` function.
+Field lines arc gracefully from source to sink. The field is written out by
+hand, softened near each charge and log-scaled like `efield_maker(log =
+TRUE)`, so the streams stay smooth.
 
 ```{r dipole, fig.height = 7}
 dipole <- function(v) {

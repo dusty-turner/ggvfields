@@ -113,9 +113,12 @@ starting point) of each vector (default is \code{FALSE} for \code{geom_vector()}
 point corresponding to the original (untransformed) seed point before any
 centering or normalization (default: \code{FALSE}).}
 
-\item{L}{Numeric scalar. The desired length for the vectors in data units. If
-\code{NULL} (the default), a value is computed automatically based on the plot’s
-x and y limits.}
+\item{L}{Numeric scalar. The length of the vectors in data units when
+\code{normalize = TRUE}. If \code{NULL} (the default), a value is computed
+automatically based on the plot’s x and y limits. When \code{length} is mapped,
+as it is by default in \code{geom_vector2()}, the drawn lengths are set by the
+length scale instead (see \code{\link[=scale_length_continuous]{scale_length_continuous()}}), and \code{L} does not
+change them.}
 
 \item{arrow}{An optional \code{grid::arrow()} specification to add arrowheads to
 the vectors (default: \code{grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")}).}
@@ -189,10 +192,10 @@ These are calculated by the 'stat' part of layers and can be accessed with
 delayed evaluation.
 
 \describe{
-\item{norm}{Calculated as the Euclidean distance between the starting point
-(\code{x}, \code{y}) and the computed endpoint (\code{xend}, \code{yend}). This
-value is used to normalize the vector length when the \code{normalize} parameter
-is set to \code{TRUE}.}
+\item{norm}{The length of the vector as given in the data, the Euclidean
+distance from (\code{x}, \code{y}) to (\code{xend}, \code{yend}) (or
+\eqn{\sqrt{f_x^2 + f_y^2}}). With \code{normalize = TRUE} the vectors are
+drawn at a common length and \code{norm} keeps the original size.}
 }
 }
 

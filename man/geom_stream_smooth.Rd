@@ -187,12 +187,8 @@ component when \code{method = "gam"}, or the multivariate linear model given by
 specified grid point, generating a smooth approximation of the vector
 field.
 
-\strong{Prediction Intervals:}
-Two types of prediction intervals can be displayed:
-\itemize{
-\item \strong{Ellipse:} Depicts the joint uncertainty (covariance) in the predicted \code{fx} and \code{fy}.
-\item \strong{Wedge:} Indicates the range of possible vector directions and magnitudes.
-}
+Prediction intervals are not drawn for streams; use
+\code{\link[=geom_vector_smooth]{geom_vector_smooth()}} to show the uncertainty of the fitted vectors.
 }
 
 \examples{

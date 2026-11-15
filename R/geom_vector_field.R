@@ -48,9 +48,10 @@
 #' @param center Logical. If `TRUE`, centers the seed points or the vectors so
 #'   that the original (x, y) becomes the midpoint. Defaults differ between the
 #'   variants.
-#' @param normalize Logical. If `TRUE`, stream lengths are normalized based on
-#'   grid spacing. If `FALSE`, a default arc length is used. (Default is `TRUE`;
-#'   if `TRUE`, it is converted internally to `"vector"`.)
+#' @param normalize Logical. If `TRUE` (the default), every vector has the same
+#'   length, 85% of the grid spacing. If `FALSE`, each vector is drawn at its
+#'   own size, from `(x, y)` to `(x, y) + fun(x, y)` (centered on `(x, y)` if
+#'   `center = TRUE`).
 #' @param tail_point Logical. If `TRUE`, a point is drawn at the tail of each
 #'   streamline.
 #' @param eval_point Logical. If `TRUE`, a point is drawn at the evaluation
@@ -85,9 +86,9 @@
 #'   streamlines.
 #'
 #' \describe{
-#'   \item{norm}{Calculated as the Euclidean distance between the starting point
-#'     (\code{x}, \code{y}) and the computed endpoint. Used to normalize the
-#'     vector.}
+#'   \item{norm}{The norm of the field at the evaluation point,
+#'     \eqn{\|f(x, y)\| = \sqrt{f_x^2 + f_y^2}}. It is the default color in
+#'     **geom_vector_field** and the default length in **geom_vector_field2**.}
 #' }
 #'
 #' @seealso [geom_stream_field()]
@@ -111,8 +112,7 @@
 #' }
 #'
 #' @name geom_vector_field
-#' @aliases geom_vector_field stat_vector_field geom_vector_field2
-#'   stat_vector_field2
+#' @aliases geom_vector_field stat_vector_field geom_vector_field2 stat_vector_field2
 NULL
 
 #' @rdname geom_vector_field

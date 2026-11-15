@@ -29,8 +29,8 @@ more rigorous use of physical constants.}
 
 \item{q_test}{The test charge, defaulted to +1.}
 
-\item{log}{Executes the transformation of the double log of the norm of the
-vectors.}
+\item{log}{Logical. If \code{TRUE}, each vector keeps its direction and its norm
+\eqn{\|F\|} is replaced by \eqn{\log(1 + \|F\|)}.}
 }
 \value{
 A vector containing the force felt by the test charge on account of

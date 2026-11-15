@@ -59,9 +59,12 @@
 #' @param eval_point Logical. If `TRUE`, a point is drawn at the evaluation
 #'   point corresponding to the original (untransformed) seed point before any
 #'   centering or normalization (default: `FALSE`).
-#' @param L Numeric scalar. The desired length for the vectors in data units. If
-#'   `NULL` (the default), a value is computed automatically based on the plot’s
-#'   x and y limits.
+#' @param L Numeric scalar. The length of the vectors in data units when
+#'   `normalize = TRUE`. If `NULL` (the default), a value is computed
+#'   automatically based on the plot’s x and y limits. When `length` is mapped,
+#'   as it is by default in `geom_vector2()`, the drawn lengths are set by the
+#'   length scale instead (see [scale_length_continuous()]), and `L` does not
+#'   change them.
 #' @param ... Other arguments passed on to \code{grid::layer()}.
 #'
 #' @section Aesthetics:
@@ -91,10 +94,10 @@
 #'   delayed evaluation.
 #'
 #' \describe{
-#'   \item{norm}{Calculated as the Euclidean distance between the starting point
-#'     (\code{x}, \code{y}) and the computed endpoint (\code{xend}, \code{yend}). This
-#'     value is used to normalize the vector length when the \code{normalize} parameter
-#'     is set to \code{TRUE}.}
+#'   \item{norm}{The length of the vector as given in the data, the Euclidean
+#'     distance from (\code{x}, \code{y}) to (\code{xend}, \code{yend}) (or
+#'     \eqn{\sqrt{f_x^2 + f_y^2}}). With \code{normalize = TRUE} the vectors are
+#'     drawn at a common length and \code{norm} keeps the original size.}
 #' }
 #'
 #' @return A ggplot2 layer that can be added to a plot.

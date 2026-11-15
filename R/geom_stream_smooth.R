@@ -68,10 +68,8 @@
 #'   specified grid point, generating a smooth approximation of the vector
 #'   field.
 #'
-#' **Prediction Intervals:**
-#' Two types of prediction intervals can be displayed:
-#'   - **Ellipse:** Depicts the joint uncertainty (covariance) in the predicted `fx` and `fy`.
-#'   - **Wedge:** Indicates the range of possible vector directions and magnitudes.
+#'   Prediction intervals are not drawn for streams; use
+#'   [geom_vector_smooth()] to show the uncertainty of the fitted vectors.
 #'
 #' @return A ggplot2 layer that can be added to a ggplot object to display a
 #'   smoothed vector field.

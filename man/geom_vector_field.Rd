@@ -151,9 +151,10 @@ each axis. Higher values produce a denser vector field. Defaults to \code{11}.}
 that the original (x, y) becomes the midpoint. Defaults differ between the
 variants.}
 
-\item{normalize}{Logical. If \code{TRUE}, stream lengths are normalized based on
-grid spacing. If \code{FALSE}, a default arc length is used. (Default is \code{TRUE};
-if \code{TRUE}, it is converted internally to \code{"vector"}.)}
+\item{normalize}{Logical. If \code{TRUE} (the default), every vector has the same
+length, 85\% of the grid spacing. If \code{FALSE}, each vector is drawn at its
+own size, from \verb{(x, y)} to \verb{(x, y) + fun(x, y)} (centered on \verb{(x, y)} if
+\code{center = TRUE}).}
 
 \item{tail_point}{Logical. If \code{TRUE}, a point is drawn at the tail of each
 streamline.}
@@ -185,9 +186,9 @@ A ggplot2 layer that computes and plots a vector field using
 streamlines.
 
 \describe{
-\item{norm}{Calculated as the Euclidean distance between the starting point
-(\code{x}, \code{y}) and the computed endpoint. Used to normalize the
-vector.}
+\item{norm}{The norm of the field at the evaluation point,
+\eqn{\|f(x, y)\| = \sqrt{f_x^2 + f_y^2}}. It is the default color in
+\strong{geom_vector_field} and the default length in \strong{geom_vector_field2}.}
 }
 }
 \description{

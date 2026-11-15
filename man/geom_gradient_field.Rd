@@ -21,6 +21,7 @@ geom_gradient_field(
   ylim = NULL,
   n = 11,
   max_it = 1000,
+  method = "rk4",
   T = NULL,
   L = NULL,
   center = TRUE,
@@ -49,6 +50,7 @@ stat_gradient_field(
   ylim = NULL,
   n = 11,
   max_it = 1000,
+  method = "rk4",
   T = NULL,
   L = NULL,
   center = TRUE,
@@ -77,6 +79,7 @@ geom_gradient_field2(
   ylim = NULL,
   n = 11,
   max_it = 1000,
+  method = "rk4",
   T = NULL,
   L = NULL,
   center = FALSE,
@@ -105,6 +108,7 @@ stat_gradient_field2(
   ylim = NULL,
   n = 11,
   max_it = 1000,
+  method = "rk4",
   T = NULL,
   L = NULL,
   center = FALSE,
@@ -123,8 +127,8 @@ stat_gradient_field2(
 \item{mapping}{A set of aesthetic mappings created by \code{ggplot2::aes()}.
 Additional aesthetics such as \code{color}, \code{size}, \code{linetype}, and \code{alpha} can
 be defined. In
-\strong{geom_gradient_field} the default mapping includes \code{color = after_stat(norm)},
-whereas in \strong{geom_gradient_field2} with \code{type = "vector"} it includes
+\strong{geom_gradient_field} the default mapping is \code{color = after_stat(norm)}
+for vectors and \code{color = after_stat(avg_spd)} for streams, whereas in \strong{geom_gradient_field2} with \code{type = "vector"} it includes
 \code{length = after_stat(norm)}.}
 
 \item{data}{A data frame containing the input data.}
@@ -161,23 +165,43 @@ each axis. Higher values produce a denser gradient field. Defaults to \code{11}.
 \item{max_it}{Integer. Maximum number of integration steps allowed when
 computing the gradient stream. Defaults to \code{1000}.}
 
-\item{T}{Numeric. Time increment used for numerical integration when
-\code{normalize} is FALSE. If not provided, it is computed automatically based
-on grid spacing and the vector field’s magnitude.}
+\item{method}{Character. Integration method. \code{"rk4"} (Runge-Kutta 4, the
+default) and \code{"euler"} (Euler's method) step through the field in equal
+shares of the arc length \code{L} or, when streams are run to a time \code{T}, of
+that time. A step is shortened where the field turns or changes speed
+sharply, so a stream that runs into a sink or a singularity (such as a
+point charge) stops there, short of \code{L}, while a stream that meets a jump
+in the field (for example one defined with \code{sign()} or \code{ifelse()}) carries
+on across it, unless the field on the far side points back. A stream that
+reaches a line the field converges on from both sides stops there; the
+exact solution would slide along the line. Sinks, singularities and jumps
+are told apart by how sharply the field turns and changes speed, so a
+field built to sit on those thresholds can be misjudged. \code{"lsoda"} uses the adaptive solver from
+\code{deSolve::ode()}, stopping each stream when its arc length reaches
+\code{L}; it was the integrator in ggvfields 1.0.1. \code{geom_stream_smooth()} and
+\code{geom_gradient_smooth()} always use \code{"rk4"}.}
 
-\item{L}{Numeric. Target length for the gradient vectors or streamlines. When
-\code{normalize} is TRUE, computed vectors are scaled to have length L. If not
-provided, L is computed automatically from the grid spacing.}
+\item{T}{Numeric. Used only with \code{normalize = FALSE}. Each stream is run for
+time \code{T} and \code{L} is ignored; with \code{center = TRUE} it runs for \code{T} forward
+and \code{T} backward from the seed. Vectors (\code{type = "vector"}) are always
+drawn as \code{fun(x, y)} scaled by a time of 1. Defaults to \code{NULL}.}
+
+\item{L}{Numeric. The length of each vector or stream; with \code{normalize = FALSE} and no \code{T}, streams are grown to \code{L} and cut back to the time of
+the fastest one (see \code{\link[=geom_stream_field]{geom_stream_field()}}). Defaults to \code{NULL}, which uses 85\% of the
+spacing of the grid.}
 
 \item{center}{Logical. If \code{TRUE}, centers the seed points so that the
 original (x, y) becomes the midpoint.}
 
 \item{type}{Character. Specifies the type of field to compute: use \code{"stream"}
 to generate integrated streamlines or \code{"vector"} for individual vector
-segments. Defaults to \code{"stream"}.}
+segments. Defaults to \code{"vector"} in \code{geom_gradient_field()} and
+\code{stat_gradient_field()}, and to \code{"stream"} in \code{geom_gradient_field2()} and
+\code{stat_gradient_field2()}.}
 
-\item{normalize}{Logical. If \code{TRUE}, gradient vectors are normalized based on
-grid spacing. Defaults to \code{TRUE}.}
+\item{normalize}{Logical. If \code{TRUE} (the default), every vector or stream
+has the same length \code{L}. If \code{FALSE}, lengths show the size of the
+gradient; see \code{\link[=geom_stream_field]{geom_stream_field()}} for how streams are then run.}
 
 \item{tail_point}{Logical. If \code{TRUE}, a point is drawn at the tail of each
 gradient vector.}
@@ -219,7 +243,8 @@ resulting vectors.
 \details{
 Two variants are provided:
 \itemize{
-\item \strong{geom_gradient_field()} uses a default mapping that sets \code{color = after_stat(norm)}.
+\item \strong{geom_gradient_field()} maps color to the size of the gradient:
+\code{color = after_stat(norm)} for vectors (the default) and \code{color = after_stat(avg_spd)} for streams.
 \item \strong{geom_gradient_field2()} leaves \code{color} unmapped and marks each seed
 point with a dot. With \code{type = "vector"} it sets \code{length = after_stat(norm)},
 so vectors are scaled by the size of the gradient, like
@@ -233,9 +258,10 @@ understand the following aesthetics (required aesthetics are in \strong{bold}):
 \itemize{
 \item \strong{\code{x}}: The x-coordinate of the seed point.
 \item \strong{\code{y}}: The y-coordinate of the seed point.
-\item \strong{\code{color}}: In \strong{geom_gradient_field}, the color of the gradient vector.
-In \strong{geom_gradient_field2}, color is not mapped by default.
-\item \strong{\code{length}}: In \strong{geom_gradient_field2} with \code{type = "vector"}, the
+\item \code{color}: In \strong{geom_gradient_field}, mapped to \code{norm} (vectors) or
+\code{avg_spd} (streams) by default. In \strong{geom_gradient_field2}, color is not
+mapped by default.
+\item \code{length}: In \strong{geom_gradient_field2} with \code{type = "vector"}, the
 computed vector norm.
 \item \code{size}, \code{linetype}, \code{alpha}: Additional aesthetics to control appearance.
 }
@@ -248,13 +274,13 @@ The following variables are computed internally by \link{StatStreamField} when
 generating the gradient field from a scalar function:
 
 \describe{
-\item{norm}{The Euclidean norm of the gradient vector, calculated as
-\eqn{\sqrt{fx^2 + fy^2}}. This value is used, by default, for mapping color or scaling
-arrow lengths in the visualization.}
+\item{norm}{The Euclidean norm of the gradient at the evaluation point,
+\eqn{\sqrt{f_x^2 + f_y^2}}. By default it is the color of vectors in
+\strong{geom_gradient_field} and their length in \strong{geom_gradient_field2}.}
 
-\item{avg_spd}{This variable may represent an average speed computed
-from the gradient magnitude. In the default mapping for \strong{geom_gradient_field}, the
-color aesthetic is mapped to \code{after_stat(avg_spd)}.}
+\item{avg_spd}{For streams, the average speed along the stream, as in
+\code{\link[=geom_stream_field]{geom_stream_field()}}. By default it is the color of streams in
+\strong{geom_gradient_field}.}
 }
 }
 
