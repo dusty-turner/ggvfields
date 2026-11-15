@@ -1,3 +1,16 @@
+# ggvfields (development version)
+
+## Changes in behavior
+
+* The gam smoother of `geom_vector_smooth()`, `geom_stream_smooth()` and
+  their stats fits `fx` and `fy` together in mgcv's multivariate normal family,
+  which also estimates the correlation of their residuals. Ellipses and wedges
+  account for that correlation, so ellipses tilt when `fx` and `fy` are
+  correlated, and the prediction regions have their stated coverage. Each
+  smooth uses at most half as many basis functions as there are locations.
+  With fewer than 10 locations, or data without noise, `fx` and `fy` are fitted
+  separately as before.
+
 # ggvfields 1.1.0
 
 ## Changes in behavior

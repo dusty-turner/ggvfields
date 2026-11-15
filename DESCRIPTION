@@ -1,7 +1,7 @@
 Package: ggvfields
 Type: Package
 Title: Vector Field Visualizations with 'ggplot2'
-Version: 1.1.0
+Version: 1.1.0.9000
 Authors@R: 
     c(person(given = "Dusty",
            family = "Turner",

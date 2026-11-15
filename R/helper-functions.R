@@ -44,6 +44,76 @@ gam_basis_size <- function(data) {
 }
 
 
+# the gam smoothers fit fx and fy together, each with the smooth s(x, y), in
+# mgcv's multivariate normal family, which also estimates the covariance of
+# the residuals of fx and fy. the joint fit uses at most half as many basis
+# functions as locations. where it cannot be fitted (fewer than 10 locations,
+# or data without noise, whose residual covariance is singular), fx and fy are
+# fitted separately and their residuals are taken to be uncorrelated
+fit_joint_gam <- function(data) {
+  k <- gam_basis_size(data)
+  n_loc <- nrow(unique(data[, c("x", "y")]))
+  joint <- tryCatch(
+    suppressWarnings(mgcv::gam(
+      list(fx ~ s(x, y, bs = "tp", k = min(k, max(4, n_loc %/% 2))),
+           fy ~ s(x, y, bs = "tp", k = min(k, max(4, n_loc %/% 2)))),
+      family = mgcv::mvn(d = 2), data = data
+    )),
+    error = function(e) NULL
+  )
+  if (!is.null(joint)) {
+    S <- tryCatch(solve(crossprod(joint$family$data$R)), error = function(e) NULL)
+    if (!is.null(S) && all(is.finite(S)) && all(eigen(S, symmetric = TRUE)$values > 0)) {
+      return(list(joint = joint))
+    }
+  }
+  list(
+    fx = mgcv::gam(fx ~ s(x, y, bs = "tp", k = k), data = data),
+    fy = mgcv::gam(fy ~ s(x, y, bs = "tp", k = k), data = data)
+  )
+}
+
+# predictions of fit_joint_gam() at the points newdata (columns x and y): the
+# fitted fx and fy and the covariance of a new observation there, which is the
+# covariance of the fitted vector plus the residual covariance. mgcv estimates
+# the residual covariance by maximum likelihood; it is scaled by n / (n - edf)
+# for each component, as the residual variance of a single gam is
+predict_joint_gam <- function(fit, newdata, se = TRUE) {
+  newdata <- newdata[, c("x", "y")]
+
+  if (is.null(fit$joint)) {
+    px <- predict(fit$fx, newdata = newdata, se.fit = se)
+    py <- predict(fit$fy, newdata = newdata, se.fit = se)
+    if (!se) return(data.frame(fx = as.numeric(px), fy = as.numeric(py)))
+    return(data.frame(
+      fx = as.numeric(px$fit), fy = as.numeric(py$fit),
+      var_fx = as.numeric(px$se.fit^2 + fit$fx$sig2),
+      var_fy = as.numeric(py$se.fit^2 + fit$fy$sig2),
+      cov_fx_fy = 0
+    ))
+  }
+
+  j <- fit$joint
+  Xp <- predict(j, newdata = newdata, type = "lpmatrix")
+  lpi <- attr(Xp, "lpi")
+  b <- stats::coef(j)
+  X1 <- Xp[, lpi[[1]], drop = FALSE]
+  X2 <- Xp[, lpi[[2]], drop = FALSE]
+  out <- data.frame(fx = drop(X1 %*% b[lpi[[1]]]), fy = drop(X2 %*% b[lpi[[2]]]))
+  if (!se) return(out)
+
+  V <- j$Vp
+  n <- nrow(j$model)
+  edf <- vapply(lpi, function(i) sum(j$edf[i]), numeric(1))
+  scale <- n / (n - edf)
+  S <- solve(crossprod(j$family$data$R)) * sqrt(outer(scale, scale))
+
+  out$var_fx <- rowSums((X1 %*% V[lpi[[1]], lpi[[1]]]) * X1) + S[1, 1]
+  out$var_fy <- rowSums((X2 %*% V[lpi[[2]], lpi[[2]]]) * X2) + S[2, 2]
+  out$cov_fx_fy <- rowSums((X1 %*% V[lpi[[1]], lpi[[2]]]) * X2) + S[1, 2]
+  out
+}
+
 tibble0 <- function(...) {
   tibble::tibble(..., .name_repair = "minimal")
 }

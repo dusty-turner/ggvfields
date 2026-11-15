@@ -77,19 +77,21 @@ They default to the range of the data.}
 
 \item{method}{Character. Specifies the smoothing method. Supported options
 are \code{"gam"} (default), \code{"lm"}, and \code{"kriging"}. The \code{"gam"} method fits
-separate generalized additive models for \code{fx} and \code{fy} with the smooth
-\code{s(x, y)} (with predictions assumed independent, i.e., zero covariance),
-the \code{"lm"} method fits the multivariate linear model given by \code{formula},
-and \code{"kriging"} uses a cokriging approach via the \code{gstat} package. The
-smooth uses mgcv's default basis of 30 functions; with fewer than 30
-distinct locations it uses half as many functions as locations, and it
-needs at least 5 locations.}
+\code{fx} and \code{fy} together, each with the smooth \code{s(x, y)}, in mgcv's
+multivariate normal family (\code{\link[mgcv:mvn]{mgcv::mvn()}}), which also estimates the
+correlation of their residuals; the \code{"lm"} method fits the multivariate
+linear model given by \code{formula}, and \code{"kriging"} uses a cokriging approach
+via the \code{gstat} package. Each smooth uses up to 30 basis functions, and
+at most half as many as there are distinct locations; at least 5
+locations are needed. With fewer than 10 locations, or data without
+noise, \code{fx} and \code{fy} are fitted separately and their residuals are taken
+to be uncorrelated.}
 
 \item{se}{Logical. If \code{TRUE}, prediction intervals for the tip of each
 vector are computed and plotted. For every \code{method} they cover a new
 observation at that location, not only the fitted mean: their covariance
-is the covariance of the fitted vector plus the residual covariance. With
-\code{"gam"} the residual covariance between \code{fx} and \code{fy} is taken to be zero.}
+is the covariance of the fitted vector plus the residual covariance, so
+ellipses tilt when \code{fx} and \code{fy} are correlated.}
 
 \item{se.circle}{Logical. Defaults to \code{FALSE}. If \code{TRUE}, circles are drawn
 around the origin of each vector. By default, the circle’s radius is

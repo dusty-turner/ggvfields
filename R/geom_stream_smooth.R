@@ -31,11 +31,11 @@
 #' @param lineend Line end style (round, butt, square).
 #' @param linejoin Line join style (round, mitre, bevel).
 #' @param linemitre Line mitre limit (number greater than 1).
-#' @param method Either `"gam"` (default), which fits `fx` and `fy` separately
-#'   with the smooth `s(x, y)`, or `"lm"`, which fits `formula`. The smooth
-#'   uses mgcv's default basis of 30 functions; with fewer than 30 distinct
-#'   locations it uses half as many functions as locations, and it needs at
-#'   least 5 locations.
+#' @param method Either `"gam"` (default), which fits `fx` and `fy` together,
+#'   each with the smooth `s(x, y)`, as in [geom_vector_smooth()], or `"lm"`,
+#'   which fits `formula`. Each smooth uses up to 30 basis functions, and at
+#'   most half as many as there are distinct locations; at least 5 locations
+#'   are needed.
 #' @param ... Additional arguments passed to the layer. If a fixed parameter
 #'   `color` is not provided, then `color = "blue"` is used.
 #'

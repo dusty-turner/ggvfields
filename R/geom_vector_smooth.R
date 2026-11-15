@@ -26,18 +26,20 @@
 #'   They default to the range of the data.
 #' @param method Character. Specifies the smoothing method. Supported options
 #'   are `"gam"` (default), `"lm"`, and `"kriging"`. The `"gam"` method fits
-#'   separate generalized additive models for `fx` and `fy` with the smooth
-#'   `s(x, y)` (with predictions assumed independent, i.e., zero covariance),
-#'   the `"lm"` method fits the multivariate linear model given by `formula`,
-#'   and `"kriging"` uses a cokriging approach via the `gstat` package. The
-#'   smooth uses mgcv's default basis of 30 functions; with fewer than 30
-#'   distinct locations it uses half as many functions as locations, and it
-#'   needs at least 5 locations.
+#'   `fx` and `fy` together, each with the smooth `s(x, y)`, in mgcv's
+#'   multivariate normal family ([mgcv::mvn()]), which also estimates the
+#'   correlation of their residuals; the `"lm"` method fits the multivariate
+#'   linear model given by `formula`, and `"kriging"` uses a cokriging approach
+#'   via the `gstat` package. Each smooth uses up to 30 basis functions, and
+#'   at most half as many as there are distinct locations; at least 5
+#'   locations are needed. With fewer than 10 locations, or data without
+#'   noise, `fx` and `fy` are fitted separately and their residuals are taken
+#'   to be uncorrelated.
 #' @param se Logical. If `TRUE`, prediction intervals for the tip of each
 #'   vector are computed and plotted. For every `method` they cover a new
 #'   observation at that location, not only the fitted mean: their covariance
-#'   is the covariance of the fitted vector plus the residual covariance. With
-#'   `"gam"` the residual covariance between `fx` and `fy` is taken to be zero.
+#'   is the covariance of the fitted vector plus the residual covariance, so
+#'   ellipses tilt when `fx` and `fy` are correlated.
 #' @param se.circle Logical. Defaults to `FALSE`. If `TRUE`, circles are drawn
 #'   around the origin of each vector. By default, the circle’s radius is
 #'   computed as the magnitude of the predicted vector.
@@ -440,42 +442,17 @@ StatVectorSmooth <- ggproto(
       rho <- sill_fx_fy / sqrt(sill_fx * sill_fy)
     }
 
-    if(method == "gam"){
-      gam <- mgcv::gam
-      s <- mgcv::s
+    if (method == "gam") {
 
-      # fit gam
-      k <- gam_basis_size(data)
-      fx_mod <- gam(fx ~ s(x, y, bs = "tp", k = k), data = data)
-      fy_mod <- gam(fy ~ s(x, y, bs = "tp", k = k), data = data)
+      fit <- fit_joint_gam(data)
 
       # Define prediction points: if eval_points is NULL, use grid; otherwise, use eval_points
       new_point <- if (is.null(eval_points)) grid else eval_points
+      pred <- predict_joint_gam(fit, new_point)
 
-      # predict with gam
-      pred_fx <- predict(fx_mod, newdata = new_point[, c("x", "y")], se.fit = TRUE)
-      pred_fy <- predict(fy_mod, newdata = new_point[, c("x", "y")], se.fit = TRUE)
-
-      # format into a new data frame
-      grid <- data.frame(
-        x  = new_point$x,
-        y  = new_point$y,
-        fx = pred_fx$fit,
-        fy = pred_fy$fit
-      )
-
-      # prediction variance, as for lm and kriging: the variance of the fitted
-      # mean (se.fit^2) plus each component's residual variance
-      var_fx <- pred_fx$se.fit^2 + fx_mod$sig2
-      var_fy <- pred_fy$se.fit^2 + fy_mod$sig2
-
-      # Since the models are fitted separately, we assume independence:
-      cov_fx_fy <- rep(0, length(var_fx))
-
-      # Assemble the covariance data frame similar to LM and kriging
-      cov_pred <- data.frame(var_fx = var_fx, var_fy = var_fy, cov_fx_fy = cov_fx_fy)
-      # add rho so it works
-      rho <- 0
+      grid <- data.frame(x = new_point$x, y = new_point$y, fx = pred$fx, fy = pred$fy)
+      cov_pred <- pred[, c("var_fx", "var_fy", "cov_fx_fy")]
+      rho <- NULL
 
     }
 
