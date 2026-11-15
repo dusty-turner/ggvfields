@@ -1,4 +1,6 @@
-# visual snapshots, one or two per layer family; CRAN skips these
+# visual snapshots, one or two per layer family. the plots are only drawn
+# and compared off CRAN
+skip_on_cran()
 skip_if_not_installed("vdiffr")
 
 rotation <- function(u) c(-u[2], u[1])
