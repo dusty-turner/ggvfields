@@ -15,6 +15,11 @@
   length `L` and then crop all of them back to the time of the fastest one,
   so a stream's length shows its speed relative to the fastest, as the
   vectors of `geom_vector_field2()` do. `type = "vector"` is unchanged.
+* Mapped lengths are proportional to the mapped value: in
+  `geom_vector2()`, `geom_vector_field2()` and `geom_gradient_field2(type =
+  "vector")`, a vector with half the largest norm is drawn half as long. The
+  longest vector is `max_range` centimeters (0.5 by default; set it with
+  `scale_length_continuous()`), and the legend shows the same lengths.
 * The ellipses and wedges of `geom_vector_smooth(method = "gam")`, the
   default, are now prediction intervals for a new observation at each
   location, as for `method = "lm"` and `method = "kriging"`: they include

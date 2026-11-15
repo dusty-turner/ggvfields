@@ -548,9 +548,10 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 #' length aesthetic in a ggplot. This is particularly useful when working with
 #' vector plots where vector lengths are mapped to a continuous scale.
 #'
-#' @param max_range The maximum value to which the input is rescaled. Numeric
-#'   scalar specifying the upper bound of the output range. Should be between 0
-#'   and 1.
+#' @param max_range The length, in centimeters, of the longest vector. Every
+#'   other vector is drawn in proportion to it, so a vector with half the
+#'   largest norm is half as long, and the legend shows the same lengths.
+#'   Defaults to `0.5`.
 #' @param ... Other arguments passed to \code{continuous_scale()}.
 #'
 #' @return If \code{max_range} is less than or equal to 0.5 (the default), a
@@ -583,10 +584,20 @@ scale_length_continuous <- function(max_range = 0.5, ...) {
     ))
   }
 
+  # lengths are proportional to the mapped value: it is rescaled from 0 (not
+  # from its smallest value) to its largest, and drawn from 0 to max_range cm
+  if (!"rescaler" %in% names(args)) {
+    args$rescaler <- function(x, to = c(0, 1), from = range(x, na.rm = TRUE)) {
+      top <- max(from)
+      if (!is.finite(top) || top <= 0) return(rep(0, length(x)))
+      scales::rescale(x, to = to, from = c(0, top))
+    }
+  }
+
   scale <- do.call(continuous_scale, c(
     list(
       aesthetics = "length",
-      palette = scales::rescale_pal(range = c(.05, max_range)),
+      palette = scales::rescale_pal(range = c(0, max_range)),
       guide = guide_val
     ),
     args

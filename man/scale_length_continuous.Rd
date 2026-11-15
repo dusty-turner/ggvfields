@@ -7,9 +7,10 @@
 scale_length_continuous(max_range = 0.5, ...)
 }
 \arguments{
-\item{max_range}{The maximum value to which the input is rescaled. Numeric
-scalar specifying the upper bound of the output range. Should be between 0
-and 1.}
+\item{max_range}{The length, in centimeters, of the longest vector. Every
+other vector is drawn in proportion to it, so a vector with half the
+largest norm is half as long, and the legend shows the same lengths.
+Defaults to \code{0.5}.}
 
 \item{...}{Other arguments passed to \code{continuous_scale()}.}
 }
