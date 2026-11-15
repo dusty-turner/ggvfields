@@ -11,8 +11,9 @@ test_that("method selects the integrator", {
   expect_false(identical(stream_data(method = "rk4"), stream_data(method = "euler")))
   expect_false(identical(stream_data(method = "rk4"), stream_data(method = "lsoda")))
 
-  # lsoda is the default
-  expect_identical(stream_data(), stream_data(method = "lsoda"))
+  # rk4 is the default, also for layers that do not expose method
+  expect_identical(stream_data(), stream_data(method = "rk4"))
+  expect_identical(formals(get("compute_group", envir = StatStreamField))$method, "rk4")
 })
 
 test_that("an unknown method is an error", {
@@ -82,8 +83,27 @@ test_that("lsoda stops at a sink wherever it is", {
                         T = 1e6, L = 1, method = "lsoda", center = FALSE)
 
   expect_lt(max(offset$t), 100)
-  expect_equal(offset$avg_spd[1], at_origin$avg_spd[1], tolerance = 1e-6)
+  expect_equal(offset$avg_spd[1], at_origin$avg_spd[1], tolerance = 1e-4)
   expect_equal(max(offset$l), max(at_origin$l), tolerance = 1e-6)
+})
+
+test_that("rk4 and euler streams stop at a point charge instead of jumping over it", {
+  # efield_maker() has a charge at (-1, -1); this seed flows straight into it
+  f <- efield_maker()
+  for (m in c("rk4", "euler")) {
+    for (bound in c("length", "time")) {
+      s <- if (bound == "length") {
+        ode_stepper(c(-1.2, -1.2), f, T = 1e6, L = 1, method = m, center = FALSE)
+      } else {
+        ode_stepper(c(-1.2, -1.2), f, T = 0.5, L = 1e6, method = m, center = FALSE)
+      }
+      n <- nrow(s)
+      info <- paste(m, bound)
+      expect_lt(sqrt(sum((c(s$x[n], s$y[n]) + 1)^2)), 1e-3)
+      expect_equal(s$l[n], sqrt(2 * 0.2^2), tolerance = 1e-3, info = info)
+      expect_lt(n, 200)
+    }
+  }
 })
 
 test_that("rk4 follows a spiral into its sink", {
@@ -104,4 +124,50 @@ test_that("a seed on a zero of the field gives a zero-length stream", {
 
   expect_equal(nrow(s), 2)
   expect_equal(s$l, c(0, 0))
+})
+
+test_that("avg_spd of streams cropped to the fastest is their drawn length over time", {
+  # normalize = FALSE without T grows streams to L, then crops them all back to
+  # the time of the fastest one; avg_spd must describe the cropped stream
+  f <- function(u) c(1, 1) - u
+  for (center in c(FALSE, TRUE)) {
+    d <- layer_data(ggplot() + geom_stream_field(fun = f, xlim = c(0, 2), ylim = c(0, 2), n = 5,
+                                                 normalize = FALSE, center = center))
+    # every stream gets the same time: the time of the fastest one
+    spans <- tapply(d$t, d$group, function(t) max(t) - min(t))
+    for (s in split(d, d$group)) {
+      s <- s[order(s$t), ]
+      n <- nrow(s)
+      if (n < 2) next
+      expect_equal(s$avg_spd[1], s$l[n] / max(spans), info = paste("center =", center))
+    }
+  }
+})
+
+test_that("avg_spd of a stream that ends at a sink does not depend on the integrator", {
+  # the stream reaches the sink at (1, 1) after length 0.1118, short of L = 1.
+  # its speed is measured up to 99% of that length: for u' = (1, 1) - u the
+  # distance to the sink is r0 * exp(-t), so 99% takes t = log(100)
+  f_sink <- function(u) c(1, 1) - u
+  u0 <- c(1.1, 1.05)
+  r0 <- sqrt(sum((u0 - 1)^2))
+  expected <- 0.99 * r0 / log(100)
+
+  spd <- vapply(c("lsoda", "rk4"), function(m) {
+    ode_stepper(u0, f_sink, T = 1e6, L = 1, method = m, center = FALSE)$avg_spd[1]
+  }, numeric(1))
+
+  # the integrators agree; the 99% time is read off the drawn polyline, so it is
+  # close to, not exactly, the analytic value
+  expect_equal(spd[["rk4"]], spd[["lsoda"]], tolerance = 1e-3)
+  expect_equal(spd[["rk4"]], expected, tolerance = 1e-2)
+})
+
+test_that("avg_spd of a stream run to a time T is its length over T", {
+  # this stream reaches the sink long before T = 50 and stops there
+  f_sink <- function(u) c(1, 1) - u
+  for (m in c("lsoda", "rk4")) {
+    s <- ode_stepper(c(1.1, 1.05), f_sink, T = 50, L = 1e6, method = m, center = FALSE)
+    expect_equal(s$avg_spd[1], max(s$l) / 50, info = m)
+  }
 })

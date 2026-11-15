@@ -60,13 +60,15 @@
 #'   all streamlines are cropped to the duration it takes for the fastest one to reach
 #'   the length `L`, allowing for variations in arc lengths that reflect differences in
 #'   flow speeds.
-#' @param method Character. Integration method. `"lsoda"` (the default) uses
-#'   the adaptive solver from \code{deSolve::ode()}, stopping each stream when
-#'   its arc length reaches `L`. `"rk4"` (Runge-Kutta 4) and `"euler"` (Euler's
-#'   method) step through the field in equal shares of the arc length `L` or,
-#'   when streams are run to a time `T`, of that time. A step is shortened
-#'   where the field turns sharply, so a stream that runs into a sink stops
-#'   there, short of `L`.
+#' @param method Character. Integration method. `"rk4"` (Runge-Kutta 4, the
+#'   default) and `"euler"` (Euler's method) step through the field in equal
+#'   shares of the arc length `L` or, when streams are run to a time `T`, of
+#'   that time. A step is shortened where the field turns or changes speed
+#'   sharply, so a stream that runs into a sink or a singularity (such as a
+#'   point charge) stops there, short of `L`. `"lsoda"` uses the adaptive solver from
+#'   \code{deSolve::ode()}, stopping each stream when its arc length reaches
+#'   `L`; it was the integrator in ggvfields 1.0.1. `geom_gradient_field()`,
+#'   `geom_stream_smooth()` and `geom_gradient_smooth()` always use `"rk4"`.
 #' @param grid A data frame containing precomputed grid points for seed
 #'   placement. If `NULL` (default), a regular Cartesian grid is generated based
 #'   on `xlim`, `ylim`, and `n`.
@@ -109,9 +111,13 @@
 #' integration of the vector field:
 #'
 #' \describe{
-#'   \item{avg_spd}{For vector fields, this is computed as the total arc length divided
-#'     by the integration time, providing an estimate of the average speed. It is used to
-#'     scale the vector lengths when mapping \code{length = after_stat(norm)}.}
+#'   \item{avg_spd}{The average speed along the stream: its arc length divided by
+#'     the time it took. Streams run to a time `T` (and, with `normalize = FALSE`,
+#'     streams cut back to the time of the fastest one) use the time they were
+#'     given, even if they stopped early at a sink. A stream run to a length `L`
+#'     that stops short of it at a sink would take unbounded time to reach the
+#'     sink, so its speed is measured up to 99% of the length it achieved. This
+#'     is the default color of streams.}
 #'
 #'   \item{t}{The integration time at each computed point along a streamline.}
 #'
@@ -248,7 +254,7 @@ geom_stream_field <- function(
     tail_point = FALSE,
     eval_point = FALSE,
     grid = NULL,
-    method = "lsoda",
+    method = "rk4",
     lineend = "butt",
     linejoin = "round",
     linemitre = 10,
@@ -274,7 +280,7 @@ stat_stream_field <- function(
     ...,
     na.rm = FALSE,
     show.legend = NA,
-    inherit.aes = TRUE,
+    inherit.aes = FALSE,
     fun,
     xlim = NULL,
     ylim = NULL,
@@ -290,7 +296,7 @@ stat_stream_field <- function(
     tail_point = FALSE,
     eval_point = FALSE,
     grid = NULL,
-    method = "lsoda",
+    method = "rk4",
     lineend = "butt",
     linejoin = "round",
     linemitre = 10,
@@ -299,11 +305,9 @@ stat_stream_field <- function(
 
   call_args <- as.list(environment())
 
-  # normalize is fixed here, as it has been since 1.0.0 (audit item 3, undecided)
   construct_layer(
     stream_field_layer, call_args, list(...),
-    stat = StatStreamField,
-    normalize = TRUE
+    stat = StatStreamField
   )
 }
 
@@ -334,7 +338,7 @@ geom_stream_field2 <- function(
     lineend = "butt",
     linejoin = "round",
     linemitre = 10,
-    method = "lsoda"
+    method = "rk4"
     ) {
 
   call_args <- as.list(environment())
@@ -372,16 +376,14 @@ stat_stream_field2 <- function(
     lineend = "butt",
     linejoin = "round",
     linemitre = 10,
-    method = "lsoda"
+    method = "rk4"
     ) {
 
   call_args <- as.list(environment())
 
-  # tol is fixed here, as it has been since 1.0.0 (audit item 3, undecided)
   construct_layer(
     stream_field2_layer, call_args, list(...),
-    stat = StatStreamField,
-    tol = sqrt(.Machine$double.eps)
+    stat = StatStreamField
   )
 }
 
@@ -418,7 +420,7 @@ StatStreamField <- ggproto(
   },
 
   compute_group = function(data, scales, fun, xlim, ylim, n,
-                           method = "lsoda", max_it = 1000, tol = sqrt(.Machine$double.eps),
+                           method = "rk4", max_it = 1000, tol = sqrt(.Machine$double.eps),
                            T = NULL, L = NULL,
                            center, type, normalize, args = NULL, grid, ...) {
 
@@ -580,11 +582,19 @@ StatStreamField <- ggproto(
       # go back through grid cropping time to T = fastest_t
       for (i in 1:nrow(grid)) {
         if (is.null(list_of_streams[[i]])) next
-        list_of_streams[[i]] <- crop_stream_time(
+        stream <- crop_stream_time(
           list_of_streams[[i]],
           T = smallest_t,
           centered = TRUE
         )
+
+        # avg_spd is the length of the drawn (cropped) stream over the time
+        # every stream was given, as for streams run to a time T; a stream that
+        # reached a sink sooner still counts the whole time
+        n_pts <- nrow(stream)
+        if (n_pts > 1) stream$avg_spd <- stream$l[n_pts] / smallest_t
+
+        list_of_streams[[i]] <- stream
       }
 
     }
@@ -610,7 +620,8 @@ StatStreamField <- ggproto(
 #' @keywords internal
 fixed_step_path <- function(u0, fun, T = NULL, L = NULL, max_it = 1000,
                             tol = sqrt(.Machine$double.eps), method = "rk4",
-                            n_steps = 25, max_turn = pi / 12, max_halvings = 30) {
+                            n_steps = 25, max_turn = pi / 12, max_speed_ratio = 2,
+                            max_halvings = 30) {
 
   T <- T %||% Inf
   L <- L %||% Inf
@@ -666,6 +677,19 @@ fixed_step_path <- function(u0, fun, T = NULL, L = NULL, max_it = 1000,
     sum(a * b) / (na * nb) >= cos(max_turn)
   }
 
+  # the speed of the field may change by at most a factor of max_speed_ratio
+  # over one step, at its end and at every stage. near a singularity such as a
+  # point charge the speed changes by orders of magnitude, and a long step can
+  # jump over the singularity to a point where the field happens to point the
+  # same way; this keeps the steps short there, so the stream stops at it
+  speed <- function(dv) if (by_length) 1 / dv[3] else norm(dv[1:2])
+  speed_ok <- function(dv, dv_new) {
+    s0 <- speed(dv); s1 <- speed(dv_new)
+    if (!is.finite(s1)) return(FALSE)
+    if (s0 < tol) return(TRUE)
+    s1 / s0 <= max_speed_ratio && s0 / s1 <= max_speed_ratio
+  }
+
   # the field has stopped moving: a sink in time, or 1/|f| blowing up in length
   stalled <- function(dv) {
     if (by_length) dv[3] > 1 / tol else norm(dv[1:2]) < tol
@@ -692,7 +716,9 @@ fixed_step_path <- function(u0, fun, T = NULL, L = NULL, max_it = 1000,
       if (all(is.finite(v_new))) {
         dv_new <- deriv(v_new)
         checks <- c(stepped$stages, list(dv_new))
-        if (all(is.finite(dv_new)) && all(vapply(checks, turn_ok, logical(1), dv = dv))) {
+        if (all(is.finite(dv_new)) &&
+            all(vapply(checks, turn_ok, logical(1), dv = dv)) &&
+            all(vapply(checks, speed_ok, logical(1), dv = dv))) {
           accepted <- TRUE
           break
         }
@@ -703,13 +729,16 @@ fixed_step_path <- function(u0, fun, T = NULL, L = NULL, max_it = 1000,
     # no step size works: the stream has reached a sink or an undefined point
     if (!accepted) break
 
-    l <- l + norm(v_new[1:2] - v[1:2])
+    moved <- norm(v_new[1:2] - v[1:2])
+    l <- l + moved
     v <- v_new
     dv <- dv_new
     k <- k + 1
     path[k,] <- c(v[3], v[1:2])
 
-    if (stalled(dv)) break
+    # stop at a sink, or when the stream has stopped moving, as it does when
+    # it closes in on a singularity in ever smaller steps
+    if (stalled(dv) || moved < tol) break
 
     h <- min(2 * h, h0)
 
@@ -719,6 +748,34 @@ fixed_step_path <- function(u0, fun, T = NULL, L = NULL, max_it = 1000,
 
   matrix_to_df_with_names(path[seq_len(k), , drop = FALSE], c("t","x","y"))
 
+}
+
+#' @keywords internal
+# the length and time that avg_spd = length / time is computed from, for a
+# stream that starts at its seed at t = 0 (one half of a centered stream).
+# avg_spd is the length a stream achieved over the time it took, but two cases
+# need care so that it describes the stream and not where the integrator stops:
+# - a stream run to a time T has its speed over T, the time it was given, even
+#   if it stopped early at a sink (T = 1e6 is the placeholder when streams are
+#   run to a length instead)
+# - a stream run to a length L that stops short of it at a sink would take
+#   unbounded time to reach the sink, so its speed is measured up to 99% of the
+#   length it achieved
+avg_spd_parts <- function(df, T, L) {
+  n <- nrow(df)
+  run_to_time <- !is.null(T) && T < 1e6
+  if (n < 2) return(c(l = 0, t = if (run_to_time) T else 0))
+
+  l <- df$l[n]
+  t <- df$t[n]
+  if (run_to_time) return(c(l = l, t = T))
+
+  if (l > 0 && !is.null(L) && l < L * (1 - 1e-6)) {
+    t_99 <- stats::approx(df$l, df$t, 0.99 * l, ties = "ordered")$y
+    return(c(l = 0.99 * l, t = t_99))
+  }
+
+  c(l = l, t = t)
 }
 
 #' @keywords internal
@@ -736,6 +793,10 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
     # solve in both directions
     df_negative <- ode_stepper(u0, neg_fun, T, L/2, max_it, tol, method, center = FALSE)
     df_positive <- ode_stepper(u0,     fun, T, L/2, max_it, tol, method, center = FALSE)
+
+    # the length and time avg_spd is computed from, for each half
+    spd_neg <- avg_spd_parts(df_negative, T, L/2)
+    spd_pos <- avg_spd_parts(df_positive, T, L/2)
 
     # format both for merging
     n_neg <- nrow(df_negative)
@@ -773,7 +834,7 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
     n <- nrow(df)
     df$d <- if (n <= 1) NA_real_ else c(NA_real_, df$d[1:(n_neg-1)], df_positive$d[-1])
     df$l <- c(0, cumsum(df$d[-1]))
-    df$avg_spd <- df$l[n] / (df$t[n] - df$t[1])
+    df$avg_spd <- (spd_neg[["l"]] + spd_pos[["l"]]) / (spd_neg[["t"]] + spd_pos[["t"]])
 
     # return
     return(df)
@@ -859,7 +920,12 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
 
   # now add on average speed and the norm
   n <- nrow(df)
-  df$avg_spd <- df$l[n] / df$t[n]
+  if (n > 0) {
+    spd <- avg_spd_parts(df, T, L)
+    df$avg_spd <- spd[["l"]] / spd[["t"]]
+  } else {
+    df$avg_spd <- numeric(0)
+  }
 
   if (nrow(df) == 0) {
     df$norm <- numeric(0)

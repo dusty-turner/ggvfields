@@ -32,7 +32,7 @@ geom_stream_field(
   tail_point = FALSE,
   eval_point = FALSE,
   grid = NULL,
-  method = "lsoda",
+  method = "rk4",
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
@@ -47,7 +47,7 @@ stat_stream_field(
   ...,
   na.rm = FALSE,
   show.legend = NA,
-  inherit.aes = TRUE,
+  inherit.aes = FALSE,
   fun,
   xlim = NULL,
   ylim = NULL,
@@ -63,7 +63,7 @@ stat_stream_field(
   tail_point = FALSE,
   eval_point = FALSE,
   grid = NULL,
-  method = "lsoda",
+  method = "rk4",
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
@@ -95,7 +95,7 @@ geom_stream_field2(
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
-  method = "lsoda"
+  method = "rk4"
 )
 
 stat_stream_field2(
@@ -123,7 +123,7 @@ stat_stream_field2(
   lineend = "butt",
   linejoin = "round",
   linemitre = 10,
-  method = "lsoda"
+  method = "rk4"
 )
 }
 \arguments{
@@ -208,13 +208,15 @@ where the field was computed. Defaults to \code{FALSE}.}
 placement. If \code{NULL} (default), a regular Cartesian grid is generated based
 on \code{xlim}, \code{ylim}, and \code{n}.}
 
-\item{method}{Character. Integration method. \code{"lsoda"} (the default) uses
-the adaptive solver from \code{deSolve::ode()}, stopping each stream when
-its arc length reaches \code{L}. \code{"rk4"} (Runge-Kutta 4) and \code{"euler"} (Euler's
-method) step through the field in equal shares of the arc length \code{L} or,
-when streams are run to a time \code{T}, of that time. A step is shortened
-where the field turns sharply, so a stream that runs into a sink stops
-there, short of \code{L}.}
+\item{method}{Character. Integration method. \code{"rk4"} (Runge-Kutta 4, the
+default) and \code{"euler"} (Euler's method) step through the field in equal
+shares of the arc length \code{L} or, when streams are run to a time \code{T}, of
+that time. A step is shortened where the field turns or changes speed
+sharply, so a stream that runs into a sink or a singularity (such as a
+point charge) stops there, short of \code{L}. \code{"lsoda"} uses the adaptive solver from
+\code{deSolve::ode()}, stopping each stream when its arc length reaches
+\code{L}; it was the integrator in ggvfields 1.0.1. \code{geom_gradient_field()},
+\code{geom_stream_smooth()} and \code{geom_gradient_smooth()} always use \code{"rk4"}.}
 
 \item{lineend}{Line end style (round, butt, square).}
 
@@ -270,9 +272,13 @@ The following variables are computed internally by \link{StatStreamField} during
 integration of the vector field:
 
 \describe{
-\item{avg_spd}{For vector fields, this is computed as the total arc length divided
-by the integration time, providing an estimate of the average speed. It is used to
-scale the vector lengths when mapping \code{length = after_stat(norm)}.}
+\item{avg_spd}{The average speed along the stream: its arc length divided by
+the time it took. Streams run to a time \code{T} (and, with \code{normalize = FALSE},
+streams cut back to the time of the fastest one) use the time they were
+given, even if they stopped early at a sink. A stream run to a length \code{L}
+that stops short of it at a sink would take unbounded time to reach the
+sink, so its speed is measured up to 99\% of the length it achieved. This
+is the default color of streams.}
 
 \item{t}{The integration time at each computed point along a streamline.}
 
