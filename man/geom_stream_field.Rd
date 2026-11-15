@@ -213,7 +213,13 @@ default) and \code{"euler"} (Euler's method) step through the field in equal
 shares of the arc length \code{L} or, when streams are run to a time \code{T}, of
 that time. A step is shortened where the field turns or changes speed
 sharply, so a stream that runs into a sink or a singularity (such as a
-point charge) stops there, short of \code{L}. \code{"lsoda"} uses the adaptive solver from
+point charge) stops there, short of \code{L}, while a stream that meets a jump
+in the field (for example one defined with \code{sign()} or \code{ifelse()}) carries
+on across it, unless the field on the far side points back. A stream that
+reaches a line the field converges on from both sides stops there; the
+exact solution would slide along the line. Sinks, singularities and jumps
+are told apart by how sharply the field turns and changes speed, so a
+field built to sit on those thresholds can be misjudged. \code{"lsoda"} uses the adaptive solver from
 \code{deSolve::ode()}, stopping each stream when its arc length reaches
 \code{L}; it was the integrator in ggvfields 1.0.1. \code{geom_gradient_field()},
 \code{geom_stream_smooth()} and \code{geom_gradient_smooth()} always use \code{"rk4"}.}
@@ -277,8 +283,9 @@ the time it took. Streams run to a time \code{T} (and, with \code{normalize = FA
 streams cut back to the time of the fastest one) use the time they were
 given, even if they stopped early at a sink. A stream run to a length \code{L}
 that stops short of it at a sink would take unbounded time to reach the
-sink, so its speed is measured up to 99\% of the length it achieved. This
-is the default color of streams.}
+sink, so its exact average speed is 0; instead its speed is measured up
+to 99\% of the length it achieved, so that its color reflects how fast it
+moved while it visibly moved. This is the default color of streams.}
 
 \item{t}{The integration time at each computed point along a streamline.}
 

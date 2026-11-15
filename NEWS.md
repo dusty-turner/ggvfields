@@ -16,7 +16,8 @@
   `"rk4"` and `"euler"` are now real integrators: they step in equal shares of
   the arc length `L`, or of the time `T` when streams are run to a time, and
   shorten a step where the field turns or changes speed sharply, so streams
-  that run into a sink or a point charge stop there. The 1.0.1 behavior is available as `method = "lsoda"`. An
+  that run into a sink or a point charge stop there, while streams cross a
+  jump in the field (for example one defined with `sign()` or `ifelse()`). The 1.0.1 behavior is available as `method = "lsoda"`. An
   unknown `method` is now an error.
 * Streams are now computed with `"rk4"` by default, in `geom_stream_field()`
   and its relatives as well as `geom_gradient_field(type = "stream")`,

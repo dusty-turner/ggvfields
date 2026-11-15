@@ -65,7 +65,13 @@
 #'   shares of the arc length `L` or, when streams are run to a time `T`, of
 #'   that time. A step is shortened where the field turns or changes speed
 #'   sharply, so a stream that runs into a sink or a singularity (such as a
-#'   point charge) stops there, short of `L`. `"lsoda"` uses the adaptive solver from
+#'   point charge) stops there, short of `L`, while a stream that meets a jump
+#'   in the field (for example one defined with `sign()` or `ifelse()`) carries
+#'   on across it, unless the field on the far side points back. A stream that
+#'   reaches a line the field converges on from both sides stops there; the
+#'   exact solution would slide along the line. Sinks, singularities and jumps
+#'   are told apart by how sharply the field turns and changes speed, so a
+#'   field built to sit on those thresholds can be misjudged. `"lsoda"` uses the adaptive solver from
 #'   \code{deSolve::ode()}, stopping each stream when its arc length reaches
 #'   `L`; it was the integrator in ggvfields 1.0.1. `geom_gradient_field()`,
 #'   `geom_stream_smooth()` and `geom_gradient_smooth()` always use `"rk4"`.
@@ -116,8 +122,9 @@
 #'     streams cut back to the time of the fastest one) use the time they were
 #'     given, even if they stopped early at a sink. A stream run to a length `L`
 #'     that stops short of it at a sink would take unbounded time to reach the
-#'     sink, so its speed is measured up to 99% of the length it achieved. This
-#'     is the default color of streams.}
+#'     sink, so its exact average speed is 0; instead its speed is measured up
+#'     to 99% of the length it achieved, so that its color reflects how fast it
+#'     moved while it visibly moved. This is the default color of streams.}
 #'
 #'   \item{t}{The integration time at each computed point along a streamline.}
 #'
@@ -703,6 +710,30 @@ fixed_step_path <- function(u0, fun, T = NULL, L = NULL, max_it = 1000,
   }
 
   h0 <- if (by_length) L / n_steps else T / n_steps
+
+  # the turn and speed checks also stop a stream at a jump in the field, e.g.
+  # one defined with sign() or ifelse(), where the particle should carry on.
+  # when a stream is about to stop, cross() takes one tiny step straight ahead
+  # and keeps it only if the far side looks like a jump: the field is finite,
+  # its speed changes by less than a factor of 10, and it does not point back
+  # (it turns less than 120 degrees). near a sink the speed is proportional to
+  # the distance from it, and the probe goes ~100 times further than where the
+  # stream stopped, so the speed changes ~100-fold; near a point charge it
+  # changes even more; past a line the field converges on, the field points
+  # back. streams therefore still stop at all three
+  cross <- function(v, dv) {
+    dist <- max(1e-4 * (if (by_length) h0 else h0 * speed(dv)), 100 * tol)
+    v_p <- v + (if (by_length) dist else dist / speed(dv)) * dv
+    if (!all(is.finite(v_p))) return(NULL)
+    dv_p <- deriv(v_p)
+    if (!all(is.finite(dv_p)) || stalled(dv_p)) return(NULL)
+    s0 <- speed(dv); s1 <- speed(dv_p)
+    if (!(s1 / s0 < 10 && s0 / s1 < 10)) return(NULL)
+    a <- dv[1:2]; b <- dv_p[1:2]
+    if (sum(a * b) / (norm(a) * norm(b)) <= cos(2 * pi / 3)) return(NULL)
+    list(v = v_p, dv = dv_p)
+  }
+
   h <- h0
   v <- c(u, 0)
   dv <- deriv(v)
@@ -740,8 +771,15 @@ fixed_step_path <- function(u0, fun, T = NULL, L = NULL, max_it = 1000,
       h <- h / 2
     }
 
-    # no step size works: the stream has reached a sink or an undefined point
-    if (!accepted) break
+    # no step size works: the stream is at a jump in the field (cross it), or
+    # at a sink or an undefined point (stop)
+    if (!accepted) {
+      jump <- cross(v, dv)
+      if (is.null(jump)) break
+      v_new <- jump$v
+      dv_new <- jump$dv
+      h <- h0
+    }
 
     moved <- norm(v_new[1:2] - v[1:2])
     l <- l + moved
@@ -750,9 +788,22 @@ fixed_step_path <- function(u0, fun, T = NULL, L = NULL, max_it = 1000,
     k <- k + 1
     path[k,] <- c(v[3], v[1:2])
 
-    # stop at a sink, or when the stream has stopped moving, as it does when
-    # it closes in on a singularity in ever smaller steps
-    if (stalled(dv) || moved < tol) break
+    # stop at a sink
+    if (stalled(dv)) break
+
+    # the stream has stopped moving: it is closing in, in ever smaller steps,
+    # on a jump in the field (cross it) or on a sink or singularity (stop)
+    if (moved < tol) {
+      jump <- if (k <= max_it) cross(v, dv)
+      if (is.null(jump)) break
+      l <- l + norm(jump$v[1:2] - v[1:2])
+      v <- jump$v
+      dv <- jump$dv
+      k <- k + 1
+      path[k,] <- c(v[3], v[1:2])
+      h <- h0
+      next
+    }
 
     h <- min(2 * h, h0)
 

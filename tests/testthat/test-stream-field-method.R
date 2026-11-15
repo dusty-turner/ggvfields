@@ -230,3 +230,30 @@ test_that("fields that index their argument by name work with every integrator",
     }
   })
 })
+
+test_that("rk4 and euler streams cross jumps in the field", {
+  # a particle crosses a line where the field jumps, as long as the field on
+  # the far side carries it on; seeds on the line are drawn too
+  seed <- c(x = -0.05, y = 0.1)
+  for (m in c("rk4", "euler")) {
+    # the direction turns 90 degrees at x = 0: down-right, then up-right
+    s <- ode_stepper(seed, function(u) c(1, sign(u[1])), T = 1e6, L = 0.17, method = m)
+    expect_equal(max(s$l), 0.17, tolerance = 1e-6, info = m)
+    expect_equal(c(tail(s$x, 1), tail(s$y, 1)),
+                 c(0.17 / sqrt(2) - 0.05, 0.05 + 0.17 / sqrt(2) - 0.05), tolerance = 1e-4, info = m)
+
+    # the speed triples at x = 0
+    s <- ode_stepper(seed, function(u) c(1, 0) * ifelse(u[1] > 0, 3, 1), T = 1e6, L = 0.17, method = m)
+    expect_equal(c(tail(s$x, 1), tail(s$y, 1)), c(0.12, 0.1), tolerance = 1e-6, info = m)
+
+    d <- layer_data(ggplot() + geom_stream_field(fun = function(u) c(1, sign(u[1])), method = m))
+    expect_length(unique(d$group), 121)
+  }
+})
+
+test_that("streams stop on a line the field converges on", {
+  # both sides push towards x = 0, so a particle cannot cross it
+  s <- ode_stepper(c(x = -0.05, y = 0), function(u) c(-sign(u[1]), 0.2), T = 1e6, L = 0.17, method = "rk4")
+  expect_lt(abs(tail(s$x, 1)), 1e-6)
+  expect_lt(max(s$l), 0.06)
+})
