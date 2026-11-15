@@ -551,8 +551,13 @@ GeomStream <- ggproto("GeomStream", GeomPath,
 #' @param max_range The length, in centimeters, of the longest vector. Every
 #'   other vector is drawn in proportion to it, so a vector with half the
 #'   largest norm is half as long, and the legend shows the same lengths.
-#'   Defaults to `0.5`.
-#' @param ... Other arguments passed to \code{continuous_scale()}.
+#'   Defaults to `0.5`. With a transformation that makes some values
+#'   negative, such as `transform = "log10"` with norms below 1, lengths
+#'   instead run from a tenth of `max_range` for the smallest value to
+#'   `max_range` for the largest, so they still grow with the norm and no
+#'   vector is reversed.
+#' @param ... Other arguments passed to \code{continuous_scale()}, such as
+#'   `transform`.
 #'
 #' @return If \code{max_range} is less than or equal to 0.5 (the default), a
 #'   continuous scale object (typically of class \code{"ScaleContinuous"})
@@ -577,20 +582,21 @@ scale_length_continuous <- function(max_range = 0.5, ...) {
   }
 
 
-  if (any(grepl("trans|transform", names(args), ignore.case = TRUE))) {
-    cli::cli_warn(c(
-      "!" = "Applying a log style transformation with {.fn scale_length_continuous} may yield negative length values for norms below 1.",
-      ">" = "This may potentially reverse the direction of the vector(s)."
-    ))
-  }
-
   # lengths are proportional to the mapped value: it is rescaled from 0 (not
-  # from its smallest value) to its largest, and drawn from 0 to max_range cm
+  # from its smallest value) to its largest, and drawn from 0 to max_range cm.
+  # a transformation such as log10 can make values negative (norms below 1);
+  # then the transformed range is mapped to lengths from a tenth of max_range
+  # to max_range, so lengths still grow with the value and are never negative
   if (!"rescaler" %in% names(args)) {
     args$rescaler <- function(x, to = c(0, 1), from = NULL) {
       from <- from %||% if (any(is.finite(x))) range(x, finite = TRUE) else c(NA, NA)
+      if (!all(is.finite(from))) return(rep(0, length(x)))
+      if (min(from) < 0) {
+        if (diff(range(from)) == 0) return(rep(to[2], length(x)))
+        return(scales::rescale(x, to = c(to[1] + 0.1 * diff(to), to[2]), from = from))
+      }
       top <- max(from)
-      if (!is.finite(top) || top <= 0) return(rep(0, length(x)))
+      if (top <= 0) return(rep(0, length(x)))
       scales::rescale(x, to = to, from = c(0, top))
     }
   }

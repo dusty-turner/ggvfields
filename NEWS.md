@@ -10,6 +10,12 @@
   smooth uses at most half as many basis functions as there are locations.
   With fewer than 10 locations, or data without noise, `fx` and `fy` are fitted
   separately as before.
+## Bug fixes
+
+* `scale_length_continuous()` with a transformation that makes some values
+  negative, such as `transform = "log10"` with norms below 1, keeps every
+  vector's direction: lengths run from a tenth of `max_range` for the smallest
+  value to `max_range` for the largest (#24).
 
 # ggvfields 1.1.0
 
