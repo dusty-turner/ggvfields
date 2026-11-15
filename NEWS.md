@@ -91,6 +91,10 @@
 
 ## Bug fixes
 
+* `geom_gradient_smooth()` keeps a color mapping supplied in `mapping`, and
+  every field layer, including `geom_gradient_field2()`, gives the same error
+  for an unknown `type`.
+
 * `geom_stream_smooth()`, `geom_gradient_smooth()` and `geom_vector_smooth()`
   always use the stat that fits their model; a different `stat` is ignored
   with a warning.

@@ -22,6 +22,19 @@ merge_default_mapping <- function(default_mapping, mapping) {
   }
 }
 
+# type of a field layer: streams or vectors
+check_field_type <- function(type) {
+  if (!(identical(type, "stream") || identical(type, "vector"))) {
+    cli::cli_abort("{.arg type} must be {.val stream} or {.val vector}, not {.val {type}}.")
+  }
+  invisible(type)
+}
+
+# default color of a field layer: average speed for streams, norm for vectors
+colour_mapping <- function(type) {
+  if (type == "stream") aes(color = after_stat(avg_spd)) else aes(color = after_stat(norm))
+}
+
 # Was a fixed colour, e.g. color = "red", passed through `...`?
 has_fixed_colour <- function(...) {
   any(c("color", "colour") %in% names(list(...)))
@@ -172,15 +185,8 @@ stream_field_layer <- function(
     tail_point, eval_point, grid, method, lineend, linejoin, linemitre, arrow
 ) {
 
-  if (type == "vector") {
-    default_mapping <- aes(color = after_stat(norm))
-  } else if (type == "stream") {
-    default_mapping <- aes(color = after_stat(avg_spd))
-  } else {
-    cli::cli_abort("Unknown type specified. Valid values are 'vector' or 'stream'.")
-  }
-
-  mapping <- merge_default_mapping(default_mapping, mapping)
+  check_field_type(type)
+  mapping <- merge_default_mapping(colour_mapping(type), mapping)
 
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
@@ -287,17 +293,11 @@ gradient_field_layer <- function(
   if (is.null(data)) data <- ensure_nonempty_data(data)
   n <- ensure_length_two(n)
 
+  check_field_type(type)
+
   if (map_colour) {
 
-    if (type == "stream") {
-      default_mapping <- aes(color = after_stat(avg_spd))
-    } else if (type == "vector") {
-      default_mapping <- aes(color = after_stat(norm))
-    } else {
-      cli::cli_abort("`type` must be either 'stream' or 'vector', not {.val {type}}")
-    }
-
-    mapping <- merge_default_mapping(default_mapping, mapping)
+    mapping <- merge_default_mapping(colour_mapping(type), mapping)
 
   } else if (type == "vector") {
 
@@ -364,16 +364,11 @@ gradient_smooth_layer <- function(
 
   mapping <- merge_default_mapping(aes(x = x, y = y, z = z), mapping)
 
-  default_color_aes <- if (type == "stream") {
-    aes(color = after_stat(avg_spd))
-  } else if (type == "vector") {
-    aes(color = after_stat(norm))
-  } else {
-    cli::cli_abort("`type` must be either 'stream' or 'vector', not {.val {type}}")
-  }
+  check_field_type(type)
 
+  # the user's own color mapping wins over the default
   if (!has_fixed_colour(...)) {
-    mapping <- modifyList(mapping, default_color_aes)
+    mapping <- merge_default_mapping(colour_mapping(type), mapping)
   }
 
   layer(
