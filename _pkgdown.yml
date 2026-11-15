@@ -1,7 +1,7 @@
 # Configuration for pkgdown site
 
 # URL of the site (leave blank if not needed)
-url: ""
+url: https://dustysturner.com/ggvfields/
 
 # Use Bootstrap version 5 for styling
 template:

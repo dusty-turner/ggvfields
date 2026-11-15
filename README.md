@@ -13,7 +13,9 @@ developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.re
 [![](https://codecov.io/gh/dusty-turner/ggvfields/branch/main/graph/badge.svg)](https://app.codecov.io/gh/dusty-turner/ggvfields)
 
 <!-- [![](http://cranlogs.r-pkg.org/badges/last-month/ggvfields)](https://cran.r-project.org/package=ggvfields) [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/grand-total/ggvfields?color=blue)](https://r-pkg.org/pkg/ggvfields) -->
+
 <!-- [![](https://img.shields.io/github/languages/code-size/dusty-turner/ggvfields.svg)](https://github.com/dusty-turner/ggvfields) -->
+
 <!-- badger::badge_doi() -->
 
 **ggvfields** extends
@@ -52,18 +54,31 @@ options(ggplot2.continuous.colour="viridis")
 ```
 
 <!-- - [Installation](#installation) -->
+
 <!-- - [Core Features](#core-features) -->
+
 <!--   - [geom_vector and geom_vector2](#geom_vector-and-geom_vector2) -->
+
 <!--   - [geom_stream_field and geom_stream_field2](#geom_stream_field-and-geom_stream_field2) -->
+
 <!--   - [geom_vector_field and geom_vector_field2](#geom_vector_field-and-geom_vector_field2) -->
+
 <!--   - [geom_gradient_field and geom_gradient_field2](#geom_gradient_field-and-geom_gradient_field2) -->
+
 <!--   - [geom_potential](#geom_potential) -->
+
 <!-- - [Advanced Features](#advanced-features) -->
+
 <!--   - [geom_stream_smooth](#geom_stream_smooth) -->
+
 <!--   - [geom_vector_smooth](#geom_vector_smooth) -->
+
 <!--   - [geom_gradient_smooth](#geom_gradient_smooth) -->
+
 <!-- - [Other Features](#other-features) -->
+
 <!--   - [Automatic Limit Detection](#automatic-limit-detection) -->
+
 <!--   - [Custom Grids](#custom-grids) -->
 
 ------------------------------------------------------------------------
@@ -232,9 +247,7 @@ The `geom_gradient_field()` function computes and visualizes gradient
 fields derived from scalar functions and displays the gradient vector
 field of a scalar function, $f(x, y)$. The gradient is given by:
 
-$$
-\nabla f(x, y) = \left( \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right)
-$$
+$$\nabla f(x, y) = \left( \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right)$$
 
 This vector field points in the direction of the greatest rate of
 increase of the scalar function. The function numerically evaluates
@@ -453,21 +466,22 @@ ggplot(wind_data, aes(x = lon, y = lat, fx = fx, fy = fy)) +
 Provides smoothed estimates of vector fields by applying statistical
 techniques to observed vectors.
 
-By default (`method = "gam"`), each component of the vector field is smoothed with a generalized additive model using a thin plate spline in `x` and `y`. With `method = "lm"`, smoothing is performed using a multivariate linear model, by default:
+By default (`method = "gam"`), each component of the vector field is
+smoothed with a generalized additive model using a thin plate spline in
+`x` and `y`. With `method = "lm"`, smoothing is performed using a
+multivariate linear model, by default:
 
-$$
-\begin{pmatrix}
+$$\begin{pmatrix}
 \hat{dx} \\
 \hat{dy}
-\end{pmatrix} = \beta_0 + \beta_1 x + \beta_2 y + \beta_3 xy
-$$
+\end{pmatrix} = \beta_0 + \beta_1 x + \beta_2 y + \beta_3 xy$$
 
 where $\beta$ are coefficients estimated by ordinary least squares
 (OLS), and the model can be changed with the `formula` argument. This
-approach captures linear and interaction effects to
-approximate the underlying vector field. This function also creates a
-prediction interval around the vector specified by the `conf_level`
-argument and defaults to `.95`.
+approach captures linear and interaction effects to approximate the
+underlying vector field. This function also creates a prediction
+interval around the vector specified by the `conf_level` argument and
+defaults to `.95`.
 
 - **Evaluating Specific Points**:
 
