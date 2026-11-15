@@ -32,7 +32,7 @@
 #' @param arrow An optional [grid::arrow()] specification to place arrowheads on
 #'   the streamline.
 #' @param arrow.fill An optional parameter specifying the color of the arrow
-#'   head. Defaults to `NULL` and inherets fill/alpha of `aes()`.
+#'   head. Defaults to `NULL` and inherits fill/alpha of `aes()`.
 #' @param lineend Line end style (round, butt, square).
 #' @param linejoin Line join style (round, mitre, bevel).
 #' @param linemitre Line mitre limit (number greater than 1).

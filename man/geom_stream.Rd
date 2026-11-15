@@ -65,7 +65,7 @@ with a warning. If \code{TRUE}, missing values are silently removed.}
 rather than combining with them.}
 
 \item{arrow.fill}{An optional parameter specifying the color of the arrow
-head. Defaults to \code{NULL} and inherets fill/alpha of \code{aes()}.}
+head. Defaults to \code{NULL} and inherits fill/alpha of \code{aes()}.}
 
 \item{lineend}{Line end style (round, butt, square).}
 
