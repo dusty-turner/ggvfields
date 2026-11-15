@@ -55,6 +55,10 @@
   variogram from the data and works in standardized coordinates, so the
   smoothed field does not depend on the units of `x` and `y`. The fitted
   coregionalization is kept positive definite.
+* Vectors in polar form take their magnitude from the `norm` aesthetic, the
+  same name as the computed variable, with `angle` or `angle_deg`. `distance`
+  is accepted as another name for it. The stream smoothers take polar input
+  without an "unknown aesthetics" warning.
 * `geom_gradient_field()`, `geom_gradient_field2()` and their stats take a
   `method` argument for the stream integrator, as `geom_stream_field()` does.
 * `stat_vector_smooth()` is exported.

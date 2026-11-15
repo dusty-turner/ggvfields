@@ -78,7 +78,7 @@ stat_vector2(
 \item{mapping}{A set of aesthetic mappings created by \code{ggplot2::aes()}.
 \strong{Required:} Must include \strong{\code{x}} and \strong{\code{y}}; in addition, either \strong{\code{xend}}
 and \strong{\code{yend}} or one of the alternative specifications (\strong{\code{fx}}/ \strong{\code{fy}}
-or \strong{\code{angle}}/ \strong{\code{angle_deg}} and \strong{\code{distance}}) must be provided.}
+or \strong{\code{angle}}/ \strong{\code{angle_deg}} and \strong{\code{norm}}) must be provided.}
 
 \item{data}{A data frame containing the vector data in wide format.}
 
@@ -133,7 +133,7 @@ A ggplot2 layer that can be added to a plot.
 Create layers for drawing vectors on ggplot2 plots. These functions accept
 wide-format data with the required aesthetics \strong{\code{x}} and \strong{\code{y}} plus either
 \strong{\code{xend}} and \strong{\code{yend}} or one of the alternative specifications: \strong{\code{fx}}
-and \strong{\code{fy}}, or \strong{\code{angle}}/ \strong{\code{angle_deg}} and \strong{\code{distance}}.
+and \strong{\code{fy}}, or \strong{\code{angle}}/ \strong{\code{angle_deg}} and \strong{\code{norm}}.
 }
 \details{
 When specifying the vector direction using polar coordinates, you can provide
@@ -145,7 +145,8 @@ automatically converted to radians).
 }
 
 The endpoints are computed by translating the starting point using these
-polar coordinates along with the supplied \strong{\code{distance}}.
+polar coordinates along with the supplied magnitude, \strong{\code{norm}} (also
+accepted under the name \strong{\code{distance}}).
 
 The data is converted to long format (two rows per vector) via \link{StatVector}
 and rendered with \link{GeomStream}. Optionally, arrowheads can be added to
@@ -175,7 +176,8 @@ instead, so length shows each vector's norm.
 \item fy (alternative specification)
 \item angle (vector direction in radians; alternative specification)
 \item angle_deg (vector direction in degrees; alternative specification, converted to radians)
-\item distance (with angle/angle_deg, used to compute endpoints)
+\item norm (the magnitude, with angle/angle_deg, used to compute endpoints;
+\code{distance} is accepted as another name for it)
 \item alpha
 \item color
 \item fill
@@ -216,20 +218,20 @@ data <- data.frame(
 ggplot(data, aes(x, y)) +
   geom_vector(aes(fx = fx, fy = fy))
 
-# Using angle (in radians) and distance to compute endpoints
+# Using angle (in radians) and norm to compute endpoints
 ggplot(data, aes(x, y)) +
-  geom_vector(aes(angle = dir, distance = spd))
+  geom_vector(aes(angle = dir, norm = spd))
 
-# Using angle_deg (in degrees) and distance to compute endpoints
+# Using angle_deg (in degrees) and norm to compute endpoints
 vectors3 <- data.frame(
   x = c(0, 1, 2),
   y = c(0, 1, 2),
   angle_deg = c(0, 90, 45),
   angle = c(0, pi/2, pi/4),
-  distance = c(3, 4, 5)
+  norm = c(3, 4, 5)
 )
 ggplot(vectors3, aes(x, y)) +
-  geom_vector(aes(angle_deg = angle_deg, distance = distance))
+  geom_vector(aes(angle_deg = angle_deg, norm = norm))
 
 # Basic usage with explicit start and end points:
 vectors1 <- data.frame(
@@ -246,7 +248,7 @@ ggplot(vectors1, aes(x = x, y = y, xend = xend, yend = yend)) +
   geom_vector(center = TRUE)
 
 # Using normalize = TRUE to adjust vectors to unit length:
-ggplot(vectors3, aes(x = x, y = y, angle = angle, distance = distance)) +
+ggplot(vectors3, aes(x = x, y = y, angle = angle, norm = norm)) +
   geom_vector(normalize = TRUE)
 
 # Using geom_vector2, which adds a default mapping for `length`

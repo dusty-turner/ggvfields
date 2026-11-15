@@ -176,8 +176,9 @@ vector displacements.
 If \code{xend}/\code{yend} are missing or all \code{NA}, the function computes them. It
 first checks for vector displacements (\code{fx} and \code{fy}); if present, it
 computes \eqn{xend = x + fx,\quad yend = y + fy.} Otherwise, it checks for
-polar coordinates (\code{angle}, in radians, and \code{distance}) and computes
-\eqn{xend = x + distance \times \cos(angle),\quad yend = y + distance \times
+polar coordinates (\code{angle}, in radians, and \code{norm}, also accepted as
+\code{distance}) and computes
+\eqn{xend = x + norm \times \cos(angle),\quad yend = y + norm \times
   \sin(angle).} An error is thrown if neither set is available.
 
 \strong{Smoothing:}

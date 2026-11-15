@@ -423,7 +423,8 @@ stream_smooth_layer <- function(
   if (is.call(lhs) && identical(lhs[[1]], as.name("cbind"))) {
     lhs_vars <- sapply(as.list(lhs[-1]), as.character)
     if (all(lhs_vars %in% c("xend", "yend")) ||
-        all(lhs_vars %in% c("distance", "angle"))) {
+        all(lhs_vars %in% c("distance", "angle")) ||
+        all(lhs_vars %in% c("norm", "angle"))) {
       # Change to use fx and fy instead
       formula[[2]] <- substitute(cbind(fx, fy))
     }

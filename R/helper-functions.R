@@ -78,6 +78,16 @@ grid_spacing <- function(grid) {
   if (is.finite(s) && s > 0) s else NULL
 }
 
+# a vector given in polar form has an angle and a magnitude; the magnitude
+# may be mapped as `norm` (the name of the computed variable) or `distance`
+norm_as_distance <- function(data) {
+  if ("norm" %in% names(data) && !all(is.na(data$norm)) &&
+      (!"distance" %in% names(data) || all(is.na(data$distance)))) {
+    data$distance <- data$norm
+  }
+  data
+}
+
 # the smoothing layers always use their own stat, which fits the model; warn
 # when a different stat is supplied, since it is not used
 warn_if_stat_ignored <- function(stat, own, own_name, fn) {

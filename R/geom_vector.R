@@ -3,7 +3,7 @@
 #' Create layers for drawing vectors on ggplot2 plots. These functions accept
 #' wide-format data with the required aesthetics **`x`** and **`y`** plus either
 #' **`xend`** and **`yend`** or one of the alternative specifications: **`fx`**
-#' and **`fy`**, or **`angle`**/ **`angle_deg`** and **`distance`**.
+#' and **`fy`**, or **`angle`**/ **`angle_deg`** and **`norm`**.
 #'
 #' When specifying the vector direction using polar coordinates, you can provide
 #' either:
@@ -13,7 +13,8 @@
 #' automatically converted to radians).
 #'
 #' The endpoints are computed by translating the starting point using these
-#' polar coordinates along with the supplied **`distance`**.
+#' polar coordinates along with the supplied magnitude, **`norm`** (also
+#' accepted under the name **`distance`**).
 #'
 #' The data is converted to long format (two rows per vector) via [StatVector]
 #' and rendered with [GeomStream]. Optionally, arrowheads can be added to
@@ -34,7 +35,7 @@
 #' @param mapping A set of aesthetic mappings created by \code{ggplot2::aes()}.
 #'   **Required:** Must include **`x`** and **`y`**; in addition, either **`xend`**
 #'   and **`yend`** or one of the alternative specifications (**`fx`**/ **`fy`**
-#'   or **`angle`**/ **`angle_deg`** and **`distance`**) must be provided.
+#'   or **`angle`**/ **`angle_deg`** and **`norm`**) must be provided.
 #' @param data A data frame containing the vector data in wide format.
 #' @param stat The statistical transformation to use on the data (default:
 #'   [StatVector]).
@@ -80,7 +81,8 @@
 #'   - fy (alternative specification)
 #'   - angle (vector direction in radians; alternative specification)
 #'   - angle_deg (vector direction in degrees; alternative specification, converted to radians)
-#'   - distance (with angle/angle_deg, used to compute endpoints)
+#'   - norm (the magnitude, with angle/angle_deg, used to compute endpoints;
+#'   `distance` is accepted as another name for it)
 #'   - alpha
 #'   - color
 #'   - fill
@@ -119,20 +121,20 @@
 #' ggplot(data, aes(x, y)) +
 #'   geom_vector(aes(fx = fx, fy = fy))
 #'
-#' # Using angle (in radians) and distance to compute endpoints
+#' # Using angle (in radians) and norm to compute endpoints
 #' ggplot(data, aes(x, y)) +
-#'   geom_vector(aes(angle = dir, distance = spd))
+#'   geom_vector(aes(angle = dir, norm = spd))
 #'
-#' # Using angle_deg (in degrees) and distance to compute endpoints
+#' # Using angle_deg (in degrees) and norm to compute endpoints
 #' vectors3 <- data.frame(
 #'   x = c(0, 1, 2),
 #'   y = c(0, 1, 2),
 #'   angle_deg = c(0, 90, 45),
 #'   angle = c(0, pi/2, pi/4),
-#'   distance = c(3, 4, 5)
+#'   norm = c(3, 4, 5)
 #' )
 #' ggplot(vectors3, aes(x, y)) +
-#'   geom_vector(aes(angle_deg = angle_deg, distance = distance))
+#'   geom_vector(aes(angle_deg = angle_deg, norm = norm))
 #'
 #' # Basic usage with explicit start and end points:
 #' vectors1 <- data.frame(
@@ -149,7 +151,7 @@
 #'   geom_vector(center = TRUE)
 #'
 #' # Using normalize = TRUE to adjust vectors to unit length:
-#' ggplot(vectors3, aes(x = x, y = y, angle = angle, distance = distance)) +
+#' ggplot(vectors3, aes(x = x, y = y, angle = angle, norm = norm)) +
 #'   geom_vector(normalize = TRUE)
 #'
 #' # Using geom_vector2, which adds a default mapping for `length`
@@ -223,12 +225,13 @@ StatVector <- ggproto("StatVector", Stat,
 
   required_aes = c("x", "y"),
 
-  default_aes = aes(xend = NA, yend = NA, distance = NA, angle = NA,
+  default_aes = aes(xend = NA, yend = NA, distance = NA, norm = NA, angle = NA,
                     angle_deg = NA, fx = NA, fy = NA),
 
   compute_group = function(data, scales, center, normalize, L,...) {
 
     n <- nrow(data)
+    data <- norm_as_distance(data)
 
     data$x0 <- data$x
     data$y0 <- data$y
@@ -252,7 +255,7 @@ StatVector <- ggproto("StatVector", Stat,
         data$xend <- data$x + data$distance * cos(data$angle)
         data$yend <- data$y + data$distance * sin(data$angle)
       } else {
-        cli::cli_abort("Either xend/yend or fx/fy or angle/distance must be provided.")
+        cli::cli_abort("Either xend/yend or fx/fy or angle/norm must be provided.")
       }
     }
 

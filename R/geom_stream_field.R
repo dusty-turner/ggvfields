@@ -410,11 +410,15 @@ StatStreamField <- ggproto(
   "StatStreamField",
   Stat,
   default_aes = aes(group = after_stat(id)),
+  # observed vectors (for the smoothing stats) can be given as fx/fy, as
+  # xend/yend, or in polar form as angle with distance or norm
+  optional_aes = c("fx", "fy", "xend", "yend", "angle", "distance", "norm"),
 
   setup_data = function(data, params) {
 
     # If data has xend/yend (and not already fx/fy), compute fx and fy.
     if (!is.null(data)) {
+      data <- norm_as_distance(data)
       if (all(c("xend", "yend") %in% names(data)) &&
           !(all(c("fx", "fy") %in% names(data)))) {
         data$fx <- data$xend - data$x
@@ -428,7 +432,7 @@ StatStreamField <- ggproto(
         data$fx <- data$distance * cos(data$angle)
         data$fy <- data$distance * sin(data$angle)
         # Remove angle and distance so that they don't affect scale calculations.
-        data <- data[, setdiff(names(data), c("angle", "distance")), drop = FALSE]
+        data <- data[, setdiff(names(data), c("angle", "distance", "norm")), drop = FALSE]
       }
     }
     data

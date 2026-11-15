@@ -233,10 +233,10 @@ StatVectorSmooth <- ggproto(
   "StatVectorSmooth",
   Stat,
   required_aes = c("x", "y"),
-  dropped_aes = c("distance", "angle"),
+  dropped_aes = c("distance", "norm", "angle"),
   default_aes = aes(
     linewidth = 0.5, linetype = 1, alpha = 1,
-    angle = NA, distance = NA, fx = NA, fy = NA, length = NA
+    angle = NA, distance = NA, norm = NA, fx = NA, fy = NA, length = NA
   ),
 
   compute_group = function(data, scales, n, method, se = TRUE, conf_level,
@@ -253,6 +253,7 @@ StatVectorSmooth <- ggproto(
       pi_type <- "wedge"
     }
     # Use helper function to validate input
+    data <- norm_as_distance(data)
     validation_result <- validate_aesthetics(data)
 
     # If 'angle' and 'distance' are provided, compute 'fx' and 'fy'
@@ -737,7 +738,7 @@ validate_aesthetics <- function(data) {
 
   # If neither pair is fully provided, throw an error
   if (!(has_angle_distance || has_fx_fy)) {
-    cli::cli_abort("You must provide either both 'fx' and 'fy' or both 'angle' and 'distance' aesthetics.")
+    cli::cli_abort("You must provide either both 'fx' and 'fy' or both 'angle' and 'norm' aesthetics.")
   }
 
   # Return a list indicating which pair is present

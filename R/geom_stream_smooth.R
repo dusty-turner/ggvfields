@@ -57,8 +57,9 @@
 #'   If `xend`/`yend` are missing or all `NA`, the function computes them. It
 #'   first checks for vector displacements (`fx` and `fy`); if present, it
 #'   computes \eqn{xend = x + fx,\quad yend = y + fy.} Otherwise, it checks for
-#'   polar coordinates (`angle`, in radians, and `distance`) and computes
-#'   \eqn{xend = x + distance \times \cos(angle),\quad yend = y + distance \times
+#'   polar coordinates (`angle`, in radians, and `norm`, also accepted as
+#'   `distance`) and computes
+#'   \eqn{xend = x + norm \times \cos(angle),\quad yend = y + norm \times
 #'   \sin(angle).} An error is thrown if neither set is available.
 #'
 #' **Smoothing:**
