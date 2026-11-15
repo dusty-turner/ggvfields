@@ -108,7 +108,9 @@ from the exact distribution of that angle when the tip is normally
 distributed with the predicted mean and covariance.
 \item \code{"length"}: A band along each vector shows the prediction interval for
 its length: the central \code{conf_level} range of the length of its tip, from
-the exact distribution of that length.
+the exact distribution of that length. On a grid, where the vectors are
+drawn at a common length, each band is scaled with its vector and cut off
+at twice the vector's drawn length.
 Ellipses are a joint region for the tip; wedges and length bands are each
 an interval for one coordinate, the direction or the length, and only one
 type is drawn at a time.

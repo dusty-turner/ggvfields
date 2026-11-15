@@ -58,7 +58,9 @@
 #'   distributed with the predicted mean and covariance.
 #'   - `"length"`: A band along each vector shows the prediction interval for
 #'   its length: the central `conf_level` range of the length of its tip, from
-#'   the exact distribution of that length.
+#'   the exact distribution of that length. On a grid, where the vectors are
+#'   drawn at a common length, each band is scaled with its vector and cut off
+#'   at twice the vector's drawn length.
 #'   Ellipses are a joint region for the tip; wedges and length bands are each
 #'   an interval for one coordinate, the direction or the length, and only one
 #'   type is drawn at a time.
@@ -679,11 +681,15 @@ GeomVectorSmooth <- ggproto(
         magnitude <- sqrt(data$fx^2 + data$fy^2)
         ux <- data$fx / magnitude
         uy <- data$fy / magnitude
+        upper <- data$length_upper
+        # on a grid, where vectors share a drawn length, a band is cut off at
+        # twice that length, as a wedge is cut off at a full circle
+        if (is.null(eval_points)) upper <- pmin(upper, 2 * magnitude)
         band <- data.frame(
           x = data$x + data$length_lower * ux,
           y = data$y + data$length_lower * uy,
-          xend = data$x + data$length_upper * ux,
-          yend = data$y + data$length_upper * uy,
+          xend = data$x + upper * ux,
+          yend = data$y + upper * uy,
           PANEL = data$PANEL, group = data$id,
           colour = "grey40", alpha = 0.4, linewidth = 3, linetype = 1
         )

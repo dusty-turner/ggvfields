@@ -64,3 +64,20 @@ test_that("length intervals work for every method and pi_type is checked", {
   expect_error(geom_vector_smooth(pi_type = "both"), "must be one of")
   expect_error(geom_vector_smooth(pi_type = c("wedge", "length")), "must be one of")
 })
+
+test_that("on a grid, drawn length bands are cut off at twice the vector", {
+  set.seed(5)
+  d <- data.frame(x = runif(80, -1, 1), y = runif(80, -1, 1))
+  d$fx <- d$x + rnorm(80, 0, 0.3)   # a field that vanishes at the origin
+  d$fy <- d$y + rnorm(80, 0, 0.3)
+  p <- ggplot(d, aes(x, y, fx = fx, fy = fy)) + geom_vector_smooth(pi_type = "length", n = 5)
+  ld <- layer_data(p)
+  len <- sqrt(ld$fx^2 + ld$fy^2)
+  expect_true(any(ld$length_upper > 2 * len))   # some raw bounds are long
+
+  grob <- layer_grob(p)[[1]]
+  band <- grob$children[[1]]
+  drawn <- sqrt((as.numeric(band$x1) - as.numeric(band$x0))^2 +
+                (as.numeric(band$y1) - as.numeric(band$y0))^2)
+  expect_true(all(is.finite(drawn)))
+})
