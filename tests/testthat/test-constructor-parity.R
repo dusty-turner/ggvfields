@@ -85,7 +85,7 @@ pairs <- list(
     )
   ),
   vector_smooth = list(
-    args = list(n = c(3, 4), method = "lm", se = FALSE, se.circle = TRUE,
+    args = list(n = c(3, 4), xlim = c(0, 1), ylim = c(0, 2), method = "lm", se = FALSE, se.circle = TRUE,
                 pi_type = "wedge", conf_level = .8, formula = cbind(fx, fy) ~ x,
                 eval_points = pts, arrow = ar),
     fixed_aes = list(linetype = 2)

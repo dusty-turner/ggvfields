@@ -17,10 +17,12 @@ geom_vector_smooth(
   show.legend = NA,
   inherit.aes = TRUE,
   n = c(11, 11),
+  xlim = NULL,
+  ylim = NULL,
   method = "gam",
   se = TRUE,
   se.circle = FALSE,
-  pi_type = "ellipse",
+  pi_type = NULL,
   conf_level = 0.95,
   formula = cbind(fx, fy) ~ x * y,
   eval_points = NULL,
@@ -37,11 +39,13 @@ stat_vector_smooth(
   show.legend = NA,
   inherit.aes = TRUE,
   n = c(11, 11),
+  xlim = NULL,
+  ylim = NULL,
   method = "gam",
   se = TRUE,
   se.circle = FALSE,
   conf_level = 0.95,
-  pi_type = "ellipse",
+  pi_type = NULL,
   formula = cbind(fx, fy) ~ x * y,
   eval_points = NULL,
   arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
@@ -66,6 +70,10 @@ underlying geometry/stat.}
 \item{n}{An integer vector specifying the number of grid points along each
 axis for smoothing.}
 
+\item{xlim, ylim}{Numeric vectors of length 2 giving the range of the grid
+on which the smoothed field is evaluated when \code{eval_points} is \code{NULL}.
+They default to the range of the data.}
+
 \item{method}{Character. Specifies the smoothing method. Supported options
 are \code{"gam"} (default), \code{"lm"}, and \code{"kriging"}. The \code{"gam"} method fits
 separate generalized additive models for \code{fx} and \code{fy} with the smooth
@@ -87,15 +95,16 @@ around the origin of each vector. By default, the circle’s radius is
 computed as the magnitude of the predicted vector.}
 
 \item{pi_type}{Character. Determines the display style for prediction
-intervals:
+intervals. By default (\code{NULL}), ellipses are drawn at \code{eval_points} and
+wedges on a grid.
 \itemize{
-\item \code{"ellipse"} (default): Ellipses are used to represent the covariance of the predictions.
+\item \code{"ellipse"}: Ellipses are used to represent the covariance of the predictions.
 \item \code{"wedge"}: Angular wedges show the prediction interval for the direction
 of each vector: the central \code{conf_level} range of the angle of its tip,
 from the exact distribution of that angle when the tip is normally
 distributed with the predicted mean and covariance.
-Ellipses need \code{eval_points}: if \code{pi_type} is \code{"ellipse"} and \code{eval_points}
-is \code{NULL}, wedges are drawn instead, with a warning.
+Ellipses need \code{eval_points}: if \code{pi_type = "ellipse"} is set and
+\code{eval_points} is \code{NULL}, wedges are drawn instead, with a warning.
 }}
 
 \item{conf_level}{Numeric. Specifies the confidence level for the prediction

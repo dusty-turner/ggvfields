@@ -20,6 +20,9 @@
 #'   position adjustment function.
 #' @param n An integer vector specifying the number of grid points along each
 #'   axis for smoothing.
+#' @param xlim,ylim Numeric vectors of length 2 giving the range of the grid
+#'   on which the smoothed field is evaluated when `eval_points` is `NULL`.
+#'   They default to the range of the data.
 #' @param method Character. Specifies the smoothing method. Supported options
 #'   are `"gam"` (default), `"lm"`, and `"kriging"`. The `"gam"` method fits
 #'   separate generalized additive models for `fx` and `fy` with the smooth
@@ -43,14 +46,15 @@
 #'   specify the grid where the smoothing model is evaluated. If `NULL`, a grid
 #'   is generated based on `n`.
 #' @param pi_type Character. Determines the display style for prediction
-#'   intervals:
-#'   - `"ellipse"` (default): Ellipses are used to represent the covariance of the predictions.
+#'   intervals. By default (`NULL`), ellipses are drawn at `eval_points` and
+#'   wedges on a grid.
+#'   - `"ellipse"`: Ellipses are used to represent the covariance of the predictions.
 #'   - `"wedge"`: Angular wedges show the prediction interval for the direction
 #'   of each vector: the central `conf_level` range of the angle of its tip,
 #'   from the exact distribution of that angle when the tip is normally
 #'   distributed with the predicted mean and covariance.
-#'   Ellipses need `eval_points`: if `pi_type` is `"ellipse"` and `eval_points`
-#'   is `NULL`, wedges are drawn instead, with a warning.
+#'   Ellipses need `eval_points`: if `pi_type = "ellipse"` is set and
+#'   `eval_points` is `NULL`, wedges are drawn instead, with a warning.
 #' @param arrow A \code{grid::arrow()} specification for arrowheads on the
 #'   smoothed vectors.
 #' @param formula A formula specifying the multivariate linear model used for
@@ -164,10 +168,12 @@ geom_vector_smooth <- function(mapping = NULL, data = NULL,
    show.legend = NA,
    inherit.aes = TRUE,
    n = c(11, 11),
+   xlim = NULL,
+   ylim = NULL,
    method = "gam",
    se = TRUE,
    se.circle = FALSE,
-   pi_type = "ellipse",
+   pi_type = NULL,
    conf_level = .95,
    formula = cbind(fx, fy) ~ x * y,
    eval_points = NULL,
@@ -195,11 +201,13 @@ stat_vector_smooth <- function(mapping = NULL, data = NULL,
    show.legend = NA,
    inherit.aes = TRUE,
    n = c(11, 11),
+   xlim = NULL,
+   ylim = NULL,
    method = "gam",
    se = TRUE,
    se.circle = FALSE,
    conf_level = .95,
-   pi_type = "ellipse",
+   pi_type = NULL,
    formula = cbind(fx, fy) ~ x * y,
    eval_points = NULL,
    arrow = grid::arrow(angle = 20, length = unit(0.015, "npc"), type = "closed")
@@ -229,7 +237,8 @@ StatVectorSmooth <- ggproto(
   ),
 
   compute_group = function(data, scales, n, method, se = TRUE, conf_level,
-                           pi_type, eval_points = NULL, formula, ...) {
+                           pi_type, eval_points = NULL, formula,
+                           xlim = NULL, ylim = NULL, ...) {
     # ----------------------------
     # 1. Initial Data Checks and Manipulation
     # ----------------------------
@@ -270,8 +279,10 @@ StatVectorSmooth <- ggproto(
       base_radius <- data_range / 2.5
     } else {
       # Generate grid when eval_points is not provided
-      x_seq <- seq(min(data$x), max(data$x), length.out = n[1])
-      y_seq <- seq(min(data$y), max(data$y), length.out = n[2])
+      xlim <- xlim %||% range(data$x, na.rm = TRUE)
+      ylim <- ylim %||% range(data$y, na.rm = TRUE)
+      x_seq <- seq(xlim[1], xlim[2], length.out = n[1])
+      y_seq <- seq(ylim[1], ylim[2], length.out = n[2])
       grid <- expand.grid(x = x_seq, y = y_seq)
 
       # Calculate grid spacing and base radius

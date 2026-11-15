@@ -47,6 +47,10 @@
   streams is 0.85 times the grid's spacing (the median distance between
   neighboring points), so dense grids do not overplot. Regular grids get the
   same length as before.
+* `geom_vector_smooth()` and `stat_vector_smooth()` choose the interval style
+  by default (`pi_type = NULL`): ellipses at `eval_points` and wedges on a
+  grid, without a message. They also gain `xlim` and `ylim` to set the range
+  of the grid, which defaults to the range of the data.
 * `stat_vector_smooth()` is exported.
 * `StatStreamSmooth` and `StatGradientSmooth` are the stats behind
   `geom_stream_smooth()` and `geom_gradient_smooth()`.

@@ -475,11 +475,14 @@ stream_smooth_layer <- function(
 vector_smooth_layer <- function(
     mapping, data, stat, geom, position, ...,
     na.rm, show.legend, inherit.aes,
-    n, method, se, se.circle, pi_type, conf_level, formula, eval_points, arrow,
-    formula_supplied
+    n, xlim, ylim, method, se, se.circle, pi_type, conf_level, formula,
+    eval_points, arrow, formula_supplied
 ) {
 
   warn_if_formula_ignored(method, formula_supplied)
+
+  # by default, ellipses at evaluation points and wedges on a grid
+  pi_type <- pi_type %||% if (is.null(eval_points)) "wedge" else "ellipse"
 
   layer(
     stat = stat,
@@ -491,6 +494,8 @@ vector_smooth_layer <- function(
     inherit.aes = inherit.aes,
     params = list(
       n = n,
+      xlim = xlim,
+      ylim = ylim,
       method = method,
       se = se,
       se.circle = se.circle,
