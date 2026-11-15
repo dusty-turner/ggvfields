@@ -2,6 +2,11 @@
 
 ## Changes in behavior
 
+* `geom_stream_field2()` and `stat_stream_field2()` now grow every stream to
+  length `L` and then crop all of them back to the time of the fastest one,
+  so a stream's length shows its speed relative to the fastest, as the
+  vectors of `geom_vector_field2()` do. `type = "vector"` is unchanged.
+
 * The ellipses and wedges of `geom_vector_smooth(method = "gam")`, the
   default, are now prediction intervals, like those of `method = "lm"` and
   `method = "kriging"`. They used only the variance of the fitted mean

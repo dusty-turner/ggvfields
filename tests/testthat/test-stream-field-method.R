@@ -257,3 +257,22 @@ test_that("streams stop on a line the field converges on", {
   expect_lt(abs(tail(s$x, 1)), 1e-6)
   expect_lt(max(s$l), 0.06)
 })
+
+test_that("geom_stream_field2 crops every stream to the time of the fastest one", {
+  # streams are grown to L, then all cropped back to the fastest stream's
+  # time, so length shows relative speed. in a rotation field the speed is the
+  # radius, so length / radius is the same everywhere
+  d <- layer_data(ggplot() + geom_stream_field2(fun = function(u) c(-u[2], u[1])))
+  st <- do.call(rbind, lapply(split(d, d$group), function(s) {
+    data.frame(r = sqrt(s$x[1]^2 + s$y[1]^2), l = max(s$l), span = max(s$t) - min(s$t))
+  }))
+  st <- st[st$l > 0, ]
+  expect_equal(min(st$span), max(st$span))
+  expect_equal(st$l / st$r, rep(st$l[1] / st$r[1], nrow(st)), tolerance = 1e-4)
+  expect_lt(min(st$l), max(st$l) / 5)
+
+  # vectors keep the same length
+  v <- layer_data(ggplot() + geom_stream_field2(fun = function(u) c(-u[2], u[1]), type = "vector"))
+  lens <- tapply(v$l, v$group, max)
+  expect_equal(min(lens[lens > 0]), max(lens))
+})

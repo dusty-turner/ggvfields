@@ -257,7 +257,10 @@ stream_field2_layer <- function(
       L = L,
       center = center,
       type = type,
-      normalize = TRUE,
+      # streams are grown to L and then all cropped back to the time of the
+      # fastest one, so their lengths show relative speed; vectors keep the
+      # same length
+      normalize = type != "stream",
       tail_point = tail_point,
       eval_point = eval_point,
       grid = grid,

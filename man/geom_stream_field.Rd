@@ -249,6 +249,18 @@ starting from these seeds, producing streamlines that visualize the flow.
 This is useful for visualizing vector fields, flow patterns, or trajectories,
 such as in fluid dynamics or gradient fields.
 }
+\details{
+There are two variants:
+\itemize{
+\item \code{\link[=geom_stream_field]{geom_stream_field()}} grows every stream to the same length \code{L} and maps
+its average speed, \code{avg_spd}, to color.
+\item \code{\link[=geom_stream_field2]{geom_stream_field2()}} grows every stream to length \code{L}, finds the time
+the fastest one took, and crops all streams back to that time, so a
+stream's length shows its speed relative to the fastest one. Color is not
+mapped and each stream's seed is marked with a dot. With \code{type = "vector"}
+it draws vectors of equal length instead.
+}
+}
 \section{Aesthetics}{
  \code{geom_stream_field()} (and its stat variant) inherit
 aesthetics from \link{GeomStream} and understand the following:

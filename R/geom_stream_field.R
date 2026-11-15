@@ -7,6 +7,16 @@
 #' This is useful for visualizing vector fields, flow patterns, or trajectories,
 #' such as in fluid dynamics or gradient fields.
 #'
+#' There are two variants:
+#'
+#' - [geom_stream_field()] grows every stream to the same length `L` and maps
+#' its average speed, `avg_spd`, to color.
+#' - [geom_stream_field2()] grows every stream to length `L`, finds the time
+#' the fastest one took, and crops all streams back to that time, so a
+#' stream's length shows its speed relative to the fastest one. Color is not
+#' mapped and each stream's seed is marked with a dot. With `type = "vector"`
+#' it draws vectors of equal length instead.
+#'
 #' @param mapping A set of aesthetic mappings created by \code{ggplot2::aes()}.
 #'   (Optional)
 #' @param data A data frame or other object, as in \code{ggplot2::layer()}.
