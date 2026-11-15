@@ -45,7 +45,10 @@
 #' @param pi_type Character. Determines the display style for prediction
 #'   intervals:
 #'   - `"ellipse"` (default): Ellipses are used to represent the covariance of the predictions.
-#'   - `"wedge"`: Angular wedges are drawn.
+#'   - `"wedge"`: Angular wedges show the prediction interval for the direction
+#'   of each vector: the central `conf_level` range of the angle of its tip,
+#'   from the exact distribution of that angle when the tip is normally
+#'   distributed with the predicted mean and covariance.
 #'   Ellipses need `eval_points`: if `pi_type` is `"ellipse"` and `eval_points`
 #'   is `NULL`, wedges are drawn instead, with a warning.
 #' @param arrow A \code{grid::arrow()} specification for arrowheads on the
@@ -82,7 +85,8 @@
 #'   When `se = TRUE`, prediction intervals are computed for the smoothed
 #'   vectors. Two types of intervals are supported:
 #'   - **Ellipse:** Ellipses represent the joint uncertainty (covariance) in the predicted `fx` and `fy`.
-#'   - **Wedge:** Wedges (angular sectors) indicate the range of possible vector directions and magnitudes.
+#'   - **Wedge:** Wedges (angular sectors) show the range of likely directions
+#'   of each vector; their radius is the predicted vector's length.
 #'   The type of interval displayed is controlled by `pi_type`, and the
 #'   confidence level is set via `conf_level`.
 #'
@@ -737,6 +741,59 @@ compute_ellipse_params <- function(var_fx, var_fy, cov_fx_fy, conf_level = 0.95)
 }
 
 #' @keywords internal
+# density of the angle theta of a bivariate normal vector N(mu, Sigma): the
+# polar-coordinate density f(r cos theta, r sin theta) |r| integrated over
+# r >= 0, in closed form. with u = (cos theta, sin theta), a = u' S^-1 u,
+# b = u' S^-1 mu and c = mu' S^-1 mu
+angle_density <- function(theta, mu, Sigma) {
+  Si <- solve(Sigma)
+  c0 <- drop(crossprod(mu, Si %*% mu))
+  k <- 2 * pi * sqrt(det(Sigma))
+  vapply(theta, function(th) {
+    u <- c(cos(th), sin(th))
+    a <- drop(crossprod(u, Si %*% u))
+    b <- drop(crossprod(u, Si %*% mu))
+    (exp(-c0 / 2) / a +
+       sqrt(2 * pi) * b * a^(-1.5) * exp(-(c0 - b^2 / a) / 2) * stats::pnorm(b / sqrt(a))) / k
+  }, numeric(1))
+}
+
+#' @keywords internal
+# offsets from the predicted angle theta0 of the alpha/2 and 1 - alpha/2
+# quantiles of the angle distribution, taken over the circle centered on
+# theta0. the density can be a very narrow peak at theta0, which a single
+# integrate() call over a wide range can miss, so the integrals are split at
+# points around theta0 spaced by multiples of the angle's approximate
+# (delta-method) standard error; the result is still the exact distribution
+angle_quantiles <- function(mu, Sigma, theta0, alpha) {
+  f <- function(t) angle_density(t, mu, Sigma)
+
+  g <- c(-mu[2], mu[1]) / sum(mu^2)
+  se <- sqrt(drop(crossprod(g, Sigma %*% g)))
+  if (!is.finite(se) || se <= 0) se <- 1
+  offsets <- se * c(0.5, 2, 8, 32, 128)
+  breaks <- sort(unique(theta0 + c(-pi, -offsets[offsets < pi], 0, offsets[offsets < pi], pi)))
+
+  # integral of f from a to b, split at the breaks between them
+  integ <- function(a, b) {
+    pts <- c(a, breaks[breaks > a & breaks < b], b)
+    sum(vapply(seq_len(length(pts) - 1), function(i) {
+      stats::integrate(f, pts[i], pts[i + 1], subdivisions = 500L, rel.tol = 1e-8)$value
+    }, numeric(1)))
+  }
+
+  F_lower <- function(t) integ(theta0 - pi, t)
+  below <- F_lower(theta0)
+  F_upper <- function(t) below + integ(theta0, t)
+
+  lower <- if (below <= alpha / 2) -pi else
+    stats::uniroot(function(t) F_lower(t) - alpha / 2, c(theta0 - pi, theta0), tol = 1e-10)$root - theta0
+  upper <- if (F_upper(theta0 + pi) <= 1 - alpha / 2) pi else
+    stats::uniroot(function(t) F_upper(t) - (1 - alpha / 2), c(theta0, theta0 + pi), tol = 1e-10)$root - theta0
+  c(lower, upper)
+}
+
+#' @keywords internal
 # Define a helper function to compute wedge endpoints (unchanged) - geom_vector_smooth
 compute_prediction_endpoints <- function(x, y, fx, fy, angle_lower, angle_upper) {
   # Validate inputs
@@ -902,7 +959,7 @@ predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL, conf_level
     cli::cli_abort("Input 'conf_level' must be a numeric value between 0 and 1.")
   }
 
-  # If rho is not provided, calculate it (not used by delta method but for compatibility)
+  # If rho is not provided, calculate it (kept for compatibility)
   if (is.null(rho)) {
     sigma_x <- sqrt(Sigma[1, 1])
     sigma_y <- sqrt(Sigma[2, 2])
@@ -913,24 +970,28 @@ predict_theta_interval <- function(x, y, mux, muy, Sigma, rho = NULL, conf_level
   theta_pred <- atan2(muy, mux)
   if (theta_pred < 0) theta_pred <- theta_pred + 2*pi
 
-  # Delta method: compute the variance of theta = arctan2(muy, mux)
-  denom <- mux^2 + muy^2
-  if (denom == 0) {
+  # the predicted vector has no direction
+  if (mux^2 + muy^2 == 0) {
     return(data.frame(min_angle = NA, max_angle = NA))
   }
 
+  # the interval comes from the exact distribution of the angle of the vector
+  # tip (fx, fy) ~ N(mu, Sigma): its density is the joint density in polar
+  # coordinates, f(r cos theta, r sin theta) |r|, integrated over r >= 0,
+  # which has the closed form in angle_density(). the bounds are the
+  # alpha/2 and 1 - alpha/2 quantiles of the angle around the predicted one
+  mu <- c(mux, muy)
+  alpha <- 1 - conf_level
+  bounds <- if (det(Sigma) > 0) {
+    tryCatch(angle_quantiles(mu, Sigma, theta_pred, alpha), error = function(e) NULL)
+  }
+  if (is.null(bounds)) {
+    # no spread in the prediction: the wedge has no width
+    bounds <- c(0, 0)
+  }
 
-  grad <- c(-muy/denom, mux/denom)
-  var_theta <- as.numeric(t(grad) %*% Sigma %*% grad)
-
-  se_theta <- ifelse(var_theta < 1e-6, 0, sqrt(var_theta))
-
-  # Get the z-value for the desired confidence level (e.g., ~1.96 for 95%)
-  z_val <- qnorm(1 - (1 - conf_level) / 2)
-
-  # Compute the raw (unwrapped) confidence interval for theta
-  raw_lower <- theta_pred - z_val * se_theta
-  raw_upper <- theta_pred + z_val * se_theta
+  raw_lower <- theta_pred + bounds[1]
+  raw_upper <- theta_pred + bounds[2]
 
   # If the raw interval width is >= 2*pi, cap the interval at the full circle.
   if ((raw_upper - raw_lower) >= 2*pi) {

@@ -90,7 +90,10 @@ computed as the magnitude of the predicted vector.}
 intervals:
 \itemize{
 \item \code{"ellipse"} (default): Ellipses are used to represent the covariance of the predictions.
-\item \code{"wedge"}: Angular wedges are drawn.
+\item \code{"wedge"}: Angular wedges show the prediction interval for the direction
+of each vector: the central \code{conf_level} range of the angle of its tip,
+from the exact distribution of that angle when the tip is normally
+distributed with the predicted mean and covariance.
 Ellipses need \code{eval_points}: if \code{pi_type} is \code{"ellipse"} and \code{eval_points}
 is \code{NULL}, wedges are drawn instead, with a warning.
 }}
@@ -154,7 +157,8 @@ When \code{se = TRUE}, prediction intervals are computed for the smoothed
 vectors. Two types of intervals are supported:
 \itemize{
 \item \strong{Ellipse:} Ellipses represent the joint uncertainty (covariance) in the predicted \code{fx} and \code{fy}.
-\item \strong{Wedge:} Wedges (angular sectors) indicate the range of possible vector directions and magnitudes.
+\item \strong{Wedge:} Wedges (angular sectors) show the range of likely directions
+of each vector; their radius is the predicted vector's length.
 The type of interval displayed is controlled by \code{pi_type}, and the
 confidence level is set via \code{conf_level}.
 }

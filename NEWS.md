@@ -25,6 +25,11 @@
   location, as for `method = "lm"` and `method = "kriging"`: they include
   each component's residual variance as well as the variance of the fit.
   They are larger than before.
+* The wedges of `geom_vector_smooth(pi_type = "wedge")` are computed from the
+  exact distribution of the angle of the predicted vector tip, so they cover
+  the stated `conf_level` however large the uncertainty, and are asymmetric
+  when the uncertainty is. They are wider than before where the uncertainty is
+  large.
 * Supplying `formula` with the default `method = "gam"` in
   `geom_stream_smooth()`, `stat_stream_smooth()`, `geom_vector_smooth()` or
   `stat_vector_smooth()` now gives a warning, since the gam smoothers fit
