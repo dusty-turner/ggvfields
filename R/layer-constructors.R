@@ -296,6 +296,13 @@ gradient_field_layer <- function(
 
     mapping <- merge_default_mapping(default_mapping, mapping)
 
+  } else if (type == "vector") {
+
+    # geom_gradient_field2(type = "vector") maps the norm to length, like
+    # geom_vector_field2(), so vectors are scaled by the size of the gradient.
+    # streams ignore length, so they get no mapping (and no empty legend)
+    mapping <- merge_default_mapping(aes(length = after_stat(norm)), mapping)
+
   }
 
   if (missing(fun) || !is.function(fun)) {

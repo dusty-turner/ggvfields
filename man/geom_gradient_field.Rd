@@ -15,7 +15,7 @@ geom_gradient_field(
   ...,
   na.rm = FALSE,
   show.legend = TRUE,
-  inherit.aes = TRUE,
+  inherit.aes = FALSE,
   fun,
   xlim = NULL,
   ylim = NULL,
@@ -43,7 +43,7 @@ stat_gradient_field(
   ...,
   na.rm = FALSE,
   show.legend = TRUE,
-  inherit.aes = TRUE,
+  inherit.aes = FALSE,
   fun,
   xlim = NULL,
   ylim = NULL,
@@ -71,7 +71,7 @@ geom_gradient_field2(
   ...,
   na.rm = FALSE,
   show.legend = TRUE,
-  inherit.aes = TRUE,
+  inherit.aes = FALSE,
   fun,
   xlim = NULL,
   ylim = NULL,
@@ -99,7 +99,7 @@ stat_gradient_field2(
   ...,
   na.rm = FALSE,
   show.legend = TRUE,
-  inherit.aes = TRUE,
+  inherit.aes = FALSE,
   fun,
   xlim = NULL,
   ylim = NULL,
@@ -124,7 +124,8 @@ stat_gradient_field2(
 Additional aesthetics such as \code{color}, \code{size}, \code{linetype}, and \code{alpha} can
 be defined. In
 \strong{geom_gradient_field} the default mapping includes \code{color = after_stat(norm)},
-whereas in \strong{geom_gradient_field2} the default mapping includes \code{length = after_stat(norm)}.}
+whereas in \strong{geom_gradient_field2} with \code{type = "vector"} it includes
+\code{length = after_stat(norm)}.}
 
 \item{data}{A data frame containing the input data.}
 
@@ -219,8 +220,11 @@ resulting vectors.
 Two variants are provided:
 \itemize{
 \item \strong{geom_gradient_field()} uses a default mapping that sets \code{color = after_stat(norm)}.
-\item \strong{geom_gradient_field2()} uses a default mapping that sets \code{length = after_stat(norm)}
-(with \code{color} unmapped by default).
+\item \strong{geom_gradient_field2()} leaves \code{color} unmapped and marks each seed
+point with a dot. With \code{type = "vector"} it sets \code{length = after_stat(norm)},
+so vectors are scaled by the size of the gradient, like
+\code{\link[=geom_vector_field2]{geom_vector_field2()}}. Streams (the default) ignore \code{length}, so they get no
+default mapping, like \code{\link[=geom_stream_field2]{geom_stream_field2()}}.
 }
 }
 \section{Aesthetics}{
@@ -231,7 +235,8 @@ understand the following aesthetics (required aesthetics are in \strong{bold}):
 \item \strong{\code{y}}: The y-coordinate of the seed point.
 \item \strong{\code{color}}: In \strong{geom_gradient_field}, the color of the gradient vector.
 In \strong{geom_gradient_field2}, color is not mapped by default.
-\item \strong{\code{length}}: In \strong{geom_gradient_field2}, the computed vector norm.
+\item \strong{\code{length}}: In \strong{geom_gradient_field2} with \code{type = "vector"}, the
+computed vector norm.
 \item \code{size}, \code{linetype}, \code{alpha}: Additional aesthetics to control appearance.
 }
 }

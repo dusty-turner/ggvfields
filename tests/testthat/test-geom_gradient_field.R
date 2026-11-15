@@ -58,3 +58,29 @@ test_that("stat_gradient_field2 includes length aesthetic and computes endpoints
 
   expect_true(all(c("x", "y", "fx", "fy", "id", "length") %in% names(d)))
 })
+
+test_that("geom_gradient_field2 maps the norm to length for vectors only", {
+  for (layer_fun in list(geom_gradient_field2, stat_gradient_field2)) {
+    l <- layer_fun(fun = f_scalar, type = "vector")
+    expect_identical(rlang::as_label(l$mapping$length), "after_stat(norm)")
+    expect_null(l$mapping$colour)
+
+    # streams ignore length, so the default stream layer maps nothing
+    expect_length(layer_fun(fun = f_scalar)$mapping, 0)
+  }
+
+  # a user mapping still wins
+  l <- geom_gradient_field2(fun = f_scalar, aes(length = after_stat(norm) * 2), type = "vector")
+  expect_identical(rlang::as_label(l$mapping$length), "after_stat(norm) * 2")
+})
+
+test_that("geom_gradient_field2 vectors match geom_vector_field2 on the gradient", {
+  grad_fun <- function(u) numDeriv::grad(f_scalar, u)
+  cols <- c("x", "y", "norm", "length")
+
+  g <- layer_data(ggplot() + geom_gradient_field2(fun = f_scalar, type = "vector"))
+  v <- layer_data(ggplot() + geom_vector_field2(fun = grad_fun))
+
+  expect_equal(g[order(g$id, g$x, g$y), cols], v[order(v$id, v$x, v$y), cols],
+               ignore_attr = TRUE)
+})

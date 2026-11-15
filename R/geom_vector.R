@@ -21,10 +21,12 @@
 #'
 #' There are two variants:
 #'
-#' - `geom_vector()`: Uses the user-supplied aesthetic mapping.
-#' - `geom_vector2()`: Uses the same underlying stat ([StatVector]) but adds a
-#' default mapping for `length = after_stat(norm)`, making the computed vector
-#' norm available as an aesthetic.
+#' - `geom_vector()` and `stat_vector()`: normalize and center the vectors and
+#' add a default mapping for `color = after_stat(norm)`, so color shows each
+#' vector's norm.
+#' - `geom_vector2()` and `stat_vector2()`: use the same underlying stat
+#' ([StatVector]) but add a default mapping for `length = after_stat(norm)`
+#' instead, so length shows each vector's norm.
 #'
 #' @inheritParams ggplot2::geom_path
 #' @inheritParams geom_stream
@@ -205,7 +207,8 @@ stat_vector <- function(mapping = NULL, data = NULL,
 
   construct_layer(
     vector_layer, call_args, list(...),
-    stat = StatVector
+    stat = StatVector,
+    default_mapping = aes(color = after_stat(norm))
   )
 }
 

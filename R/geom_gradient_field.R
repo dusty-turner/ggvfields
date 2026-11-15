@@ -11,8 +11,11 @@
 #' Two variants are provided:
 #'
 #' - **geom_gradient_field()** uses a default mapping that sets `color = after_stat(norm)`.
-#' - **geom_gradient_field2()** uses a default mapping that sets `length = after_stat(norm)`
-#' (with `color` unmapped by default).
+#' - **geom_gradient_field2()** leaves `color` unmapped and marks each seed
+#' point with a dot. With `type = "vector"` it sets `length = after_stat(norm)`,
+#' so vectors are scaled by the size of the gradient, like
+#' [geom_vector_field2()]. Streams (the default) ignore `length`, so they get no
+#' default mapping, like [geom_stream_field2()].
 #'
 #' @inheritParams geom_vector
 #' @inheritParams geom_stream_field
@@ -21,8 +24,8 @@
 #'   Additional aesthetics such as `color`, `size`, `linetype`, and `alpha` can
 #'   be defined. In
 #'   **geom_gradient_field** the default mapping includes `color = after_stat(norm)`,
-#'   whereas in **geom_gradient_field2** the default mapping includes `length =
-#'   after_stat(norm)`.
+#'   whereas in **geom_gradient_field2** with `type = "vector"` it includes
+#'   `length = after_stat(norm)`.
 #' @param data A data frame containing the input data.
 #' @param stat The statistical transformation to use on the data for this layer.
 #'   Defaults to [StatStreamField].
@@ -80,7 +83,8 @@
 #'   - **`y`**: The y-coordinate of the seed point.
 #'   - **`color`**: In **geom_gradient_field**, the color of the gradient vector.
 #'   In **geom_gradient_field2**, color is not mapped by default.
-#'   - **`length`**: In **geom_gradient_field2**, the computed vector norm.
+#'   - **`length`**: In **geom_gradient_field2** with `type = "vector"`, the
+#'   computed vector norm.
 #'   - `size`, `linetype`, `alpha`: Additional aesthetics to control appearance.
 #'
 #' @return A ggplot2 layer that computes and plots a gradient field by
@@ -143,7 +147,7 @@ geom_gradient_field <- function(
   ...,
   na.rm = FALSE,
   show.legend = TRUE,
-  inherit.aes = TRUE,
+  inherit.aes = FALSE,
   fun,
   xlim = NULL,
   ylim = NULL,
@@ -182,7 +186,7 @@ stat_gradient_field <- function(
   ...,
   na.rm = FALSE,
   show.legend = TRUE,
-  inherit.aes = TRUE,
+  inherit.aes = FALSE,
   fun,
   xlim = NULL,
   ylim = NULL,
@@ -222,7 +226,7 @@ geom_gradient_field2 <- function(
   ...,
   na.rm = FALSE,
   show.legend = TRUE,
-  inherit.aes = TRUE,
+  inherit.aes = FALSE,
   fun,
   xlim = NULL,
   ylim = NULL,
@@ -262,7 +266,7 @@ stat_gradient_field2 <- function(
   ...,
   na.rm = FALSE,
   show.legend = TRUE,
-  inherit.aes = TRUE,
+  inherit.aes = FALSE,
   fun,
   xlim = NULL,
   ylim = NULL,

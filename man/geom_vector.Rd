@@ -150,10 +150,12 @@ indicate direction.
 
 There are two variants:
 \itemize{
-\item \code{geom_vector()}: Uses the user-supplied aesthetic mapping.
-\item \code{geom_vector2()}: Uses the same underlying stat (\link{StatVector}) but adds a
-default mapping for \code{length = after_stat(norm)}, making the computed vector
-norm available as an aesthetic.
+\item \code{geom_vector()} and \code{stat_vector()}: normalize and center the vectors and
+add a default mapping for \code{color = after_stat(norm)}, so color shows each
+vector's norm.
+\item \code{geom_vector2()} and \code{stat_vector2()}: use the same underlying stat
+(\link{StatVector}) but add a default mapping for \code{length = after_stat(norm)}
+instead, so length shows each vector's norm.
 }
 }
 \section{Aesthetics}{

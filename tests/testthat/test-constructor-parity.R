@@ -39,9 +39,7 @@ pairs <- list(
            normalize = FALSE, tail_point = TRUE, eval_point = TRUE, grid = pts,
            method = "euler", arrow = ar),
       line_args
-    ),
-    # stat_stream_field() fixes normalize = TRUE (undecided whether to change)
-    known = "normalize"
+    )
   ),
   stream_field2 = list(
     args = c(
@@ -49,9 +47,7 @@ pairs <- list(
            max_it = 50, tol = 1e-3, L = 3, center = TRUE, type = "vector",
            tail_point = FALSE, eval_point = TRUE, grid = pts, method = "lsoda"),
       line_args
-    ),
-    # stat_stream_field2() fixes tol (undecided whether to change)
-    known = "tol"
+    )
   ),
   gradient_field = list(
     args = c(
@@ -126,6 +122,17 @@ for (family in names(pairs)) {
 
     expect_identical(class(geom_layer$stat), class(stat_layer$stat))
     expect_identical(class(geom_layer$geom), class(stat_layer$geom))
+
+    # the default mappings must match too, with and without a fixed colour
+    labels <- function(layer) {
+      if (length(layer$mapping) == 0) return(character(0))
+      m <- vapply(layer$mapping, rlang::as_label, character(1))
+      m[order(names(m))]
+    }
+    for (a in list(args, pairs[[family]]$args)) {
+      expect_identical(labels(do.call(paste0("geom_", family), a)),
+                       labels(do.call(paste0("stat_", family), a)))
+    }
   })
 
 }
