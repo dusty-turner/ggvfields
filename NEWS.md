@@ -135,8 +135,9 @@
   example in `geom_vector_smooth()` is fixed, and the references to the
   nonexistent `geom_vector_smooth2()` are removed.
 * Examples are now run when the package is checked. This turned up a
-  `geom_stream_smooth()` example that failed because it had too few points
-  for the default smoother, which needs at least 30.
+  `geom_stream_smooth()` example that failed because it had fewer than 30
+  points, which the default gam smoother could not fit before this release
+  (see Bug fixes).
 
 ## Internal
 

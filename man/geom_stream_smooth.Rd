@@ -209,7 +209,7 @@ f <- function(u) c(-u[2], u[1])
 # Visualize the vector field
 ggplot() + geom_stream_field(fun = f, xlim = c(-2, 2), ylim = c(-2, 2))
 
-# Generate design points (the default gam smoother needs at least 30)
+# Generate design points
 set.seed(1)
 n <- 50
 df <- data.frame(x = runif(n, -2, 2), y = runif(n, -2, 2))
