@@ -61,3 +61,19 @@ normalize <- function(u) u / norm(u)
 
 
 utils::globalVariables(c("potential", "fun", "f", "l", "max_t", "avg_spd", "x", "y", "fx", "fy", "normalize", "z"))
+
+# typical spacing of a set of points (columns x and y): the median distance
+# from a point to its nearest neighbour. large sets use a sample of points, each
+# compared with all the others
+grid_spacing <- function(grid) {
+  xy <- unique(as.matrix(grid[, c("x", "y"), drop = FALSE]))
+  n <- nrow(xy)
+  if (n < 2) return(NULL)
+  idx <- if (n > 2000) unique(round(seq(1, n, length.out = 2000))) else seq_len(n)
+  nn <- vapply(idx, function(i) {
+    d <- sqrt((xy[, 1] - xy[i, 1])^2 + (xy[, 2] - xy[i, 2])^2)
+    min(d[-i])
+  }, numeric(1))
+  s <- stats::median(nn)
+  if (is.finite(s) && s > 0) s else NULL
+}

@@ -445,6 +445,7 @@ StatStreamField <- ggproto(
     # limit specified by user
     # range of data received from ggplot layer or in this layer
     # range inherited from previous layer's scales
+    L_grid <- NULL
     if( is.null(grid) || (!is.data.frame(grid) && grid == "hex") ){
 
       xlim <- xlim %||%
@@ -476,6 +477,9 @@ StatStreamField <- ggproto(
       grid  <- as.matrix(grid)
       xlim <- range(grid[, "x"])
       ylim <- range(grid[, "y"])
+      # the default length comes from the spacing of the supplied points
+      spacing <- grid_spacing(grid)
+      if (is.null(L) && !is.null(spacing)) L_grid <- spacing * 0.85
     }
 
     # allow for additional args to be passed
@@ -484,7 +488,7 @@ StatStreamField <- ggproto(
 
     ## vector and normalize
     if ( type == "vector" && normalize ) {
-      if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
+      if( is.null(L) ) L <- L_grid %||% (min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85)
     }
 
     ## vector and not normalize
@@ -497,7 +501,7 @@ StatStreamField <- ggproto(
 
     ## stream and normalize
     if ( type == "stream" && normalize ) {
-        if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
+        if( is.null(L) ) L <- L_grid %||% (min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85)
         if( !is.null(T) ) cli::cli_alert("Specifying T for normalized streams is not compatible. Ignoring T.")
     }
 
@@ -507,7 +511,7 @@ StatStreamField <- ggproto(
     ## If both are given, ignore L and growl all streams to T
     if ( type == "stream" && !normalize ) {
       if( is.null(T)) {## user didn't specify T so we need to calculate L first, if L isn't given
-        if( is.null(L) ) L <- min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85
+        if( is.null(L) ) L <- L_grid %||% (min(diff(xlim), diff(ylim)) / (max(n) - 1) * 0.85)
       }
       if( !is.null(T) && !is.null(L) ) {
         cli::cli_inform("Specifying L and T for non normalized streams is not compatible. Ignoring L.")

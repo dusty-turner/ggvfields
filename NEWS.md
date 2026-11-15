@@ -43,6 +43,10 @@
   small data sets: with fewer than 30 distinct locations the gam smoother
   uses half as many basis functions as locations. At least 5 locations are
   needed; with fewer, the error suggests `method = "lm"`.
+* With a supplied `grid` data frame, the default length `L` of vectors and
+  streams is 0.85 times the grid's spacing (the median distance between
+  neighboring points), so dense grids do not overplot. Regular grids get the
+  same length as before.
 * `stat_vector_smooth()` is exported.
 * `StatStreamSmooth` and `StatGradientSmooth` are the stats behind
   `geom_stream_smooth()` and `geom_gradient_smooth()`.
