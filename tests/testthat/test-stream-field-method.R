@@ -74,9 +74,9 @@ test_that("streams stop at a sink instead of running past it", {
 })
 
 test_that("lsoda stops at a sink wherever it is", {
-  # the same sink at the origin and moved to (1, 1) must give the same stream;
-  # lsoda used to stop only at sinks at the origin and otherwise ran the clock
-  # to T = 1e6, which made avg_spd nearly 0
+  # the same sink at the origin and moved to (1, 1) must give the same
+  # stream, and the stream must stop when it reaches the sink rather than run
+  # the clock on to T
   at_origin <- ode_stepper(c(0.1, 0.05), function(u) -u,
                            T = 1e6, L = 1, method = "lsoda", center = FALSE)
   offset <- ode_stepper(c(1.1, 1.05), function(u) c(1, 1) - u,
@@ -173,9 +173,9 @@ test_that("avg_spd of a stream run to a time T is its length over T", {
 })
 
 test_that("streams of a constant field match its vectors (no sliver end segments)", {
-  # the paper's Fig. 2.15: for a constant field, streams and vectors are the
-  # same picture. rounding could leave a ~1e-16 final segment that turned the
-  # arrowhead in an arbitrary direction
+  # for a constant field, streams and vectors are the same picture. every
+  # segment, including the last one along which the arrowhead is drawn, must
+  # point along the field, with no rounding-sized sliver at either end
   for (f in list(c(3, 4), c(2, 1))) {
     for (center in c(TRUE, FALSE)) {
       d <- layer_data(ggplot() + geom_stream_field(fun = function(u) f, center = center))
@@ -193,7 +193,7 @@ test_that("streams of a constant field match its vectors (no sliver end segments
 
 test_that("a centered stream that can only move one way from its seed is drawn", {
   # the field is undefined for x < 0, so from a seed on x = 0 a stream can
-  # only go one way; this used to fail the whole layer
+  # only go one way; the layer must still be drawn, with that half stream
   forward_blocked <- function(u) c(-1, sqrt(u[1]))   # forward heads into x < 0
   backward_blocked <- function(u) c(1, sqrt(u[1]))   # backward heads into x < 0
 

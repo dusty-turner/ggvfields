@@ -3,7 +3,7 @@ test_that("crop_stream_time keeps l consistent with d", {
 
   expect_equal(crop_stream_time(d, T = 2.5)$l[4], 4.5)
 
-  # cropping inside the first segment used to give NA
+  # cropping inside the first segment
   expect_equal(crop_stream_time(d, T = 0.5)$l[2], 0.5)
 })
 
