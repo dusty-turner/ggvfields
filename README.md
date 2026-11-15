@@ -400,17 +400,18 @@ ggplot(wind_data) +
 **Polar Coordinates Support**
 
 Both `geom_vector()` and `geom_vector2()` also support polar
-coordinates, where vectors are specified using magnitude (`distance`)
-and direction (`angle`). Instead of providing Cartesian components
-(`fx`, `fy` or `xend`, `yend`), users can directly supply polar data.
-This feature simplifies workflows for directional data and works for all
-subsequent relevant functions that handle polar coordinates.
+coordinates, where vectors are specified using magnitude (`norm`, also
+accepted as `distance`) and direction (`angle`). Instead of providing
+Cartesian components (`fx`, `fy` or `xend`, `yend`), users can directly
+supply polar data. This feature simplifies workflows for directional
+data and works for all subsequent relevant functions that handle polar
+coordinates.
 
 Polar coordinates can be visualized like this:
 
 ``` r
 ggplot(wind_data) +
-  geom_vector(aes(x = lon, y = lat, distance = spd, angle = dir)) 
+  geom_vector(aes(x = lon, y = lat, norm = spd, angle = dir)) 
 ```
 
 <img src="man/figures/README-unnamed-chunk-23-1.png" width="100%" />
