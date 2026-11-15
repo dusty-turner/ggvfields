@@ -51,6 +51,10 @@
   by default (`pi_type = NULL`): ellipses at `eval_points` and wedges on a
   grid, without a message. They also gain `xlim` and `ylim` to set the range
   of the grid, which defaults to the range of the data.
+* `geom_vector_smooth(method = "kriging")` estimates the range of its
+  variogram from the data and works in standardized coordinates, so the
+  smoothed field does not depend on the units of `x` and `y`. The fitted
+  coregionalization is kept positive definite.
 * `stat_vector_smooth()` is exported.
 * `StatStreamSmooth` and `StatGradientSmooth` are the stats behind
   `geom_stream_smooth()` and `geom_gradient_smooth()`.

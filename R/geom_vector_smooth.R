@@ -371,8 +371,22 @@ StatVectorSmooth <- ggproto(
 
       rlang::check_installed(c("sp", "gstat"), reason = "to use `method = \"kriging\"`.")
 
+      # kriging runs in standardized coordinates (shifted to the lower corner
+      # of the data and divided by its diagonal), so the result does not
+      # depend on the units of x and y; predictions are reported at the
+      # original evaluation points
+      origin <- c(min(data$x, na.rm = TRUE), min(data$y, na.rm = TRUE))
+      unit <- sqrt(diff(range(data$x, na.rm = TRUE))^2 + diff(range(data$y, na.rm = TRUE))^2)
+      if (!is.finite(unit) || unit <= 0) unit <- 1
+      standardize <- function(d) {
+        d <- as.data.frame(d)
+        d$x <- (d$x - origin[1]) / unit
+        d$y <- (d$y - origin[2]) / unit
+        d
+      }
+
       # Convert data (a tibble) to a regular data frame and then to a SpatialPointsDataFrame
-      df <- as.data.frame(data)
+      df <- standardize(data)
       sp::coordinates(df) <- ~ x + y
 
       # Build the cokriging model for fx and fy
@@ -382,21 +396,29 @@ StatVectorSmooth <- ggproto(
       # Compute the experimental variograms (adjust cutoff as needed)
       v <- gstat::variogram(g)
 
-      # Fit a linear model of coregionalization (LMC) using a Gaussian model
-      model <- gstat::vgm(psill = 1, model = "Gau", range = 3, nugget = 0.1)
-      lmc <- gstat::fit.lmc(v, g, model = model)
+      # Fit a linear model of coregionalization (LMC) using a Gaussian model.
+      # fit.lmc() fits the sills for a given range, so the range is estimated
+      # from the data first: a Gaussian variogram is fitted to each component
+      # and the LMC uses the mean of the two ranges
+      range0 <- kriging_range(df, v)
+      model <- gstat::vgm(psill = 1, model = "Gau", range = range0, nugget = 0.1)
+      # correct.diagonal keeps the fitted sill matrices positive definite, so
+      # the model is a valid covariance and prediction does not fail
+      lmc <- gstat::fit.lmc(v, g, model = model, correct.diagonal = 1.01)
 
       # Define prediction points: if eval_points is NULL, use grid; otherwise, use eval_points
       new_point <- if (is.null(eval_points)) grid else eval_points
+      new_xy <- data.frame(x = new_point$x, y = new_point$y)
 
-      # Convert the new_point data frame to a SpatialPointsDataFrame
-      sp::coordinates(new_point) <- ~ x + y
+      # Convert the standardized points to a SpatialPointsDataFrame
+      new_std <- standardize(new_xy)
+      sp::coordinates(new_std) <- ~ x + y
 
       # Perform prediction using the fitted LMC model
-       invisible(capture.output(pred <- predict(lmc, newdata = new_point)))
+      invisible(capture.output(pred <- predict(lmc, newdata = new_std)))
 
-      # Extract prediction results into a simple data frame (optional)
-      grid <- data.frame(x = new_point$x, y = new_point$y,
+      # Extract prediction results into a simple data frame
+      grid <- data.frame(x = new_xy$x, y = new_xy$y,
                          fx = pred$fx.pred, fy = pred$fy.pred)
       cov_pred <- data.frame(var_fx = pred$fx.var,
                              var_fy = pred$fy.var,
@@ -749,6 +771,30 @@ compute_ellipse_params <- function(var_fx, var_fy, cov_fx_fy, conf_level = 0.95)
   height <- 2 * scale_factor * sqrt(eigenvalues[2])
 
   return(list(width = width, height = height, angle = angle))
+}
+
+#' @keywords internal
+# range of the Gaussian variogram used by the kriging smoother, estimated from
+# the data: the mean of the ranges of Gaussian variograms fitted to fx and fy
+# separately, each started from a third of the data's diagonal. that starting
+# value is used for a component whose fit fails
+kriging_range <- function(df, v) {
+  coords <- sp::coordinates(df)
+  diagonal <- sqrt(sum(apply(coords, 2, function(z) diff(range(z)))^2))
+  start <- diagonal / 3
+  fit_one <- function(id) {
+    vv <- v[v$id == id, ]
+    s <- stats::var(df[[id]])
+    fitted <- tryCatch(
+      suppressWarnings(gstat::fit.variogram(
+        vv, gstat::vgm(psill = 0.9 * s, model = "Gau", range = start, nugget = 0.1 * s)
+      )),
+      error = function(e) NULL
+    )
+    r <- if (is.null(fitted)) NA_real_ else fitted$range[fitted$model == "Gau"]
+    if (length(r) == 1 && is.finite(r) && r > 0 && r < 10 * diagonal) r else start
+  }
+  mean(c(fit_one("fx"), fit_one("fy")))
 }
 
 #' @keywords internal
