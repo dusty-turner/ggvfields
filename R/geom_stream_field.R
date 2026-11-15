@@ -820,8 +820,15 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
     } else {
       row.names(df_positive) <- character(0)
     }
-    # merge
-    df <- rbind( flip(df_negative[-1,]), df_positive )
+    # merge; the seed (t = 0) is the first row of both halves, so it is taken
+    # from the forward half, or from the backward half when the forward half is
+    # empty (the stream can only move one way from this seed, e.g. at the edge
+    # of the field's domain)
+    df <- if (n_pos == 0) {
+      flip(df_negative)
+    } else {
+      rbind( flip(df_negative[-1,]), df_positive )
+    }
 
     if (nrow(df) == 0) {## this happens when stream is in a sync or source
       df <- data.frame(
@@ -839,8 +846,8 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
 
     # shift lengths, recompute distances, arc length, avg speed
     n <- nrow(df)
-    df$d <- if (n <= 1) NA_real_ else c(NA_real_, df$d[1:(n_neg-1)], df_positive$d[-1])
-    df$l <- c(0, cumsum(df$d[-1]))
+    df$d <- if (n <= 1) NA_real_ else c(NA_real_, sqrt(diff(df$x)^2 + diff(df$y)^2))
+    df$l <- if (n <= 1) 0 else c(0, cumsum(df$d[-1]))
     df$avg_spd <- (spd_neg[["l"]] + spd_pos[["l"]]) / (spd_neg[["t"]] + spd_pos[["t"]])
 
     # return

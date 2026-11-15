@@ -190,3 +190,23 @@ test_that("streams of a constant field match its vectors (no sliver end segments
     }
   }
 })
+
+test_that("a centered stream that can only move one way from its seed is drawn", {
+  # the field is undefined for x < 0, so from a seed on x = 0 a stream can
+  # only go one way; this used to fail the whole layer
+  forward_blocked <- function(u) c(-1, sqrt(u[1]))   # forward heads into x < 0
+  backward_blocked <- function(u) c(1, sqrt(u[1]))   # backward heads into x < 0
+
+  for (f in list(forward_blocked, backward_blocked)) {
+    for (m in c("rk4", "lsoda")) {
+      d <- suppressWarnings(layer_data(ggplot() + geom_stream_field(fun = f, method = m)))
+      seeds_on_edge <- unique(d$group[d$x0 == 0])
+      expect_length(seeds_on_edge, 11)
+
+      s <- suppressWarnings(ode_stepper(c(x = 0, y = 0), f, T = 1e6, L = 0.2, method = m, center = TRUE))
+      expect_true(any(s$x == 0 & s$y == 0), info = m)       # the seed is kept
+      expect_equal(max(s$l), 0.1, tolerance = 1e-6, info = m) # one half, L / 2
+      expect_true(is.finite(s$avg_spd[1]), info = m)
+    }
+  }
+})

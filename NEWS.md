@@ -35,6 +35,11 @@
 
 ## Bug fixes
 
+* Centered streams (`center = TRUE`, the default) no longer fail the whole
+  layer when a stream can move only one way from its seed, for example on the
+  edge of the domain where the field is defined. Such a seed now gets the half
+  of the stream that exists.
+
 * `stat_vector()` colors vectors by their norm by default, as `geom_vector()`
   does. The default `color = after_stat(norm)` mapping was dropped from
   `stat_vector()` in a refactor before 1.0.0, so its vectors were black.
