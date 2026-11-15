@@ -211,6 +211,17 @@ test_that("a centered stream that can only move one way from its seed is drawn",
   }
 })
 
+test_that("lsoda paths only hold points where the field is defined", {
+  # the stream walks off the edge of the field's domain at x = 0; lsoda tries
+  # steps past it, and those trial points are not part of the path
+  f <- function(u) if (isTRUE(u[1] >= 0)) c(-1, 0.3) else c(NaN, NaN)
+  s <- suppressWarnings(ode_stepper(c(x = 0.05, y = 0), f, T = 1e6, L = 1, method = "lsoda"))
+
+  expect_gt(nrow(s), 1)
+  expect_true(all(s$x >= 0))
+  expect_true(all(is.finite(s$l)))
+})
+
 test_that("fields that index their argument by name work with every integrator", {
   # lsoda and the vector layers call fun with c(x = , y = ); rk4 and euler must too
   local({

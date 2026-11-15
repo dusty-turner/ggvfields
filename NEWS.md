@@ -97,6 +97,9 @@
 
 ## Bug fixes
 
+* Streams computed with `method = "lsoda"` only include points where the
+  field is defined, so a stream that runs to the edge of the field's domain
+  is drawn up to that edge.
 * `geom_vector_smooth()` takes a fixed or mapped `colour` for its vectors
   (blue by default), and keeps a fixed `linewidth` when there is a single
   evaluation point.

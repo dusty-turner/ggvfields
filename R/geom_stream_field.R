@@ -948,9 +948,12 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
   fun_wrapper <- function(t, u, parms) {
 
     fu <- fun(u[1:2])
-    n_evals <<- n_evals + 1L
-    if (n_evals > length(evals)) length(evals) <<- 2L * length(evals)
-    evals[[n_evals]] <<- c(t, u[1:2])
+    # a trial point where the field is undefined is not on the path
+    if (all(is.finite(fu))) {
+      n_evals <<- n_evals + 1L
+      if (n_evals > length(evals)) length(evals) <<- 2L * length(evals)
+      evals[[n_evals]] <<- c(t, u[1:2])
+    }
     list( c( fu, "l" = norm(fu) ) )
   }
 
@@ -983,6 +986,10 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
 
   # the evals have lots of near-duplicated rows. let's remove those
   # (a row is dropped when it is within tol of the eval just before it)
+  if (n_evals == 0L) {   # the field is undefined at the seed itself
+    evals[[1]] <- c(0, u0)
+    n_evals <- 1L
+  }
   evals <- unname( do.call(rbind, evals[seq_len(n_evals)]) )
   n <- nrow(evals)
   steps <- sqrt(rowSums( (evals[-1,,drop = FALSE] - evals[-n,,drop = FALSE])^2 ))
@@ -998,8 +1005,8 @@ ode_stepper <- function(u0, fun, T = NULL, L = NULL, max_it = 5000, tol = sqrt(.
 
   # compute d and l stats
   n <- nrow(df)
-  df$d <- c(NA_real_, apply( df[2:n,c("x","y")] - df[1:(n-1),c("x","y")], 1, norm ))
-  df$l <- c(0, cumsum(df$d[-1]))
+  df$d <- if (n <= 1) rep(NA_real_, n) else c(NA_real_, sqrt(diff(df$x)^2 + diff(df$y)^2))
+  df$l <- if (n <= 1) rep(0, n) else c(0, cumsum(df$d[-1]))
 
   # ode() evals of fun go further than needed, and ode() internally crops back
   # the result. since we don't use the output of ode(), we need to manually crop back
