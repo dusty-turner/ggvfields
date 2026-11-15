@@ -1,18 +1,21 @@
-#' @rdname geom_stream_smooth
-#' @format NULL
-#' @usage NULL
-#' @export
-StatStreamSmooth <- ggproto(
-  "StatStreamSmooth",
+# StatStreamSmooth and StatGradientSmooth fit a field to the data once per
+# group and hand it to StatStreamField. they share this compute_group(), which
+# lists every parameter so ggplot2 passes them through, and differ only in
+# fit_field(), which returns the fitted field u -> c(fx, fy)
+StatFittedField <- ggproto(
+  "StatFittedField",
   StatStreamField,
+
+  fit_field = function(self, data, formula, method) {
+    cli::cli_abort("{.fn fit_field} must be defined by a subclass.")
+  },
 
   compute_group = function(self, data, scales, formula, method = "gam",
                            xlim, ylim, n, max_it = 1000,
                            tol = sqrt(.Machine$double.eps), T = NULL, L = NULL,
                            center, type, normalize, grid, ...) {
 
-    # fit once per group, then hand the fitted field to StatStreamField
-    fun <- fit_vector_field(data, formula, method)
+    fun <- self$fit_field(data, formula, method)
 
     ggproto_parent(StatStreamField, self)$compute_group(
       data, scales, fun = fun, xlim = xlim, ylim = ylim, n = n,
@@ -22,27 +25,29 @@ StatStreamSmooth <- ggproto(
   }
 )
 
+#' @rdname geom_stream_smooth
+#' @format NULL
+#' @usage NULL
+#' @export
+StatStreamSmooth <- ggproto(
+  "StatStreamSmooth",
+  StatFittedField,
+
+  fit_field = function(self, data, formula, method) {
+    fit_vector_field(data, formula, method)
+  }
+)
+
 #' @rdname geom_gradient_smooth
 #' @format NULL
 #' @usage NULL
 #' @export
 StatGradientSmooth <- ggproto(
   "StatGradientSmooth",
-  StatStreamField,
+  StatFittedField,
 
-  compute_group = function(self, data, scales, formula,
-                           xlim, ylim, n, max_it = 1000,
-                           tol = sqrt(.Machine$double.eps), T = NULL, L = NULL,
-                           center, type, normalize, grid, ...) {
-
-    # fit once per group, then hand the fitted gradient to StatStreamField
-    fun <- fit_gradient_field(data, formula)
-
-    ggproto_parent(StatStreamField, self)$compute_group(
-      data, scales, fun = fun, xlim = xlim, ylim = ylim, n = n,
-      max_it = max_it, tol = tol, T = T, L = L,
-      center = center, type = type, normalize = normalize, grid = grid
-    )
+  fit_field = function(self, data, formula, method) {
+    fit_gradient_field(data, formula)
   }
 )
 
