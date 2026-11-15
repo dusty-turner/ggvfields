@@ -56,6 +56,12 @@
 #'   of each vector: the central `conf_level` range of the angle of its tip,
 #'   from the exact distribution of that angle when the tip is normally
 #'   distributed with the predicted mean and covariance.
+#'   - `"length"`: A band along each vector shows the prediction interval for
+#'   its length: the central `conf_level` range of the length of its tip, from
+#'   the exact distribution of that length.
+#'   Ellipses are a joint region for the tip; wedges and length bands are each
+#'   an interval for one coordinate, the direction or the length, and only one
+#'   type is drawn at a time.
 #'   Ellipses need `eval_points`: if `pi_type = "ellipse"` is set and
 #'   `eval_points` is `NULL`, wedges are drawn instead, with a warning.
 #' @param arrow A \code{grid::arrow()} specification for arrowheads on the
@@ -90,10 +96,11 @@
 #'
 #' **Prediction Intervals:**
 #'   When `se = TRUE`, prediction intervals are computed for the smoothed
-#'   vectors. Two types of intervals are supported:
+#'   vectors. Three types of intervals are supported:
 #'   - **Ellipse:** Ellipses represent the joint uncertainty (covariance) in the predicted `fx` and `fy`.
 #'   - **Wedge:** Wedges (angular sectors) show the range of likely directions
 #'   of each vector; their radius is the predicted vector's length.
+#'   - **Length:** Bands along each vector show the range of likely lengths.
 #'   The type of interval displayed is controlled by `pi_type`, and the
 #'   confidence level is set via `conf_level`.
 #'
@@ -461,7 +468,7 @@ StatVectorSmooth <- ggproto(
     # ----------------------------
 
 
-    if (pi_type == "ellipse" || pi_type == "wedge") {
+    if (pi_type %in% c("ellipse", "wedge", "length")) {
       # Compute prediction intervals based on pi_type
       if (pi_type == "ellipse") {
         ellipse_params_list <- mapply(
@@ -529,12 +536,36 @@ StatVectorSmooth <- ggproto(
         grid <- cbind(grid, prediction_df)
       }
 
+      if (pi_type == "length") {
+        # the central conf_level range of the length of a new vector
+        bounds <- t(mapply(function(mux, muy, var_fx, var_fy, cov_fx_fy) {
+          S <- matrix(c(var_fx, cov_fx_fy, cov_fx_fy, var_fy), nrow = 2)
+          if (mux^2 + muy^2 == 0 || !isTRUE(det(S) > 0)) return(c(NA_real_, NA_real_))
+          tryCatch(length_quantiles(c(mux, muy), S, 1 - conf_level[1]),
+                   error = function(e) c(NA_real_, NA_real_))
+        }, grid$fx, grid$fy, cov_pred$var_fx, cov_pred$var_fy, cov_pred$cov_fx_fy))
+        grid$length_lower <- bounds[, 1]
+        grid$length_upper <- bounds[, 2]
+
+        # on a grid the vectors are drawn at a common length, as with wedges;
+        # the interval is scaled with its vector
+        if (is.null(eval_points)) {
+          magnitudes <- sqrt(grid$fx^2 + grid$fy^2)
+          magnitudes[magnitudes == 0] <- 1
+          scaling_factors <- base_radius / magnitudes
+          grid$fx <- grid$fx * scaling_factors
+          grid$fy <- grid$fy * scaling_factors
+          grid$length_lower <- grid$length_lower * scaling_factors
+          grid$length_upper <- grid$length_upper * scaling_factors
+        }
+      }
+
       # Finalize result
       result <- grid
       result$xend <- result$x + result$fx
       result$yend <- result$y + result$fy
     } else {
-      cli::cli_abort("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
+      cli::cli_abort("{.arg pi_type} must be {.val ellipse}, {.val wedge} or {.val length}.")
     }
     return(result)
   }
@@ -643,8 +674,27 @@ GeomVectorSmooth <- ggproto(
         )
 
         grobs <- c(grid::gList(ellipse_grob), grobs)
+      } else if (pi_type == "length") {
+        # a band along each vector, from the shortest to the longest length
+        magnitude <- sqrt(data$fx^2 + data$fy^2)
+        ux <- data$fx / magnitude
+        uy <- data$fy / magnitude
+        band <- data.frame(
+          x = data$x + data$length_lower * ux,
+          y = data$y + data$length_lower * uy,
+          xend = data$x + data$length_upper * ux,
+          yend = data$y + data$length_upper * uy,
+          PANEL = data$PANEL, group = data$id,
+          colour = "grey40", alpha = 0.4, linewidth = 3, linetype = 1
+        )
+        band <- band[stats::complete.cases(band[c("x", "y", "xend", "yend")]), , drop = FALSE]
+        if (nrow(band) > 0) {
+          band_grob <- GeomSegment$draw_panel(band, panel_params = panel_params,
+                                              coord = coord, lineend = "butt")
+          grobs <- c(grid::gList(band_grob), grobs)
+        }
       } else {
-        cli::cli_abort("Invalid value for pi_type. Must be 'wedge' or 'ellipse'.")
+        cli::cli_abort("{.arg pi_type} must be {.val ellipse}, {.val wedge} or {.val length}.")
       }
     }
     if (se.circle) {
@@ -788,6 +838,48 @@ angle_density <- function(theta, mu, Sigma) {
     (exp(-c0 / 2) / a +
        sqrt(2 * pi) * b * a^(-1.5) * exp(-(c0 - b^2 / a) / 2) * stats::pnorm(b / sqrt(a))) / k
   }, numeric(1))
+}
+
+#' @keywords internal
+# distribution function of the length r = |v| of a bivariate normal vector
+# v ~ N(mu, Sigma): the polar-coordinate density f(r cos theta, r sin theta) r
+# integrated over radii 0 to r has a closed form along each ray (with u, a, b
+# and c as in angle_density()), which is then integrated over the angle. the
+# angle integral is split around the direction of mu, as in angle_quantiles()
+length_cdf <- function(r, mu, Sigma) {
+  if (r <= 0) return(0)
+  Si <- solve(Sigma)
+  c0 <- drop(crossprod(mu, Si %*% mu))
+  k <- 2 * pi * sqrt(det(Sigma))
+  ray <- function(th) vapply(th, function(t) {
+    u <- c(cos(t), sin(t))
+    a <- drop(crossprod(u, Si %*% u))
+    b <- drop(crossprod(u, Si %*% mu))
+    m <- b / a
+    (exp(-c0 / 2) - exp(-(c0 - b^2 / a) / 2 - a * (r - m)^2 / 2)) / a +
+      exp(-(c0 - b^2 / a) / 2) * m * sqrt(2 * pi / a) *
+        (stats::pnorm(sqrt(a) * (r - m)) - stats::pnorm(-sqrt(a) * m))
+  }, numeric(1)) / k
+
+  theta0 <- atan2(mu[2], mu[1])
+  g <- c(-mu[2], mu[1]) / sum(mu^2)
+  se <- sqrt(drop(crossprod(g, Sigma %*% g)))
+  if (!is.finite(se) || se <= 0) se <- 1
+  offsets <- se * c(0.5, 2, 8, 32, 128)
+  breaks <- sort(unique(theta0 + c(-pi, -offsets[offsets < pi], 0, offsets[offsets < pi], pi)))
+  total <- sum(vapply(seq_len(length(breaks) - 1), function(i) {
+    stats::integrate(ray, breaks[i], breaks[i + 1], subdivisions = 500L, rel.tol = 1e-8)$value
+  }, numeric(1)))
+  min(max(total, 0), 1)
+}
+
+#' @keywords internal
+# the alpha/2 and 1 - alpha/2 quantiles of the length of v ~ N(mu, Sigma)
+length_quantiles <- function(mu, Sigma, alpha) {
+  top <- sqrt(sum(mu^2)) + 12 * sqrt(max(eigen(Sigma, symmetric = TRUE, only.values = TRUE)$values))
+  q <- function(p) stats::uniroot(function(r) length_cdf(r, mu, Sigma) - p,
+                                  c(0, top), tol = 1e-10)$root
+  c(q(alpha / 2), q(1 - alpha / 2))
 }
 
 #' @keywords internal

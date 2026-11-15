@@ -106,6 +106,12 @@ wedges on a grid.
 of each vector: the central \code{conf_level} range of the angle of its tip,
 from the exact distribution of that angle when the tip is normally
 distributed with the predicted mean and covariance.
+\item \code{"length"}: A band along each vector shows the prediction interval for
+its length: the central \code{conf_level} range of the length of its tip, from
+the exact distribution of that length.
+Ellipses are a joint region for the tip; wedges and length bands are each
+an interval for one coordinate, the direction or the length, and only one
+type is drawn at a time.
 Ellipses need \code{eval_points}: if \code{pi_type = "ellipse"} is set and
 \code{eval_points} is \code{NULL}, wedges are drawn instead, with a warning.
 }}
@@ -166,11 +172,12 @@ data to provide an estimate of the underlying vector field.
 
 \strong{Prediction Intervals:}
 When \code{se = TRUE}, prediction intervals are computed for the smoothed
-vectors. Two types of intervals are supported:
+vectors. Three types of intervals are supported:
 \itemize{
 \item \strong{Ellipse:} Ellipses represent the joint uncertainty (covariance) in the predicted \code{fx} and \code{fy}.
 \item \strong{Wedge:} Wedges (angular sectors) show the range of likely directions
 of each vector; their radius is the predicted vector's length.
+\item \strong{Length:} Bands along each vector show the range of likely lengths.
 The type of interval displayed is controlled by \code{pi_type}, and the
 confidence level is set via \code{conf_level}.
 }

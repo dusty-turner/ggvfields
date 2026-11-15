@@ -487,6 +487,9 @@ vector_smooth_layer <- function(
 
   # by default, ellipses at evaluation points and wedges on a grid
   pi_type <- pi_type %||% if (is.null(eval_points)) "wedge" else "ellipse"
+  if (!(is.character(pi_type) && length(pi_type) == 1 && pi_type %in% c("ellipse", "wedge", "length"))) {
+    cli::cli_abort("{.arg pi_type} must be one of {.val ellipse}, {.val wedge} or {.val length}.")
+  }
 
   layer(
     stat = stat,

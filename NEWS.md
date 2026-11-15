@@ -12,6 +12,10 @@
   separately as before.
 ## New features
 
+* `geom_vector_smooth(pi_type = "length")` draws a prediction interval for the
+  length of each vector, as a band along it, from the exact distribution of
+  the length of the predicted tip. It joins the ellipse (a joint region for
+  the tip) and the wedge (an interval for the direction), for every method.
 * `grid = "even"` in the stream layers (`geom_stream_field()`,
   `geom_gradient_field(type = "stream")` and their relatives) draws evenly
   spaced streamlines (Jobard and Lefer, 1997): streams are grown until they
