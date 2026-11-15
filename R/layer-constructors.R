@@ -285,7 +285,7 @@ stream_field2_layer <- function(
 gradient_field_layer <- function(
     mapping, data, stat, geom, position, ...,
     na.rm, show.legend, inherit.aes,
-    fun, xlim, ylim, n, max_it, T, L, center, type, normalize,
+    fun, xlim, ylim, n, max_it, method, T, L, center, type, normalize,
     tail_point, eval_point, grid, lineend, linejoin, linemitre, arrow,
     map_colour
 ) {
@@ -294,6 +294,7 @@ gradient_field_layer <- function(
   n <- ensure_length_two(n)
 
   check_field_type(type)
+  method <- match.arg(method, c("rk4", "euler", "lsoda"))
 
   if (map_colour) {
 
@@ -334,6 +335,7 @@ gradient_field_layer <- function(
       n = n,
       na.rm = na.rm,
       max_it = max_it,
+      method = method,
       T = T,
       L = L,
       center = center,

@@ -276,3 +276,20 @@ test_that("geom_stream_field2 crops every stream to the time of the fastest one"
   lens <- tapply(v$l, v$group, max)
   expect_equal(min(lens[lens > 0]), max(lens))
 })
+
+test_that("gradient fields take and check the stream integrator method", {
+  f <- function(u) u[1]^2 - u[2]^2 + u[1] * u[2]
+
+  build <- function(...) {
+    p <- ggplot() + geom_gradient_field(fun = f, n = 3, type = "stream", ...)
+    layer_data(p)
+  }
+
+  rk4 <- build()
+  expect_identical(rk4, build(method = "rk4"))
+  expect_false(isTRUE(all.equal(rk4[, c("x", "y")], build(method = "euler")[, c("x", "y")])))
+
+  expect_error(geom_gradient_field(fun = f, method = "bogus"), "should be one of")
+  expect_error(geom_gradient_field2(fun = f, method = "bogus"), "should be one of")
+  expect_equal(geom_gradient_field2(fun = f, method = "lsoda")$stat_params$method, "lsoda")
+})

@@ -55,6 +55,8 @@
   variogram from the data and works in standardized coordinates, so the
   smoothed field does not depend on the units of `x` and `y`. The fitted
   coregionalization is kept positive definite.
+* `geom_gradient_field()`, `geom_gradient_field2()` and their stats take a
+  `method` argument for the stream integrator, as `geom_stream_field()` does.
 * `stat_vector_smooth()` is exported.
 * `StatStreamSmooth` and `StatGradientSmooth` are the stats behind
   `geom_stream_smooth()` and `geom_gradient_smooth()`.

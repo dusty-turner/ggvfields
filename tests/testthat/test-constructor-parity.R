@@ -52,7 +52,7 @@ pairs <- list(
   gradient_field = list(
     args = c(
       list(fun = f_scalar, xlim = c(0, 1), ylim = c(0, 2), n = c(3, 4), max_it = 50,
-           T = 2, L = 3, center = FALSE, type = "stream", normalize = FALSE,
+           method = "euler", T = 2, L = 3, center = FALSE, type = "stream", normalize = FALSE,
            tail_point = TRUE, eval_point = TRUE, grid = pts, arrow = ar),
       line_args
     ),
@@ -62,7 +62,7 @@ pairs <- list(
   gradient_field2 = list(
     args = c(
       list(fun = f_scalar, xlim = c(0, 1), ylim = c(0, 2), n = 3, max_it = 50,
-           T = 2, L = 3, center = TRUE, type = "vector", normalize = FALSE,
+           method = "lsoda", T = 2, L = 3, center = TRUE, type = "vector", normalize = FALSE,
            tail_point = FALSE, eval_point = TRUE, grid = pts, arrow = ar),
       line_args
     ),
