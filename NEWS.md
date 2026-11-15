@@ -72,7 +72,9 @@
 * `stat_stream_field()` passes `normalize` and `stat_stream_field2()` passes
   `tol` through to the computation, as `geom_stream_field()` and
   `geom_stream_field2()` do.
-* `efield_maker()` passes `k` and `q_test` to the field it returns.
+* `efield_maker()` passes `k` and `q_test` to the field it returns, and the
+  field keeps the argument values `efield_maker()` was called with, so fields
+  can be made in a loop.
 * `linetype` applies to vector layers such as `geom_vector()` and
   `geom_vector_field()`.
 

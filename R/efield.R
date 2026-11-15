@@ -78,5 +78,7 @@ efield_maker <- function(
   q_test = +1,
   log = FALSE
 ) {
+  # evaluate the arguments now, so the field keeps the values it was made with
+  force(charge_positions); force(charges); force(k); force(q_test); force(log)
   function(u) efield(u, charge_positions, charges, k = k, q_test = q_test, log = log)
 }
