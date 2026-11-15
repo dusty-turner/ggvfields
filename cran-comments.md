@@ -1,3 +1,15 @@
+## Resubmission
+
+This is a resubmission. In this version I have:
+
+* Removed the stray 'Rplots.pdf' files that were included by mistake, and
+  excluded them from the build.
+* Skipped the visual snapshot tests on CRAN. The ERROR on r-devel-windows
+  came from drawing one of these plots: "cannot open file
+  '.../ggplot2/R/ggplot2.rdb': No such file or directory". It did not occur
+  on win-builder (R-devel) or on the other platforms, but the tests no longer
+  draw these plots on CRAN.
+
 ## Submission
 
 This is a minor release (1.1.0). Streams are computed with a Runge-Kutta 4

@@ -14,3 +14,5 @@ dusty_files*
 ^data-raw$
 
 ^vignettes$
+^Rplots\.pdf$
+^tests/testthat/Rplots\.pdf$
