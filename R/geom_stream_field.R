@@ -659,7 +659,9 @@ fixed_step_path <- function(u0, fun, T = NULL, L = NULL, max_it = 1000,
   # argument by name, e.g. u["x"] or with(as.list(u), ...), work with rk4 too
   coord_names <- names(u0)
   at <- function(p) { names(p) <- coord_names; p }
-  field <- function(p) as.numeric(fun(at(p)))
+  # a position that is not finite (a step from where the field is infinite)
+  # is outside the field, and fun is not called there
+  field <- function(p) if (all(is.finite(p))) as.numeric(fun(at(p))) else c(NaN, NaN)
 
   u <- as.numeric(u0)
   nfu <- norm(field(u))

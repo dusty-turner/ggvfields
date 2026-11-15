@@ -587,7 +587,8 @@ scale_length_continuous <- function(max_range = 0.5, ...) {
   # lengths are proportional to the mapped value: it is rescaled from 0 (not
   # from its smallest value) to its largest, and drawn from 0 to max_range cm
   if (!"rescaler" %in% names(args)) {
-    args$rescaler <- function(x, to = c(0, 1), from = range(x, na.rm = TRUE)) {
+    args$rescaler <- function(x, to = c(0, 1), from = NULL) {
+      from <- from %||% if (any(is.finite(x))) range(x, finite = TRUE) else c(NA, NA)
       top <- max(from)
       if (!is.finite(top) || top <= 0) return(rep(0, length(x)))
       scales::rescale(x, to = to, from = c(0, top))

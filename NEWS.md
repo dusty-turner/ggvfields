@@ -97,6 +97,8 @@
 
 ## Bug fixes
 
+* Streams stop where the field becomes infinite, and the field function is
+  only called at finite points.
 * Streams computed with `method = "lsoda"` only include points where the
   field is defined, so a stream that runs to the edge of the field's domain
   is drawn up to that edge.
