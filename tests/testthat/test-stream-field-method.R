@@ -210,3 +210,23 @@ test_that("a centered stream that can only move one way from its seed is drawn",
     }
   }
 })
+
+test_that("fields that index their argument by name work with every integrator", {
+  # lsoda and the vector layers call fun with c(x = , y = ); rk4 and euler must too
+  local({
+    x <- 99; y <- 99   # a with(as.list(u), ...) field must not pick these up
+    positional <- function(u) c(-u[2], u[1])
+    by_name <- list(
+      function(u) c(-u["y"], u["x"]),
+      function(u) c(-u[["y"]], u[["x"]]),
+      function(u) with(as.list(u), c(-y, x))
+    )
+    for (m in c("rk4", "euler", "lsoda")) {
+      ref <- layer_data(ggplot() + geom_stream_field(fun = positional, method = m))
+      for (f in by_name) {
+        d <- layer_data(ggplot() + geom_stream_field(fun = f, method = m))
+        expect_equal(d[, c("x", "y")], ref[, c("x", "y")], info = m)
+      }
+    }
+  })
+})

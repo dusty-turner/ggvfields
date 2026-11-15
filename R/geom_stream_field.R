@@ -631,8 +631,15 @@ fixed_step_path <- function(u0, fun, T = NULL, L = NULL, max_it = 1000,
     l = numeric(0), avg_spd = numeric(0), norm = numeric(0)
   )
 
+  # fun is called with the seed's names (x and y from the grid) at every
+  # point, as the lsoda path and vector layers do, so fields that index their
+  # argument by name, e.g. u["x"] or with(as.list(u), ...), work with rk4 too
+  coord_names <- names(u0)
+  at <- function(p) { names(p) <- coord_names; p }
+  field <- function(p) as.numeric(fun(at(p)))
+
   u <- as.numeric(u0)
-  nfu <- norm(fun(u))
+  nfu <- norm(field(u))
 
   # the field is undefined at the seed; nothing to draw
   if (!is.finite(nfu)) return(empty)
@@ -649,9 +656,9 @@ fixed_step_path <- function(u0, fun, T = NULL, L = NULL, max_it = 1000,
   # time T is integrated in time, du/dt = f(u). the state is v = (x, y, t).
   by_length <- L / nfu <= T
   deriv <- if (by_length) {
-    function(v) { fv <- fun(v[1:2]); nfv <- norm(fv); c(fv / nfv, 1 / nfv) }
+    function(v) { fv <- field(v[1:2]); nfv <- norm(fv); c(fv / nfv, 1 / nfv) }
   } else {
-    function(v) c(fun(v[1:2]), 1)
+    function(v) c(field(v[1:2]), 1)
   }
 
   # each step returns the new state and the derivatives at its stages
