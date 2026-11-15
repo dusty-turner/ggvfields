@@ -58,7 +58,13 @@
 #'   point where the gradient was computed. Defaults to `FALSE`.
 #' @param grid A data frame containing precomputed grid points for seed
 #'   placement. If `NULL` (default), a regular Cartesian grid is generated based
-#'   on `xlim`, `ylim`, and `n`.
+#'   on `xlim`, `ylim`, and `n`. For streams, `grid = "even"` places evenly
+#'   spaced streamlines instead (Jobard and Lefer, 1997): each stream is grown
+#'   in both directions until it comes within half a grid spacing of another
+#'   stream, reaches a sink or leaves the plot, and new streams are started a
+#'   grid spacing to either side of earlier ones, so the streams fill the plot
+#'   about one grid spacing apart. `L`, `T` and `normalize` are not used then;
+#'   increase `n` for denser streams.
 #' @param arrow A \code{grid::arrow()} specification to add arrowheads to the
 #'   gradient vectors. In **geom_gradient_field**, the default is a closed arrow
 #'   with a 30° angle and length `0.02` npc; in `geom_gradient_field2()`, the

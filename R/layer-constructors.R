@@ -7,6 +7,9 @@
 # wrapper's `as.list(environment())` and `dots` its `list(...)`. Values given in
 # `...` here are added to, or take the place of, the wrapper's arguments.
 construct_layer <- function(constructor, args, dots, ...) {
+  if (identical(args$grid, "even") && identical(args$type, "vector")) {
+    cli::cli_abort("{.code grid = \"even\"} places streams, so it needs {.code type = \"stream\"}.")
+  }
   if (!is.null(args$domain) && !is.function(args$domain)) {
     cli::cli_abort("{.arg domain} must be a function or {.code NULL}.")
   }

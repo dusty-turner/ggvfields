@@ -85,7 +85,13 @@
 #'   `geom_gradient_smooth()` always use `"rk4"`.
 #' @param grid A data frame containing precomputed grid points for seed
 #'   placement. If `NULL` (default), a regular Cartesian grid is generated based
-#'   on `xlim`, `ylim`, and `n`.
+#'   on `xlim`, `ylim`, and `n`. For streams, `grid = "even"` places evenly
+#'   spaced streamlines instead (Jobard and Lefer, 1997): each stream is grown
+#'   in both directions until it comes within half a grid spacing of another
+#'   stream, reaches a sink or leaves the plot, and new streams are started a
+#'   grid spacing to either side of earlier ones, so the streams fill the plot
+#'   about one grid spacing apart. `L`, `T` and `normalize` are not used then;
+#'   increase `n` for denser streams.
 #' @param domain A function that restricts the field to a region, or `NULL`
 #'   (the default) for the whole rectangle `xlim` by `ylim`. It is called like
 #'   `fun`, with a point `c(x, y)`, and returns `TRUE` for points in the
@@ -459,6 +465,12 @@ StatStreamField <- ggproto(
     # range of data received from ggplot layer or in this layer
     # range inherited from previous layer's scales
     L_grid <- NULL
+    even <- identical(grid, "even")
+    if (even && type != "stream") {
+      cli::cli_abort("{.code grid = \"even\"} places streams, so it needs {.code type = \"stream\"}.")
+    }
+    if (even) grid <- NULL   # the regular grid gives the backup seeds
+
     if( is.null(grid) || (!is.data.frame(grid) && grid == "hex") ){
 
       xlim <- xlim %||%
@@ -539,6 +551,33 @@ StatStreamField <- ggproto(
       unrestricted <- fun
       fun <- function(v) if (in_domain(v)) unrestricted(v) else c(NaN, NaN)
       if (nrow(grid) == 0) return(data.frame(x = numeric(0), y = numeric(0)))
+    }
+
+    # evenly spaced streams: about one grid spacing apart, grown until they
+    # come close to another stream. the first seed is the grid point nearest
+    # the center, and the other grid points are seeds for regions the streams
+    # do not reach
+    if (even) {
+      d_sep <- min(diff(xlim), diff(ylim)) / (max(n) - 1)
+      center <- c(mean(xlim), mean(ylim))
+      seeds <- grid[order((grid[, "x"] - center[1])^2 + (grid[, "y"] - center[2])^2), , drop = FALSE]
+      streams <- even_streams(fun, xlim, ylim, d_sep = d_sep, max_it = max_it,
+                              tol = tol, seeds = seeds)
+      if (length(streams) == 0) return(data.frame(x = numeric(0), y = numeric(0)))
+      streams <- lapply(seq_along(streams), function(i) {
+        s <- streams[[i]]
+        s$id <- i
+        s$x0 <- s$x[1]
+        s$y0 <- s$y[1]
+        s
+      })
+      out <- do.call(rbind, streams)
+      out$fx <- NA_real_
+      out$fy <- NA_real_
+      out$z <- NA_real_
+      out$distance <- NA_real_
+      out$angle <- NA_real_
+      return(out)
     }
 
     # initialize the data frame

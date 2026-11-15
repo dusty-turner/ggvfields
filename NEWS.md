@@ -12,6 +12,11 @@
   separately as before.
 ## New features
 
+* `grid = "even"` in the stream layers (`geom_stream_field()`,
+  `geom_gradient_field(type = "stream")` and their relatives) draws evenly
+  spaced streamlines (Jobard and Lefer, 1997): streams are grown until they
+  come close to another stream, and new ones are started beside earlier ones,
+  so they fill the plot about one grid spacing apart.
 * The stream, vector and gradient field layers take a `domain` function that
   restricts the field to a region: seeds outside it are dropped and streams
   stop at its boundary, so a field only defined on part of the plot can be

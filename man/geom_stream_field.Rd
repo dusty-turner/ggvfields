@@ -208,7 +208,13 @@ where the field was computed. Defaults to \code{FALSE}.}
 
 \item{grid}{A data frame containing precomputed grid points for seed
 placement. If \code{NULL} (default), a regular Cartesian grid is generated based
-on \code{xlim}, \code{ylim}, and \code{n}.}
+on \code{xlim}, \code{ylim}, and \code{n}. For streams, \code{grid = "even"} places evenly
+spaced streamlines instead (Jobard and Lefer, 1997): each stream is grown
+in both directions until it comes within half a grid spacing of another
+stream, reaches a sink or leaves the plot, and new streams are started a
+grid spacing to either side of earlier ones, so the streams fill the plot
+about one grid spacing apart. \code{L}, \code{T} and \code{normalize} are not used then;
+increase \code{n} for denser streams.}
 
 \item{domain}{A function that restricts the field to a region, or \code{NULL}
 (the default) for the whole rectangle \code{xlim} by \code{ylim}. It is called like
