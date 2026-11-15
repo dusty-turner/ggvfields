@@ -25,9 +25,15 @@
 #'   separate generalized additive models for `fx` and `fy` with the smooth
 #'   `s(x, y)` (with predictions assumed independent, i.e., zero covariance),
 #'   the `"lm"` method fits the multivariate linear model given by `formula`,
-#'   and `"kriging"` uses a cokriging approach via the `gstat` package.
-#' @param se Logical. If `TRUE`, prediction (confidence) intervals are computed
-#'   and plotted.
+#'   and `"kriging"` uses a cokriging approach via the `gstat` package. The
+#'   smooth uses mgcv's default basis of 30 functions; with fewer than 30
+#'   distinct locations it uses half as many functions as locations, and it
+#'   needs at least 5 locations.
+#' @param se Logical. If `TRUE`, prediction intervals for the tip of each
+#'   vector are computed and plotted. For every `method` they cover a new
+#'   observation at that location, not only the fitted mean: their covariance
+#'   is the covariance of the fitted vector plus the residual covariance. With
+#'   `"gam"` the residual covariance between `fx` and `fy` is taken to be zero.
 #' @param se.circle Logical. Defaults to `FALSE`. If `TRUE`, circles are drawn
 #'   around the origin of each vector. By default, the circle’s radius is
 #'   computed as the magnitude of the predicted vector.
@@ -398,8 +404,9 @@ StatVectorSmooth <- ggproto(
       s <- mgcv::s
 
       # fit gam
-      fx_mod <- gam(fx ~ s(x, y, bs = "tp"), data = data)
-      fy_mod <- gam(fy ~ s(x, y, bs = "tp"), data = data)
+      k <- gam_basis_size(data)
+      fx_mod <- gam(fx ~ s(x, y, bs = "tp", k = k), data = data)
+      fy_mod <- gam(fy ~ s(x, y, bs = "tp", k = k), data = data)
 
       # Define prediction points: if eval_points is NULL, use grid; otherwise, use eval_points
       new_point <- if (is.null(eval_points)) grid else eval_points
@@ -416,8 +423,10 @@ StatVectorSmooth <- ggproto(
         fy = pred_fy$fit
       )
 
-      var_fx <- pred_fx$se.fit^2
-      var_fy <- pred_fy$se.fit^2
+      # prediction variance, as for lm and kriging: the variance of the fitted
+      # mean (se.fit^2) plus each component's residual variance
+      var_fx <- pred_fx$se.fit^2 + fx_mod$sig2
+      var_fy <- pred_fy$se.fit^2 + fy_mod$sig2
 
       # Since the models are fitted separately, we assume independence:
       cov_fx_fy <- rep(0, length(var_fx))

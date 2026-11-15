@@ -28,6 +28,22 @@ warn_if_formula_ignored <- function(method, formula_supplied) {
 }
 
 
+# basis dimension k for the gam smoothers' s(x, y). mgcv's default of 30 needs
+# at least 30 distinct locations; with fewer the fit fails. for small data
+# sets use half the number of locations, which keeps enough residual degrees of
+# freedom for the standard errors without interpolating the noise
+gam_basis_size <- function(data) {
+  n <- nrow(unique(data[, c("x", "y")]))
+  if (n < 5) {
+    cli::cli_abort(c(
+      "{.code method = \"gam\"} needs at least 5 distinct locations, not {n}.",
+      "i" = "Use {.code method = \"lm\"} for smaller data sets."
+    ))
+  }
+  if (n >= 30) 30 else max(4, n %/% 2)
+}
+
+
 tibble0 <- function(...) {
   tibble::tibble(..., .name_repair = "minimal")
 }

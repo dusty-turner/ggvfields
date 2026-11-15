@@ -101,7 +101,10 @@ smoothing when \code{method = "lm"}. Defaults to \code{cbind(fx, fy) ~ x * y}. I
 ignored, with a warning if supplied, when \code{method = "gam"}.}
 
 \item{method}{Either \code{"gam"} (default), which fits \code{fx} and \code{fy} separately
-with the smooth \code{s(x, y)}, or \code{"lm"}, which fits \code{formula}.}
+with the smooth \code{s(x, y)}, or \code{"lm"}, which fits \code{formula}. The smooth
+uses mgcv's default basis of 30 functions; with fewer than 30 distinct
+locations it uses half as many functions as locations, and it needs at
+least 5 locations.}
 
 \item{eval_points}{A data frame of evaluation points, or \code{NULL}. When
 provided, it specifies the grid where the smoothing model is evaluated; if

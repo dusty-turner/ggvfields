@@ -71,10 +71,16 @@ are \code{"gam"} (default), \code{"lm"}, and \code{"kriging"}. The \code{"gam"} 
 separate generalized additive models for \code{fx} and \code{fy} with the smooth
 \code{s(x, y)} (with predictions assumed independent, i.e., zero covariance),
 the \code{"lm"} method fits the multivariate linear model given by \code{formula},
-and \code{"kriging"} uses a cokriging approach via the \code{gstat} package.}
+and \code{"kriging"} uses a cokriging approach via the \code{gstat} package. The
+smooth uses mgcv's default basis of 30 functions; with fewer than 30
+distinct locations it uses half as many functions as locations, and it
+needs at least 5 locations.}
 
-\item{se}{Logical. If \code{TRUE}, prediction (confidence) intervals are computed
-and plotted.}
+\item{se}{Logical. If \code{TRUE}, prediction intervals for the tip of each
+vector are computed and plotted. For every \code{method} they cover a new
+observation at that location, not only the fitted mean: their covariance
+is the covariance of the fitted vector plus the residual covariance. With
+\code{"gam"} the residual covariance between \code{fx} and \code{fy} is taken to be zero.}
 
 \item{se.circle}{Logical. Defaults to \code{FALSE}. If \code{TRUE}, circles are drawn
 around the origin of each vector. By default, the circle’s radius is

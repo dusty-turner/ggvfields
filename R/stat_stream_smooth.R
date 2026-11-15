@@ -53,8 +53,9 @@ fit_vector_field <- function(data, formula, method) {
 
   if (method == "gam") {
 
-    fx_mod <- mgcv::gam(fx ~ s(x, y, bs = "tp"), data = data)
-    fy_mod <- mgcv::gam(fy ~ s(x, y, bs = "tp"), data = data)
+    k <- gam_basis_size(data)
+    fx_mod <- mgcv::gam(fx ~ s(x, y, bs = "tp", k = k), data = data)
+    fy_mod <- mgcv::gam(fy ~ s(x, y, bs = "tp", k = k), data = data)
 
     return(function(u) {
       new_point <- data.frame(x = u[1], y = u[2])
