@@ -30,14 +30,17 @@ test_that("the basis size leaves residual degrees of freedom on small data", {
   }
 })
 
-test_that("the gam smoothers are unchanged with 30 or more locations", {
-  d <- wind(40)
+test_that("with 60 or more locations the joint gam uses 30 basis functions", {
+  d <- wind(80)
   expect_identical(gam_basis_size(d), 30)
 
   fit <- fit_vector_field(d, NULL, "gam")
-  default <- mgcv::gam(fx ~ s(x, y, bs = "tp"), data = d)
-  expect_equal(as.numeric(fit(c(0.1, 0.2))[1]),
-               as.numeric(predict(default, newdata = data.frame(x = 0.1, y = 0.2))))
+  joint <- mgcv::gam(
+    list(fx ~ s(x, y, bs = "tp"), fy ~ s(x, y, bs = "tp")),
+    family = mgcv::mvn(d = 2), data = d
+  )
+  expect_equal(as.numeric(fit(c(0.1, 0.2))),
+               as.numeric(predict(joint, newdata = data.frame(x = 0.1, y = 0.2))))
 })
 
 test_that("too few locations for a gam give a clear error", {

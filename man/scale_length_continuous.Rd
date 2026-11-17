@@ -10,9 +10,14 @@ scale_length_continuous(max_range = 0.5, ...)
 \item{max_range}{The length, in centimeters, of the longest vector. Every
 other vector is drawn in proportion to it, so a vector with half the
 largest norm is half as long, and the legend shows the same lengths.
-Defaults to \code{0.5}.}
+Defaults to \code{0.5}. With a transformation that makes some values
+negative, such as \code{transform = "log10"} with norms below 1, lengths
+instead run from a tenth of \code{max_range} for the smallest value to
+\code{max_range} for the largest, so they still grow with the norm and no
+vector is reversed.}
 
-\item{...}{Other arguments passed to \code{continuous_scale()}.}
+\item{...}{Other arguments passed to \code{continuous_scale()}, such as
+\code{transform}.}
 }
 \value{
 If \code{max_range} is less than or equal to 0.5 (the default), a

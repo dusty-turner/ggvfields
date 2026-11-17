@@ -48,10 +48,21 @@ navbar:
     articles:
       text: Articles
       menu:
+        - text: "Vector and Stream Fields from Functions"
+          href: articles/fields.html
+        - text: "Plotting Vector Data"
+          href: articles/vector-data.html
+        - text: "Smoothing Vector Data and Prediction Intervals"
+          href: articles/smoothing.html
         - text: "The Art of Flow: A Visual Gallery"
           href: articles/gallery.html
 
 articles:
+  - title: "Guides"
+    contents:
+      - fields
+      - vector-data
+      - smoothing
   - title: "Gallery"
     contents:
       - gallery

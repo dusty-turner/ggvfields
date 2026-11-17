@@ -77,19 +77,21 @@ They default to the range of the data.}
 
 \item{method}{Character. Specifies the smoothing method. Supported options
 are \code{"gam"} (default), \code{"lm"}, and \code{"kriging"}. The \code{"gam"} method fits
-separate generalized additive models for \code{fx} and \code{fy} with the smooth
-\code{s(x, y)} (with predictions assumed independent, i.e., zero covariance),
-the \code{"lm"} method fits the multivariate linear model given by \code{formula},
-and \code{"kriging"} uses a cokriging approach via the \code{gstat} package. The
-smooth uses mgcv's default basis of 30 functions; with fewer than 30
-distinct locations it uses half as many functions as locations, and it
-needs at least 5 locations.}
+\code{fx} and \code{fy} together, each with the smooth \code{s(x, y)}, in mgcv's
+multivariate normal family (\code{\link[mgcv:mvn]{mgcv::mvn()}}), which also estimates the
+correlation of their residuals; the \code{"lm"} method fits the multivariate
+linear model given by \code{formula}, and \code{"kriging"} uses a cokriging approach
+via the \code{gstat} package. Each smooth uses up to 30 basis functions, and
+at most half as many as there are distinct locations; at least 5
+locations are needed. With fewer than 10 locations, or data without
+noise, \code{fx} and \code{fy} are fitted separately and their residuals are taken
+to be uncorrelated.}
 
 \item{se}{Logical. If \code{TRUE}, prediction intervals for the tip of each
 vector are computed and plotted. For every \code{method} they cover a new
 observation at that location, not only the fitted mean: their covariance
-is the covariance of the fitted vector plus the residual covariance. With
-\code{"gam"} the residual covariance between \code{fx} and \code{fy} is taken to be zero.}
+is the covariance of the fitted vector plus the residual covariance, so
+ellipses tilt when \code{fx} and \code{fy} are correlated.}
 
 \item{se.circle}{Logical. Defaults to \code{FALSE}. If \code{TRUE}, circles are drawn
 around the origin of each vector. By default, the circle’s radius is
@@ -104,6 +106,14 @@ wedges on a grid.
 of each vector: the central \code{conf_level} range of the angle of its tip,
 from the exact distribution of that angle when the tip is normally
 distributed with the predicted mean and covariance.
+\item \code{"length"}: A band along each vector shows the prediction interval for
+its length: the central \code{conf_level} range of the length of its tip, from
+the exact distribution of that length. On a grid, where the vectors are
+drawn at a common length, each band is scaled with its vector and cut off
+at twice the vector's drawn length.
+Ellipses are a joint region for the tip; wedges and length bands are each
+an interval for one coordinate, the direction or the length, and only one
+type is drawn at a time.
 Ellipses need \code{eval_points}: if \code{pi_type = "ellipse"} is set and
 \code{eval_points} is \code{NULL}, wedges are drawn instead, with a warning.
 }}
@@ -164,11 +174,12 @@ data to provide an estimate of the underlying vector field.
 
 \strong{Prediction Intervals:}
 When \code{se = TRUE}, prediction intervals are computed for the smoothed
-vectors. Two types of intervals are supported:
+vectors. Three types of intervals are supported:
 \itemize{
 \item \strong{Ellipse:} Ellipses represent the joint uncertainty (covariance) in the predicted \code{fx} and \code{fy}.
 \item \strong{Wedge:} Wedges (angular sectors) show the range of likely directions
 of each vector; their radius is the predicted vector's length.
+\item \strong{Length:} Bands along each vector show the range of likely lengths.
 The type of interval displayed is controlled by \code{pi_type}, and the
 confidence level is set via \code{conf_level}.
 }

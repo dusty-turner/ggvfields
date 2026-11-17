@@ -22,10 +22,13 @@ test_that("fit_vector_field returns the fitted gam field", {
 
   fhat <- fit_vector_field(d, NULL, "gam")
   new_point <- data.frame(x = .2, y = -.3)
-  expected <- c(
-    predict(mgcv::gam(fx ~ s(x, y, bs = "tp"), data = d), newdata = new_point),
-    predict(mgcv::gam(fy ~ s(x, y, bs = "tp"), data = d), newdata = new_point)
+  # fx and fy are fitted jointly, with at most half as many basis functions
+  # as the 30 locations
+  joint <- mgcv::gam(
+    list(fx ~ s(x, y, bs = "tp", k = 15), fy ~ s(x, y, bs = "tp", k = 15)),
+    family = mgcv::mvn(d = 2), data = d
   )
+  expected <- predict(joint, newdata = new_point)
 
   expect_equal(as.numeric(fhat(c(.2, -.3))), as.numeric(expected))
 })

@@ -37,11 +37,10 @@ test_that("streams stop at a jump to a field that is infinite", {
   expect_lte(max(s$x), 1e-3)
 })
 
-test_that("the length scale maps values with no positive maximum to 0", {
+test_that("the length scale maps missing or all-zero values to 0", {
   rescale <- scale_length_continuous()$rescaler
   expect_equal(rescale(c(0, 0, 0)), c(0, 0, 0))
   expect_equal(rescale(c(NA_real_, NA_real_)), c(0, 0))
-  expect_equal(rescale(c(-2, -1)), c(0, 0))
   expect_equal(rescale(c(1, 2, 4)), c(0.25, 0.5, 1))
 })
 

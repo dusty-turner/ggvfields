@@ -1,3 +1,38 @@
+# ggvfields (development version)
+
+## Changes in behavior
+
+* The gam smoother of `geom_vector_smooth()`, `geom_stream_smooth()` and
+  their stats fits `fx` and `fy` together in mgcv's multivariate normal family,
+  which also estimates the correlation of their residuals. Ellipses and wedges
+  account for that correlation, so ellipses tilt when `fx` and `fy` are
+  correlated, and the prediction regions have their stated coverage. Each
+  smooth uses at most half as many basis functions as there are locations.
+  With fewer than 10 locations, or data without noise, `fx` and `fy` are fitted
+  separately as before.
+## New features
+
+* `geom_vector_smooth(pi_type = "length")` draws a prediction interval for the
+  length of each vector, as a band along it, from the exact distribution of
+  the length of the predicted tip. It joins the ellipse (a joint region for
+  the tip) and the wedge (an interval for the direction), for every method.
+* `grid = "even"` in the stream layers (`geom_stream_field()`,
+  `geom_gradient_field(type = "stream")` and their relatives) draws evenly
+  spaced streamlines (Jobard and Lefer, 1997): streams are grown until they
+  come close to another stream, and new ones are started beside earlier ones,
+  so they fill the plot about one grid spacing apart.
+* The stream, vector and gradient field layers take a `domain` function that
+  restricts the field to a region: seeds outside it are dropped and streams
+  stop at its boundary, so a field only defined on part of the plot can be
+  drawn there (#37).
+
+## Bug fixes
+
+* `scale_length_continuous()` with a transformation that makes some values
+  negative, such as `transform = "log10"` with norms below 1, keeps every
+  vector's direction: lengths run from a tenth of `max_range` for the smallest
+  value to `max_range` for the largest (#24).
+
 # ggvfields 1.1.0
 
 ## Changes in behavior

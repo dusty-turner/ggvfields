@@ -58,13 +58,10 @@ fit_vector_field <- function(data, formula, method) {
 
   if (method == "gam") {
 
-    k <- gam_basis_size(data)
-    fx_mod <- mgcv::gam(fx ~ s(x, y, bs = "tp", k = k), data = data)
-    fy_mod <- mgcv::gam(fy ~ s(x, y, bs = "tp", k = k), data = data)
+    fit <- fit_joint_gam(data)
 
     return(function(u) {
-      new_point <- data.frame(x = u[1], y = u[2])
-      c(predict(fx_mod, newdata = new_point), predict(fy_mod, newdata = new_point))
+      as.numeric(predict_joint_gam(fit, data.frame(x = u[1], y = u[2]), se = FALSE))
     })
 
   }

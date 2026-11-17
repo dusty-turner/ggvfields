@@ -85,7 +85,19 @@
 #'   `geom_gradient_smooth()` always use `"rk4"`.
 #' @param grid A data frame containing precomputed grid points for seed
 #'   placement. If `NULL` (default), a regular Cartesian grid is generated based
-#'   on `xlim`, `ylim`, and `n`.
+#'   on `xlim`, `ylim`, and `n`. For streams, `grid = "even"` places evenly
+#'   spaced streamlines instead (Jobard and Lefer, 1997): each stream is grown
+#'   in both directions until it comes within half a grid spacing of another
+#'   stream, reaches a sink or leaves the plot, and new streams are started a
+#'   grid spacing to either side of earlier ones, so the streams fill the plot
+#'   about one grid spacing apart. `L`, `T` and `normalize` are not used then;
+#'   increase `n` for denser streams.
+#' @param domain A function that restricts the field to a region, or `NULL`
+#'   (the default) for the whole rectangle `xlim` by `ylim`. It is called like
+#'   `fun`, with a point `c(x, y)`, and returns `TRUE` for points in the
+#'   region. Seeds outside the region are dropped, and the field is taken to
+#'   be undefined outside it, so streams stop at its boundary. Use it, for
+#'   example, when `fun` is only defined on part of the plot.
 #' @param arrow A \code{grid::arrow()} specification for adding arrowheads to the
 #'   streamlines. Defaults to a closed arrow with a 30° angle and length `0.02`
 #'   npc.
@@ -269,6 +281,7 @@ geom_stream_field <- function(
     tail_point = FALSE,
     eval_point = FALSE,
     grid = NULL,
+    domain = NULL,
     method = "rk4",
     lineend = "butt",
     linejoin = "round",
@@ -311,6 +324,7 @@ stat_stream_field <- function(
     tail_point = FALSE,
     eval_point = FALSE,
     grid = NULL,
+    domain = NULL,
     method = "rk4",
     lineend = "butt",
     linejoin = "round",
@@ -350,6 +364,7 @@ geom_stream_field2 <- function(
     tail_point = TRUE,
     eval_point = FALSE,
     grid = NULL,
+    domain = NULL,
     lineend = "butt",
     linejoin = "round",
     linemitre = 10,
@@ -388,6 +403,7 @@ stat_stream_field2 <- function(
     tail_point = TRUE,
     eval_point = FALSE,
     grid = NULL,
+    domain = NULL,
     lineend = "butt",
     linejoin = "round",
     linemitre = 10,
@@ -441,13 +457,20 @@ StatStreamField <- ggproto(
   compute_group = function(data, scales, fun, xlim, ylim, n,
                            method = "rk4", max_it = 1000, tol = sqrt(.Machine$double.eps),
                            T = NULL, L = NULL,
-                           center, type, normalize, args = NULL, grid, ...) {
+                           center, type, normalize, args = NULL, grid,
+                           domain = NULL, ...) {
 
     ## pick the right limits.  may need updating but currently prioritizing
     # limit specified by user
     # range of data received from ggplot layer or in this layer
     # range inherited from previous layer's scales
     L_grid <- NULL
+    even <- identical(grid, "even")
+    if (even && type != "stream") {
+      cli::cli_abort("{.code grid = \"even\"} places streams, so it needs {.code type = \"stream\"}.")
+    }
+    if (even) grid <- NULL   # the regular grid gives the backup seeds
+
     if( is.null(grid) || (!is.data.frame(grid) && grid == "hex") ){
 
       xlim <- xlim %||%
@@ -520,11 +543,48 @@ StatStreamField <- ggproto(
       }
     }
 
+    # restrict the field to its domain: seeds outside it are dropped, and the
+    # field is undefined outside it, so streams stop at its boundary
+    if (!is.null(domain)) {
+      in_domain <- function(u) isTRUE(as.logical(domain(u))[1])
+      grid <- grid[vapply(seq_len(nrow(grid)), function(i) in_domain(grid[i, ]), logical(1)), , drop = FALSE]
+      unrestricted <- fun
+      fun <- function(v) if (in_domain(v)) unrestricted(v) else c(NaN, NaN)
+      if (nrow(grid) == 0) return(data.frame(x = numeric(0), y = numeric(0)))
+    }
+
+    # evenly spaced streams: about one grid spacing apart, grown until they
+    # come close to another stream. the first seed is the grid point nearest
+    # the center, and the other grid points are seeds for regions the streams
+    # do not reach
+    if (even) {
+      d_sep <- min(diff(xlim), diff(ylim)) / (max(n) - 1)
+      center <- c(mean(xlim), mean(ylim))
+      seeds <- grid[order((grid[, "x"] - center[1])^2 + (grid[, "y"] - center[2])^2), , drop = FALSE]
+      streams <- even_streams(fun, xlim, ylim, d_sep = d_sep, max_it = max_it,
+                              tol = tol, seeds = seeds)
+      if (length(streams) == 0) return(data.frame(x = numeric(0), y = numeric(0)))
+      streams <- lapply(seq_along(streams), function(i) {
+        s <- streams[[i]]
+        s$id <- i
+        s$x0 <- s$x[1]
+        s$y0 <- s$y[1]
+        s
+      })
+      out <- do.call(rbind, streams)
+      out$fx <- NA_real_
+      out$fy <- NA_real_
+      out$z <- NA_real_
+      out$distance <- NA_real_
+      out$angle <- NA_real_
+      return(out)
+    }
+
     # initialize the data frame
     list_of_streams <- vector(mode = "list", length = nrow(grid))
     # iterate computing streams/vectors
 
-    for (i in 1:nrow(grid)) {
+    for (i in seq_len(nrow(grid))) {
 
       # compute the stream for the current grid point using ode_stepper()
       if (type == "vector") {
@@ -603,7 +663,7 @@ StatStreamField <- ggproto(
       smallest_t <- times_to_L_by_stream[fastest_stream_id]
 
       # go back through grid cropping time to T = fastest_t
-      for (i in 1:nrow(grid)) {
+      for (i in seq_len(nrow(grid))) {
         if (is.null(list_of_streams[[i]])) next
         stream <- crop_stream_time(
           list_of_streams[[i]],

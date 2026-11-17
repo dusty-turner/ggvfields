@@ -55,6 +55,9 @@ test_that("smoothing layers draw as expected", {
   vdiffr::expect_doppelganger("geom_vector_smooth gam ellipse",
     ggplot(wind, aes(x, y, fx = fx, fy = fy)) + geom_vector() +
       geom_vector_smooth(eval_points = data.frame(x = 0, y = 0)))
+  vdiffr::expect_doppelganger("geom_vector_smooth length",
+    ggplot(wind, aes(x, y, fx = fx, fy = fy)) + geom_vector() +
+      geom_vector_smooth(method = "lm", eval_points = data.frame(x = 0, y = 0), pi_type = "length"))
   vdiffr::expect_doppelganger("geom_stream_smooth",
     ggplot(wind, aes(x, y, fx = fx, fy = fy)) + geom_stream_smooth(n = 5))
 })
