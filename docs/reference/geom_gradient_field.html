@@ -19,7 +19,7 @@ resulting vectors."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ggvfields</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,7 +30,10 @@ resulting vectors."></head><body>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/gallery.html">The Art of Flow: A Visual Gallery</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/fields.html">Vector and Stream Fields from Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/vector-data.html">Plotting Vector Data</a></li>
+    <li><a class="dropdown-item" href="../articles/smoothing.html">Smoothing Vector Data and Prediction Intervals</a></li>
+    <li><a class="dropdown-item" href="../articles/gallery.html">The Art of Flow: A Visual Gallery</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -84,6 +87,7 @@ resulting vectors.</p>
 <span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lineend <span class="op">=</span> <span class="st">"butt"</span>,</span>
 <span>  linejoin <span class="op">=</span> <span class="st">"round"</span>,</span>
 <span>  linemitre <span class="op">=</span> <span class="fl">10</span>,</span>
@@ -113,6 +117,7 @@ resulting vectors.</p>
 <span>  tail_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lineend <span class="op">=</span> <span class="st">"butt"</span>,</span>
 <span>  linejoin <span class="op">=</span> <span class="st">"round"</span>,</span>
 <span>  linemitre <span class="op">=</span> <span class="fl">10</span>,</span>
@@ -142,6 +147,7 @@ resulting vectors.</p>
 <span>  tail_point <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lineend <span class="op">=</span> <span class="st">"butt"</span>,</span>
 <span>  linejoin <span class="op">=</span> <span class="st">"round"</span>,</span>
 <span>  linemitre <span class="op">=</span> <span class="fl">10</span>,</span>
@@ -171,6 +177,7 @@ resulting vectors.</p>
 <span>  tail_point <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  eval_point <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  domain <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lineend <span class="op">=</span> <span class="st">"butt"</span>,</span>
 <span>  linejoin <span class="op">=</span> <span class="st">"round"</span>,</span>
 <span>  linemitre <span class="op">=</span> <span class="fl">10</span>,</span>
@@ -312,7 +319,22 @@ point where the gradient was computed. Defaults to <code>FALSE</code>.</p></dd>
 <dt id="arg-grid">grid<a class="anchor" aria-label="anchor" href="#arg-grid"></a></dt>
 <dd><p>A data frame containing precomputed grid points for seed
 placement. If <code>NULL</code> (default), a regular Cartesian grid is generated based
-on <code>xlim</code>, <code>ylim</code>, and <code>n</code>.</p></dd>
+on <code>xlim</code>, <code>ylim</code>, and <code>n</code>. For streams, <code>grid = "even"</code> places evenly
+spaced streamlines instead (Jobard and Lefer, 1997): each stream is grown
+in both directions until it comes within half a grid spacing of another
+stream, reaches a sink or leaves the plot, and new streams are started a
+grid spacing to either side of earlier ones, so the streams fill the plot
+about one grid spacing apart. <code>L</code>, <code>T</code> and <code>normalize</code> are not used then;
+increase <code>n</code> for denser streams.</p></dd>
+
+
+<dt id="arg-domain">domain<a class="anchor" aria-label="anchor" href="#arg-domain"></a></dt>
+<dd><p>A function that restricts the field to a region, or <code>NULL</code>
+(the default) for the whole rectangle <code>xlim</code> by <code>ylim</code>. It is called like
+<code>fun</code>, with a point <code>c(x, y)</code>, and returns <code>TRUE</code> for points in the
+region. Seeds outside the region are dropped, and the field is taken to
+be undefined outside it, so streams stop at its boundary. Use it, for
+example, when <code>fun</code> is only defined on part of the plot.</p></dd>
 
 
 <dt id="arg-lineend">lineend<a class="anchor" aria-label="anchor" href="#arg-lineend"></a></dt>

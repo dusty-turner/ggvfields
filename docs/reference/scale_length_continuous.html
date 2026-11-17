@@ -11,7 +11,7 @@ vector plots where vector lengths are mapped to a continuous scale."></head><bod
 
     <a class="navbar-brand me-2" href="../index.html">ggvfields</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,7 +22,10 @@ vector plots where vector lengths are mapped to a continuous scale."></head><bod
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/gallery.html">The Art of Flow: A Visual Gallery</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/fields.html">Vector and Stream Fields from Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/vector-data.html">Plotting Vector Data</a></li>
+    <li><a class="dropdown-item" href="../articles/smoothing.html">Smoothing Vector Data and Prediction Intervals</a></li>
+    <li><a class="dropdown-item" href="../articles/gallery.html">The Art of Flow: A Visual Gallery</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -60,11 +63,16 @@ vector plots where vector lengths are mapped to a continuous scale.</p>
 <dd><p>The length, in centimeters, of the longest vector. Every
 other vector is drawn in proportion to it, so a vector with half the
 largest norm is half as long, and the legend shows the same lengths.
-Defaults to <code>0.5</code>.</p></dd>
+Defaults to <code>0.5</code>. With a transformation that makes some values
+negative, such as <code>transform = "log10"</code> with norms below 1, lengths
+instead run from a tenth of <code>max_range</code> for the smallest value to
+<code>max_range</code> for the largest, so they still grow with the norm and no
+vector is reversed.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Other arguments passed to <code><a href="https://ggplot2.tidyverse.org/reference/continuous_scale.html" class="external-link">continuous_scale()</a></code>.</p></dd>
+<dd><p>Other arguments passed to <code><a href="https://ggplot2.tidyverse.org/reference/continuous_scale.html" class="external-link">continuous_scale()</a></code>, such as
+<code>transform</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

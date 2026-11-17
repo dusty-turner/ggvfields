@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ggvfields</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,7 +18,10 @@
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/gallery.html">The Art of Flow: A Visual Gallery</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/fields.html">Vector and Stream Fields from Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/vector-data.html">Plotting Vector Data</a></li>
+    <li><a class="dropdown-item" href="../articles/smoothing.html">Smoothing Vector Data and Prediction Intervals</a></li>
+    <li><a class="dropdown-item" href="../articles/gallery.html">The Art of Flow: A Visual Gallery</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -36,6 +39,21 @@
       <small>Source: <a href="https://github.com/dusty-turner/ggvfields/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="ggvfields-development-version">ggvfields (development version)<a class="anchor" aria-label="anchor" href="#ggvfields-development-version"></a></h2>
+<div class="section level3">
+<h3 id="changes-in-behavior-development-version">Changes in behavior<a class="anchor" aria-label="anchor" href="#changes-in-behavior-development-version"></a></h3>
+<ul><li><p>The gam smoother of <code><a href="../reference/geom_vector_smooth.html">geom_vector_smooth()</a></code>, <code><a href="../reference/geom_stream_smooth.html">geom_stream_smooth()</a></code> and their stats fits <code>fx</code> and <code>fy</code> together in mgcv’s multivariate normal family, which also estimates the correlation of their residuals. Ellipses and wedges account for that correlation, so ellipses tilt when <code>fx</code> and <code>fy</code> are correlated, and the prediction regions have their stated coverage. Each smooth uses at most half as many basis functions as there are locations. With fewer than 10 locations, or data without noise, <code>fx</code> and <code>fy</code> are fitted separately as before. ## New features</p></li>
+<li><p><code>geom_vector_smooth(pi_type = "length")</code> draws a prediction interval for the length of each vector, as a band along it, from the exact distribution of the length of the predicted tip. It joins the ellipse (a joint region for the tip) and the wedge (an interval for the direction), for every method.</p></li>
+<li><p><code>grid = "even"</code> in the stream layers (<code><a href="../reference/geom_stream_field.html">geom_stream_field()</a></code>, <code>geom_gradient_field(type = "stream")</code> and their relatives) draws evenly spaced streamlines (Jobard and Lefer, 1997): streams are grown until they come close to another stream, and new ones are started beside earlier ones, so they fill the plot about one grid spacing apart.</p></li>
+<li><p>The stream, vector and gradient field layers take a <code>domain</code> function that restricts the field to a region: seeds outside it are dropped and streams stop at its boundary, so a field only defined on part of the plot can be drawn there (<a href="https://github.com/dusty-turner/ggvfields/issues/37" class="external-link">#37</a>).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/scale_length_continuous.html">scale_length_continuous()</a></code> with a transformation that makes some values negative, such as <code>transform = "log10"</code> with norms below 1, keeps every vector’s direction: lengths run from a tenth of <code>max_range</code> for the smallest value to <code>max_range</code> for the largest (<a href="https://github.com/dusty-turner/ggvfields/issues/24" class="external-link">#24</a>).</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.0" id="ggvfields-110">ggvfields 1.1.0<a class="anchor" aria-label="anchor" href="#ggvfields-110"></a></h2><p class="text-muted">CRAN release: 2026-11-15</p>
 <div class="section level3">
