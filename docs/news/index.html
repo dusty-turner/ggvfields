@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ggvfields</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,7 +23,7 @@
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="nav-link" href="https://github.com/dusty-turner/ggvfields/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/dusty-turner/ggvfields/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -33,14 +33,111 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/dusty-turner/ggvfields/blob/HEAD/NEWS.md"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/dusty-turner/ggvfields/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.1.0" id="ggvfields-110">ggvfields 1.1.0<a class="anchor" aria-label="anchor" href="#ggvfields-110"></a></h2><p class="text-muted">CRAN release: 2026-11-15</p>
+<div class="section level3">
+<h3 id="changes-in-behavior-1-1-0">Changes in behavior<a class="anchor" aria-label="anchor" href="#changes-in-behavior-1-1-0"></a></h3>
+<ul><li>Streams are now computed with a Runge-Kutta 4 integrator by default (<code>method = "rk4"</code>), in <code><a href="../reference/geom_stream_field.html">geom_stream_field()</a></code> and its relatives as well as <code>geom_gradient_field(type = "stream")</code>, <code><a href="../reference/geom_stream_smooth.html">geom_stream_smooth()</a></code> and <code><a href="../reference/geom_gradient_smooth.html">geom_gradient_smooth()</a></code>. Streams follow the field more closely, which changes <code>avg_spd</code> slightly. Streams stop at sinks and at singularities such as point charges, and cross jumps in the field, such as one defined with <code><a href="https://rdrr.io/r/base/sign.html" class="external-link">sign()</a></code> or <code><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse()</a></code>. The adaptive deSolve integrator remains available as <code>method = "lsoda"</code>, and <code>"euler"</code> is also available. An unknown <code>method</code> is an error.</li>
+<li>
+<code><a href="../reference/geom_stream_field.html">geom_stream_field2()</a></code> and <code><a href="../reference/geom_stream_field.html">stat_stream_field2()</a></code> now grow every stream to length <code>L</code> and then crop all of them back to the time of the fastest one, so a stream’s length shows its speed relative to the fastest, as the vectors of <code><a href="../reference/geom_vector_field.html">geom_vector_field2()</a></code> do. <code>type = "vector"</code> is unchanged.</li>
+<li>Mapped lengths are proportional to the mapped value: in <code><a href="../reference/geom_vector.html">geom_vector2()</a></code>, <code><a href="../reference/geom_vector_field.html">geom_vector_field2()</a></code> and <code>geom_gradient_field2(type = "vector")</code>, a vector with half the largest norm is drawn half as long. The longest vector is <code>max_range</code> centimeters (0.5 by default; set it with <code><a href="../reference/scale_length_continuous.html">scale_length_continuous()</a></code>), and the legend shows the same lengths.</li>
+<li>The ellipses and wedges of <code>geom_vector_smooth(method = "gam")</code>, the default, are now prediction intervals for a new observation at each location, as for <code>method = "lm"</code> and <code>method = "kriging"</code>: they include each component’s residual variance as well as the variance of the fit. They are larger than before.</li>
+<li>The wedges of <code>geom_vector_smooth(pi_type = "wedge")</code> are computed from the exact distribution of the angle of the predicted vector tip, so they cover the stated <code>conf_level</code> however large the uncertainty, and are asymmetric when the uncertainty is. They are wider than before where the uncertainty is large.</li>
+<li>Supplying <code>formula</code> with the default <code>method = "gam"</code> in <code><a href="../reference/geom_stream_smooth.html">geom_stream_smooth()</a></code>, <code><a href="../reference/geom_stream_smooth.html">stat_stream_smooth()</a></code>, <code><a href="../reference/geom_vector_smooth.html">geom_vector_smooth()</a></code> or <code><a href="../reference/geom_vector_smooth.html">stat_vector_smooth()</a></code> now gives a warning, since the gam smoothers fit <code>fx</code> and <code>fy</code> with <code>s(x, y)</code>. Use <code>method = "lm"</code> to fit a formula.</li>
+<li>The default of <code>conf_level</code> in <code><a href="../reference/geom_vector_smooth.html">geom_vector_smooth()</a></code> is now <code>0.95</code>. Results are the same.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-and-improvements-1-1-0">New features and improvements<a class="anchor" aria-label="anchor" href="#new-features-and-improvements-1-1-0"></a></h3>
+<ul><li>
+<code><a href="../reference/geom_stream_smooth.html">geom_stream_smooth()</a></code>, <code><a href="../reference/geom_vector_smooth.html">geom_vector_smooth()</a></code> and their stats work with small data sets: with fewer than 30 distinct locations the gam smoother uses half as many basis functions as locations. At least 5 locations are needed; with fewer, the error suggests <code>method = "lm"</code>.</li>
+<li>With a supplied <code>grid</code> data frame, the default length <code>L</code> of vectors and streams is 0.85 times the grid’s spacing (the median distance between neighboring points), so dense grids do not overplot. Regular grids get the same length as before.</li>
+<li>
+<code><a href="../reference/geom_vector_smooth.html">geom_vector_smooth()</a></code> and <code><a href="../reference/geom_vector_smooth.html">stat_vector_smooth()</a></code> choose the interval style by default (<code>pi_type = NULL</code>): ellipses at <code>eval_points</code> and wedges on a grid, without a message. They also gain <code>xlim</code> and <code>ylim</code> to set the range of the grid, which defaults to the range of the data.</li>
+<li>
+<code>geom_vector_smooth(method = "kriging")</code> estimates the range of its variogram from the data and works in standardized coordinates, so the smoothed field does not depend on the units of <code>x</code> and <code>y</code>. The fitted coregionalization is kept positive definite.</li>
+<li>Vectors in polar form take their magnitude from the <code>norm</code> aesthetic, the same name as the computed variable, with <code>angle</code> or <code>angle_deg</code>. <code>distance</code> is accepted as another name for it. The stream smoothers take polar input without an “unknown aesthetics” warning.</li>
+<li>
+<code><a href="../reference/geom_gradient_field.html">geom_gradient_field()</a></code>, <code><a href="../reference/geom_gradient_field.html">geom_gradient_field2()</a></code> and their stats take a <code>method</code> argument for the stream integrator, as <code><a href="../reference/geom_stream_field.html">geom_stream_field()</a></code> does.</li>
+<li>
+<code><a href="../reference/geom_vector_smooth.html">stat_vector_smooth()</a></code> is exported.</li>
+<li>
+<code>StatStreamSmooth</code> and <code>StatGradientSmooth</code> are the stats behind <code><a href="../reference/geom_stream_smooth.html">geom_stream_smooth()</a></code> and <code><a href="../reference/geom_gradient_smooth.html">geom_gradient_smooth()</a></code>.</li>
+<li>
+<code><a href="../reference/geom_vector.html">stat_vector()</a></code> maps <code>color = after_stat(norm)</code> by default, like <code><a href="../reference/geom_vector.html">geom_vector()</a></code>.</li>
+<li>
+<code>geom_gradient_field2(type = "vector")</code> and <code>stat_gradient_field2(type = "vector")</code> map <code>length = after_stat(norm)</code>, so vectors are scaled by the size of the gradient, like <code><a href="../reference/geom_vector_field.html">geom_vector_field2()</a></code>. Streams are unchanged.</li>
+<li>Layers computed from a function (<code><a href="../reference/geom_stream_field.html">stat_stream_field()</a></code>, <code><a href="../reference/geom_gradient_field.html">geom_gradient_field()</a></code>, <code><a href="../reference/geom_gradient_field.html">geom_gradient_field2()</a></code>, <code><a href="../reference/geom_potential.html">geom_potential()</a></code> and their <code>stat_*()</code> versions) default to <code>inherit.aes = FALSE</code>, like <code><a href="../reference/geom_vector_field.html">geom_vector_field()</a></code> and <code><a href="../reference/geom_stream_field.html">geom_stream_field()</a></code>, so they can be added to a plot that has its own data, for example to draw a field behind observed vectors.</li>
+<li>
+<code><a href="../reference/geom_stream_field.html">stat_stream_field()</a></code> passes <code>normalize</code> and <code><a href="../reference/geom_stream_field.html">stat_stream_field2()</a></code> passes <code>tol</code> through to the computation, as <code><a href="../reference/geom_stream_field.html">geom_stream_field()</a></code> and <code><a href="../reference/geom_stream_field.html">geom_stream_field2()</a></code> do.</li>
+<li>
+<code><a href="../reference/efield.html">efield_maker()</a></code> passes <code>k</code> and <code>q_test</code> to the field it returns, and the field keeps the argument values <code><a href="../reference/efield.html">efield_maker()</a></code> was called with, so fields can be made in a loop.</li>
+<li>
+<code>linetype</code> applies to vector layers such as <code><a href="../reference/geom_vector.html">geom_vector()</a></code> and <code><a href="../reference/geom_vector_field.html">geom_vector_field()</a></code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="stream-speeds-avg_spd-1-1-0">Stream speeds (<code>avg_spd</code>)<a class="anchor" aria-label="anchor" href="#stream-speeds-avg_spd-1-1-0"></a></h3>
+<ul><li>
+<code>avg_spd</code>, the default color of streams, is the length of the drawn stream divided by the time it took, in every mode:
+<ul><li>streams run to a time <code>T</code>, and streams with <code>normalize = FALSE</code> that are cropped to the time of the fastest stream, use that shared time, so color and length agree;</li>
+<li>a stream run to a length <code>L</code> that stops short of it at a sink would take unbounded time to reach the sink, so its speed is measured up to 99% of the length it achieved. This makes it the same for every integrator.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-1-1-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-1-0"></a></h3>
+<ul><li><p>Streams stop where the field becomes infinite, and the field function is only called at finite points.</p></li>
+<li><p>Streams computed with <code>method = "lsoda"</code> only include points where the field is defined, so a stream that runs to the edge of the field’s domain is drawn up to that edge.</p></li>
+<li><p><code><a href="../reference/geom_vector_smooth.html">geom_vector_smooth()</a></code> takes a fixed or mapped <code>colour</code> for its vectors (blue by default), and keeps a fixed <code>linewidth</code> when there is a single evaluation point.</p></li>
+<li><p><code><a href="../reference/geom_gradient_smooth.html">geom_gradient_smooth()</a></code> keeps a color mapping supplied in <code>mapping</code>, and every field layer, including <code><a href="../reference/geom_gradient_field.html">geom_gradient_field2()</a></code>, gives the same error for an unknown <code>type</code>.</p></li>
+<li><p><code><a href="../reference/geom_stream_smooth.html">geom_stream_smooth()</a></code>, <code><a href="../reference/geom_gradient_smooth.html">geom_gradient_smooth()</a></code> and <code><a href="../reference/geom_vector_smooth.html">geom_vector_smooth()</a></code> always use the stat that fits their model; a different <code>stat</code> is ignored with a warning.</p></li>
+<li><p>Centered streams (<code>center = TRUE</code>, the default) are drawn when a stream can move only one way from its seed, for example on the edge of the domain where the field is defined.</p></li>
+<li><p>Stream layers skip seed points where the field is undefined, for example a grid point on a charge with <code><a href="../reference/efield.html">efield_maker()</a></code>, and draw the remaining streams.</p></li>
+<li><p><code><a href="../reference/geom_stream.html">geom_stream()</a></code> gives the same message as <code><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_path()</a></code> when every group has a single observation.</p></li>
+<li><p><code><a href="../reference/geom_stream_smooth.html">geom_stream_smooth()</a></code> and <code><a href="../reference/geom_stream_smooth.html">stat_stream_smooth()</a></code> accept fixed aesthetics such as <code>color = "red"</code> or <code>linewidth = 2</code> without a warning, and respect <code>colour = "red"</code>.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="performance-1-1-0">Performance<a class="anchor" aria-label="anchor" href="#performance-1-1-0"></a></h3>
+<ul><li>
+<code><a href="../reference/geom_stream_smooth.html">geom_stream_smooth()</a></code> and <code><a href="../reference/geom_gradient_smooth.html">geom_gradient_smooth()</a></code> fit their model once per group rather than at every evaluation of the field, which is much faster.</li>
+<li>Computing streams with <code>method = "lsoda"</code> is about twice as fast.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-1-1-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-1-1-0"></a></h3>
+<ul><li>The help pages document the defaults of <code>pi_type</code> in <code><a href="../reference/geom_vector_smooth.html">geom_vector_smooth()</a></code> (ellipses at <code>eval_points</code>, wedges on a grid) and of <code>n</code> in <code><a href="../reference/geom_potential.html">geom_potential()</a></code>, whose <code>fun</code> returns a vector.</li>
+<li>The smoothers are documented as using a gam by default, with <code>formula</code> applying to <code>method = "lm"</code>.</li>
+<li>Angles in <code><a href="../reference/geom_stream_smooth.html">geom_stream_smooth()</a></code> are documented as radians, and the <code><a href="../reference/geom_vector_smooth.html">geom_vector_smooth()</a></code> examples are clarified.</li>
+<li>The help for <code><a href="../reference/geom_stream_field.html">geom_stream_field()</a></code>, <code><a href="../reference/geom_vector_field.html">geom_vector_field()</a></code> and <code><a href="../reference/geom_gradient_field.html">geom_gradient_field()</a></code> describes how <code>L</code>, <code>T</code> and <code>normalize</code> set the length of streams and vectors, including that a centered stream run to a time <code>T</code> runs for <code>T</code> in each direction.</li>
+<li>
+<code><a href="../reference/geom_gradient_field.html">geom_gradient_field()</a></code> documents its default <code>type</code> (<code>"vector"</code>) and its default colors (<code>norm</code> for vectors, <code>avg_spd</code> for streams).</li>
+<li>The <code>norm</code> computed variable, <code>L</code> in <code><a href="../reference/geom_vector.html">geom_vector2()</a></code>, <code>log</code> in <code><a href="../reference/efield.html">efield()</a></code> and the computed variables of <code><a href="../reference/geom_potential.html">geom_potential()</a></code> are described more precisely.</li>
+<li>Examples are run when the package is checked.</li>
+<li>The pkgdown site is at <a href="https://dustysturner.com/ggvfields/" class="uri">https://dustysturner.com/ggvfields/</a>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="internal-1-1-0">Internal<a class="anchor" aria-label="anchor" href="#internal-1-1-0"></a></h3>
+<ul><li>sp and gstat are suggested rather than imported, since only <code>method = "kriging"</code> in <code><a href="../reference/geom_vector_smooth.html">geom_vector_smooth()</a></code> needs them; you are asked to install them the first time you use it. farver is no longer a dependency, and rlang is declared.</li>
+<li>The package uses only exported ggplot2 functions.</li>
+<li>Each <code>geom_*()</code> / <code>stat_*()</code> pair is built by one shared internal constructor, and a test checks that both members of a pair pass the same parameters and default mappings.</li>
+<li>Errors are raised with cli throughout.</li>
+<li>Added tests for the changes above, visual snapshot tests with vdiffr (now in Suggests; CRAN skips them), and an R CMD check workflow.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.1" id="ggvfields-101">ggvfields 1.0.1<a class="anchor" aria-label="anchor" href="#ggvfields-101"></a></h2><p class="text-muted">CRAN release: 2026-06-18</p>
+<ul><li>Fixed the <code>length</code> legend for <code><a href="../reference/geom_vector_field.html">geom_vector_field2()</a></code> (and the related stream geoms): <code>GeomStream</code> now uses a custom <code>draw_key</code> that dispatches to <code>draw_key_length()</code> when the <code>length</code> aesthetic is mapped, so the legend relating segment lengths to vector norms is drawn again.</li>
+<li>Corrected the handling of the time variable <code>t</code> in <code><a href="../reference/geom_stream.html">geom_stream()</a></code>.</li>
+<li>Fixed the draw order of grobs in the stream and vector geoms and suppressed spurious output from the kriging step.</li>
+<li>Fixed handling of the <code>linewidth</code> argument.</li>
+<li>Added an option to choose between <code>gam</code> and <code>lm</code> when smoothing.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.0" id="ggvfields-100">ggvfields 1.0.0<a class="anchor" aria-label="anchor" href="#ggvfields-100"></a></h2><p class="text-muted">CRAN release: 2025-03-15</p>
 <ul><li>Initial CRAN submission.</li>
 </ul></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
@@ -48,7 +145,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>

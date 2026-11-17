@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ggvfields</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,7 +23,7 @@
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="nav-link" href="https://github.com/dusty-turner/ggvfields/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/dusty-turner/ggvfields/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -33,12 +33,12 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Create a Smooth Vector Plot Layer</h1>
-      <small class="dont-index">Source: <a href="https://github.com/dusty-turner/ggvfields/blob/HEAD/R/geom_vector_smooth.R"><code>R/geom_vector_smooth.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/dusty-turner/ggvfields/blob/HEAD/R/geom_vector_smooth.R" class="external-link"><code>R/geom_vector_smooth.R</code></a></small>
       <div class="d-none name"><code>geom_vector_smooth.Rd</code></div>
     </div>
 
     <div class="ref-description section level2">
-    <p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental"><img src="figures/lifecycle-experimental.svg" alt="[Experimental]"></a></p>
+    <p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="figures/lifecycle-experimental.svg" alt="[Experimental]"></a></p>
     </div>
 
     <div class="section level2">
@@ -52,15 +52,39 @@
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">11</span>, <span class="fl">11</span><span class="op">)</span>,</span>
+<span>  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">11</span>, <span class="fl">11</span><span class="op">)</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"gam"</span>,</span>
 <span>  se <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  se.circle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  pi_type <span class="op">=</span> <span class="st">"ellipse"</span>,</span>
-<span>  conf_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
-<span>  formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>,</span>
+<span>  pi_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  conf_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>,</span>
 <span>  eval_points <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
+<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">stat_vector_smooth</span><span class="op">(</span></span>
+<span>  mapping <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  geom <span class="op">=</span> <span class="st">"vector_smooth"</span>,</span>
+<span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  show.legend <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  inherit.aes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">11</span>, <span class="fl">11</span><span class="op">)</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"gam"</span>,</span>
+<span>  se <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  se.circle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  conf_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  pi_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>,</span>
+<span>  eval_points <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -69,7 +93,7 @@
 
 
 <dl><dt id="arg-mapping">mapping<a class="anchor" aria-label="anchor" href="#arg-mapping"></a></dt>
-<dd><p>A set of aesthetic mappings created by <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">ggplot2::aes()</a></code>.
+<dd><p>A set of aesthetic mappings created by <code><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">ggplot2::aes()</a></code>.
 <strong>Required:</strong> Must include <strong><code>x</code></strong> and <strong><code>y</code></strong>; vector displacements are defined by
 <strong><code>fx</code></strong> and <strong><code>fy</code></strong>.</p></dd>
 
@@ -79,8 +103,9 @@
 
 
 <dt id="arg-stat">stat<a class="anchor" aria-label="anchor" href="#arg-stat"></a></dt>
-<dd><p>The statistical transformation to use on the data (default:
-<code>"vector_smooth"</code>).</p></dd>
+<dd><p>The statistical transformation. <code>geom_vector_smooth()</code> always
+uses <code>StatVectorSmooth</code>, which fits the model; another value is ignored
+with a warning.</p></dd>
 
 
 <dt id="arg-position">position<a class="anchor" aria-label="anchor" href="#arg-position"></a></dt>
@@ -89,7 +114,7 @@ position adjustment function.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Other arguments passed to <code><a href="https://ggplot2.tidyverse.org/reference/layer.html">ggplot2::layer()</a></code> and the
+<dd><p>Other arguments passed to <code><a href="https://ggplot2.tidyverse.org/reference/layer.html" class="external-link">ggplot2::layer()</a></code> and the
 underlying geometry/stat.</p></dd>
 
 
@@ -98,18 +123,30 @@ underlying geometry/stat.</p></dd>
 axis for smoothing.</p></dd>
 
 
+<dt id="arg-xlim-ylim">xlim, ylim<a class="anchor" aria-label="anchor" href="#arg-xlim-ylim"></a></dt>
+<dd><p>Numeric vectors of length 2 giving the range of the grid
+on which the smoothed field is evaluated when <code>eval_points</code> is <code>NULL</code>.
+They default to the range of the data.</p></dd>
+
+
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
 <dd><p>Character. Specifies the smoothing method. Supported options
-include <code>"lm"</code>, <code>"kriging"</code>, and <code>"gam"</code>. The <code>"lm"</code> method fits a
-multivariate linear model, <code>"kriging"</code> uses a cokriging approach via the
-<code>gstat</code> package, and <code>"gam"</code> fits separate generalized additive models for
-<code>fx</code> and <code>fy</code> (with predictions assumed independent, i.e., zero
-covariance).</p></dd>
+are <code>"gam"</code> (default), <code>"lm"</code>, and <code>"kriging"</code>. The <code>"gam"</code> method fits
+separate generalized additive models for <code>fx</code> and <code>fy</code> with the smooth
+<code>s(x, y)</code> (with predictions assumed independent, i.e., zero covariance),
+the <code>"lm"</code> method fits the multivariate linear model given by <code>formula</code>,
+and <code>"kriging"</code> uses a cokriging approach via the <code>gstat</code> package. The
+smooth uses mgcv's default basis of 30 functions; with fewer than 30
+distinct locations it uses half as many functions as locations, and it
+needs at least 5 locations.</p></dd>
 
 
 <dt id="arg-se">se<a class="anchor" aria-label="anchor" href="#arg-se"></a></dt>
-<dd><p>Logical. If <code>TRUE</code>, prediction (confidence) intervals are computed
-and plotted.</p></dd>
+<dd><p>Logical. If <code>TRUE</code>, prediction intervals for the tip of each
+vector are computed and plotted. For every <code>method</code> they cover a new
+observation at that location, not only the fitted mean: their covariance
+is the covariance of the fitted vector plus the residual covariance. With
+<code>"gam"</code> the residual covariance between <code>fx</code> and <code>fy</code> is taken to be zero.</p></dd>
 
 
 <dt id="arg-se-circle">se.circle<a class="anchor" aria-label="anchor" href="#arg-se-circle"></a></dt>
@@ -120,21 +157,27 @@ computed as the magnitude of the predicted vector.</p></dd>
 
 <dt id="arg-pi-type">pi_type<a class="anchor" aria-label="anchor" href="#arg-pi-type"></a></dt>
 <dd><p>Character. Determines the display style for prediction
-intervals:</p><ul><li><p><code>"wedge"</code> (default): Angular wedges are drawn.</p></li>
-<li><p><code>"ellipse"</code>: Ellipses are used to represent the covariance of the predictions.
-If <code>pi_type</code> is set to <code>"ellipse"</code> and <code>eval_points</code> is <code>NULL</code>, it will
-revert to <code>"wedge"</code>.</p></li>
+intervals. By default (<code>NULL</code>), ellipses are drawn at <code>eval_points</code> and
+wedges on a grid.</p><ul><li><p><code>"ellipse"</code>: Ellipses are used to represent the covariance of the predictions.</p></li>
+<li><p><code>"wedge"</code>: Angular wedges show the prediction interval for the direction
+of each vector: the central <code>conf_level</code> range of the angle of its tip,
+from the exact distribution of that angle when the tip is normally
+distributed with the predicted mean and covariance.
+Ellipses need <code>eval_points</code>: if <code>pi_type = "ellipse"</code> is set and
+<code>eval_points</code> is <code>NULL</code>, wedges are drawn instead, with a warning.</p></li>
 </ul></dd>
 
 
 <dt id="arg-conf-level">conf_level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
 <dd><p>Numeric. Specifies the confidence level for the prediction
-intervals. Default is <code>0.95</code>.</p></dd>
+intervals. Default is <code>0.95</code>. If a vector is given, its first element is used.</p></dd>
 
 
 <dt id="arg-formula">formula<a class="anchor" aria-label="anchor" href="#arg-formula"></a></dt>
 <dd><p>A formula specifying the multivariate linear model used for
-smoothing. The default is <code>cbind(fx, fy) ~ x * y</code>.</p></dd>
+smoothing when <code>method = "lm"</code>. The default is <code>cbind(fx, fy) ~ x * y</code>. It
+is ignored by the other methods, with a warning if it is supplied when
+<code>method = "gam"</code>.</p></dd>
 
 
 <dt id="arg-eval-points">eval_points<a class="anchor" aria-label="anchor" href="#arg-eval-points"></a></dt>
@@ -144,7 +187,7 @@ is generated based on <code>n</code>.</p></dd>
 
 
 <dt id="arg-arrow">arrow<a class="anchor" aria-label="anchor" href="#arg-arrow"></a></dt>
-<dd><p>A <code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code> specification for arrowheads on the
+<dd><p>A <code><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">grid::arrow()</a></code> specification for arrowheads on the
 smoothed vectors.</p></dd>
 
 </dl></div>
@@ -156,9 +199,10 @@ field visualization.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p><code>geom_vector_smooth()</code> creates a ggplot2 layer that visualizes a smooth
-vector field. It takes raw vector data and applies smoothing (via a
-multivariate linear model) to estimate the underlying vector field. This
-functionality is analogous to <code><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html">geom_smooth()</a></code> in ggplot2 but is tailored for
+vector field. It takes raw vector data and applies smoothing (by default a
+generalized additive model; a multivariate linear model or cokriging are
+also available via <code>method</code>) to estimate the underlying vector field. This
+functionality is analogous to <code><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth()</a></code> in ggplot2 but is tailored for
 vector data rather than scalar responses.</p>
     </div>
     <div class="section level2">
@@ -186,7 +230,8 @@ data to provide an estimate of the underlying vector field.</p>
 <p><strong>Prediction Intervals:</strong>
 When <code>se = TRUE</code>, prediction intervals are computed for the smoothed
 vectors. Two types of intervals are supported:</p><ul><li><p><strong>Ellipse:</strong> Ellipses represent the joint uncertainty (covariance) in the predicted <code>fx</code> and <code>fy</code>.</p></li>
-<li><p><strong>Wedge:</strong> Wedges (angular sectors) indicate the range of possible vector directions and magnitudes.
+<li><p><strong>Wedge:</strong> Wedges (angular sectors) show the range of likely directions
+of each vector; their radius is the predicted vector's length.
 The type of interval displayed is controlled by <code>pi_type</code>, and the
 confidence level is set via <code>conf_level</code>.</p></li>
 </ul></div>
@@ -197,56 +242,55 @@ confidence level is set via <code>conf_level</code>.</p></li>
 <span class="r-in"><span><span class="va">generate_vectors</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></span>
 <span class="r-in"><span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">1</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Set seed for reproducibility</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Create sample points and compute vectors</span></span></span>
-<span class="r-in"><span><span class="va">sample_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sample_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="va">sample_points</span>, <span class="fl">1</span>, <span class="va">generate_vectors</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">sample_points</span>, <span class="fl">1</span>, <span class="va">generate_vectors</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">xend</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">yend</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">fx</span> <span class="op">&lt;-</span> <span class="va">sample_points</span><span class="op">$</span><span class="va">xend</span> <span class="op">-</span> <span class="va">sample_points</span><span class="op">$</span><span class="va">x</span></span></span>
 <span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">fy</span> <span class="op">&lt;-</span> <span class="va">sample_points</span><span class="op">$</span><span class="va">yend</span> <span class="op">-</span> <span class="va">sample_points</span><span class="op">$</span><span class="va">y</span></span></span>
-<span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">distance</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">sample_points</span><span class="op">$</span><span class="va">fx</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">sample_points</span><span class="op">$</span><span class="va">fy</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">angle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">atan2</a></span><span class="op">(</span><span class="va">sample_points</span><span class="op">$</span><span class="va">fy</span>, <span class="va">sample_points</span><span class="op">$</span><span class="va">fx</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">distance</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">sample_points</span><span class="op">$</span><span class="va">fx</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">sample_points</span><span class="op">$</span><span class="va">fy</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sample_points</span><span class="op">$</span><span class="va">angle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">atan2</a></span><span class="op">(</span><span class="va">sample_points</span><span class="op">$</span><span class="va">fy</span>, <span class="va">sample_points</span><span class="op">$</span><span class="va">fx</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Define evaluation points</span></span></span>
-<span class="r-in"><span><span class="va">eval_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">7.5</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">eval_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">7.5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 1:</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">sample_points</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span>, color <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>, center <span class="op">=</span> <span class="cn">FALSE</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_vector_smooth</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"Smoothed Vector Field"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> <span style="color: #00BB00;">eval_points</span> is `NULL`; changing <span style="color: #00BB00;">pi_type</span> from <span style="color: #0000BB;">"ellipse"</span> to <span style="color: #0000BB;">"wedge"</span>.</span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">sample_points</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span>, color <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>, center <span class="op">=</span> <span class="cn">FALSE</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">geom_vector_smooth</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Smoothed Vector Field"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="geom_vector_smooth-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: Ellipse with eval_points</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">sample_points</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span>, color <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>, center <span class="op">=</span> <span class="cn">FALSE</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_vector_smooth</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span>, eval_points <span class="op">=</span> <span class="va">eval_points</span>, conf_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.9</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"Smoothed Vector Field with Ellipse Intervals"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">sample_points</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span>, color <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>, center <span class="op">=</span> <span class="cn">FALSE</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">geom_vector_smooth</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span>, eval_points <span class="op">=</span> <span class="va">eval_points</span>, conf_level <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Smoothed Vector Field with Ellipse Intervals"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="geom_vector_smooth-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: Wedge with eval_points</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">sample_points</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span>, color <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>, center <span class="op">=</span> <span class="cn">FALSE</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_vector_smooth</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span>, eval_points <span class="op">=</span> <span class="va">eval_points</span>, pi_type <span class="op">=</span> <span class="st">"ellipse"</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"Smoothed Vector Field with Wedge Intervals"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">sample_points</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span>, color <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>, center <span class="op">=</span> <span class="cn">FALSE</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">geom_vector_smooth</span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span>, eval_points <span class="op">=</span> <span class="va">eval_points</span>, pi_type <span class="op">=</span> <span class="st">"wedge"</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Smoothed Vector Field with Wedge Intervals"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="geom_vector_smooth-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -260,7 +304,7 @@ confidence level is set via <code>conf_level</code>.</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>

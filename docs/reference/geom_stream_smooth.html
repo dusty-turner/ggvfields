@@ -53,7 +53,7 @@ as the cumulative sum of d.
 
     <a class="navbar-brand me-2" href="../index.html">ggvfields</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,7 @@ as the cumulative sum of d.
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="nav-link" href="https://github.com/dusty-turner/ggvfields/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/dusty-turner/ggvfields/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -79,12 +79,12 @@ as the cumulative sum of d.
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Create a Smoothed Vector Field Layer</h1>
-      <small class="dont-index">Source: <a href="https://github.com/dusty-turner/ggvfields/blob/HEAD/R/geom_stream_smooth.R"><code>R/geom_stream_smooth.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/dusty-turner/ggvfields/blob/HEAD/R/geom_stream_smooth.R" class="external-link"><code>R/geom_stream_smooth.R</code></a>, <a href="https://github.com/dusty-turner/ggvfields/blob/HEAD/R/stat_stream_smooth.R" class="external-link"><code>R/stat_stream_smooth.R</code></a></small>
       <div class="d-none name"><code>geom_stream_smooth.Rd</code></div>
     </div>
 
     <div class="ref-description section level2">
-    <p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental"><img src="figures/lifecycle-experimental.svg" alt="[Experimental]"></a></p>
+    <p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="figures/lifecycle-experimental.svg" alt="[Experimental]"></a></p>
 <dl><dt>norm</dt>
 <dd><p>Computed as the Euclidean norm of the displacement,
 \(\sqrt{fx^2 + fy^2}\), this variable is used to normalize and scale the
@@ -112,7 +112,7 @@ as the cumulative sum of <code>d</code>.</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">geom_stream_smooth</span><span class="op">(</span></span>
 <span>  mapping <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  stat <span class="op">=</span> <span class="va">StatStreamField</span>,</span>
+<span>  stat <span class="op">=</span> <span class="va">StatStreamSmooth</span>,</span>
 <span>  position <span class="op">=</span> <span class="st">"identity"</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -124,13 +124,13 @@ as the cumulative sum of <code>d</code>.</p></dd>
 <span>  normalize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"vector"</span>,</span>
-<span>  formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>,</span>
+<span>  formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"gam"</span>,</span>
 <span>  eval_points <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lineend <span class="op">=</span> <span class="st">"butt"</span>,</span>
 <span>  linejoin <span class="op">=</span> <span class="st">"round"</span>,</span>
 <span>  linemitre <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
+<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">stat_stream_smooth</span><span class="op">(</span></span>
@@ -149,12 +149,12 @@ as the cumulative sum of <code>d</code>.</p></dd>
 <span>  center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"vector"</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"gam"</span>,</span>
-<span>  formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>,</span>
+<span>  formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>,</span>
 <span>  eval_points <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lineend <span class="op">=</span> <span class="st">"butt"</span>,</span>
 <span>  linejoin <span class="op">=</span> <span class="st">"round"</span>,</span>
 <span>  linemitre <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
+<span>  arrow <span class="op">=</span> <span class="fu">grid</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">20</span>, length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="st">"npc"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"closed"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -163,7 +163,7 @@ as the cumulative sum of <code>d</code>.</p></dd>
 
 
 <dl><dt id="arg-mapping">mapping<a class="anchor" aria-label="anchor" href="#arg-mapping"></a></dt>
-<dd><p>A set of aesthetic mappings created by <code><a href="https://ggplot2.tidyverse.org/reference/aes.html">ggplot2::aes()</a></code>.
+<dd><p>A set of aesthetic mappings created by <code><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">ggplot2::aes()</a></code>.
 <strong>Required:</strong> Must include <strong><code>x</code></strong> and <strong><code>y</code></strong>; vector displacements are defined
 by <strong><code>fx</code></strong> and <strong><code>fy</code></strong>.</p></dd>
 
@@ -173,8 +173,9 @@ by <strong><code>fx</code></strong> and <strong><code>fy</code></strong>.</p></d
 
 
 <dt id="arg-stat">stat<a class="anchor" aria-label="anchor" href="#arg-stat"></a></dt>
-<dd><p>The statistical transformation to use on the data. Defaults to
-<code>"vector_smooth"</code>.</p></dd>
+<dd><p>The statistical transformation. <code>geom_stream_smooth()</code> always
+uses StatStreamSmooth and <code><a href="geom_gradient_smooth.html">geom_gradient_smooth()</a></code> <a href="geom_gradient_smooth.html">StatGradientSmooth</a>,
+which fit the model; another value is ignored with a warning.</p></dd>
 
 
 <dt id="arg-position">position<a class="anchor" aria-label="anchor" href="#arg-position"></a></dt>
@@ -233,11 +234,16 @@ computes a full streamline by integrating in both directions (if <code>center = 
 
 <dt id="arg-formula">formula<a class="anchor" aria-label="anchor" href="#arg-formula"></a></dt>
 <dd><p>A formula specifying the multivariate linear model used for
-smoothing. Defaults to <code>cbind(fx, fy) ~ x * y</code>.</p></dd>
+smoothing when <code>method = "lm"</code>. Defaults to <code>cbind(fx, fy) ~ x * y</code>. It is
+ignored, with a warning if supplied, when <code>method = "gam"</code>.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
-<dd><p>either "gam" (default) or "lm".</p></dd>
+<dd><p>Either <code>"gam"</code> (default), which fits <code>fx</code> and <code>fy</code> separately
+with the smooth <code>s(x, y)</code>, or <code>"lm"</code>, which fits <code>formula</code>. The smooth
+uses mgcv's default basis of 30 functions; with fewer than 30 distinct
+locations it uses half as many functions as locations, and it needs at
+least 5 locations.</p></dd>
 
 
 <dt id="arg-eval-points">eval_points<a class="anchor" aria-label="anchor" href="#arg-eval-points"></a></dt>
@@ -259,7 +265,7 @@ provided, it specifies the grid where the smoothing model is evaluated; if
 
 
 <dt id="arg-arrow">arrow<a class="anchor" aria-label="anchor" href="#arg-arrow"></a></dt>
-<dd><p>An optional <code><a href="https://rdrr.io/r/grid/arrow.html">grid::arrow()</a></code> specification to add arrowheads to
+<dd><p>An optional <code><a href="https://rdrr.io/r/grid/arrow.html" class="external-link">grid::arrow()</a></code> specification to add arrowheads to
 the vectors (default: <code>grid::arrow(angle = 25, length = unit(0.025, "npc"), type = "closed")</code>).</p></dd>
 
 
@@ -276,8 +282,10 @@ smoothed vector field.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p><code>geom_stream_smooth()</code> creates a ggplot2 layer that visualizes a smooth
-vector field based on raw vector data. The function fits a multivariate
-linear model (by default, using the formula <code>cbind(fx, fy) ~ x * y</code>) to
+vector field based on raw vector data. By default (<code>method = "gam"</code>) the
+function fits a thin plate spline smoother to each of <code>fx</code> and <code>fy</code>; with
+<code>method = "lm"</code> it fits a multivariate linear model (by default, using the
+formula <code>cbind(fx, fy) ~ x * y</code>). The fitted model is used to
 predict the vector displacements at any given location. It also handles
 different input formats by converting polar coordinates or endpoint data to
 vector displacements.</p>
@@ -303,85 +311,103 @@ vector displacements.</p>
 If <code>xend</code>/<code>yend</code> are missing or all <code>NA</code>, the function computes them. It
 first checks for vector displacements (<code>fx</code> and <code>fy</code>); if present, it
 computes \(xend = x + fx,\quad yend = y + fy.\) Otherwise, it checks for
-polar coordinates (<code>angle</code> and <code>distance</code>) and computes \(xend = x +
-  distance \times \cos(angle \times 180/\pi),\quad yend = y + distance \times
-  \sin(angle \times 180/\pi).\) An error is thrown if neither set is
-available.</p>
+polar coordinates (<code>angle</code>, in radians, and <code>norm</code>, also accepted as
+<code>distance</code>) and computes
+\(xend = x + norm \times \cos(angle),\quad yend = y + norm \times
+  \sin(angle).\) An error is thrown if neither set is available.</p>
 <p><strong>Smoothing:</strong>
-The multivariate linear model is fitted using the provided <code>formula</code> and
-<code>data</code>. This model is then used to predict vector displacements at any
+The model is fitted once per group: a thin plate spline smoother for each
+component when <code>method = "gam"</code>, or the multivariate linear model given by
+<code>formula</code> when <code>method = "lm"</code>. It is then used to predict vector displacements at any
 specified grid point, generating a smooth approximation of the vector
 field.</p>
-<p><strong>Prediction Intervals:</strong>
-Two types of prediction intervals can be displayed:</p><ul><li><p><strong>Ellipse:</strong> Depicts the joint uncertainty (covariance) in the predicted <code>fx</code> and <code>fy</code>.</p></li>
-<li><p><strong>Wedge:</strong> Indicates the range of possible vector directions and magnitudes.</p></li>
-</ul></div>
+<p>Prediction intervals are not drawn for streams; use
+<code><a href="geom_vector_smooth.html">geom_vector_smooth()</a></code> to show the uncertainty of the fitted vectors.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Define a true vector field function</span></span></span>
 <span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">u</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>; <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">u</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span>, <span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span>, <span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Alternative example function</span></span></span>
-<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">u</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">u</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">u</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">u</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Visualize the vector field</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="geom_stream_field.html">geom_stream_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="geom_stream_field.html">geom_stream_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_smooth-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate design points</span></span></span>
-<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">20</span></span></span>
-<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">50</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Sample function values at design points</span></span></span>
-<span class="r-in"><span><span class="va">fdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="va">df</span>, <span class="fl">1</span>, <span class="va">f</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">fdf</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"fx"</span>, <span class="st">"fy"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">fdf</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">df</span>, <span class="fl">1</span>, <span class="va">f</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">fdf</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fx"</span>, <span class="st">"fy"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">fdf</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Visualize raw vector field data</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_smooth-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Add smoothed layer using default model</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_stream_smooth</span><span class="op">(</span>formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Add smoothed layer using the default smoother</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">geom_stream_smooth</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_smooth-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Use a linear model</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">geom_stream_smooth</span><span class="op">(</span>method <span class="op">=</span> <span class="st">"lm"</span>, formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_smooth-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Use a more complex polynomial model</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu">geom_stream_smooth</span><span class="op">(</span>formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html">poly</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html">poly</a></span><span class="op">(</span><span class="va">y</span>, <span class="fl">2</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">geom_stream_smooth</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    method <span class="op">=</span> <span class="st">"lm"</span>,</span></span>
+<span class="r-in"><span>    formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">y</span>, <span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">df</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_smooth-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Fit a linear model and use it for prediction</span></span></span>
 <span class="r-in"><span><span class="va">fhat</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">model</span>, newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">u</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">u</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">fx</span>, <span class="va">fy</span><span class="op">)</span> <span class="op">~</span> <span class="va">x</span> <span class="op">*</span> <span class="va">y</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, newdata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">u</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">u</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Visualize estimated field with the raw vector field</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="geom_stream_field.html">geom_stream_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">fhat</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span>, color <span class="op">=</span> <span class="st">"#3366FF"</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_smooth-6.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Generate a hexagonal grid</span></span></span>
-<span class="r-in"><span><span class="va">hex_lattice</span> <span class="op">&lt;-</span> <span class="fu"><a href="grid_hex.html">grid_hex</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>, d <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">hex_lattice</span> <span class="op">&lt;-</span> <span class="fu"><a href="grid_hex.html">grid_hex</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>, d <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Use the hexagonal grid in geom_stream_field</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"black"</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"black"</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu">geom_stream_smooth</span><span class="op">(</span>eval_points <span class="op">=</span> <span class="va">hex_lattice</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="geom_stream_smooth-7.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># user specified point</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">eval_pts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">eval_pts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"black"</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"black"</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span></span>
 <span class="r-in"><span>  <span class="fu">geom_stream_smooth</span><span class="op">(</span>eval_points <span class="op">=</span> <span class="va">eval_pts</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-plt img"><img src="geom_stream_smooth-8.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -394,7 +420,7 @@ Two types of prediction intervals can be displayed:</p><ul><li><p><strong>Ellips
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>

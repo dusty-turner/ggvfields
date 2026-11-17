@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ggvfields</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
-<li class="nav-item"><a class="nav-link" href="https://github.com/dusty-turner/ggvfields/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/dusty-turner/ggvfields/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -55,26 +55,26 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="ggvfields-">ggvfields <img src="reference/figures/ggvfields_hex.png" align="right" width="120" style="padding-left:10px;background-color:white;"><a class="anchor" aria-label="anchor" href="#ggvfields-"></a>
 </h1></div>
-<p><a href="https://CRAN.R-project.org/package=ggvfields"><img src="https://www.r-pkg.org/badges/version/ggvfields" alt="CRAN status"></a> <a href="https://cran.r-project.org/web/checks/check_results_ggvfields.html"><img src="https://badges.cranchecks.info/summary/ggvfields.svg" alt="CRAN checks"></a> <a href="https://www.repostatus.org/#active"><img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active - The project has reached a stable, usable state and is being actively developed."></a> <a href="https://app.codecov.io/gh/dusty-turner/ggvfields"><img src="https://codecov.io/gh/dusty-turner/ggvfields/branch/main/graph/badge.svg"></a></p>
+<p><a href="https://CRAN.R-project.org/package=ggvfields" class="external-link"><img src="https://www.r-pkg.org/badges/version/ggvfields" alt="CRAN status"></a> <a href="https://cran.r-project.org/web/checks/check_results_ggvfields.html" class="external-link"><img src="https://badges.cranchecks.info/summary/ggvfields.svg" alt="CRAN checks"></a> <a href="https://www.repostatus.org/#active" class="external-link"><img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active - The project has reached a stable, usable state and is being actively developed."></a> <a href="https://app.codecov.io/gh/dusty-turner/ggvfields" class="external-link"><img src="https://codecov.io/gh/dusty-turner/ggvfields/branch/main/graph/badge.svg"></a></p>
 <!-- [![](http://cranlogs.r-pkg.org/badges/last-month/ggvfields)](https://cran.r-project.org/package=ggvfields) [![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/grand-total/ggvfields?color=blue)](https://r-pkg.org/pkg/ggvfields) -->
 <!-- [![](https://img.shields.io/github/languages/code-size/dusty-turner/ggvfields.svg)](https://github.com/dusty-turner/ggvfields) -->
 <!-- badger::badge_doi() -->
-<p><strong>ggvfields</strong> extends <a href="https://github.com/tidyverse/ggplot2"><strong>ggplot2</strong></a> by providing suite of tools to visualize vector and stream fields. In addition to standard vector and stream plotting, <strong>ggvfields</strong> automatically computes and visualizes smoothed vector fields, smooth gradient fields, gradient fields derived from scalar functions, and potential fields from gradients. This integrated framework simplifies the analysis and interpretation of complex vector and scalar field data.</p>
+<p><strong>ggvfields</strong> extends <a href="https://github.com/tidyverse/ggplot2" class="external-link"><strong>ggplot2</strong></a> by providing suite of tools to visualize vector and stream fields. In addition to standard vector and stream plotting, <strong>ggvfields</strong> automatically computes and visualizes smoothed vector fields, smooth gradient fields, gradient fields derived from scalar functions, and potential fields from gradients. This integrated framework simplifies the analysis and interpretation of complex vector and scalar field data.</p>
 <p>A manuscript describing the theoretical foundations and detailed methodologies behind ggvfields is forthcoming.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p><strong>ggvfields</strong> is available on CRAN and can be installed with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"ggvfields"</span><span class="op">)</span></span></code></pre></div>
-<p>Alternatively, you can install the latest development version from <a href="https://github.com/dusty-turner/ggvfields">GitHub</a> with:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ggvfields"</span><span class="op">)</span></span></code></pre></div>
+<p>Alternatively, you can install the latest development version from <a href="https://github.com/dusty-turner/ggvfields" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"dusty-turner/ggvfields"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"dusty-turner/ggvfields"</span><span class="op">)</span></span></code></pre></div>
 <p>Load the package in R:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/dusty-turner/ggvfields">"ggvfields"</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dustysturner.com/ggvfields/">"ggvfields"</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: ggplot2</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>ggplot2.continuous.colour<span class="op">=</span><span class="st">"viridis"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>ggplot2.continuous.colour<span class="op">=</span><span class="st">"viridis"</span><span class="op">)</span></span></code></pre></div>
 <!-- - [Installation](#installation) -->
 <!-- - [Core Features](#core-features) -->
 <!--   - [geom_vector and geom_vector2](#geom_vector-and-geom_vector2) -->
@@ -101,13 +101,13 @@
 </h3>
 <ul>
 <li>
-<strong><code><a href="reference/geom_vector_field.html">geom_vector_field()</a></code></strong>: Computes vector fields from a user-defined function over the domain <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>∈</mo><msup><mi>ℝ</mi><mn>2</mn></msup><mo>:</mo><mi>−</mi><mn>1</mn><mo>&lt;</mo><mi>x</mi><mo>&lt;</mo><mn>1</mn><mo>,</mo><mspace width="0.222em"></mspace><mo>−</mo><mn>1</mn><mo>&lt;</mo><mi>y</mi><mo>&lt;</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{(x,y) \in \mathbb{R}^2 : -1 &lt; x &lt; 1,\ -1 &lt; y &lt; 1\}</annotation></semantics></math> on an <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">n \times n</annotation></semantics></math> grid (default: <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>11</mn><mo>×</mo><mn>11</mn></mrow><annotation encoding="application/x-tex">11 \times 11</annotation></semantics></math>) and maps the norm to color. Vectors are centered and normalized by default.</li>
+<strong><code><a href="reference/geom_vector_field.html">geom_vector_field()</a></code></strong>: Computes vector fields from a user-defined function over the domain <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mo>∈</mo><msup><mi>ℝ</mi><mn>2</mn></msup><mo>:</mo><mi>−</mi><mn>1</mn><mo>&lt;</mo><mi>x</mi><mo>&lt;</mo><mn>1</mn><mo>,</mo><mspace width="0.222em"></mspace><mo>−</mo><mn>1</mn><mo>&lt;</mo><mi>y</mi><mo>&lt;</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{(x,y) \in \mathbb{R}^2 : -1 &lt; x &lt; 1,\ -1 &lt; y &lt; 1\}</annotation></semantics></math> on an <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">n \times n</annotation></semantics></math> grid (default: <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>11</mn><mo>×</mo><mn>11</mn></mrow><annotation encoding="application/x-tex">11 \times 11</annotation></semantics></math>) and maps the norm to color. Vectors are centered and normalized by default.</li>
 </ul>
-<p>The norm <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐰</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbf{w} = (u, v)</annotation></semantics></math> is calculated <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">|</mo><mi>𝐰</mi><mo stretchy="true" form="postfix">|</mo></mrow><mo>=</mo><msqrt><mrow><msup><mi>u</mi><mn>2</mn></msup><mo>+</mo><msup><mi>v</mi><mn>2</mn></msup></mrow></msqrt></mrow><annotation encoding="application/x-tex">|\mathbf{w}| = \sqrt{u^2 + v^2}</annotation></semantics></math> .</p>
+<p>The norm <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐰</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\mathbf{w} = (u, v)</annotation></semantics></math> is calculated <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>𝐰</mi><mo stretchy="false" form="prefix">|</mo><mo>=</mo><msqrt><mrow><msup><mi>u</mi><mn>2</mn></msup><mo>+</mo><msup><mi>v</mi><mn>2</mn></msup></mrow></msqrt></mrow><annotation encoding="application/x-tex">|\mathbf{w}| = \sqrt{u^2 + v^2}</annotation></semantics></math> .</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="co"># Define a function for the field</span></span>
+<code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="co"># Define a function for the field</span></span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="100%"></p>
 <ul>
@@ -115,7 +115,7 @@
 <strong><code><a href="reference/geom_vector_field.html">geom_vector_field2()</a></code></strong>: Similar to <code><a href="reference/geom_vector_field.html">geom_vector_field()</a></code>, but maps the norm of vectors to their lengths instead of color.</li>
 </ul>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field2</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="100%"></p>
 <p><strong>Why Length Mapping Matters</strong></p>
@@ -126,19 +126,19 @@
 <p><strong>Length</strong></p>
 <p>We can set the <code>L</code> parameter to visualize vectors at a specified length.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, n <span class="op">=</span> <span class="fl">4</span>, L <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="100%"></p>
 <p><strong>Center</strong></p>
 <p>By default, all vectors are centered on their origin. We can turn off centering.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, n <span class="op">=</span> <span class="fl">4</span>, center <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="100%"></p>
 <p><strong>normalize</strong></p>
 <p>If we turn off normalization and centering, we get a raw look at the vector field data.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_field.html">geom_vector_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, n <span class="op">=</span> <span class="fl">4</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span>, center <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-8-1.png" width="100%"></p>
 </div>
@@ -149,11 +149,11 @@
 </h3>
 <ul>
 <li>
-<strong><code><a href="reference/geom_stream_field.html">geom_stream_field()</a></code></strong>: Computes stream fields from a user-defined function and maps the average speed to color. Average speed is the overall rate at which a particle traverses the shown stream. If the displacement vector has length <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">|</mo><mi>𝐝</mi><mo stretchy="true" form="postfix">|</mo></mrow><annotation encoding="application/x-tex">|\mathbf{d}|</annotation></semantics></math> and it takes time <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>, the integration time of streams, to traverse that distance, then the average speed is given by <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Average Speed</mtext><mo>=</mo><mfrac><mrow><mo stretchy="true" form="prefix">|</mo><mi>𝐝</mi><mo stretchy="true" form="postfix">|</mo></mrow><mi>t</mi></mfrac></mrow><annotation encoding="application/x-tex">\text{Average Speed} = \frac{|\mathbf{d}|}{t}</annotation></semantics></math>
+<strong><code><a href="reference/geom_stream_field.html">geom_stream_field()</a></code></strong>: Computes stream fields from a user-defined function and maps the average speed to color. Average speed is the overall rate at which a particle traverses the shown stream. If the displacement vector has length <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>𝐝</mi><mo stretchy="false" form="prefix">|</mo></mrow><annotation encoding="application/x-tex">|\mathbf{d}|</annotation></semantics></math> and it takes time <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>, the integration time of streams, to traverse that distance, then the average speed is given by <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Average Speed</mtext><mo>=</mo><mfrac><mrow><mo stretchy="false" form="prefix">|</mo><mi>𝐝</mi><mo stretchy="false" form="prefix">|</mo></mrow><mi>t</mi></mfrac></mrow><annotation encoding="application/x-tex">\text{Average Speed} = \frac{|\mathbf{d}|}{t}</annotation></semantics></math>
 </li>
 </ul>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_stream_field.html">geom_stream_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-9-1.png" width="100%"></p>
 <ul>
@@ -161,7 +161,7 @@
 <strong><code><a href="reference/geom_stream_field.html">geom_stream_field2()</a></code></strong>: Similar to <code><a href="reference/geom_stream_field.html">geom_stream_field()</a></code>, but removes mapping, arrow heads, and designates stream origins with a dot.</li>
 </ul>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_stream_field.html">geom_stream_field2</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-10-1.png" width="100%"></p>
 <ul>
@@ -171,24 +171,24 @@
 <p><strong>Length</strong></p>
 <p>By adjusting the <code>L</code> parameter, we can control the length of each stream.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_stream_field.html">geom_stream_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, n <span class="op">=</span> <span class="fl">4</span>, L <span class="op">=</span> <span class="fl">.8</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-11-1.png" width="100%"></p>
 <p><strong>Normalization</strong></p>
 <p>By default, the lengths of each stream is normalized to be the same length. By turning normalization off, each stream becomes time normalized. In other words, each stream grows for the same amount of time.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_stream_field.html">geom_stream_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, n <span class="op">=</span> <span class="fl">4</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-12-1.png" width="100%"></p>
 <p>We can control the length of the longest stream when <code>normalize = FALSE</code> by altering the <code>L</code> argument.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_stream_field.html">geom_stream_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, n <span class="op">=</span> <span class="fl">4</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span>, L <span class="op">=</span> <span class="fl">.8</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-13-1.png" width="100%"></p>
 <p><strong>Time</strong></p>
 <p>When <code>normalize = FALSE</code>, we can grow each stream for the same amount of time by using the <code>T</code> parameter.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_stream_field.html">geom_stream_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, n <span class="op">=</span> <span class="fl">4</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span>, T <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-14-1.png" width="100%"></p>
 </div>
@@ -197,10 +197,8 @@
 <code>geom_gradient_field()</code> and <code>geom_gradient_field2()</code>
 <a class="anchor" aria-label="anchor" href="#geom_gradient_field-and-geom_gradient_field2"></a>
 </h3>
-<p>The <code><a href="reference/geom_gradient_field.html">geom_gradient_field()</a></code> function computes and visualizes gradient fields derived from scalar functions and displays the gradient vector field of a scalar function, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(x, y)</annotation></semantics></math>. The gradient is given by:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>∇</mi><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>∂</mi><mi>f</mi></mrow><mrow><mi>∂</mi><mi>x</mi></mrow></mfrac><mo>,</mo><mfrac><mrow><mi>∂</mi><mi>f</mi></mrow><mrow><mi>∂</mi><mi>y</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
-\nabla f(x, y) = \left( \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right)
-</annotation></semantics></math></p>
+<p>The <code><a href="reference/geom_gradient_field.html">geom_gradient_field()</a></code> function computes and visualizes gradient fields derived from scalar functions and displays the gradient vector field of a scalar function, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f(x, y)</annotation></semantics></math>. The gradient is given by:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>∇</mi><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>∂</mi><mi>f</mi></mrow><mrow><mi>∂</mi><mi>x</mi></mrow></mfrac><mo>,</mo><mfrac><mrow><mi>∂</mi><mi>f</mi></mrow><mrow><mi>∂</mi><mi>y</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\nabla f(x, y) = \left( \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right)</annotation></semantics></math></p>
 <p>This vector field points in the direction of the greatest rate of increase of the scalar function. The function numerically evaluates these partial derivatives and visualizes the resulting vectors.</p>
 <ul>
 <li>
@@ -214,7 +212,7 @@
 <span>  <span class="va">x</span><span class="op">^</span><span class="fl">3</span> <span class="op">+</span> <span class="va">y</span><span class="op">^</span><span class="fl">3</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_gradient_field.html">geom_gradient_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">field</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-15-1.png" width="100%"></p>
 <ul>
@@ -223,7 +221,7 @@
 </li>
 </ul>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_gradient_field.html">geom_gradient_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">field</span>, type <span class="op">=</span> <span class="st">"stream"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-16-1.png" width="100%"></p>
 </div>
@@ -237,23 +235,23 @@
 <code class="sourceCode R"><span><span class="va">conservative_fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">{</span></span>
 <span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span> <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
-<span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="va">y</span>, <span class="va">x</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
+<span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="va">y</span>, <span class="va">x</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_potential.html">geom_potential</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">conservative_fun</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_potential.html">geom_potential</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">conservative_fun</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-17-1.png" width="100%"></p>
 <p>The <code>tol</code> parameter can be adjusted to control the sensitivity of the conservativeness check. Decreasing the tolerance makes the check stricter, while increasing it allows for more numerical error. You can turn this functionality on with <code>verify_conservative = TRUE</code>.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">non_conservative_fun</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">{</span></span>
 <span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span> <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">v</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
-<span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span></span>
+<span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">y</span>, <span class="va">x</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_potential.html">geom_potential</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">non_conservative_fun</span>, </span>
-<span>                 xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span>, </span>
+<span>                 xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="fl">2</span><span class="op">*</span><span class="va">pi</span><span class="op">)</span>, </span>
 <span>                 verify_conservative <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>                 tol <span class="op">=</span> <span class="fl">1e-6</span></span>
 <span>                 <span class="op">)</span></span>
@@ -271,23 +269,23 @@
 <p>So far, these layers have supported visualizing functions. <strong>ggvfields</strong> can also visualize raw data.</p>
 <p>Generate sample wind data:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
 <span></span>
-<span><span class="va">wind_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span></span>
-<span>  lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, </span>
-<span>  lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, </span>
-<span>  dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="op">-</span><span class="va">pi</span><span class="op">/</span><span class="fl">2</span>, <span class="va">pi</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>,</span>
-<span>  spd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Chisquare.html">rchisq</a></span><span class="op">(</span><span class="va">n</span>, df <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">wind_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, </span>
+<span>  lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, </span>
+<span>  dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">n</span>, <span class="op">-</span><span class="va">pi</span><span class="op">/</span><span class="fl">2</span>, <span class="va">pi</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span>,</span>
+<span>  spd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Chisquare.html" class="external-link">rchisq</a></span><span class="op">(</span><span class="va">n</span>, df <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/with.html">within</a></span><span class="op">(</span><span class="op">{</span></span>
-<span>    <span class="va">fx</span>    <span class="op">&lt;-</span> <span class="va">spd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">cos</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span>          <span class="co"># Compute the x-component of the vector</span></span>
-<span>    <span class="va">fy</span>    <span class="op">&lt;-</span> <span class="va">spd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span>          <span class="co"># Compute the y-component of the vector</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span><span class="op">{</span></span>
+<span>    <span class="va">fx</span>    <span class="op">&lt;-</span> <span class="va">spd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span>          <span class="co"># Compute the x-component of the vector</span></span>
+<span>    <span class="va">fy</span>    <span class="op">&lt;-</span> <span class="va">spd</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span>          <span class="co"># Compute the y-component of the vector</span></span>
 <span>    <span class="va">xend</span>  <span class="op">&lt;-</span> <span class="va">lon</span> <span class="op">+</span> <span class="va">fx</span>                <span class="co"># Compute the end x-coordinate</span></span>
 <span>    <span class="va">yend</span>  <span class="op">&lt;-</span> <span class="va">lat</span> <span class="op">+</span> <span class="va">fy</span>                <span class="co"># Compute the end y-coordinate</span></span>
 <span>  <span class="op">}</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">wind_data</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">6</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">wind_data</span>, digits <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">6</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     lon   lat   dir   spd  yend xend    fy    fx</span></span>
 <span><span class="co">#&gt; 1 -1.21 -0.48  0.17  3.55  0.11 2.29  0.59  3.50</span></span>
 <span><span class="co">#&gt; 2  0.28 -1.00  0.46  2.19 -0.03 2.24  0.97  1.96</span></span>
@@ -300,28 +298,28 @@
 <strong><code><a href="reference/geom_vector.html">geom_vector()</a></code></strong>: By default, this maps the norm (magnitude) of a vector to its color.</li>
 </ul>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, xend <span class="op">=</span> <span class="va">xend</span>, yend <span class="op">=</span> <span class="va">yend</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-20-1.png" width="100%"></p>
 <p><code><a href="reference/geom_vector.html">geom_vector()</a></code> also supports both <code>xend</code>/<code>yend</code> format as well as <code>fx</code>/<code>fy</code> format.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-21-1.png" width="100%"></p>
 <ul>
 <li>
 <strong><code><a href="reference/geom_vector.html">geom_vector2()</a></code></strong>: Maps the norm of a vector directly to its length. This provides a more intuitive representation of magnitude. This is done by mapping <code>length = after_stat(norm)</code> by default.</li>
 </ul>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector2</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector2</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-22-1.png" width="100%"></p>
 <p><strong>Polar Coordinates Support</strong></p>
-<p>Both <code><a href="reference/geom_vector.html">geom_vector()</a></code> and <code><a href="reference/geom_vector.html">geom_vector2()</a></code> also support polar coordinates, where vectors are specified using magnitude (<code>distance</code>) and direction (<code>angle</code>). Instead of providing Cartesian components (<code>fx</code>, <code>fy</code> or <code>xend</code>, <code>yend</code>), users can directly supply polar data. This feature simplifies workflows for directional data and works for all subsequent relevant functions that handle polar coordinates.</p>
+<p>Both <code><a href="reference/geom_vector.html">geom_vector()</a></code> and <code><a href="reference/geom_vector.html">geom_vector2()</a></code> also support polar coordinates, where vectors are specified using magnitude (<code>norm</code>, also accepted as <code>distance</code>) and direction (<code>angle</code>). Instead of providing Cartesian components (<code>fx</code>, <code>fy</code> or <code>xend</code>, <code>yend</code>), users can directly supply polar data. This feature simplifies workflows for directional data and works for all subsequent relevant functions that handle polar coordinates.</p>
 <p>Polar coordinates can be visualized like this:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, distance <span class="op">=</span> <span class="va">spd</span>, angle <span class="op">=</span> <span class="va">dir</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, norm <span class="op">=</span> <span class="va">spd</span>, angle <span class="op">=</span> <span class="va">dir</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-23-1.png" width="100%"></p>
 <p><strong>Normalize and Center</strong></p>
 <ul>
@@ -330,8 +328,8 @@
 </ul>
 <p>The example below turns off this default behavior:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span>, center <span class="op">=</span> <span class="cn">FALSE</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> </span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span>, center <span class="op">=</span> <span class="cn">FALSE</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-24-1.png" width="100%"></p>
 </div>
 </div>
@@ -345,9 +343,9 @@
 <code>geom_stream_smooth()</code><a class="anchor" aria-label="anchor" href="#geom_stream_smooth"></a>
 </h3>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">.5</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_stream_smooth.html">geom_stream_smooth</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
+<span>  <span class="fu"><a href="reference/geom_stream_smooth.html">geom_stream_smooth</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-25-1.png" width="100%"></p>
 </div>
 <div class="section level3">
@@ -355,26 +353,24 @@
 <code>geom_vector_smooth()</code><a class="anchor" aria-label="anchor" href="#geom_vector_smooth"></a>
 </h3>
 <p>Provides smoothed estimates of vector fields by applying statistical techniques to observed vectors.</p>
-<p>Smoothing is performed using a multivariate linear model defined by:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mover><mrow><mi>d</mi><mi>x</mi></mrow><mo accent="true">̂</mo></mover></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mover><mrow><mi>d</mi><mi>y</mi></mrow><mo accent="true">̂</mo></mover></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><mi>x</mi><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><mi>y</mi><mo>+</mo><msub><mi>β</mi><mn>3</mn></msub><mi>x</mi><mi>y</mi></mrow><annotation encoding="application/x-tex">
-\begin{pmatrix}
+<p>By default (<code>method = "gam"</code>), each component of the vector field is smoothed with a generalized additive model using a thin plate spline in <code>x</code> and <code>y</code>. With <code>method = "lm"</code>, smoothing is performed using a multivariate linear model, by default:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mover><mrow><mi>d</mi><mi>x</mi></mrow><mo accent="true">̂</mo></mover></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mover><mrow><mi>d</mi><mi>y</mi></mrow><mo accent="true">̂</mo></mover></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><mi>x</mi><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><mi>y</mi><mo>+</mo><msub><mi>β</mi><mn>3</mn></msub><mi>x</mi><mi>y</mi></mrow><annotation encoding="application/x-tex">\begin{pmatrix}
 \hat{dx} \\
 \hat{dy}
-\end{pmatrix} = \beta_0 + \beta_1 x + \beta_2 y + \beta_3 xy
-</annotation></semantics></math></p>
-<p>where <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math> are coefficients estimated by ordinary least squares (OLS). This approach captures linear and interaction effects to approximate the underlying vector field. This function also creates a prediction interval around the vector specified by the <code>conf_level</code> argument and defaults to <code>.95</code>.</p>
+\end{pmatrix} = \beta_0 + \beta_1 x + \beta_2 y + \beta_3 xy</annotation></semantics></math></p>
+<p>where <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math> are coefficients estimated by ordinary least squares (OLS), and the model can be changed with the <code>formula</code> argument. This approach captures linear and interaction effects to approximate the underlying vector field. This function also creates a prediction interval around the vector specified by the <code>conf_level</code> argument and defaults to <code>.95</code>.</p>
 <ul>
 <li>
 <strong>Evaluating Specific Points</strong>:</li>
 </ul>
 <p>When evaluation points are provided, smoothing is performed at those locations and prediction intervals can be visualized using either wedges or ellipses to indicate uncertainty.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">eval_point</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">.5</span>, y <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span> </span>
+<code class="sourceCode R"><span><span class="va">eval_point</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">.5</span>, y <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span> </span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span>normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span>eval_points <span class="op">=</span> <span class="va">eval_point</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html">lims</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">7</span>,<span class="fl">10</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html" class="external-link">lims</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">7</span>,<span class="fl">10</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Removed 2 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_stream()`).</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-26-1.png" width="100%"></p>
@@ -383,7 +379,7 @@
 <strong>Using Wedges to Visualize Uncertainty</strong>:</li>
 </ul>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span>normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span>eval_points <span class="op">=</span> <span class="va">eval_point</span>, pi_type <span class="op">=</span> <span class="st">"wedge"</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-27-1.png" width="100%"></p>
@@ -392,7 +388,7 @@
 <strong>Grid-Based Smoothing</strong>:</li>
 </ul>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span>pi_type <span class="op">=</span> <span class="st">"wedge"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-28-1.png" width="100%"></p>
@@ -401,7 +397,7 @@
 <strong>Custom Grid Resolution</strong>:</li>
 </ul>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">6</span>, pi_type <span class="op">=</span> <span class="st">"wedge"</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-29-1.png" width="100%"></p>
 <ul>
@@ -409,7 +405,7 @@
 </ul>
 <p>For all options, you can change the confidence level from the default to another value by using the <code>conf_level</code> argument.</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span>normalize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span>eval_points <span class="op">=</span> <span class="va">eval_point</span>, pi_type <span class="op">=</span> <span class="st">"wedge"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector_smooth.html">geom_vector_smooth</a></span><span class="op">(</span>eval_points <span class="op">=</span> <span class="va">eval_point</span>, pi_type <span class="op">=</span> <span class="st">"wedge"</span>, conf_level <span class="op">=</span> <span class="fl">.7</span><span class="op">)</span> </span></code></pre></div>
@@ -428,15 +424,15 @@
 <span>  <span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="va">grid_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html">expand.grid</a></span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span>, length.out <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
-<span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span>, length.out <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span>
+<span><span class="va">grid_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span>, length.out <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
+<span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span>, length.out <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span><span class="va">grid_data</span><span class="op">$</span><span class="va">z</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="va">grid_data</span>, <span class="fl">1</span>, <span class="va">f1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">grid_data</span><span class="op">)</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span><span class="va">grid_data</span><span class="op">$</span><span class="va">z</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">grid_data</span>, <span class="fl">1</span>, <span class="va">f1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">grid_data</span><span class="op">)</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">grid_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, z <span class="op">=</span> <span class="va">z</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">grid_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, z <span class="op">=</span> <span class="va">z</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_gradient_smooth.html">geom_gradient_smooth</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-31-1.png" width="100%"></p>
 <p>To illustrate how <code><a href="reference/geom_gradient_smooth.html">geom_gradient_smooth()</a></code> can adapt to nonlinear surfaces, we can change the formula used to fit the scalar field and switch to a streamline visualization using <code>type = "stream"</code>. The example below uses a smooth but noisy scalar function that generates curved gradients and fits a flexible smoothing model to capture these variations.</p>
@@ -444,13 +440,13 @@
 <code class="sourceCode R"><span><span class="va">h1</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">u</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">u</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">u</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">sin</a></span><span class="op">(</span><span class="va">x</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html">cos</a></span><span class="op">(</span><span class="va">y</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="va">x</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">cos</a></span><span class="op">(</span><span class="va">y</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="va">grid_data</span><span class="op">$</span><span class="va">z</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html">apply</a></span><span class="op">(</span><span class="va">grid_data</span>, <span class="fl">1</span>, <span class="va">h1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">grid_data</span><span class="op">)</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">grid_data</span><span class="op">$</span><span class="va">z</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">grid_data</span>, <span class="fl">1</span>, <span class="va">h1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">grid_data</span><span class="op">)</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">grid_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, z <span class="op">=</span> <span class="va">z</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="reference/geom_gradient_smooth.html">geom_gradient_smooth</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">z</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="va">y</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">5</span>, type <span class="op">=</span> <span class="st">"stream"</span><span class="op">)</span> </span></code></pre></div>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">grid_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, z <span class="op">=</span> <span class="va">z</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="reference/geom_gradient_smooth.html">geom_gradient_smooth</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">z</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">y</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">5</span>, type <span class="op">=</span> <span class="st">"stream"</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-32-1.png" width="100%"></p>
 </div>
 </div>
@@ -462,7 +458,7 @@
 </h3>
 <p>These functions can automatically determine plot limits based on the function provided. This happens when data exists in previous layers or in the base ggplot object. This allows the limits to be inferred from context. Customize limits with the <code>xlim</code> and <code>ylim</code> parameters if needed for more control.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">wind_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">lon</span>, y <span class="op">=</span> <span class="va">lat</span>, fx <span class="op">=</span> <span class="va">fx</span>, fy <span class="op">=</span> <span class="va">fy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_vector.html">geom_vector</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_stream_field.html">geom_stream_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span><span class="op">)</span> <span class="co"># Automatically determines limits based on existing data</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-33-1.png" width="100%"></p>
@@ -472,14 +468,14 @@
 </h3>
 <p>The <code>geom_*_field</code> functions allow the user to plot with custom evaluation locations. The user can specify specific points to be evaluated over the field or can also use a “hex” pattern.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_stream_field.html">geom_stream_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, grid <span class="op">=</span> <span class="st">"hex"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-34-1.png" width="100%"></p>
 <p>This shows a custom grid.</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">custom</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span>,<span class="fl">5</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">custom</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span>,<span class="fl">5</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="reference/geom_stream_field.html">geom_stream_field</a></span><span class="op">(</span>fun <span class="op">=</span> <span class="va">f</span>, grid <span class="op">=</span> <span class="va">custom</span>, normalize <span class="op">=</span> <span class="cn">FALSE</span>, center <span class="op">=</span> <span class="cn">FALSE</span>, L <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-35-1.png" width="100%"></p>
 </div>
@@ -492,29 +488,29 @@
 <div class="section level2">
 <h2 id="contact">Contact<a class="anchor" aria-label="anchor" href="#contact"></a>
 </h2>
-<p>For questions or feedback, please <a href="https://github.com/dusty-turner/ggvfields/issues/new">open an issue</a>.</p>
+<p>For questions or feedback, please <a href="https://github.com/dusty-turner/ggvfields/issues/new" class="external-link">open an issue</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="related-projects">Related Projects<a class="anchor" aria-label="anchor" href="#related-projects"></a>
 </h2>
 <ul>
 <li>
-<a href="https://github.com/eliocamp/metR/blob/master/R/geom_streamline.R">metR</a>: Meteorological visualizations with tools for vector fields.</li>
+<a href="https://github.com/eliocamp/metR/blob/master/R/geom_streamline.R" class="external-link">metR</a>: Meteorological visualizations with tools for vector fields.</li>
 <li>
-<a href="https://github.com/pepijn-devries/ggfields">ggfields</a>: Vector field layers similar to <code>geom_spoke</code>.</li>
+<a href="https://github.com/pepijn-devries/ggfields" class="external-link">ggfields</a>: Vector field layers similar to <code>geom_spoke</code>.</li>
 <li>
-<a href="http://pkg.mitchelloharawild.com/ggquiver/">ggquiver</a>: Quiver plots for vector fields.</li>
+<a href="http://pkg.mitchelloharawild.com/ggquiver/" class="external-link">ggquiver</a>: Quiver plots for vector fields.</li>
 <li>
-<a href="https://github.com/mdhall272/ggarchery">ggarchery</a>: Arrow segment visualizations.</li>
+<a href="https://github.com/mdhall272/ggarchery" class="external-link">ggarchery</a>: Arrow segment visualizations.</li>
 </ul>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li><a href="https://cloud.r-project.org/package=ggvfields">View on CRAN</a></li>
-<li><a href="https://github.com/dusty-turner/ggvfields/">Browse source code</a></li>
-<li><a href="https://github.com/dusty-turner/ggvfields/issues">Report a bug</a></li>
+<li><a href="https://cloud.r-project.org/package=ggvfields" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/dusty-turner/ggvfields/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/dusty-turner/ggvfields/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
@@ -522,7 +518,7 @@
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
 
@@ -554,7 +550,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
